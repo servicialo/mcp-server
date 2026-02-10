@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -77,6 +78,7 @@ export default function RootLayout({
       <body className="bg-bg text-text font-sans antialiased">
         <Navbar />
         <main>{children}</main>
+        <Analytics />
       </body>
     </html>
   );
