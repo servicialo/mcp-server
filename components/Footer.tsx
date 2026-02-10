@@ -10,10 +10,7 @@ export function Footer() {
         </div>
       </div>
       <div className="font-mono text-[11px] text-text-dim">
-        Ecosistema:{" "}
-        <span className="text-text-muted">Servicialo</span> →{" "}
-        <span className="text-accent">Coordinalo</span> →{" "}
-        <span className="text-purple">Orquestalo</span>
+        Estándar abierto — libre para implementar
       </div>
     </footer>
   );

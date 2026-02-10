@@ -3,7 +3,7 @@ import { SectionTitle } from "./SectionTitle";
 const cards = [
   {
     title: "Implementadores",
-    desc: "Construye productos sobre el estándar. Coordinalo es la primera implementación.",
+    desc: "Construye productos sobre el estándar. Crea tu propia implementación.",
     icon: "\u{1F528}",
     label: "Construir",
   },
