@@ -10,7 +10,10 @@ export function Footer() {
         </div>
       </div>
       <div className="font-mono text-[11px] text-text-dim">
-        Estándar abierto — libre para implementar
+        Un estándar de{" "}
+        <a href="https://grupodigitalo.com" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent transition-colors">
+          Grupo Digitalo
+        </a>
       </div>
     </footer>
   );
