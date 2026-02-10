@@ -27,7 +27,7 @@ export const SERVICE_ORIGINS = [
     examples: [
       { asset: "Experiencia en tributación", service: "Asesoría tributaria", ref: "" },
       { asset: "Red de contactos en industria X", service: "Búsqueda de talento / reclutamiento", ref: "" },
-      { asset: "Certificación en kinesiología", service: "Rehabilitación deportiva", ref: "Tu clínica piloto" },
+      { asset: "Certificación en kinesiología", service: "Rehabilitación deportiva", ref: "" },
       { asset: "Dominio de un idioma", service: "Traducción / interpretación", ref: "" },
       { asset: "Experiencia en marketing digital", service: "Consultoría de crecimiento", ref: "" },
       { asset: "Conocimiento regulatorio", service: "Cumplimiento normativo como servicio", ref: "" },
