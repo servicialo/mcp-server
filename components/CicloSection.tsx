@@ -6,15 +6,15 @@ import { LIFECYCLE_STATES } from "@/lib/data";
 
 const EXCEPTIONS = [
   {
-    title: "No-show cliente",
+    title: "Inasistencia del cliente",
     transition: "Confirmado → Cancelado",
-    desc: "Cobra penalidad según política, libera slot del provider para reasignación.",
+    desc: "Cobra penalidad según política, libera horario del proveedor para reasignación.",
     borderColor: "border-l-rose-500",
   },
   {
-    title: "No-show provider",
-    transition: "Confirmado → Re-matching",
-    desc: "Reasigna provider automáticamente, notifica al cliente del cambio.",
+    title: "Inasistencia del proveedor",
+    transition: "Confirmado → Reasignación",
+    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio.",
     borderColor: "border-l-amber-500",
   },
   {
@@ -31,8 +31,8 @@ const EXCEPTIONS = [
   },
   {
     title: "Reagendamiento",
-    transition: "Agendado/Confirmado → Re-scheduling",
-    desc: "Busca nuevo slot compatible para ambas partes, mantiene el mismo provider.",
+    transition: "Agendado/Confirmado → Reagendando",
+    desc: "Busca nuevo horario compatible para ambas partes, mantiene el mismo proveedor.",
     borderColor: "border-l-cyan-500",
   },
   {
@@ -55,12 +55,12 @@ export function CicloSection() {
         subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
       />
 
-      {/* Interactive lifecycle stepper */}
-      <div className="bg-dark rounded-[20px] p-5 md:p-7 text-white">
-        {/* State indicators — scrollable on mobile */}
-        <div className="flex items-center gap-0 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
+      {/* Stepper interactivo del ciclo de vida */}
+      <div className="bg-dark rounded-2xl p-4 md:p-7 text-white">
+        {/* Indicadores — grid en mobile, línea en desktop */}
+        <div className="grid grid-cols-5 gap-2 md:flex md:items-center md:gap-0 mb-6">
           {LIFECYCLE_STATES.map((s, i) => (
-            <div key={s.id} className="flex items-center shrink-0">
+            <div key={s.id} className="flex items-center justify-center md:justify-start shrink-0">
               <button
                 onClick={() => setActive(i)}
                 className={`w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-semibold transition-all duration-200 border-2 ${
@@ -75,7 +75,7 @@ export function CicloSection() {
               </button>
               {i < LIFECYCLE_STATES.length - 1 && (
                 <div
-                  className={`w-6 h-0.5 transition-colors duration-300 ${
+                  className={`hidden md:block w-6 h-0.5 transition-colors duration-300 ${
                     i < active ? "bg-green/40" : "bg-[#333]"
                   }`}
                 />
@@ -84,20 +84,20 @@ export function CicloSection() {
           ))}
         </div>
 
-        {/* Active state detail */}
+        {/* Detalle del estado activo */}
         <div>
           <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1.5">
             Estado {active + 1} de {LIFECYCLE_STATES.length}
           </div>
-          <div className="font-serif text-[28px] text-white mb-2.5">
+          <div className="font-serif text-2xl md:text-[28px] text-white mb-2.5">
             {state.label}
           </div>
-          <div className="text-[15px] text-[#999] leading-[1.7] max-w-[560px]">
+          <div className="text-sm md:text-[15px] text-[#999] leading-[1.7]">
             {state.desc}
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* Navegación */}
         <div className="flex gap-2 mt-5">
           <button
             onClick={() => setActive(Math.max(0, active - 1))}
@@ -127,7 +127,7 @@ export function CicloSection() {
       </div>
 
       {/* ¿Por qué 9 estados? */}
-      <div className="mt-5 bg-surface rounded-xl py-5 px-6 border border-border">
+      <div className="mt-5 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
           ¿Por qué 9 estados?
         </div>

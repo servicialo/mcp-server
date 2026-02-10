@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 
 const sections = [
-  { name: "Qué es un servicio", id: "que-es" },
-  { name: "Cómo nace", id: "origen" },
+  { name: "Definición", id: "que-es" },
+  { name: "Origen", id: "origen" },
   { name: "Anatomía", id: "anatomia" },
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Principios", id: "principios" },
-  { name: "El estándar", id: "estandar" },
+  { name: "Estándar", id: "estandar" },
 ];
 
 export function Navbar() {
@@ -52,13 +52,16 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur-md border-b border-border">
-      <div className="max-w-[800px] mx-auto px-6 md:px-8 h-[52px] flex items-center gap-8">
-        <a href="/" className="font-mono text-sm font-semibold tracking-tight shrink-0">
+      <div className="max-w-content mx-auto px-4 md:px-8 h-[52px] flex items-center justify-between">
+        <a
+          href="/"
+          className="font-mono text-sm font-semibold tracking-tight shrink-0"
+        >
           servicialo<span className="text-accent">.com</span>
         </a>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1 overflow-x-auto flex-1">
+        <div className="hidden md:flex items-center gap-0.5">
           {sections.map((section) => (
             <button
               key={section.id}
@@ -74,10 +77,10 @@ export function Navbar() {
           ))}
         </div>
 
-        {/* Hamburger button */}
+        {/* Menú hamburguesa — solo mobile */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden ml-auto w-8 h-8 flex flex-col items-center justify-center gap-1.5"
+          className="md:hidden w-8 h-8 flex flex-col items-center justify-center gap-1.5"
           aria-label="Menú"
         >
           <span
@@ -98,18 +101,18 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Menú desplegable mobile */}
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 border-t border-border ${
-          menuOpen ? "max-h-96" : "max-h-0 border-transparent"
+        className={`md:hidden overflow-hidden transition-all duration-300 ${
+          menuOpen ? "max-h-96 border-t border-border" : "max-h-0"
         }`}
       >
-        <div className="max-w-[800px] mx-auto px-6 py-3 flex flex-col gap-1">
+        <div className="max-w-content mx-auto px-4 py-3 flex flex-col gap-0.5">
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => handleClick(section.id)}
-              className={`font-mono text-[12px] px-3 py-2.5 text-left rounded-lg transition-colors ${
+              className={`font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors ${
                 activeId === section.id
                   ? "text-accent bg-accent-soft"
                   : "text-text-body hover:bg-surface-alt"

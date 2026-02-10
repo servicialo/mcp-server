@@ -49,8 +49,8 @@ export function OrigenSection() {
               }
               className={`rounded-2xl cursor-pointer transition-all duration-300 ${
                 isExpanded
-                  ? `${colors.soft} ${colors.border} border p-6`
-                  : "bg-surface border border-border p-5"
+                  ? `${colors.soft} ${colors.border} border p-4 md:p-6`
+                  : "bg-surface border border-border p-4 md:p-5"
               }`}
             >
               <div
@@ -58,9 +58,9 @@ export function OrigenSection() {
                   isExpanded ? "mb-4" : ""
                 }`}
               >
-                <span className="text-[32px]">{origin.emoji}</span>
-                <div className="flex-1">
-                  <div className="font-serif text-[22px] text-text">
+                <span className="text-2xl md:text-[32px]">{origin.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-lg md:text-[22px] text-text">
                     {origin.title}
                   </div>
                   <div className="text-sm text-text-muted mt-0.5">
@@ -80,7 +80,7 @@ export function OrigenSection() {
 
               {isExpanded && (
                 <div>
-                  <p className="text-[15px] text-text-body leading-[1.7] mb-5">
+                  <p className="text-sm md:text-[15px] text-text-body leading-[1.7] mb-4 md:mb-5">
                     {origin.desc}
                   </p>
 
@@ -93,13 +93,13 @@ export function OrigenSection() {
                     >
                       Pregunta clave
                     </div>
-                    <div className="font-serif text-xl text-text leading-[1.4]">
+                    <div className="font-serif text-lg md:text-xl text-text leading-[1.4]">
                       {origin.keyQuestion}
                     </div>
                   </div>
 
                   {/* Fórmula */}
-                  <div className="font-mono text-[13px] text-text-body bg-surface-alt rounded-lg py-3 px-4 text-center mb-5 tracking-[0.02em]">
+                  <div className="font-mono text-[12px] md:text-[13px] text-text-body bg-surface-alt rounded-lg py-3 px-4 text-center mb-4 md:mb-5 tracking-[0.02em]">
                     {origin.formula}
                   </div>
 
@@ -133,12 +133,12 @@ export function OrigenSection() {
         })}
       </div>
 
-      {/* Insight final */}
-      <div className="mt-6 bg-accent-soft rounded-xl py-5 px-6 border-l-[3px] border-l-accent">
+      {/* Dato clave */}
+      <div className="mt-6 bg-accent-soft rounded-xl py-4 px-4 md:py-5 md:px-6 border-l-[3px] border-l-accent">
         <div className="font-mono text-[11px] text-accent font-semibold uppercase tracking-[0.08em] mb-2">
-          Insight
+          Dato clave
         </div>
-        <div className="text-[15px] text-text-body leading-[1.7]">
+        <div className="text-sm md:text-[15px] text-text-body leading-[1.7]">
           Los servicios más valiosos combinan dos o tres fuentes. Un kinesiólogo
           usa su <strong>ventaja</strong> (certificación + experiencia) aplicada
           en su <strong>tiempo</strong>, a veces con un{" "}

@@ -5,19 +5,19 @@ const cards = [
     title: "Implementadores",
     desc: "Construye productos sobre el estándar. Coordinalo es la primera implementación.",
     icon: "\u{1F528}",
-    label: "Build",
+    label: "Construir",
   },
   {
-    title: "Providers",
+    title: "Proveedores",
     desc: "Ofrece servicios en un formato que agentes AI entienden y pueden coordinar.",
     icon: "\u{1F3AF}",
-    label: "Offer",
+    label: "Ofrecer",
   },
   {
     title: "Agentes AI",
     desc: "Descubre, agenda y verifica servicios con un protocolo estandarizado.",
     icon: "\u{1F916}",
-    label: "Connect",
+    label: "Conectar",
   },
 ];
 
@@ -33,7 +33,7 @@ function Line({ children }: { children: React.ReactNode }) {
 
 function SchemaBlock() {
   return (
-    <pre className="font-mono text-xs leading-[2] m-0 overflow-x-auto">
+    <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
       <Line><span className={a}>service:</span></Line>
       <Line>  <span className={k}>id:</span> <span className={t}>string</span>                  <span className={c}># Identificador único</span></Line>
       <Line>  <span className={k}>type:</span> <span className={t}>string</span>                <span className={c}># Categoría del servicio</span></Line>
@@ -46,7 +46,7 @@ function SchemaBlock() {
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>client:</span></Line>
       <Line>    <span className={k}>id:</span> <span className={t}>string</span></Line>
-      <Line>    <span className={k}>payer_id:</span> <span className={t}>string</span>          <span className={c}># Puede diferir del client</span></Line>
+      <Line>    <span className={k}>payer_id:</span> <span className={t}>string</span>          <span className={c}># Puede diferir del cliente</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>scheduling:</span></Line>
       <Line>    <span className={k}>requested_at:</span> <span className={t}>datetime</span></Line>
@@ -57,13 +57,13 @@ function SchemaBlock() {
       <Line>  <span className={a}>lifecycle:</span></Line>
       <Line>    <span className={k}>current_state:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
       <Line>    <span className={k}>transitions:</span> <span className={t}>transition[]</span> <span className={c}># Historial de cambios</span></Line>
-      <Line>    <span className={k}>exceptions:</span> <span className={t}>exception[]</span>   <span className={c}># No-shows, disputas, etc</span></Line>
+      <Line>    <span className={k}>exceptions:</span> <span className={t}>exception[]</span>   <span className={c}># Inasistencias, disputas, etc</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>delivery_proof:</span></Line>
       <Line>    <span className={k}>checkin:</span> <span className={t}>datetime</span></Line>
       <Line>    <span className={k}>checkout:</span> <span className={t}>datetime</span></Line>
       <Line>    <span className={k}>duration_actual:</span> <span className={t}>minutes</span></Line>
-      <Line>    <span className={k}>evidence:</span> <span className={t}>evidence[]</span>      <span className={c}># GPS, firma, fotos, docs</span></Line>
+      <Line>    <span className={k}>evidence:</span> <span className={t}>evidence[]</span>      <span className={c}># GPS, firma, fotos, documentos</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>documentation:</span></Line>
       <Line>    <span className={k}>record_type:</span> <span className={t}>string</span>       <span className={c}># Ficha clínica, minuta, reporte</span></Line>
@@ -84,14 +84,14 @@ export function EstandarSection() {
     <section id="estandar" className="mb-16">
       <SectionTitle
         tag="06 — El estándar"
-        title="Service Delivery Protocol"
+        title="Protocolo de Entrega de Servicios"
         subtitle="Cualquiera puede implementarlo."
       />
 
       {/* Schema block */}
-      <div className="bg-dark rounded-[20px] py-8 px-9 text-white mb-4">
+      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Service Delivery Protocol v0.1
+          Protocolo de Entrega de Servicios v0.1
         </div>
         <SchemaBlock />
       </div>

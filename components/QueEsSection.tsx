@@ -18,7 +18,7 @@ const comparisons = [
     emoji: "\u{26A1}",
     traits: [
       "Se consume al entregarse",
-      "Es irrepetible",
+      "Cada instancia es única",
       "Requiere presencia",
       "Se verifica, no se rastrea",
       "Existe solo en el momento",
@@ -26,13 +26,14 @@ const comparisons = [
     highlight: true,
   },
   {
-    title: "Combinado",
-    emoji: "\u{1F517}",
+    title: "Experiencia",
+    emoji: "\u{2728}",
     traits: [
-      "Instalación",
-      "Reparación con repuestos",
-      "Consulta + medicamento",
-      "El futuro del comercio",
+      "Se diseña para ser memorable",
+      "Involucra los sentidos",
+      "Genera conexión emocional",
+      "Viajes, gastronomía, eventos",
+      "Todo servicio puede serlo",
     ],
     highlight: false,
   },
@@ -48,15 +49,15 @@ export function QueEsSection() {
       />
 
       {/* Definición — blockquote */}
-      <blockquote className="border-l-[3px] border-l-accent pl-6 py-1 mb-6">
-        <p className="font-serif text-2xl text-text leading-[1.5]">
+      <blockquote className="border-l-[3px] border-l-accent pl-4 md:pl-6 py-1 mb-6">
+        <p className="font-serif text-xl md:text-2xl text-text leading-[1.5]">
           Un servicio es una promesa de transformación entregada en un momento y
           lugar específico.
         </p>
       </blockquote>
 
       {/* Explicación */}
-      <p className="text-[15px] text-text-body leading-[1.8] max-w-[640px] mb-10">
+      <p className="text-sm md:text-[15px] text-text-body leading-[1.8] mb-8 md:mb-10">
         A diferencia de un producto, un servicio no se puede almacenar,
         revender ni devolver. Se consume en el momento en que se entrega. Eso
         lo hace fundamentalmente diferente — y es por eso que necesita su

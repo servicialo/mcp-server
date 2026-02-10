@@ -14,7 +14,7 @@ export function PrincipiosSection() {
         {PRINCIPLES.map((p, i) => (
           <div
             key={i}
-            className="bg-surface rounded-[14px] py-[22px] px-6 border border-border transition-shadow duration-200 hover:shadow-sm"
+            className="bg-surface rounded-[14px] py-4 px-4 md:py-[22px] md:px-6 border border-border transition-shadow duration-200 hover:shadow-sm"
           >
             <div className="font-mono text-[10px] text-accent mb-2 uppercase tracking-[0.1em]">
               Principio {String(i + 1).padStart(2, "0")}

@@ -14,7 +14,7 @@ export function AnatomiaSection() {
         {ANATOMY.map((item, i) => (
           <div
             key={item.field}
-            className={`rounded-[10px] py-4 px-5 items-start ${
+            className={`rounded-[10px] py-3 px-4 md:py-4 md:px-5 items-start ${
               i % 2 === 0
                 ? "bg-surface border border-border-light"
                 : "border border-transparent"

@@ -1,6 +1,6 @@
 export function Footer() {
   return (
-    <footer className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <footer className="border-t border-border pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-4">
       <div>
         <div className="font-mono text-[13px] font-semibold text-text">
           servicialo<span className="text-accent">.com</span>
