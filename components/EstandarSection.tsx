@@ -24,7 +24,7 @@ const cards = [
 // Syntax highlighting colors
 const k = "text-[#7EC8E3]";  // keys — celeste
 const t = "text-[#E5C07B]";  // types — amarillo suave
-const c = "text-[#5C6370]";  // comments — gris
+const c = "text-[#5C6370] hidden md:inline";  // comments — gris, ocultos en mobile
 const a = "text-accent";      // section keys — accent
 
 function Line({ children }: { children: React.ReactNode }) {
