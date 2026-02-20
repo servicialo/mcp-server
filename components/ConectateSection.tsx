@@ -27,7 +27,7 @@ const c = "text-[#5C6370]";
 function DiscoveryBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <div><span className={c}>{"// Sin credenciales — modo discovery"}</span></div>
+      <div><span className={c}>{"// Sin credenciales — modo descubrimiento"}</span></div>
       <div><span className={s}>npx -y @servicialo/mcp-server</span></div>
     </pre>
   );
@@ -71,20 +71,14 @@ export function ConectateSection() {
     <section id="mcp-server" className="mb-16">
       <SectionTitle
         tag="07 — Servidor MCP"
-        title="AI-native por diseño"
+        title="Hecho para agentes"
         subtitle="Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa."
       />
 
       {/* Intro block */}
       <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
-        <div className="font-mono text-[10px] text-accent uppercase tracking-[0.1em] mb-2">
-          Namespace
-        </div>
-        <div className="font-mono text-[13px] text-text mb-4">
-          com.servicialo/professional-services
-        </div>
         <div className="text-[13px] text-text-muted leading-relaxed mb-3">
-          Para developers que construyen AI agents que necesitan interactuar con
+          Para desarrolladores que construyen agentes de IA que necesitan interactuar con
           organizaciones de servicios profesionales: agendar citas, consultar
           disponibilidad, gestionar clientes.
         </div>
@@ -94,54 +88,51 @@ export function ConectateSection() {
         </div>
       </div>
 
-      {/* Two modes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-        {/* Discovery mode */}
-        <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-6 text-white">
-          <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
-            Modo discovery
-          </div>
-          <div className="font-mono text-[10px] text-white/40 mb-4">
-            Sin credenciales — 4 herramientas públicas
-          </div>
-          <DiscoveryBlock />
-          <div className="mt-5 pt-5 border-t border-white/10 grid gap-1">
-            {publicTools.map((t) => (
-              <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
-            ))}
-          </div>
+      {/* Discovery mode */}
+      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
+        <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
+          Modo descubrimiento
         </div>
+        <div className="font-mono text-[10px] text-white/40 mb-4">
+          Sin credenciales — 4 herramientas públicas
+        </div>
+        <DiscoveryBlock />
+        <div className="mt-5 pt-5 border-t border-white/10 grid gap-1.5">
+          {publicTools.map((t) => (
+            <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
+          ))}
+        </div>
+      </div>
 
-        {/* Authenticated mode */}
-        <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-6 text-white">
-          <div className="flex items-center justify-between mb-1">
-            <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em]">
-              Modo autenticado
-            </div>
-            <a
-              href="https://www.npmjs.com/package/@servicialo/mcp-server"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
-            >
-              npm &rarr;
-            </a>
+      {/* Authenticated mode */}
+      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
+        <div className="flex items-center justify-between mb-1">
+          <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em]">
+            Modo autenticado
           </div>
-          <div className="font-mono text-[10px] text-white/40 mb-4">
-            Con credenciales — 23 herramientas totales
-          </div>
-          <AuthenticatedBlock />
-          <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
-            Las credenciales las obtiene cada organización desde la plataforma
-            Servicialo-compatible que utilice.
-          </div>
-          <div className="mt-5 pt-5 border-t border-white/10 grid gap-1">
-            {authenticatedTools.map((t) => (
-              <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
-            ))}
-            <div className="font-mono text-[10px] text-white/25 mt-1">
-              + 10 herramientas más (pagos, proveedores, nóminas)
-            </div>
+          <a
+            href="https://www.npmjs.com/package/@servicialo/mcp-server"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
+          >
+            npm &rarr;
+          </a>
+        </div>
+        <div className="font-mono text-[10px] text-white/40 mb-4">
+          Con credenciales — 23 herramientas totales
+        </div>
+        <AuthenticatedBlock />
+        <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
+          Las credenciales las obtiene cada organización desde la plataforma
+          Servicialo-compatible que utilice.
+        </div>
+        <div className="mt-5 pt-5 border-t border-white/10 grid gap-1.5">
+          {authenticatedTools.map((t) => (
+            <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
+          ))}
+          <div className="font-mono text-[10px] text-white/25 mt-1">
+            + 10 herramientas más (pagos, proveedores, nóminas)
           </div>
         </div>
       </div>
