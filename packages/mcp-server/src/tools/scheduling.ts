@@ -12,22 +12,44 @@ const ActorSchema = z.object({
 
 export const schedulingTools = {
   'scheduling.check_availability': {
-    description: 'Consulta los horarios disponibles de un proveedor para un servicio en un rango de fechas',
+    description: 'Consulta los horarios disponibles para agendar una sesión en un rango de fechas',
     schema: z.object({
-      provider_id: z.string().describe('ID del proveedor'),
-      service_id: z.string().describe('ID del servicio'),
-      date_range: z.object({
-        from: z.string().describe('Fecha inicio (ISO date, ej: 2025-03-01)'),
-        to: z.string().describe('Fecha fin (ISO date, ej: 2025-03-07)'),
-      }),
+      provider_id: z.string().optional().describe('ID del proveedor (opcional, filtra por profesional)'),
+      service_id: z.string().optional().describe('ID del servicio (opcional)'),
+      date_from: z.string().describe('Fecha inicio (ISO date, ej: 2025-03-01)'),
+      date_to: z.string().describe('Fecha fin (ISO date, ej: 2025-03-07)'),
     }),
-    handler: async (client: CoordinaloClient, args: { provider_id: string; service_id: string; date_range: { from: string; to: string } }) => {
-      const result = await client.get(`/api/v1/providers/${args.provider_id}/slots`, {
-        service_id: args.service_id,
-        from: args.date_range.from,
-        to: args.date_range.to,
+    handler: async (client: CoordinaloClient, args: { provider_id?: string; service_id?: string; date_from: string; date_to: string }) => {
+      return client.get('/coordinalo/availability/slots', {
+        providerId: args.provider_id,
+        serviceId: args.service_id,
+        from: args.date_from,
+        to: args.date_to,
       });
-      return result;
+    },
+  },
+
+  'scheduling.list_sessions': {
+    description: 'Lista sesiones con filtros por fecha, proveedor, cliente o estado',
+    schema: z.object({
+      date_from: z.string().optional().describe('Fecha inicio (ISO date)'),
+      date_to: z.string().optional().describe('Fecha fin (ISO date)'),
+      provider_id: z.string().optional().describe('Filtrar por proveedor'),
+      client_id: z.string().optional().describe('Filtrar por cliente'),
+      status: z.string().optional().describe('Filtrar por estado (scheduled, completed, cancelled)'),
+      limit: z.number().default(20).describe('Resultados por página'),
+      page: z.number().default(1).describe('Número de página'),
+    }),
+    handler: async (client: CoordinaloClient, args: { date_from?: string; date_to?: string; provider_id?: string; client_id?: string; status?: string; limit?: number; page?: number }) => {
+      return client.get('/coordinalo/sessions', {
+        from: args.date_from,
+        to: args.date_to,
+        providerId: args.provider_id,
+        clientId: args.client_id,
+        status: args.status,
+        limit: args.limit ?? 20,
+        page: args.page ?? 1,
+      });
     },
   },
 
@@ -41,14 +63,13 @@ export const schedulingTools = {
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
     handler: async (client: CoordinaloClient, args: { service_id: string; provider_id: string; client_id: string; starts_at: string; actor: z.infer<typeof ActorSchema> }) => {
-      const result = await client.post('/api/v1/sessions', {
+      return client.post('/coordinalo/sessions', {
         serviceId: args.service_id,
         providerId: args.provider_id,
         clientId: args.client_id,
         startTime: args.starts_at,
         actor: args.actor,
       });
-      return result;
     },
   },
 
@@ -60,11 +81,10 @@ export const schedulingTools = {
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
     handler: async (client: CoordinaloClient, args: { session_id: string; new_datetime: string; actor: z.infer<typeof ActorSchema> }) => {
-      const result = await client.put(`/api/v1/sessions/${args.session_id}`, {
+      return client.put(`/coordinalo/sessions/${args.session_id}`, {
         startTime: args.new_datetime,
         actor: args.actor,
       });
-      return result;
     },
   },
 
@@ -76,11 +96,10 @@ export const schedulingTools = {
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
     handler: async (client: CoordinaloClient, args: { session_id: string; reason?: string; actor: z.infer<typeof ActorSchema> }) => {
-      const result = await client.post(`/api/v1/sessions/${args.session_id}/cancel`, {
+      return client.post(`/coordinalo/sessions/${args.session_id}/cancel`, {
         reason: args.reason,
         actor: args.actor,
       });
-      return result;
     },
   },
 };

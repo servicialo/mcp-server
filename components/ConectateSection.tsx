@@ -16,16 +16,18 @@ const steps = [
   {
     icon: "\u{1F916}",
     label: "Conectar",
-    title: "11 herramientas",
-    desc: "Agendamiento, clientes, pagos y notificaciones. Listas para tu agente AI.",
+    title: "19 herramientas",
+    desc: "Agendamiento, clientes, pagos, profesionales y nóminas. Listas para tu agente AI.",
   },
 ];
 
 const tools = [
-  { group: "scheduling", items: ["check_availability", "book", "reschedule", "cancel"] },
-  { group: "clients", items: ["list", "get", "create"] },
-  { group: "payments", items: ["get_balance", "charge", "record"] },
-  { group: "notifications", items: ["send"] },
+  { group: "scheduling", items: ["check_availability", "list_sessions", "book", "reschedule", "cancel"] },
+  { group: "clients", items: ["list", "get", "create", "history"] },
+  { group: "payments", items: ["list_sales", "create_sale", "record_payment", "client_balance"] },
+  { group: "providers", items: ["list", "get", "get_commission"] },
+  { group: "payroll", items: ["calculate", "history", "settlement_detail", "vacations", "request_vacation"] },
+  { group: "notifications", items: ["session_reminder", "payment_reminder"] },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -57,9 +59,9 @@ function ToolsList() {
   return (
     <div className="mt-6 pt-6 border-t border-white/10">
       <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-3">
-        11 Tools disponibles
+        19 Tools disponibles
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {tools.map((group) => (
           <div key={group.group}>
             <div className="font-mono text-[11px] text-white/60 mb-1">{group.group}</div>

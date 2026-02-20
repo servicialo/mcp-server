@@ -14,28 +14,26 @@ export const clientsTools = {
   'clients.list': {
     description: 'Lista los clientes de la organización con búsqueda y paginación',
     schema: z.object({
-      search: z.string().optional().describe('Texto para buscar por nombre, email o teléfono'),
-      limit: z.number().default(20).describe('Cantidad de resultados por página'),
+      search: z.string().optional().describe('Buscar por nombre, email o teléfono'),
+      limit: z.number().default(20).describe('Resultados por página'),
       page: z.number().default(1).describe('Número de página'),
     }),
     handler: async (client: CoordinaloClient, args: { search?: string; limit?: number; page?: number }) => {
-      const result = await client.get('/api/v1/clients', {
+      return client.get('/relacionalo/clients', {
         search: args.search,
         limit: args.limit ?? 20,
         page: args.page ?? 1,
       });
-      return result;
     },
   },
 
   'clients.get': {
-    description: 'Obtiene el detalle de un cliente incluyendo estadísticas (sesiones totales, monto gastado, última sesión)',
+    description: 'Obtiene el detalle de un cliente incluyendo historial y pagos pendientes',
     schema: z.object({
       client_id: z.string().describe('ID del cliente'),
     }),
     handler: async (client: CoordinaloClient, args: { client_id: string }) => {
-      const result = await client.get(`/api/v1/clients/${args.client_id}`);
-      return result;
+      return client.get(`/relacionalo/clients/${args.client_id}`);
     },
   },
 
@@ -49,14 +47,23 @@ export const clientsTools = {
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
     handler: async (client: CoordinaloClient, args: { name: string; last_name: string; email?: string; phone?: string; actor: z.infer<typeof ActorSchema> }) => {
-      const result = await client.post('/api/v1/clients', {
+      return client.post('/relacionalo/clients', {
         name: args.name,
         lastName: args.last_name,
         email: args.email,
         phone: args.phone,
         actor: args.actor,
       });
-      return result;
+    },
+  },
+
+  'clients.history': {
+    description: 'Obtiene el historial de un cliente: sesiones pasadas, pagos y actividad',
+    schema: z.object({
+      client_id: z.string().describe('ID del cliente'),
+    }),
+    handler: async (client: CoordinaloClient, args: { client_id: string }) => {
+      return client.get(`/relacionalo/clients/${args.client_id}/history`);
     },
   },
 };

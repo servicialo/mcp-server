@@ -7,6 +7,8 @@ import { schedulingTools } from './tools/scheduling.js';
 import { clientsTools } from './tools/clients.js';
 import { paymentsTools } from './tools/payments.js';
 import { notificationsTools } from './tools/notifications.js';
+import { providersTools } from './tools/providers.js';
+import { payrollTools } from './tools/payroll.js';
 import type { z } from 'zod';
 
 // --- Validate env vars ---
@@ -34,7 +36,7 @@ const apiClient = new CoordinaloClient({
 // --- Init MCP server ---
 const server = new McpServer({
   name: 'servicialo',
-  version: '0.1.0',
+  version: '0.2.0',
 });
 
 // --- Register all tools ---
@@ -50,6 +52,8 @@ const allTools: Record<string, ToolDef> = {
   ...clientsTools as unknown as Record<string, ToolDef>,
   ...paymentsTools as unknown as Record<string, ToolDef>,
   ...notificationsTools as unknown as Record<string, ToolDef>,
+  ...providersTools as unknown as Record<string, ToolDef>,
+  ...payrollTools as unknown as Record<string, ToolDef>,
 };
 
 for (const [name, tool] of Object.entries(allTools)) {

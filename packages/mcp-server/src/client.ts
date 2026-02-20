@@ -1,6 +1,7 @@
 /**
  * HTTP client for Coordinalo REST API.
  * Wraps native fetch with auth headers and base URL.
+ * All paths are prefixed with /api/organizations/{orgSlug}.
  */
 
 export interface ClientConfig {
@@ -20,16 +21,31 @@ export class CoordinaloClient {
     this.orgId = config.orgId;
   }
 
+  /** Base path for all org-scoped endpoints */
+  private orgPath(): string {
+    return `/api/organizations/${this.orgId}`;
+  }
+
   private headers(): Record<string, string> {
     return {
       'Authorization': `Bearer ${this.apiKey}`,
       'Content-Type': 'application/json',
-      'X-Org-Id': this.orgId,
     };
   }
 
+  /**
+   * Build full URL. If path starts with `/api/` it's used as-is (absolute).
+   * Otherwise it's appended to the org-scoped base path.
+   */
+  private buildUrl(path: string): string {
+    if (path.startsWith('/api/')) {
+      return `${this.baseUrl}${path}`;
+    }
+    return `${this.baseUrl}${this.orgPath()}${path}`;
+  }
+
   async get(path: string, params?: Record<string, string | number | undefined>): Promise<unknown> {
-    const url = new URL(`${this.baseUrl}${path}`);
+    const url = new URL(this.buildUrl(path));
     if (params) {
       for (const [key, value] of Object.entries(params)) {
         if (value !== undefined) {
@@ -52,7 +68,7 @@ export class CoordinaloClient {
   }
 
   async post(path: string, body?: unknown): Promise<unknown> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+    const res = await fetch(this.buildUrl(path), {
       method: 'POST',
       headers: this.headers(),
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -67,7 +83,7 @@ export class CoordinaloClient {
   }
 
   async put(path: string, body?: unknown): Promise<unknown> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+    const res = await fetch(this.buildUrl(path), {
       method: 'PUT',
       headers: this.headers(),
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -76,6 +92,35 @@ export class CoordinaloClient {
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`PUT ${path} failed (${res.status}): ${text}`);
+    }
+
+    return res.json();
+  }
+
+  async patch(path: string, body?: unknown): Promise<unknown> {
+    const res = await fetch(this.buildUrl(path), {
+      method: 'PATCH',
+      headers: this.headers(),
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`PATCH ${path} failed (${res.status}): ${text}`);
+    }
+
+    return res.json();
+  }
+
+  async delete(path: string): Promise<unknown> {
+    const res = await fetch(this.buildUrl(path), {
+      method: 'DELETE',
+      headers: this.headers(),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`DELETE ${path} failed (${res.status}): ${text}`);
     }
 
     return res.json();
