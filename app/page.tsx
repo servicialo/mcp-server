@@ -4,7 +4,6 @@ import { OrigenSection } from "@/components/OrigenSection";
 import { AnatomiaSection } from "@/components/AnatomiaSection";
 import { CicloSection } from "@/components/CicloSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
-import { DerivacionesSection } from "@/components/DerivacionesSection";
 import { EstandarSection } from "@/components/EstandarSection";
 import { ConectateSection } from "@/components/ConectateSection";
 import { Footer } from "@/components/Footer";
@@ -28,9 +27,6 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <PrincipiosSection />
-      </FadeIn>
-      <FadeIn>
-        <DerivacionesSection />
       </FadeIn>
       <FadeIn>
         <EstandarSection />
