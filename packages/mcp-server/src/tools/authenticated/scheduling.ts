@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../client.js';
+import type { CoordinaloClient } from '../../client.js';
 
 const ActorSchema = z.object({
   type: z.enum(['client', 'provider', 'organization', 'agent']),
@@ -11,24 +11,6 @@ const ActorSchema = z.object({
 });
 
 export const schedulingTools = {
-  'scheduling.check_availability': {
-    description: 'Consulta los horarios disponibles para agendar una sesión en un rango de fechas',
-    schema: z.object({
-      provider_id: z.string().optional().describe('ID del proveedor (opcional, filtra por profesional)'),
-      service_id: z.string().optional().describe('ID del servicio (opcional)'),
-      date_from: z.string().describe('Fecha inicio (ISO date, ej: 2025-03-01)'),
-      date_to: z.string().describe('Fecha fin (ISO date, ej: 2025-03-07)'),
-    }),
-    handler: async (client: CoordinaloClient, args: { provider_id?: string; service_id?: string; date_from: string; date_to: string }) => {
-      return client.get('/coordinalo/availability/slots', {
-        providerId: args.provider_id,
-        serviceId: args.service_id,
-        from: args.date_from,
-        to: args.date_to,
-      });
-    },
-  },
-
   'scheduling.list_sessions': {
     description: 'Lista sesiones con filtros por fecha, proveedor, cliente o estado',
     schema: z.object({

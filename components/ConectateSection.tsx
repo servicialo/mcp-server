@@ -1,17 +1,22 @@
 import { SectionTitle } from "./SectionTitle";
 
-const toolTable = [
+const publicTools = [
+  { tool: "registry.search", desc: "Buscar organizaciones por vertical y ubicación" },
+  { tool: "registry.get_organization", desc: "Detalle público de una organización" },
   { tool: "scheduling.check_availability", desc: "Consultar horarios disponibles" },
+  { tool: "services.list", desc: "Catálogo público de servicios" },
+];
+
+const authenticatedTools = [
   { tool: "scheduling.book", desc: "Agendar una sesión" },
   { tool: "scheduling.reschedule", desc: "Reagendar sesión existente" },
   { tool: "scheduling.cancel", desc: "Cancelar sesión" },
-  { tool: "clients.list", desc: "Listar clientes de la organización" },
-  { tool: "clients.get", desc: "Obtener detalle de un cliente" },
+  { tool: "clients.list", desc: "Listar clientes" },
+  { tool: "clients.get", desc: "Detalle de un cliente" },
   { tool: "clients.create", desc: "Crear nuevo cliente" },
-  { tool: "payments.get_balance", desc: "Consultar saldo de un cliente" },
-  { tool: "payments.charge", desc: "Registrar cobro" },
-  { tool: "payments.record", desc: "Registrar pago recibido" },
-  { tool: "notifications.send", desc: "Enviar notificación por WhatsApp o email" },
+  { tool: "payments.create_sale", desc: "Registrar cobro" },
+  { tool: "payments.record_payment", desc: "Registrar pago recibido" },
+  { tool: "notifications.send_session_reminder", desc: "Enviar recordatorio" },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -19,7 +24,16 @@ const k = "text-[#7EC8E3]";
 const s = "text-[#98C379]";
 const c = "text-[#5C6370]";
 
-function ConfigBlock() {
+function DiscoveryBlock() {
+  return (
+    <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
+      <div><span className={c}>{"// Sin credenciales — modo discovery"}</span></div>
+      <div><span className={s}>npx -y @servicialo/mcp-server</span></div>
+    </pre>
+  );
+}
+
+function AuthenticatedBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
       <div><span className={c}>{"// claude_desktop_config.json"}</span></div>
@@ -39,24 +53,15 @@ function ConfigBlock() {
   );
 }
 
-function ToolsTable() {
+function ToolRow({ tool, desc }: { tool: string; desc: string }) {
   return (
-    <div className="mt-6 pt-6 border-t border-white/10">
-      <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-3">
-        Herramientas disponibles
-      </div>
-      <div className="grid gap-1">
-        {toolTable.map((row) => (
-          <div key={row.tool} className="flex items-baseline gap-3">
-            <span className="font-mono text-[10px] md:text-[11px] text-white/60 shrink-0">
-              {row.tool}
-            </span>
-            <span className="font-mono text-[10px] md:text-[11px] text-white/35 leading-relaxed">
-              {row.desc}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="flex items-baseline gap-3">
+      <span className="font-mono text-[10px] md:text-[11px] text-white/60 shrink-0">
+        {tool}
+      </span>
+      <span className="font-mono text-[10px] md:text-[11px] text-white/35 leading-relaxed">
+        {desc}
+      </span>
     </div>
   );
 }
@@ -89,30 +94,56 @@ export function ConectateSection() {
         </div>
       </div>
 
-      {/* Config + tools block */}
-      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
-        <div className="flex items-center justify-between mb-1">
-          <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em]">
-            Configuración
+      {/* Two modes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        {/* Discovery mode */}
+        <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-6 text-white">
+          <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
+            Modo discovery
           </div>
-          <a
-            href="https://www.npmjs.com/package/@servicialo/mcp-server"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
-          >
-            npm &rarr;
-          </a>
+          <div className="font-mono text-[10px] text-white/40 mb-4">
+            Sin credenciales — 4 herramientas públicas
+          </div>
+          <DiscoveryBlock />
+          <div className="mt-5 pt-5 border-t border-white/10 grid gap-1">
+            {publicTools.map((t) => (
+              <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
+            ))}
+          </div>
         </div>
-        <div className="font-mono text-[10px] text-white/40 mb-4">
-          npm install -g @servicialo/mcp-server
+
+        {/* Authenticated mode */}
+        <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-6 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em]">
+              Modo autenticado
+            </div>
+            <a
+              href="https://www.npmjs.com/package/@servicialo/mcp-server"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
+            >
+              npm &rarr;
+            </a>
+          </div>
+          <div className="font-mono text-[10px] text-white/40 mb-4">
+            Con credenciales — 23 herramientas totales
+          </div>
+          <AuthenticatedBlock />
+          <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
+            Las credenciales las obtiene cada organización desde la plataforma
+            Servicialo-compatible que utilice.
+          </div>
+          <div className="mt-5 pt-5 border-t border-white/10 grid gap-1">
+            {authenticatedTools.map((t) => (
+              <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
+            ))}
+            <div className="font-mono text-[10px] text-white/25 mt-1">
+              + 10 herramientas más (pagos, proveedores, nóminas)
+            </div>
+          </div>
         </div>
-        <ConfigBlock />
-        <div className="mt-4 font-mono text-[10px] text-white/35 leading-relaxed">
-          Las credenciales las obtiene cada organización desde la plataforma
-          Servicialo-compatible que utilice.
-        </div>
-        <ToolsTable />
       </div>
 
       {/* Compatible implementations */}

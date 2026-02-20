@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../client.js';
+import type { CoordinaloClient } from '../../client.js';
 
 export const providersTools = {
   'providers.list': {

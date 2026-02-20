@@ -1,16 +1,30 @@
 # @servicialo/mcp-server
 
-MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via the [Coordinalo](https://coordinalo.com) REST API.
+MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
 
-## Quick Start
+## Two Modes of Operation
+
+### Discovery Mode (no configuration)
 
 ```bash
 npx -y @servicialo/mcp-server
 ```
 
-### Claude Desktop Configuration
+No credentials needed. The server exposes 4 public tools for discovering organizations, services, and availability across any Servicialo-compatible platform.
 
-Add to your `claude_desktop_config.json`:
+Useful for: agents that help users find and evaluate professional services.
+
+### Authenticated Mode
+
+```bash
+SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
+```
+
+Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` obtained from the Servicialo-compatible platform your organization uses (e.g., [Coordinalo](https://coordinalo.com)).
+
+Enables: scheduling, client management, payments, providers, payroll, and notifications — all 23 tools.
+
+### Claude Desktop Configuration
 
 ```json
 {
@@ -27,23 +41,31 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-Credentials are provided by the Servicialo-compatible platform your organization uses (e.g., [Coordinalo](https://coordinalo.com)).
+Omit the `env` block entirely for discovery-only mode.
 
 ## Environment Variables
 
 | Variable | Required | Description |
 |---|---|---|
-| `SERVICIALO_API_KEY` | Yes | Bearer token for the Coordinalo API |
-| `SERVICIALO_ORG_ID` | Yes | Organization slug (e.g., `mamapro`) |
+| `SERVICIALO_API_KEY` | No | Bearer token — enables authenticated mode |
+| `SERVICIALO_ORG_ID` | No | Organization slug — enables authenticated mode |
 | `SERVICIALO_BASE_URL` | No | API base URL (default: `https://coordinalo.com`) |
 
-## Available Tools (19)
-
-### Scheduling (5)
+## Public Tools (4) — Always Available
 
 | Tool | Description |
 |---|---|
-| `scheduling.check_availability` | Check available slots for a provider/service in a date range |
+| `registry.search` | Search Servicialo-compatible organizations by vertical and location |
+| `registry.get_organization` | Get public details of an organization (services, providers, booking) |
+| `scheduling.check_availability` | Check available slots without authentication |
+| `services.list` | List the public service catalog of an organization |
+
+## Authenticated Tools (19) — Require Credentials
+
+### Scheduling (4)
+
+| Tool | Description |
+|---|---|
 | `scheduling.list_sessions` | List sessions filtered by date, provider, client, or status |
 | `scheduling.book` | Book a new session for a client with a provider |
 | `scheduling.reschedule` | Reschedule an existing session to a new datetime |
@@ -94,7 +116,7 @@ Credentials are provided by the Servicialo-compatible platform your organization
 
 ## API Modules
 
-The server connects to three Coordinalo platform modules:
+The server connects to three platform modules:
 
 - **Coordinalo** — Scheduling and session management
 - **Relacionalo** — Client CRM and relationship management
