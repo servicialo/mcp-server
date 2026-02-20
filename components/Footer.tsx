@@ -11,7 +11,7 @@ export function Footer() {
       </div>
       <div className="flex items-center gap-4 font-mono text-[11px] text-text-dim">
         <a
-          href="https://github.com/danioni/servicialo"
+          href="https://github.com/servicialo/mcp-server"
           target="_blank"
           rel="noopener noreferrer"
           className="text-text-muted hover:text-accent transition-colors"

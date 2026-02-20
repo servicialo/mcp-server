@@ -79,7 +79,7 @@ export function Navbar() {
           ))}
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
             <a
-              href="https://github.com/danioni/servicialo"
+              href="https://github.com/servicialo/mcp-server"
               target="_blank"
               rel="noopener noreferrer"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"
@@ -96,7 +96,7 @@ export function Navbar() {
         {/* Mobile: theme toggle + hamburger */}
         <div className="md:hidden flex items-center gap-1">
           <a
-            href="https://github.com/danioni/servicialo"
+            href="https://github.com/servicialo/mcp-server"
             target="_blank"
             rel="noopener noreferrer"
             className="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"

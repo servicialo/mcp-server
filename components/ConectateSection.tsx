@@ -147,7 +147,7 @@ export function ConectateSection() {
           conectarse a este servidor MCP.
         </div>
         <a
-          href="https://github.com/danioni/servicialo"
+          href="https://github.com/servicialo/mcp-server"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block font-mono text-[11px] text-accent hover:text-text transition-colors"

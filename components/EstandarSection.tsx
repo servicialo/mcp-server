@@ -6,7 +6,7 @@ const cards = [
     desc: "Implementa el estándar en tu plataforma. La especificación y el programa de certificación están en GitHub.",
     icon: "\u{1F528}",
     label: "Construir",
-    link: "https://github.com/danioni/servicialo",
+    link: "https://github.com/servicialo/mcp-server",
     linkText: "Ver especificación en GitHub",
   },
   {
