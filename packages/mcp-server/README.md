@@ -27,6 +27,8 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
+Get your API key and Organization ID from [digitalo.app](https://digitalo.app).
+
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -35,38 +37,68 @@ Add to your `claude_desktop_config.json`:
 | `SERVICIALO_ORG_ID` | Yes | Organization slug (e.g., `mamapro`) |
 | `SERVICIALO_BASE_URL` | No | API base URL (default: `https://coordinalo.com`) |
 
-## Available Tools (11)
+## Available Tools (19)
 
-### Scheduling (4)
+### Scheduling (5)
 
 | Tool | Description |
 |---|---|
 | `scheduling.check_availability` | Check available slots for a provider/service in a date range |
-| `scheduling.book` | Book a new session |
-| `scheduling.reschedule` | Reschedule an existing session |
+| `scheduling.list_sessions` | List sessions filtered by date, provider, client, or status |
+| `scheduling.book` | Book a new session for a client with a provider |
+| `scheduling.reschedule` | Reschedule an existing session to a new datetime |
 | `scheduling.cancel` | Cancel a session |
 
-### Clients (3)
+### Clients (4)
 
 | Tool | Description |
 |---|---|
 | `clients.list` | List clients with search and pagination |
-| `clients.get` | Get client details with stats |
+| `clients.get` | Get client details including history and pending payments |
 | `clients.create` | Create a new client |
+| `clients.history` | Get client activity history: past sessions, payments |
 
-### Payments (3)
-
-| Tool | Description |
-|---|---|
-| `payments.get_balance` | Get client balance (available sessions, pending amount) |
-| `payments.charge` | Create a sale/charge for a service |
-| `payments.record` | Record a payment received against a sale |
-
-### Notifications (1)
+### Payments (4)
 
 | Tool | Description |
 |---|---|
-| `notifications.send` | Send a notification to a client (reminder, confirmation, etc.) |
+| `payments.list_sales` | List sales filtered by client, provider, service, or status |
+| `payments.create_sale` | Create a sale/charge for a client |
+| `payments.record_payment` | Record a payment received against a sale |
+| `payments.client_balance` | Get client account balance and session availability |
+
+### Providers (3)
+
+| Tool | Description |
+|---|---|
+| `providers.list` | List organization providers/professionals |
+| `providers.get` | Get provider details including services and commissions |
+| `providers.get_commission` | Get provider commission configuration |
+
+### Payroll (5)
+
+| Tool | Description |
+|---|---|
+| `payroll.calculate` | Calculate salary settlement for a provider in a period |
+| `payroll.history` | Query payroll settlement history |
+| `payroll.settlement_detail` | Get monthly settlement breakdown (earnings and deductions) |
+| `payroll.vacations` | Query vacation requests |
+| `payroll.request_vacation` | Create a vacation request for a provider |
+
+### Notifications (2)
+
+| Tool | Description |
+|---|---|
+| `notifications.send_session_reminder` | Send a reminder notification for a session |
+| `notifications.send_payment_reminder` | Send a payment reminder for a pending sale |
+
+## API Modules
+
+The server connects to three Coordinalo platform modules:
+
+- **Coordinalo** — Scheduling and session management
+- **Relacionalo** — Client CRM and relationship management
+- **Planificalo** — Finance, payments, payroll, and provider management
 
 ## Development
 
