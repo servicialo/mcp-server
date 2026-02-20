@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Servicialo
 
-## Getting Started
+Estándar abierto para la entrega de servicios profesionales.
 
-First, run the development server:
+Define cómo se estructura, agenda, ejecuta, documenta y cobra un servicio — independiente de la plataforma que lo implemente.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Qué hay en este repositorio
+
+```
+servicialo/
+├── app/                  # servicialo.com — sitio del estándar (Next.js)
+├── components/           # Componentes del sitio
+├── packages/
+│   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### servicialo.com
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Sitio público que documenta el estándar: definición de servicio, las 8 dimensiones, los 9 estados del ciclo de vida, principios de diseño y el esquema del protocolo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### @servicialo/mcp-server
 
-## Learn More
+Servidor MCP que permite a agentes de IA interactuar con organizaciones de servicios profesionales. Dos modos de operación:
 
-To learn more about Next.js, take a look at the following resources:
+- **Modo descubrimiento** — sin credenciales, 4 herramientas públicas para buscar organizaciones y consultar disponibilidad
+- **Modo autenticado** — con credenciales, 23 herramientas para agendar, gestionar clientes, pagos, proveedores y nóminas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx -y @servicialo/mcp-server
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ver documentación completa en [`packages/mcp-server/README.md`](packages/mcp-server/README.md).
 
-## Deploy on Vercel
+## El estándar
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Un servicio profesional tiene 8 dimensiones:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Identidad** — qué servicio es y a qué vertical pertenece
+2. **Proveedor** — quién lo entrega, con qué credenciales
+3. **Cliente** — quién lo recibe, quién paga
+4. **Agendamiento** — cuándo, dónde, cuánto dura
+5. **Ciclo de vida** — 9 estados universales desde solicitud hasta cierre
+6. **Prueba de entrega** — checkin, checkout, evidencia
+7. **Documentación** — fichas, minutas, reportes
+8. **Facturación** — monto, pagador, estado de pago
+
+## Implementaciones
+
+Cualquier plataforma puede implementar la especificación Servicialo. La primera implementación de referencia es [Coordinalo](https://coordinalo.com).
+
+## Licencia
+
+MIT
