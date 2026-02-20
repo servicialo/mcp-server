@@ -5,6 +5,7 @@ import { AnatomiaSection } from "@/components/AnatomiaSection";
 import { CicloSection } from "@/components/CicloSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
 import { EstandarSection } from "@/components/EstandarSection";
+import { ConectateSection } from "@/components/ConectateSection";
 import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
 
@@ -29,6 +30,9 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <EstandarSection />
+      </FadeIn>
+      <FadeIn>
+        <ConectateSection />
       </FadeIn>
       <FadeIn>
         <Footer />

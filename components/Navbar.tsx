@@ -9,6 +9,7 @@ const sections = [
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Principios", id: "principios" },
   { name: "Estándar", id: "estandar" },
+  { name: "Conéctate", id: "conectate" },
 ];
 
 export function Navbar() {
