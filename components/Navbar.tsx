@@ -9,6 +9,7 @@ const sections = [
   { name: "Anatomía", id: "anatomia" },
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Principios", id: "principios" },
+  { name: "Derivaciones", id: "derivaciones" },
   { name: "Estándar", id: "estandar" },
   { name: "MCP Server", id: "mcp-server" },
 ];
