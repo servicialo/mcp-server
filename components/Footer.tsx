@@ -34,12 +34,6 @@ export function Footer() {
         >
           Coordinalo
         </a>
-        <span>
-          Mantenido por{" "}
-          <a href="https://grupodigitalo.com" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent transition-colors">
-            Grupo Digitalo
-          </a>
-        </span>
       </div>
     </footer>
   );
