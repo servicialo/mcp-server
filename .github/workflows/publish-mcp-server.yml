@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'packages/mcp-server/**'
+      - '.github/workflows/publish-mcp-server.yml'
 
 jobs:
   publish:
