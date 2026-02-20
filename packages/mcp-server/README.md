@@ -27,7 +27,7 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-Get your API key and Organization ID from [digitalo.app](https://digitalo.app).
+Credentials are provided by the Servicialo-compatible platform your organization uses (e.g., [Coordinalo](https://coordinalo.com)).
 
 ## Environment Variables
 

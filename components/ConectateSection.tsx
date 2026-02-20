@@ -1,33 +1,17 @@
 import { SectionTitle } from "./SectionTitle";
 
-const steps = [
-  {
-    icon: "\u{1F4E6}",
-    label: "Instalar",
-    title: "Un comando",
-    desc: "npx descarga y ejecuta el servidor MCP. Sin configuraciones complejas.",
-  },
-  {
-    icon: "\u{1F511}",
-    label: "Configurar",
-    title: "Dos variables",
-    desc: "Obtén tu API key y org ID desde digitalo.app. Eso es todo lo que necesitas.",
-  },
-  {
-    icon: "\u{1F916}",
-    label: "Conectar",
-    title: "19 herramientas",
-    desc: "Agendamiento, clientes, pagos, profesionales y nóminas. Listas para tu agente AI.",
-  },
-];
-
-const tools = [
-  { group: "scheduling", items: ["check_availability", "list_sessions", "book", "reschedule", "cancel"] },
-  { group: "clients", items: ["list", "get", "create", "history"] },
-  { group: "payments", items: ["list_sales", "create_sale", "record_payment", "client_balance"] },
-  { group: "providers", items: ["list", "get", "get_commission"] },
-  { group: "payroll", items: ["calculate", "history", "settlement_detail", "vacations", "request_vacation"] },
-  { group: "notifications", items: ["session_reminder", "payment_reminder"] },
+const toolTable = [
+  { tool: "scheduling.check_availability", desc: "Consultar horarios disponibles" },
+  { tool: "scheduling.book", desc: "Agendar una sesión" },
+  { tool: "scheduling.reschedule", desc: "Reagendar sesión existente" },
+  { tool: "scheduling.cancel", desc: "Cancelar sesión" },
+  { tool: "clients.list", desc: "Listar clientes de la organización" },
+  { tool: "clients.get", desc: "Obtener detalle de un cliente" },
+  { tool: "clients.create", desc: "Crear nuevo cliente" },
+  { tool: "payments.get_balance", desc: "Consultar saldo de un cliente" },
+  { tool: "payments.charge", desc: "Registrar cobro" },
+  { tool: "payments.record", desc: "Registrar pago recibido" },
+  { tool: "notifications.send", desc: "Enviar notificación por WhatsApp o email" },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -55,21 +39,21 @@ function ConfigBlock() {
   );
 }
 
-function ToolsList() {
+function ToolsTable() {
   return (
     <div className="mt-6 pt-6 border-t border-white/10">
       <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-3">
-        19 Tools disponibles
+        Herramientas disponibles
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {tools.map((group) => (
-          <div key={group.group}>
-            <div className="font-mono text-[11px] text-white/60 mb-1">{group.group}</div>
-            {group.items.map((item) => (
-              <div key={item} className="font-mono text-[10px] md:text-[11px] text-white/40 leading-relaxed">
-                .{item}
-              </div>
-            ))}
+      <div className="grid gap-1">
+        {toolTable.map((row) => (
+          <div key={row.tool} className="flex items-baseline gap-3">
+            <span className="font-mono text-[10px] md:text-[11px] text-white/60 shrink-0">
+              {row.tool}
+            </span>
+            <span className="font-mono text-[10px] md:text-[11px] text-white/35 leading-relaxed">
+              {row.desc}
+            </span>
           </div>
         ))}
       </div>
@@ -79,18 +63,37 @@ function ToolsList() {
 
 export function ConectateSection() {
   return (
-    <section id="conectate" className="mb-16">
+    <section id="mcp-server" className="mb-16">
       <SectionTitle
-        tag="07 — Conéctate"
-        title="MCP Server"
-        subtitle="Conecta tu agente AI al protocolo Servicialo en 30 segundos."
+        tag="07 — Servidor MCP"
+        title="AI-native por diseño"
+        subtitle="Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa."
       />
 
-      {/* Config block */}
+      {/* Intro block */}
+      <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
+        <div className="font-mono text-[10px] text-accent uppercase tracking-[0.1em] mb-2">
+          Namespace
+        </div>
+        <div className="font-mono text-[13px] text-text mb-4">
+          com.servicialo/professional-services
+        </div>
+        <div className="text-[13px] text-text-muted leading-relaxed mb-3">
+          Para developers que construyen AI agents que necesitan interactuar con
+          organizaciones de servicios profesionales: agendar citas, consultar
+          disponibilidad, gestionar clientes.
+        </div>
+        <div className="text-[13px] text-text-dim leading-relaxed">
+          No es para usuarios finales de plataformas Servicialo-compatible — esas
+          plataformas gestionan la conexión internamente.
+        </div>
+      </div>
+
+      {/* Config + tools block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-1">
           <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em]">
-            @servicialo/mcp-server
+            Configuración
           </div>
           <a
             href="https://www.npmjs.com/package/@servicialo/mcp-server"
@@ -101,29 +104,34 @@ export function ConectateSection() {
             npm &rarr;
           </a>
         </div>
+        <div className="font-mono text-[10px] text-white/40 mb-4">
+          npm install -g @servicialo/mcp-server
+        </div>
         <ConfigBlock />
-        <ToolsList />
+        <div className="mt-4 font-mono text-[10px] text-white/35 leading-relaxed">
+          Las credenciales las obtiene cada organización desde la plataforma
+          Servicialo-compatible que utilice.
+        </div>
+        <ToolsTable />
       </div>
 
-      {/* Step cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {steps.map((step) => (
-          <div
-            key={step.label}
-            className="bg-surface rounded-[14px] py-[22px] px-6 border border-border text-center transition-shadow duration-200 hover:shadow-sm"
-          >
-            <span className="text-[28px]">{step.icon}</span>
-            <div className="font-mono text-[10px] text-accent uppercase tracking-[0.1em] mt-2 mb-1.5">
-              {step.label}
-            </div>
-            <div className="font-serif text-lg text-text mb-2">
-              {step.title}
-            </div>
-            <div className="text-[13px] text-text-muted leading-relaxed">
-              {step.desc}
-            </div>
-          </div>
-        ))}
+      {/* Compatible implementations */}
+      <div className="bg-surface rounded-[14px] py-5 px-6 border border-border text-center">
+        <div className="font-mono text-[10px] text-accent uppercase tracking-[0.1em] mb-2">
+          Implementaciones compatibles
+        </div>
+        <div className="text-[13px] text-text-muted leading-relaxed mb-3">
+          Cualquier plataforma que implemente la especificación Servicialo puede
+          conectarse a este servidor MCP.
+        </div>
+        <a
+          href="https://github.com/danioni/servicialo"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block font-mono text-[11px] text-accent hover:text-text transition-colors"
+        >
+          Ver lista en GitHub &rarr;
+        </a>
       </div>
     </section>
   );

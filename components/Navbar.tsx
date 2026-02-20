@@ -10,7 +10,7 @@ const sections = [
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Principios", id: "principios" },
   { name: "Estándar", id: "estandar" },
-  { name: "Conéctate", id: "conectate" },
+  { name: "MCP Server", id: "mcp-server" },
 ];
 
 export function Navbar() {

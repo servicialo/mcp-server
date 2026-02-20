@@ -26,8 +26,16 @@ export function Footer() {
         >
           npm
         </a>
+        <a
+          href="https://coordinalo.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-muted hover:text-accent transition-colors"
+        >
+          Coordinalo
+        </a>
         <span>
-          Un estándar de{" "}
+          Mantenido por{" "}
           <a href="https://grupodigitalo.com" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent transition-colors">
             Grupo Digitalo
           </a>

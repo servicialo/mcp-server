@@ -3,9 +3,11 @@ import { SectionTitle } from "./SectionTitle";
 const cards = [
   {
     title: "Implementadores",
-    desc: "Construye productos sobre el estándar. Crea tu propia implementación.",
+    desc: "Implementa el estándar en tu plataforma. La especificación completa está disponible en GitHub. Para certificación, escríbenos a hola@grupodigitalo.com.",
     icon: "\u{1F528}",
     label: "Construir",
+    link: "https://github.com/danioni/servicialo",
+    linkText: "Ver especificación en GitHub",
   },
   {
     title: "Proveedores",
@@ -113,6 +115,16 @@ export function EstandarSection() {
             <div className="text-[13px] text-text-muted leading-relaxed">
               {card.desc}
             </div>
+            {"link" in card && card.link && (
+              <a
+                href={card.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 font-mono text-[11px] text-accent hover:text-text transition-colors"
+              >
+                {card.linkText} &rarr;
+              </a>
+            )}
           </div>
         ))}
       </div>
