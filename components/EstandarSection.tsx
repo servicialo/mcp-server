@@ -3,7 +3,7 @@ import { SectionTitle } from "./SectionTitle";
 const cards = [
   {
     title: "Implementadores",
-    desc: "Implementa el estándar en tu plataforma. La especificación completa está disponible en GitHub. Para certificación, escríbenos a hola@grupodigitalo.com.",
+    desc: "Implementa el estándar en tu plataforma. La especificación y el programa de certificación están en GitHub.",
     icon: "\u{1F528}",
     label: "Construir",
     link: "https://github.com/danioni/servicialo",
