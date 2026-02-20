@@ -87,44 +87,44 @@ export const PRINCIPLES = [
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
 ] as const;
 
-export const SCHEMA_YAML = `service:
-  id: string                  # Identificador único
-  type: string                # Categoría del servicio
-  vertical: string            # salud | legal | hogar | educación | ...
+export const SCHEMA_YAML = `servicio:
+  id: texto                      # Identificador único
+  tipo: texto                    # Categoría del servicio
+  vertical: texto                # salud | legal | hogar | educación | ...
 
-  provider:
-    id: string
-    credentials: string[]     # Certificaciones requeridas
-    trust_score: number       # 0-100 calculado por historial
+  proveedor:
+    id: texto
+    credenciales: texto[]        # Certificaciones requeridas
+    puntaje_confianza: número    # 0-100 calculado por historial
 
-  client:
-    id: string
-    payer_id: string          # Puede diferir del client
+  cliente:
+    id: texto
+    id_pagador: texto            # Puede diferir del cliente
 
-  scheduling:
-    requested_at: datetime
-    scheduled_for: datetime
-    duration_expected: minutes
-    location: physical | virtual
+  agenda:
+    solicitado_en: fecha_hora
+    agendado_para: fecha_hora
+    duración_esperada: minutos
+    ubicación: presencial | virtual
 
-  lifecycle:
-    current_state: enum[9]    # Los 9 estados universales
-    transitions: transition[]  # Historial de cambios
-    exceptions: exception[]    # No-shows, disputas, etc
+  ciclo_de_vida:
+    estado_actual: enum[9]       # Los 9 estados universales
+    transiciones: transición[]   # Historial de cambios
+    excepciones: excepción[]     # Inasistencias, disputas, etc
 
-  delivery_proof:
-    checkin: datetime
-    checkout: datetime
-    duration_actual: minutes
-    evidence: evidence[]      # GPS, firma, fotos, docs
+  prueba_de_entrega:
+    entrada: fecha_hora
+    salida: fecha_hora
+    duración_real: minutos
+    evidencia: evidencia[]       # GPS, firma, fotos, documentos
 
-  documentation:
-    record_type: string       # Ficha clínica, minuta, reporte
-    generated_at: datetime
-    signed_by: string[]
+  documentación:
+    tipo_registro: texto         # Ficha clínica, minuta, reporte
+    generado_en: fecha_hora
+    firmado_por: texto[]
 
-  billing:
-    amount: money
-    payer: reference
-    status: pending | billed | paid | disputed
-    tax_document: reference`;
+  facturación:
+    monto: dinero
+    pagador: referencia
+    estado: pendiente | facturado | pagado | disputado
+    documento_tributario: referencia`;

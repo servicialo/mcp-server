@@ -36,47 +36,47 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={a}>service:</span></Line>
-      <Line>  <span className={k}>id:</span> <span className={t}>string</span>                  <span className={c}># Identificador único</span></Line>
-      <Line>  <span className={k}>type:</span> <span className={t}>string</span>                <span className={c}># Categoría del servicio</span></Line>
-      <Line>  <span className={k}>vertical:</span> <span className={t}>string</span>            <span className={c}># salud | legal | hogar | educación | ...</span></Line>
+      <Line><span className={a}>servicio:</span></Line>
+      <Line>  <span className={k}>id:</span> <span className={t}>texto</span>                   <span className={c}># Identificador único</span></Line>
+      <Line>  <span className={k}>tipo:</span> <span className={t}>texto</span>                 <span className={c}># Categoría del servicio</span></Line>
+      <Line>  <span className={k}>vertical:</span> <span className={t}>texto</span>             <span className={c}># salud | legal | hogar | educación | ...</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>provider:</span></Line>
-      <Line>    <span className={k}>id:</span> <span className={t}>string</span></Line>
-      <Line>    <span className={k}>credentials:</span> <span className={t}>string[]</span>     <span className={c}># Certificaciones requeridas</span></Line>
-      <Line>    <span className={k}>trust_score:</span> <span className={t}>number</span>       <span className={c}># 0-100 calculado por historial</span></Line>
+      <Line>  <span className={a}>proveedor:</span></Line>
+      <Line>    <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>    <span className={k}>credenciales:</span> <span className={t}>texto[]</span>     <span className={c}># Certificaciones requeridas</span></Line>
+      <Line>    <span className={k}>puntaje_confianza:</span> <span className={t}>número</span> <span className={c}># 0-100 calculado por historial</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>client:</span></Line>
-      <Line>    <span className={k}>id:</span> <span className={t}>string</span></Line>
-      <Line>    <span className={k}>payer_id:</span> <span className={t}>string</span>          <span className={c}># Puede diferir del cliente</span></Line>
+      <Line>  <span className={a}>cliente:</span></Line>
+      <Line>    <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>    <span className={k}>id_pagador:</span> <span className={t}>texto</span>         <span className={c}># Puede diferir del cliente</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>scheduling:</span></Line>
-      <Line>    <span className={k}>requested_at:</span> <span className={t}>datetime</span></Line>
-      <Line>    <span className={k}>scheduled_for:</span> <span className={t}>datetime</span></Line>
-      <Line>    <span className={k}>duration_expected:</span> <span className={t}>minutes</span></Line>
-      <Line>    <span className={k}>location:</span> <span className={t}>physical | virtual</span></Line>
+      <Line>  <span className={a}>agenda:</span></Line>
+      <Line>    <span className={k}>solicitado_en:</span> <span className={t}>fecha_hora</span></Line>
+      <Line>    <span className={k}>agendado_para:</span> <span className={t}>fecha_hora</span></Line>
+      <Line>    <span className={k}>duración_esperada:</span> <span className={t}>minutos</span></Line>
+      <Line>    <span className={k}>ubicación:</span> <span className={t}>presencial | virtual</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>lifecycle:</span></Line>
-      <Line>    <span className={k}>current_state:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
-      <Line>    <span className={k}>transitions:</span> <span className={t}>transition[]</span> <span className={c}># Historial de cambios</span></Line>
-      <Line>    <span className={k}>exceptions:</span> <span className={t}>exception[]</span>   <span className={c}># Inasistencias, disputas, etc</span></Line>
+      <Line>  <span className={a}>ciclo_de_vida:</span></Line>
+      <Line>    <span className={k}>estado_actual:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
+      <Line>    <span className={k}>transiciones:</span> <span className={t}>transición[]</span> <span className={c}># Historial de cambios</span></Line>
+      <Line>    <span className={k}>excepciones:</span> <span className={t}>excepción[]</span>  <span className={c}># Inasistencias, disputas, etc</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>delivery_proof:</span></Line>
-      <Line>    <span className={k}>checkin:</span> <span className={t}>datetime</span></Line>
-      <Line>    <span className={k}>checkout:</span> <span className={t}>datetime</span></Line>
-      <Line>    <span className={k}>duration_actual:</span> <span className={t}>minutes</span></Line>
-      <Line>    <span className={k}>evidence:</span> <span className={t}>evidence[]</span>      <span className={c}># GPS, firma, fotos, documentos</span></Line>
+      <Line>  <span className={a}>prueba_de_entrega:</span></Line>
+      <Line>    <span className={k}>entrada:</span> <span className={t}>fecha_hora</span></Line>
+      <Line>    <span className={k}>salida:</span> <span className={t}>fecha_hora</span></Line>
+      <Line>    <span className={k}>duración_real:</span> <span className={t}>minutos</span></Line>
+      <Line>    <span className={k}>evidencia:</span> <span className={t}>evidencia[]</span>    <span className={c}># GPS, firma, fotos, documentos</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>documentation:</span></Line>
-      <Line>    <span className={k}>record_type:</span> <span className={t}>string</span>       <span className={c}># Ficha clínica, minuta, reporte</span></Line>
-      <Line>    <span className={k}>generated_at:</span> <span className={t}>datetime</span></Line>
-      <Line>    <span className={k}>signed_by:</span> <span className={t}>string[]</span></Line>
+      <Line>  <span className={a}>documentación:</span></Line>
+      <Line>    <span className={k}>tipo_registro:</span> <span className={t}>texto</span>      <span className={c}># Ficha clínica, minuta, reporte</span></Line>
+      <Line>    <span className={k}>generado_en:</span> <span className={t}>fecha_hora</span></Line>
+      <Line>    <span className={k}>firmado_por:</span> <span className={t}>texto[]</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>billing:</span></Line>
-      <Line>    <span className={k}>amount:</span> <span className={t}>money</span></Line>
-      <Line>    <span className={k}>payer:</span> <span className={t}>reference</span></Line>
-      <Line>    <span className={k}>status:</span> <span className={t}>pending | billed | paid | disputed</span></Line>
-      <Line>    <span className={k}>tax_document:</span> <span className={t}>reference</span></Line>
+      <Line>  <span className={a}>facturación:</span></Line>
+      <Line>    <span className={k}>monto:</span> <span className={t}>dinero</span></Line>
+      <Line>    <span className={k}>pagador:</span> <span className={t}>referencia</span></Line>
+      <Line>    <span className={k}>estado:</span> <span className={t}>pendiente | facturado | pagado | disputado</span></Line>
+      <Line>    <span className={k}>documento_tributario:</span> <span className={t}>referencia</span></Line>
     </pre>
   );
 }
