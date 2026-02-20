@@ -36,7 +36,7 @@ const c = "text-[#5C6370]";
 function ConfigBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <div><span className={c}>// claude_desktop_config.json</span></div>
+      <div><span className={c}>{"// claude_desktop_config.json"}</span></div>
       <div>{"{"}</div>
       <div>  <span className={k}>&quot;mcpServers&quot;</span>: {"{"}</div>
       <div>    <span className={k}>&quot;servicialo&quot;</span>: {"{"}</div>
