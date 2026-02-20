@@ -1,22 +1,22 @@
 import { SectionTitle } from "./SectionTitle";
 
 const publicTools = [
-  { tool: "registro.buscar", desc: "Buscar organizaciones por vertical y ubicación" },
-  { tool: "registro.detalle_organización", desc: "Detalle público de una organización" },
-  { tool: "agenda.consultar_disponibilidad", desc: "Consultar horarios disponibles" },
-  { tool: "servicios.listar", desc: "Catálogo público de servicios" },
+  { tool: "registry.search", desc: "Buscar organizaciones por vertical y ubicación" },
+  { tool: "registry.get_organization", desc: "Detalle público de una organización" },
+  { tool: "scheduling.check_availability", desc: "Consultar horarios disponibles" },
+  { tool: "services.list", desc: "Catálogo público de servicios" },
 ];
 
 const authenticatedTools = [
-  { tool: "agenda.agendar", desc: "Agendar una sesión" },
-  { tool: "agenda.reagendar", desc: "Reagendar sesión existente" },
-  { tool: "agenda.cancelar", desc: "Cancelar sesión" },
-  { tool: "clientes.listar", desc: "Listar clientes" },
-  { tool: "clientes.detalle", desc: "Detalle de un cliente" },
-  { tool: "clientes.crear", desc: "Crear nuevo cliente" },
-  { tool: "pagos.registrar_cobro", desc: "Registrar cobro" },
-  { tool: "pagos.registrar_pago", desc: "Registrar pago recibido" },
-  { tool: "notificaciones.enviar_recordatorio", desc: "Enviar recordatorio" },
+  { tool: "scheduling.book", desc: "Agendar una sesión" },
+  { tool: "scheduling.reschedule", desc: "Reagendar sesión existente" },
+  { tool: "scheduling.cancel", desc: "Cancelar sesión" },
+  { tool: "clients.list", desc: "Listar clientes" },
+  { tool: "clients.get", desc: "Detalle de un cliente" },
+  { tool: "clients.create", desc: "Crear nuevo cliente" },
+  { tool: "payments.create_sale", desc: "Registrar cobro" },
+  { tool: "payments.record_payment", desc: "Registrar pago recibido" },
+  { tool: "notifications.send_session_reminder", desc: "Enviar recordatorio" },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
