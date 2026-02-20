@@ -61,6 +61,11 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -75,7 +80,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-bg text-text font-sans antialiased">
+      <body className="bg-bg text-text font-sans antialiased transition-colors duration-300">
         <Navbar />
         <main>{children}</main>
         <Analytics />

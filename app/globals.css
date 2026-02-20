@@ -10,3 +10,53 @@ html {
 body {
   overflow-x: hidden;
 }
+
+/* Light mode (default) */
+:root {
+  --color-bg: #FAFAF8;
+  --color-bg-alpha: rgba(250, 250, 248, 0.9);
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F5F3EF;
+  --color-border: #E8E4DD;
+  --color-border-light: #F0EDE7;
+  --color-text: #1A1A18;
+  --color-text-body: #3D3D3A;
+  --color-text-muted: #8A8780;
+  --color-text-dim: #B0ADA6;
+  --color-accent: #E8590C;
+  --color-accent-dark: #C24B0A;
+  --color-accent-soft: #FFF1EB;
+  --color-green: #2B8A3E;
+  --color-green-soft: #EBFBEE;
+  --color-blue: #1971C2;
+  --color-blue-soft: #E7F5FF;
+  --color-purple: #7048C6;
+  --color-purple-soft: #F3F0FF;
+  --color-dark: #1A1A18;
+  --color-dark-soft: #2C2C29;
+}
+
+/* Dark mode */
+.dark {
+  --color-bg: #121210;
+  --color-bg-alpha: rgba(18, 18, 16, 0.9);
+  --color-surface: #1A1A18;
+  --color-surface-alt: #222220;
+  --color-border: #2C2C29;
+  --color-border-light: #252523;
+  --color-text: #F0EFEC;
+  --color-text-body: #C8C6C0;
+  --color-text-muted: #8A8780;
+  --color-text-dim: #5C5A55;
+  --color-accent: #F0722B;
+  --color-accent-dark: #E8590C;
+  --color-accent-soft: #2A1A10;
+  --color-green: #51CF66;
+  --color-green-soft: #0F2014;
+  --color-blue: #4DABF7;
+  --color-blue-soft: #0D1B2A;
+  --color-purple: #9775FA;
+  --color-purple-soft: #1A1030;
+  --color-dark: #0A0A09;
+  --color-dark-soft: #1A1A18;
+}

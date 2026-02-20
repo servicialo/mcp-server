@@ -9,11 +9,29 @@ export function Footer() {
           El estándar abierto para servicios — v0.1
         </div>
       </div>
-      <div className="font-mono text-[11px] text-text-dim">
-        Un estándar de{" "}
-        <a href="https://grupodigitalo.com" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent transition-colors">
-          Grupo Digitalo
+      <div className="flex items-center gap-4 font-mono text-[11px] text-text-dim">
+        <a
+          href="https://github.com/danioni/servicialo"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-muted hover:text-accent transition-colors"
+        >
+          GitHub
         </a>
+        <a
+          href="https://www.npmjs.com/package/@servicialo/mcp-server"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-text-muted hover:text-accent transition-colors"
+        >
+          npm
+        </a>
+        <span>
+          Un estándar de{" "}
+          <a href="https://grupodigitalo.com" target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent transition-colors">
+            Grupo Digitalo
+          </a>
+        </span>
       </div>
     </footer>
   );

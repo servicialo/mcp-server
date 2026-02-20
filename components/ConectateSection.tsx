@@ -11,7 +11,7 @@ const steps = [
     icon: "\u{1F511}",
     label: "Configurar",
     title: "Dos variables",
-    desc: "Tu API key y el ID de tu organización. Eso es todo lo que necesitas.",
+    desc: "Obtén tu API key y org ID desde digitalo.app. Eso es todo lo que necesitas.",
   },
   {
     icon: "\u{1F916}",
