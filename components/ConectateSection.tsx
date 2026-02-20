@@ -11,7 +11,7 @@ const steps = [
     icon: "\u{1F511}",
     label: "Configurar",
     title: "Dos variables",
-    desc: "Tu API key y el ID de tu organizaci\u00f3n. Eso es todo lo que necesitas.",
+    desc: "Tu API key y el ID de tu organización. Eso es todo lo que necesitas.",
   },
   {
     icon: "\u{1F916}",
@@ -79,7 +79,7 @@ export function ConectateSection() {
   return (
     <section id="conectate" className="mb-16">
       <SectionTitle
-        tag="07 — Con\u00e9ctate"
+        tag="07 — Conéctate"
         title="MCP Server"
         subtitle="Conecta tu agente AI al protocolo Servicialo en 30 segundos."
       />
