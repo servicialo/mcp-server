@@ -8,22 +8,28 @@ const publicTools = [
 ];
 
 const authenticatedTools = [
-  { tool: "contract.get", desc: "Contrato pre-acordado del servicio" },
-  { tool: "scheduling.book", desc: "Agendar una sesión" },
-  { tool: "scheduling.reschedule", desc: "Reagendar sesión existente" },
-  { tool: "scheduling.cancel", desc: "Cancelar sesión" },
-  { tool: "clients.list", desc: "Listar clientes" },
-  { tool: "clients.get", desc: "Detalle de un cliente" },
-  { tool: "clients.create", desc: "Crear nuevo cliente" },
-  { tool: "payments.create_sale", desc: "Registrar cobro" },
-  { tool: "payments.record_payment", desc: "Registrar pago recibido" },
-  { tool: "notifications.send_session_reminder", desc: "Enviar recordatorio" },
+  { tool: "service.get", desc: "9 dimensiones del servicio" },
+  { tool: "contract.get", desc: "Contrato pre-acordado" },
+  { tool: "clients.get_or_create", desc: "Buscar o crear cliente" },
+  { tool: "scheduling.book", desc: "Agendar → Solicitado" },
+  { tool: "scheduling.confirm", desc: "Confirmar → Confirmado" },
+  { tool: "lifecycle.get_state", desc: "Estado + transiciones" },
+  { tool: "lifecycle.transition", desc: "Ejecutar transición" },
+  { tool: "scheduling.reschedule", desc: "Reagendar (excepción)" },
+  { tool: "scheduling.cancel", desc: "Cancelar con política" },
+  { tool: "delivery.checkin", desc: "Check-in → En Curso" },
+  { tool: "delivery.checkout", desc: "Check-out → Completado" },
+  { tool: "delivery.record_evidence", desc: "Evidencia por vertical" },
+  { tool: "documentation.create", desc: "Registro del servicio" },
+  { tool: "payments.create_sale", desc: "Crear venta/cargo" },
+  { tool: "payments.record_payment", desc: "Registrar pago" },
+  { tool: "payments.get_status", desc: "Estado de pago" },
 ];
 
-const agentLayers = [
+const agentPhases = [
   {
     num: "1",
-    label: "Contexto",
+    label: "Descubrimiento",
     desc: "Qué hay disponible",
     tools: "registry.* · check_availability · services.list",
     color: "text-[#7EC8E3]",
@@ -31,20 +37,43 @@ const agentLayers = [
   },
   {
     num: "2",
-    label: "Contrato",
-    desc: "Bajo qué reglas",
-    tools: "contract.get",
+    label: "Entender",
+    desc: "Dimensiones y reglas del servicio",
+    tools: "service.get · contract.get",
     color: "text-accent",
     bg: "bg-accent/10",
-    highlight: true,
   },
   {
     num: "3",
-    label: "Acción",
-    desc: "Ejecutar con las reglas claras",
-    tools: "scheduling.book · cancel · reschedule",
+    label: "Comprometer",
+    desc: "Identidad del cliente y booking",
+    tools: "clients.get_or_create · scheduling.book · confirm",
     color: "text-[#98C379]",
     bg: "bg-[#98C379]/10",
+  },
+  {
+    num: "4",
+    label: "Ciclo de vida",
+    desc: "Estado y transiciones",
+    tools: "lifecycle.get_state · transition · reschedule · cancel",
+    color: "text-[#E5C07B]",
+    bg: "bg-[#E5C07B]/10",
+  },
+  {
+    num: "5",
+    label: "Verificar entrega",
+    desc: "Evidencia de que ocurrió",
+    tools: "delivery.checkin · checkout · record_evidence",
+    color: "text-[#C678DD]",
+    bg: "bg-[#C678DD]/10",
+  },
+  {
+    num: "6",
+    label: "Cerrar",
+    desc: "Documentación y cobro",
+    tools: "documentation.create · payments.*",
+    color: "text-[#E06C75]",
+    bg: "bg-[#E06C75]/10",
   },
 ];
 
@@ -117,52 +146,50 @@ export function ConectateSection() {
         </div>
       </div>
 
-      {/* Agent flow — 3 layers */}
+      {/* Agent flow — 6 lifecycle phases */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
           Flujo del agente
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-5">
-          Tres capas antes de actuar — sin business logic hardcodeada
+          Seis fases del ciclo de vida del servicio — 20 herramientas
         </div>
 
         <div className="grid gap-2.5">
-          {agentLayers.map((layer) => (
-            <div key={layer.num} className="flex items-start gap-3">
+          {agentPhases.map((phase) => (
+            <div key={phase.num} className="flex items-start gap-3">
               <div
-                className={`shrink-0 w-6 h-6 rounded-full ${layer.bg} flex items-center justify-center`}
+                className={`shrink-0 w-6 h-6 rounded-full ${phase.bg} flex items-center justify-center`}
               >
-                <span className={`font-mono text-[11px] font-semibold ${layer.color}`}>
-                  {layer.num}
+                <span className={`font-mono text-[11px] font-semibold ${phase.color}`}>
+                  {phase.num}
                 </span>
               </div>
               <div className="min-w-0">
                 <div className="flex items-baseline gap-2">
-                  <span className={`font-mono text-[11px] font-semibold ${layer.color}`}>
-                    {layer.label}
+                  <span className={`font-mono text-[11px] font-semibold ${phase.color}`}>
+                    {phase.label}
                   </span>
                   <span className="font-mono text-[10px] text-white/35">
-                    {layer.desc}
+                    {phase.desc}
                   </span>
                 </div>
                 <div className="font-mono text-[10px] text-white/50 mt-0.5">
-                  {layer.tools}
+                  {phase.tools}
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Connecting arrows */}
         <div className="mt-5 pt-5 border-t border-white/10">
           <div className="text-[12px] text-white/40 leading-[1.7]">
-            <span className="text-accent font-mono text-[10px]">contract.get</span>{" "}
-            es el puente entre descubrir un servicio y ejecutar una acción.
-            El agente lee el contrato antes de actuar: evidencia requerida,
-            política de cancelación, reglas de inasistencia, términos de arbitraje.{" "}
+            Un agente bien diseñado sigue este orden:{" "}
             <span className="text-white/55">
-              Sin lógica de negocio hardcodeada en el agente — las reglas vienen del contrato.
-            </span>
+              Descubrir &rarr; Entender &rarr; Comprometer &rarr; Gestionar &rarr; Verificar &rarr; Cerrar.
+            </span>{" "}
+            Cada fase tiene sus tools. El estándar garantiza que cualquier agente pueda
+            completar el ciclo completo con cualquier implementación compatible.
           </div>
         </div>
       </div>
@@ -199,7 +226,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 24 herramientas totales
+          Con credenciales — 20 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
@@ -210,9 +237,6 @@ export function ConectateSection() {
           {authenticatedTools.map((t) => (
             <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
           ))}
-          <div className="font-mono text-[10px] text-white/25 mt-1">
-            + 10 herramientas más (pagos, proveedores, nóminas, notificaciones)
-          </div>
         </div>
       </div>
 

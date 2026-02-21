@@ -11,14 +11,12 @@ import { registryTools } from './tools/public/registry.js';
 import { publicAvailabilityTools } from './tools/public/availability.js';
 import { publicServicesTools } from './tools/public/services.js';
 
-// --- Authenticated tools ---
-import { schedulingTools } from './tools/authenticated/scheduling.js';
-import { clientsTools } from './tools/authenticated/clients.js';
-import { paymentsTools } from './tools/authenticated/payments.js';
-import { notificationsTools } from './tools/authenticated/notifications.js';
-import { providersTools } from './tools/authenticated/providers.js';
-import { payrollTools } from './tools/authenticated/payroll.js';
-import { contractsTools } from './tools/authenticated/contracts.js';
+// --- Authenticated tools (Phases 2–6) ---
+import { entenderTools } from './tools/authenticated/entender.js';
+import { comprometerTools } from './tools/authenticated/comprometer.js';
+import { lifecycleTools } from './tools/authenticated/lifecycle.js';
+import { deliveryTools } from './tools/authenticated/delivery.js';
+import { cerrarTools } from './tools/authenticated/cerrar.js';
 
 // --- Detect mode ---
 const mode = detectMode();
@@ -40,7 +38,7 @@ const apiClient = new CoordinaloClient({
 // --- Init MCP server ---
 const server = new McpServer({
   name: 'servicialo',
-  version: '0.3.0',
+  version: '0.4.0',
 });
 
 // --- Tool type ---
@@ -60,13 +58,11 @@ const publicTools: Record<string, ToolDef> = {
 
 // --- Authenticated tools (only in authenticated mode) ---
 const authenticatedTools: Record<string, ToolDef> = {
-  ...schedulingTools as unknown as Record<string, ToolDef>,
-  ...clientsTools as unknown as Record<string, ToolDef>,
-  ...paymentsTools as unknown as Record<string, ToolDef>,
-  ...notificationsTools as unknown as Record<string, ToolDef>,
-  ...providersTools as unknown as Record<string, ToolDef>,
-  ...payrollTools as unknown as Record<string, ToolDef>,
-  ...contractsTools as unknown as Record<string, ToolDef>,
+  ...entenderTools as unknown as Record<string, ToolDef>,
+  ...comprometerTools as unknown as Record<string, ToolDef>,
+  ...lifecycleTools as unknown as Record<string, ToolDef>,
+  ...deliveryTools as unknown as Record<string, ToolDef>,
+  ...cerrarTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Register tools ---
