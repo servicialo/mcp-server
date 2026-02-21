@@ -28,6 +28,7 @@ const k = "text-[#7EC8E3]";  // keys — celeste
 const t = "text-[#E5C07B]";  // types — amarillo suave
 const c = "text-[#5C6370] hidden md:inline";  // comments — gris, ocultos en mobile
 const a = "text-accent";      // section keys — accent
+const h = "text-[#5C6370]";  // header comments — siempre visibles
 
 function Line({ children }: { children: React.ReactNode }) {
   return <div>{children}</div>;
@@ -36,6 +37,8 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
+      <Line><span className={h}># ── SERVICIALO CORE ──────────────────</span></Line>
+      <Line>&nbsp;</Line>
       <Line><span className={a}>servicio:</span></Line>
       <Line>  <span className={k}>id:</span> <span className={t}>texto</span>                   <span className={c}># Identificador único</span></Line>
       <Line>  <span className={k}>tipo:</span> <span className={t}>texto</span>                 <span className={c}># Categoría del servicio</span></Line>
@@ -46,7 +49,7 @@ function SchemaBlock() {
       <Line>    <span className={k}>credenciales:</span> <span className={t}>texto[]</span>     <span className={c}># Certificaciones requeridas</span></Line>
       <Line>    <span className={k}>puntaje_confianza:</span> <span className={t}>número</span> <span className={c}># 0-100 calculado por historial</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>partes:</span>                          <span className={c}># Reemplaza &quot;cliente&quot;</span></Line>
+      <Line>  <span className={a}>partes:</span></Line>
       <Line>    <span className={a}>beneficiario:</span>                  <span className={c}># Quién recibe el servicio</span></Line>
       <Line>      <span className={k}>id:</span> <span className={t}>texto</span></Line>
       <Line>      <span className={k}>relación:</span> <span className={t}>texto</span>         <span className={c}># paciente | alumno | propietario</span></Line>
@@ -84,16 +87,6 @@ function SchemaBlock() {
       <Line>    <span className={k}>duración_real:</span> <span className={t}>minutos</span></Line>
       <Line>    <span className={k}>evidencia:</span> <span className={t}>evidencia[]</span>    <span className={c}># GPS, firma, fotos, documentos</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>resolución:</span>                      <span className={c}># Mecanismo de disputas</span></Line>
-      <Line>    <span className={k}>estado:</span> <span className={t}>ninguna | en_revisión | en_arbitraje | resuelta</span></Line>
-      <Line>    <span className={k}>evidencia_evaluada:</span> <span className={t}>evaluación[]</span></Line>
-      <Line>    <span className={k}>resultado:</span> <span className={t}>a_favor_proveedor | a_favor_cliente | ambiguo</span></Line>
-      <Line>    <span className={a}>arbitraje:</span></Line>
-      <Line>      <span className={k}>árbitros:</span> <span className={t}>referencia[]</span></Line>
-      <Line>      <span className={k}>votos:</span> <span className={t}>voto[]</span></Line>
-      <Line>    <span className={k}>resolución_final:</span> <span className={t}>referencia</span></Line>
-      <Line>    <span className={k}>resuelta_en:</span> <span className={t}>fecha_hora</span></Line>
-      <Line>&nbsp;</Line>
       <Line>  <span className={a}>documentación:</span></Line>
       <Line>    <span className={k}>tipo_registro:</span> <span className={t}>texto</span>      <span className={c}># Ficha clínica, minuta, reporte</span></Line>
       <Line>    <span className={k}>generado_en:</span> <span className={t}>fecha_hora</span></Line>
@@ -104,6 +97,33 @@ function SchemaBlock() {
       <Line>    <span className={k}>pagador:</span> <span className={t}>referencia</span>       <span className={c}># Apunta a partes.pagador</span></Line>
       <Line>    <span className={k}>estado:</span> <span className={t}>pendiente | facturado | pagado | disputado | reembolsado</span></Line>
       <Line>    <span className={k}>documento_tributario:</span> <span className={t}>referencia</span></Line>
+      <Line>&nbsp;</Line>
+      <Line><span className={h}># ── MÓDULO: Servicialo/Finanzas (en diseño) ──</span></Line>
+      <Line>&nbsp;</Line>
+      <Line>  <span className={a}>distribución:</span>                    <span className={c}># Servicialo/Finanzas</span></Line>
+      <Line>    <span className={a}>profesional:</span></Line>
+      <Line>      <span className={k}>tipo:</span> <span className={t}>porcentaje | monto_fijo | mixto</span></Line>
+      <Line>      <span className={k}>valor:</span> <span className={t}>número</span></Line>
+      <Line>      <span className={k}>liquidación:</span> <span className={t}>por_sesión | mensual</span></Line>
+      <Line>    <span className={a}>organización:</span></Line>
+      <Line>      <span className={k}>tipo:</span> <span className={t}>porcentaje | monto_fijo</span></Line>
+      <Line>      <span className={k}>valor:</span> <span className={t}>número</span></Line>
+      <Line>    <span className={a}>infraestructura:</span></Line>
+      <Line>      <span className={k}>tipo:</span> <span className={t}>monto_fijo | porcentaje</span></Line>
+      <Line>      <span className={k}>valor:</span> <span className={t}>número</span></Line>
+      <Line>      <span className={k}>concepto:</span> <span className={t}>box | equipamiento | sala</span></Line>
+      <Line>&nbsp;</Line>
+      <Line><span className={h}># ── MÓDULO: Servicialo/Disputas (en diseño) ──</span></Line>
+      <Line>&nbsp;</Line>
+      <Line>  <span className={a}>resolución:</span>                      <span className={c}># Servicialo/Disputas</span></Line>
+      <Line>    <span className={k}>estado:</span> <span className={t}>ninguna | en_revisión | en_arbitraje | resuelta</span></Line>
+      <Line>    <span className={k}>evidencia_evaluada:</span> <span className={t}>evaluación[]</span></Line>
+      <Line>    <span className={k}>resultado:</span> <span className={t}>a_favor_proveedor | a_favor_cliente | ambiguo</span></Line>
+      <Line>    <span className={a}>arbitraje:</span></Line>
+      <Line>      <span className={k}>árbitros:</span> <span className={t}>referencia[]</span></Line>
+      <Line>      <span className={k}>votos:</span> <span className={t}>voto[]</span></Line>
+      <Line>    <span className={k}>resolución_final:</span> <span className={t}>referencia</span></Line>
+      <Line>    <span className={k}>resuelta_en:</span> <span className={t}>fecha_hora</span></Line>
     </pre>
   );
 }
@@ -112,7 +132,7 @@ export function EstandarSection() {
   return (
     <section id="estandar" className="mb-16">
       <SectionTitle
-        tag="08 — El estándar"
+        tag="09 — El estándar"
         title="Protocolo de Entrega de Servicios"
         subtitle="Cualquiera puede implementarlo."
       />

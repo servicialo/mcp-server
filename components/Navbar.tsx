@@ -11,6 +11,7 @@ const sections = [
   { name: "Disputas", id: "resolucion" },
   { name: "Evidencia", id: "evidencia-vertical" },
   { name: "Principios", id: "principios" },
+  { name: "Módulos", id: "modulos" },
   { name: "Estándar", id: "estandar" },
   { name: "Servidor MCP", id: "mcp-server" },
 ];

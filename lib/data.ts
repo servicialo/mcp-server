@@ -89,7 +89,12 @@ export const PRINCIPLES = [
   { title: "Las reglas se acuerdan antes, no después", body: "El contrato de servicio define qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Una vez que ambas partes aceptan, las reglas son inmutables. Ni el proveedor, ni el cliente, ni la plataforma pueden cambiarlas unilateralmente." },
 ] as const;
 
-export const SCHEMA_YAML = `servicio:
+export const SCHEMA_YAML = `# ─────────────────────────────────────────────
+# SERVICIALO CORE
+# Todo lo necesario para modelar un servicio
+# ─────────────────────────────────────────────
+
+servicio:
   id: texto                      # Identificador único
   tipo: texto                    # Categoría del servicio
   vertical: texto                # salud | legal | hogar | educación | ...
@@ -137,16 +142,6 @@ export const SCHEMA_YAML = `servicio:
     duración_real: minutos
     evidencia: evidencia[]       # GPS, firma, fotos, documentos
 
-  resolución:                    # Mecanismo de resolución de disputas
-    estado: ninguna | en_revisión | en_arbitraje | resuelta
-    evidencia_evaluada: evaluación[]
-    resultado: a_favor_proveedor | a_favor_cliente | ambiguo
-    arbitraje:
-      árbitros: referencia[]
-      votos: voto[]
-    resolución_final: referencia
-    resuelta_en: fecha_hora
-
   documentación:
     tipo_registro: texto         # Ficha clínica, minuta, reporte
     generado_en: fecha_hora
@@ -156,7 +151,40 @@ export const SCHEMA_YAML = `servicio:
     monto: dinero
     pagador: referencia          # Apunta a partes.pagador
     estado: pendiente | facturado | pagado | disputado | reembolsado
-    documento_tributario: referencia`;
+    documento_tributario: referencia
+
+# ─────────────────────────────────────────────
+# MÓDULO: Servicialo/Finanzas (en diseño)
+# Distribución de pagos entre partes
+# ─────────────────────────────────────────────
+
+  distribución:                  # Servicialo/Finanzas
+    profesional:
+      tipo: porcentaje | monto_fijo | mixto
+      valor: número
+      liquidación: por_sesión | mensual
+    organización:
+      tipo: porcentaje | monto_fijo
+      valor: número
+    infraestructura:
+      tipo: monto_fijo | porcentaje
+      valor: número
+      concepto: box | equipamiento | sala
+
+# ─────────────────────────────────────────────
+# MÓDULO: Servicialo/Disputas (en diseño)
+# Resolución formal de disputas
+# ─────────────────────────────────────────────
+
+  resolución:                    # Servicialo/Disputas
+    estado: ninguna | en_revisión | en_arbitraje | resuelta
+    evidencia_evaluada: evaluación[]
+    resultado: a_favor_proveedor | a_favor_cliente | ambiguo
+    arbitraje:
+      árbitros: referencia[]
+      votos: voto[]
+    resolución_final: referencia
+    resuelta_en: fecha_hora`;
 
 export const EVIDENCE_BY_VERTICAL = [
   {
@@ -253,6 +281,53 @@ export const DISPUTE_RESOLUTION_FLOW = [
     label: "Resolución final",
     desc: "Pago liberado o reembolsado según resolución. Puntaje de confianza ajustado para ambas partes. Historial de disputa registrado.",
     actor: "sistema",
+  },
+] as const;
+
+export const MODULES = [
+  {
+    id: "core",
+    name: "Servicialo Core",
+    status: "estable" as const,
+    statusColor: "green" as const,
+    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción y prueba de entrega.",
+    audience: "Cualquier plataforma que coordine servicios profesionales — desde una clínica de kinesiología hasta un marketplace de limpieza.",
+    includes: [
+      "Ciclo de vida (9 estados universales)",
+      "8 dimensiones del servicio",
+      "Flujos de excepción (cancelación, inasistencia, reagendamiento)",
+      "Prueba de entrega con evidencia por vertical",
+      "Contrato de servicio pre-acordado",
+      "Protocolo MCP para agentes AI",
+    ],
+  },
+  {
+    id: "finanzas",
+    name: "Servicialo/Finanzas",
+    status: "en diseño" as const,
+    statusColor: "accent" as const,
+    desc: "Distribución de pagos entre las partes involucradas. Define cómo se reparte el ingreso entre profesional, organización e infraestructura — con reglas claras de liquidación.",
+    audience: "Plataformas que intermedian pagos entre clientes y profesionales, o que cobran comisiones y arriendo de infraestructura.",
+    includes: [
+      "Distribución de pagos a tres destinatarios",
+      "Tipos: porcentaje | monto_fijo | mixto",
+      "Momentos de liquidación: por_sesión | mensual | al_cierre",
+      "Concepto de infraestructura (box, equipamiento, sala)",
+    ],
+  },
+  {
+    id: "disputas",
+    name: "Servicialo/Disputas",
+    status: "en diseño" as const,
+    statusColor: "accent" as const,
+    desc: "Resolución formal de disputas con arbitraje algorítmico y por pares. Define el flujo completo desde apertura hasta resolución final, con evidencia válida por vertical.",
+    audience: "Plataformas con volumen suficiente para justificar arbitraje estructurado — o donde el monto por servicio hace que las disputas sean económicamente relevantes.",
+    includes: [
+      "Flujo de disputa en 6 pasos",
+      "Resolución algorítmica (~80% de los casos)",
+      "Arbitraje por pares del mismo vertical",
+      "Evidencia válida definida por vertical",
+    ],
   },
 ] as const;
 

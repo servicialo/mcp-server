@@ -6,6 +6,7 @@ import { CicloSection } from "@/components/CicloSection";
 import { ResolucionSection } from "@/components/ResolucionSection";
 import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
+import { ModulosSection } from "@/components/ModulosSection";
 import { EstandarSection } from "@/components/EstandarSection";
 import { ConectateSection } from "@/components/ConectateSection";
 import { Footer } from "@/components/Footer";
@@ -35,6 +36,9 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <PrincipiosSection />
+      </FadeIn>
+      <FadeIn>
+        <ModulosSection />
       </FadeIn>
       <FadeIn>
         <EstandarSection />

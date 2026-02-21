@@ -31,7 +31,43 @@ npx -y @servicialo/mcp-server
 
 Ver documentación completa en [`packages/mcp-server/README.md`](packages/mcp-server/README.md).
 
-## El estándar
+## Arquitectura modular
+
+Servicialo está diseñado como un estándar por capas. Un implementador adopta lo que necesita según la complejidad de su operación.
+
+```
+Servicialo Core                    ← estable
+├── Ciclo de vida (9 estados)
+├── 8 dimensiones del servicio
+├── Flujos de excepción
+├── Prueba de entrega
+├── Contrato de servicio
+└── Protocolo MCP para agentes AI
+
+Servicialo/Finanzas                ← en diseño
+├── Distribución de pagos (profesional, organización, infraestructura)
+├── Tipos: porcentaje | monto_fijo | mixto
+└── Momentos de liquidación: por_sesión | mensual | al_cierre
+
+Servicialo/Disputas                ← en diseño
+├── Resolución algorítmica (~80%)
+├── Arbitraje por pares del mismo vertical
+└── Evidencia válida por vertical
+```
+
+### Certificación por capas
+
+Un implementador puede ser **Servicialo Core certified** sin adoptar los módulos opcionales. Core cubre todo lo necesario para modelar, agendar, ejecutar, documentar y cobrar un servicio profesional.
+
+Los módulos son independientes entre sí y se agregan según necesidad:
+
+| Módulo | Para quién | Estado |
+|--------|-----------|--------|
+| **Core** | Cualquier plataforma que coordine servicios | Estable |
+| **/Finanzas** | Plataformas que intermedian pagos o cobran comisiones | En diseño |
+| **/Disputas** | Plataformas con volumen o montos que justifican arbitraje formal | En diseño |
+
+## El estándar (Core)
 
 Un servicio profesional tiene 9 dimensiones:
 
@@ -42,27 +78,33 @@ Un servicio profesional tiene 9 dimensiones:
 5. **Agendamiento** — cuándo, dónde, cuánto dura
 6. **Ciclo de vida** — 9 estados universales desde solicitud hasta cierre
 7. **Prueba de entrega** — checkin, checkout, evidencia por vertical
-8. **Resolución** — mecanismo algorítmico + arbitraje por pares para disputas
-9. **Documentación y facturación** — fichas, minutas, cobro, documento tributario
+8. **Documentación y facturación** — fichas, minutas, cobro, documento tributario
 
 ## Resolución de disputas
 
-El estándar define un mecanismo híbrido de resolución que no depende de un árbitro centralizado:
+> **Nota:** La resolución de disputas está documentada como spec en Servicialo/Disputas (en diseño). En Core, la disputa queda a criterio de la implementación — el contrato de servicio define las reglas, pero el mecanismo de resolución es libre.
 
-1. **Contrato de servicio** — antes de iniciar, ambas partes aceptan qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Las reglas son inmutables una vez aceptadas.
-2. **Resolución algorítmica (~80%)** — el sistema compara evidencia registrada contra la evidencia requerida por el contrato. Si la evidencia es concluyente, se resuelve automáticamente.
-3. **Arbitraje por pares (~20%)** — cuando la evidencia es ambigua, un panel de 1-3 profesionales del mismo vertical con alta reputación revisa y vota. Mayoría simple en 48 horas.
+El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un árbitro centralizado:
 
-## Límites de la versión actual (v0.2)
+1. **Contrato de servicio** (Core) — antes de iniciar, ambas partes aceptan qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Las reglas son inmutables una vez aceptadas.
+2. **Resolución algorítmica (~80%)** (Disputas) — el sistema compara evidencia registrada contra la evidencia requerida por el contrato. Si la evidencia es concluyente, se resuelve automáticamente.
+3. **Arbitraje por pares (~20%)** (Disputas) — cuando la evidencia es ambigua, un panel de 1-3 profesionales del mismo vertical con alta reputación revisa y vota. Mayoría simple en 48 horas.
 
-### Lo que cubre
+## Límites del estándar v0.x
+
+### Lo que cubre Core hoy
 
 - **Modelo de partes** — separación entre beneficiario, solicitante y pagador para cubrir los casos más comunes (salud con aseguradora, corporativo, familiar)
 - **Ciclo de vida** — 9 estados universales con 6 flujos de excepción definidos
-- **Resolución de disputas** — mecanismo híbrido algorítmico + arbitraje por pares
 - **Evidencia por vertical** — tipos de evidencia requerida para salud, hogar, legal y educación
 - **Contrato de servicio** — reglas pre-acordadas inmutables una vez iniciado el ciclo
+- **Facturación simple** — monto, pagador, estado, documento tributario
 - **Agentes AI** — protocolo MCP con 23 herramientas para interacción programática
+
+### Lo que queda para módulos futuros
+
+- **Distribución de pagos** — cómo se reparte el ingreso entre profesional, organización e infraestructura → Servicialo/Finanzas
+- **Resolución formal de disputas** — arbitraje algorítmico + por pares con evidencia por vertical → Servicialo/Disputas. En Core, la resolución de disputas queda a criterio de cada implementación
 
 ### Lo que NO cubre (aún)
 
