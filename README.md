@@ -4,6 +4,8 @@ Estándar abierto para la entrega de servicios profesionales.
 
 Define cómo se estructura, agenda, ejecuta, documenta y cobra un servicio — independiente de la plataforma que lo implemente.
 
+📋 **[Read the Protocol Specification →](./PROTOCOL.md)**
+
 ## Qué hay en este repositorio
 
 ```
@@ -67,18 +69,28 @@ Los módulos son independientes entre sí y se agregan según necesidad:
 | **/Finanzas** | Plataformas que intermedian pagos o cobran comisiones | En diseño |
 | **/Disputas** | Plataformas con volumen o montos que justifican arbitraje formal | En diseño |
 
-## El estándar (Core)
+## El estándar
 
-Un servicio profesional tiene 9 dimensiones:
+La especificación completa vive en [`PROTOCOL.md`](./PROTOCOL.md) e incluye:
+- Las 8 dimensiones de un servicio profesional
+- Los 9 estados universales del ciclo de vida
+- 6 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial)
+- 6 principios de diseño
+- Schema canónico en YAML
+- Telemetry Extension (planificada) para benchmarks de industria
+- Referencia del MCP server
 
+### Resumen rápido
+
+Un servicio profesional tiene 8 dimensiones:
 1. **Identidad** — qué servicio es y a qué vertical pertenece
 2. **Proveedor** — quién lo entrega, con qué credenciales
-3. **Partes** — quién recibe (beneficiario), quién solicita (solicitante), quién paga (pagador)
-4. **Contrato de servicio** — reglas acordadas antes del compromiso: evidencia requerida, políticas, arbitraje
-5. **Agendamiento** — cuándo, dónde, cuánto dura
-6. **Ciclo de vida** — 9 estados universales desde solicitud hasta cierre
-7. **Prueba de entrega** — checkin, checkout, evidencia por vertical
-8. **Documentación y facturación** — fichas, minutas, cobro, documento tributario
+3. **Cliente** — quién lo recibe, quién paga
+4. **Agendamiento** — cuándo, dónde, cuánto dura
+5. **Ciclo de vida** — 9 estados universales desde solicitud hasta cierre
+6. **Prueba de entrega** — checkin, checkout, evidencia
+7. **Documentación** — fichas, minutas, reportes
+8. **Facturación** — monto, pagador, estado de pago
 
 ## Resolución de disputas
 
@@ -119,7 +131,31 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 
 ## Implementaciones
 
-Cualquier plataforma puede implementar la especificación Servicialo.
+Cualquier plataforma puede implementar la especificación Servicialo. Para ser listada, debe:
+
+1. Modelar servicios usando las 8 dimensiones
+2. Implementar los 9 estados del ciclo de vida
+3. Manejar al menos 3 flujos de excepción
+4. Exponer una API conectable al MCP server
+
+### Implementación de referencia
+
+| Plataforma | Vertical | Cobertura | Estado | URL |
+|------------|----------|-----------|--------|-----|
+| **Coordinalo** | Salud (kinesiología) | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+
+Coordinalo implementó compatibilidad Servicialo en 6 fases:
+
+| Fase | Qué implementa | Dimensiones cubiertas |
+|------|----------------|----------------------|
+| 1 — Ciclo de vida | Timestamps como milestones (`startedAt`, `documentedAt`, `invoicedAt`, `paidAt`) | Agendamiento, Ciclo de vida |
+| 2 — Flujos de excepción | Transiciones de estado, StatusHistory, cancelaciones, no-shows, reagendamiento | Ciclo de vida (excepciones) |
+| 3 — Prueba de entrega | DeliveryProof bilateral (proveedor + cliente confirman) | Prueba de entrega |
+| 4 — Pagador ≠ Receptor | PaymentResponsible (self, family, institution) + PaymentAssignment | Cliente (quién paga) |
+| 5 — Catálogo descubrible | Servicio enriquecido: requisitos, resultado esperado, contraindicaciones, etiquetas, isDiscoverable | Identidad |
+| 6 — Compatibilidad MCP | Exposición vía @servicialo/mcp-server (4 tools discovery + 23 autenticadas) | Todas (via MCP) |
+
+> Querés listar tu implementación? [Abrí un issue](https://github.com/servicialo/mcp-server/issues).
 
 ## Licencia
 
