@@ -1,8 +1,14 @@
 # Servicialo
 
-Estándar abierto para la entrega de servicios profesionales.
+Protocolo abierto para que agentes AI coordinen servicios profesionales.
 
-Define cómo se estructura, agenda, ejecuta, documenta y cobra un servicio — independiente de la plataforma que lo implemente.
+Si estás construyendo un agente que necesita agendar, verificar entrega o cobrar un servicio — sin integrarte con cada plataforma por separado — este es el protocolo.
+
+**Quickstart**
+
+```bash
+npx -y @servicialo/mcp-server
+```
 
 📋 **[Read the Protocol Specification →](./PROTOCOL.md)**
 
@@ -25,7 +31,7 @@ Sitio público que documenta el estándar: definición de servicio, las 9 dimens
 Servidor MCP que permite a agentes de IA interactuar con organizaciones de servicios profesionales. Dos modos de operación:
 
 - **Modo descubrimiento** — sin credenciales, 4 herramientas públicas para buscar organizaciones y consultar disponibilidad
-- **Modo autenticado** — con credenciales, 23 herramientas para agendar, gestionar clientes, pagos, proveedores y nóminas
+- **Modo autenticado** — con credenciales, 16 herramientas en 6 fases del ciclo de vida del servicio
 
 ```bash
 npx -y @servicialo/mcp-server
@@ -111,7 +117,7 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 - **Evidencia por vertical** — tipos de evidencia requerida para salud, hogar, legal y educación
 - **Contrato de servicio** — reglas pre-acordadas inmutables una vez iniciado el ciclo
 - **Facturación simple** — monto, pagador, estado, documento tributario
-- **Agentes AI** — protocolo MCP con 23 herramientas para interacción programática
+- **Agentes AI** — protocolo MCP con 20 herramientas para interacción programática
 
 ### Lo que queda para módulos futuros
 
@@ -155,7 +161,7 @@ Coordinalo implementó compatibilidad Servicialo en 6 fases:
 | 3 — Prueba de entrega | DeliveryProof bilateral (proveedor + cliente confirman) | Prueba de entrega |
 | 4 — Pagador ≠ Receptor | PaymentResponsible (self, family, institution) + PaymentAssignment | Cliente (quién paga) |
 | 5 — Catálogo descubrible | Servicio enriquecido: requisitos, resultado esperado, contraindicaciones, etiquetas, isDiscoverable | Identidad |
-| 6 — Compatibilidad MCP | Exposición vía @servicialo/mcp-server (4 tools discovery + 23 autenticadas) | Todas (via MCP) |
+| 6 — Compatibilidad MCP | Exposición vía @servicialo/mcp-server (4 tools discovery + 16 autenticadas) | Todas (via MCP) |
 
 > Querés listar tu implementación? [Abrí un issue](https://github.com/servicialo/mcp-server/issues).
 

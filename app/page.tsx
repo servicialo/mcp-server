@@ -8,6 +8,7 @@ import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection"
 import { PrincipiosSection } from "@/components/PrincipiosSection";
 import { ModulosSection } from "@/components/ModulosSection";
 import { EstandarSection } from "@/components/EstandarSection";
+import { PorQueSection } from "@/components/PorQueSection";
 import { ConectateSection } from "@/components/ConectateSection";
 import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
@@ -42,6 +43,9 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <EstandarSection />
+      </FadeIn>
+      <FadeIn>
+        <PorQueSection />
       </FadeIn>
       <FadeIn>
         <ConectateSection />

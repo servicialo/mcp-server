@@ -128,17 +128,17 @@ export function ConectateSection() {
   return (
     <section id="mcp-server" className="mb-16">
       <SectionTitle
-        tag="10 — Servidor MCP"
+        tag="11 — Servidor MCP"
         title="Hecho para agentes"
         subtitle="Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa."
       />
 
       {/* Intro block */}
       <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
-        <div className="text-[13px] text-text-muted leading-relaxed mb-3">
-          Para desarrolladores que construyen agentes de IA que necesitan interactuar con
-          organizaciones de servicios profesionales: agendar citas, consultar
-          disponibilidad, gestionar clientes.
+        <div className="text-[13px] text-text-body leading-relaxed mb-3">
+          Diseñado para developers que construyen agentes AI sobre negocios de servicios
+          profesionales en LATAM. Si tu agente necesita agendar, verificar entrega o cobrar
+          un servicio — sin importar la plataforma — este es el protocolo.
         </div>
         <div className="text-[13px] text-text-dim leading-relaxed">
           No es para usuarios finales de plataformas Servicialo-compatible — esas

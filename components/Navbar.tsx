@@ -13,6 +13,7 @@ const sections = [
   { name: "Principios", id: "principios" },
   { name: "Módulos", id: "modulos" },
   { name: "Estándar", id: "estandar" },
+  { name: "Por qué", id: "por-que" },
   { name: "Servidor MCP", id: "mcp-server" },
 ];
 
