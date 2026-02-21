@@ -8,6 +8,8 @@ const sections = [
   { name: "Origen", id: "origen" },
   { name: "Anatomía", id: "anatomia" },
   { name: "Ciclo de vida", id: "ciclo" },
+  { name: "Disputas", id: "resolucion" },
+  { name: "Evidencia", id: "evidencia-vertical" },
   { name: "Principios", id: "principios" },
   { name: "Estándar", id: "estandar" },
   { name: "Servidor MCP", id: "mcp-server" },

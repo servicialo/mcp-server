@@ -46,9 +46,26 @@ function SchemaBlock() {
       <Line>    <span className={k}>credenciales:</span> <span className={t}>texto[]</span>     <span className={c}># Certificaciones requeridas</span></Line>
       <Line>    <span className={k}>puntaje_confianza:</span> <span className={t}>número</span> <span className={c}># 0-100 calculado por historial</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>cliente:</span></Line>
-      <Line>    <span className={k}>id:</span> <span className={t}>texto</span></Line>
-      <Line>    <span className={k}>id_pagador:</span> <span className={t}>texto</span>         <span className={c}># Puede diferir del cliente</span></Line>
+      <Line>  <span className={a}>partes:</span>                          <span className={c}># Reemplaza &quot;cliente&quot;</span></Line>
+      <Line>    <span className={a}>beneficiario:</span>                  <span className={c}># Quién recibe el servicio</span></Line>
+      <Line>      <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>      <span className={k}>relación:</span> <span className={t}>texto</span>         <span className={c}># paciente | alumno | propietario</span></Line>
+      <Line>    <span className={a}>solicitante:</span>                   <span className={c}># Quién inicia y gestiona</span></Line>
+      <Line>      <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>      <span className={k}>relación:</span> <span className={t}>texto</span>         <span className={c}># mismo | familiar | empleador</span></Line>
+      <Line>    <span className={a}>pagador:</span>                       <span className={c}># Quién paga</span></Line>
+      <Line>      <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>      <span className={k}>tipo:</span> <span className={t}>persona | org | aseguradora</span></Line>
+      <Line>&nbsp;</Line>
+      <Line>  <span className={a}>contrato_de_servicio:</span>            <span className={c}># Reglas ANTES del compromiso</span></Line>
+      <Line>    <span className={k}>evidencia_requerida:</span> <span className={t}>tipo[]</span></Line>
+      <Line>    <span className={k}>plazo_disputa:</span> <span className={t}>duración</span></Line>
+      <Line>    <span className={k}>política_cancelación:</span> <span className={t}>regla[]</span></Line>
+      <Line>    <span className={k}>política_inasistencia:</span> <span className={t}>regla[]</span></Line>
+      <Line>    <span className={a}>arbitraje:</span></Line>
+      <Line>      <span className={k}>habilitado:</span> <span className={t}>booleano</span></Line>
+      <Line>      <span className={k}>árbitros:</span> <span className={t}>1 | 3</span></Line>
+      <Line>      <span className={k}>plazo_voto:</span> <span className={t}>duración</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>agenda:</span></Line>
       <Line>    <span className={k}>solicitado_en:</span> <span className={t}>fecha_hora</span></Line>
@@ -58,14 +75,24 @@ function SchemaBlock() {
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>ciclo_de_vida:</span></Line>
       <Line>    <span className={k}>estado_actual:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
-      <Line>    <span className={k}>transiciones:</span> <span className={t}>transición[]</span> <span className={c}># Historial de cambios</span></Line>
-      <Line>    <span className={k}>excepciones:</span> <span className={t}>excepción[]</span>  <span className={c}># Inasistencias, disputas, etc</span></Line>
+      <Line>    <span className={k}>transiciones:</span> <span className={t}>transición[]</span></Line>
+      <Line>    <span className={k}>excepciones:</span> <span className={t}>excepción[]</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>prueba_de_entrega:</span></Line>
       <Line>    <span className={k}>entrada:</span> <span className={t}>fecha_hora</span></Line>
       <Line>    <span className={k}>salida:</span> <span className={t}>fecha_hora</span></Line>
       <Line>    <span className={k}>duración_real:</span> <span className={t}>minutos</span></Line>
       <Line>    <span className={k}>evidencia:</span> <span className={t}>evidencia[]</span>    <span className={c}># GPS, firma, fotos, documentos</span></Line>
+      <Line>&nbsp;</Line>
+      <Line>  <span className={a}>resolución:</span>                      <span className={c}># Mecanismo de disputas</span></Line>
+      <Line>    <span className={k}>estado:</span> <span className={t}>ninguna | en_revisión | en_arbitraje | resuelta</span></Line>
+      <Line>    <span className={k}>evidencia_evaluada:</span> <span className={t}>evaluación[]</span></Line>
+      <Line>    <span className={k}>resultado:</span> <span className={t}>a_favor_proveedor | a_favor_cliente | ambiguo</span></Line>
+      <Line>    <span className={a}>arbitraje:</span></Line>
+      <Line>      <span className={k}>árbitros:</span> <span className={t}>referencia[]</span></Line>
+      <Line>      <span className={k}>votos:</span> <span className={t}>voto[]</span></Line>
+      <Line>    <span className={k}>resolución_final:</span> <span className={t}>referencia</span></Line>
+      <Line>    <span className={k}>resuelta_en:</span> <span className={t}>fecha_hora</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>documentación:</span></Line>
       <Line>    <span className={k}>tipo_registro:</span> <span className={t}>texto</span>      <span className={c}># Ficha clínica, minuta, reporte</span></Line>
@@ -74,8 +101,8 @@ function SchemaBlock() {
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>facturación:</span></Line>
       <Line>    <span className={k}>monto:</span> <span className={t}>dinero</span></Line>
-      <Line>    <span className={k}>pagador:</span> <span className={t}>referencia</span></Line>
-      <Line>    <span className={k}>estado:</span> <span className={t}>pendiente | facturado | pagado | disputado</span></Line>
+      <Line>    <span className={k}>pagador:</span> <span className={t}>referencia</span>       <span className={c}># Apunta a partes.pagador</span></Line>
+      <Line>    <span className={k}>estado:</span> <span className={t}>pendiente | facturado | pagado | disputado | reembolsado</span></Line>
       <Line>    <span className={k}>documento_tributario:</span> <span className={t}>referencia</span></Line>
     </pre>
   );
@@ -85,7 +112,7 @@ export function EstandarSection() {
   return (
     <section id="estandar" className="mb-16">
       <SectionTitle
-        tag="06 — El estándar"
+        tag="08 — El estándar"
         title="Protocolo de Entrega de Servicios"
         subtitle="Cualquiera puede implementarlo."
       />
@@ -93,7 +120,7 @@ export function EstandarSection() {
       {/* Schema block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Protocolo de Entrega de Servicios v0.1
+          Protocolo de Entrega de Servicios v0.2
         </div>
         <SchemaBlock />
       </div>

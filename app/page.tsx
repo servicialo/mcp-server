@@ -3,6 +3,8 @@ import { QueEsSection } from "@/components/QueEsSection";
 import { OrigenSection } from "@/components/OrigenSection";
 import { AnatomiaSection } from "@/components/AnatomiaSection";
 import { CicloSection } from "@/components/CicloSection";
+import { ResolucionSection } from "@/components/ResolucionSection";
+import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
 import { EstandarSection } from "@/components/EstandarSection";
 import { ConectateSection } from "@/components/ConectateSection";
@@ -24,6 +26,12 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <CicloSection />
+      </FadeIn>
+      <FadeIn>
+        <ResolucionSection />
+      </FadeIn>
+      <FadeIn>
+        <EvidenciaVerticalSection />
       </FadeIn>
       <FadeIn>
         <PrincipiosSection />

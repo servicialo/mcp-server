@@ -25,8 +25,8 @@ const EXCEPTIONS = [
   },
   {
     title: "Disputa de calidad",
-    transition: "Completado → En Revisión",
-    desc: "Congela pago, solicita evidencia adicional, escala si es necesario.",
+    transition: "Completado → En Revisión → Resuelta",
+    desc: "Congela pago. Algoritmo evalúa evidencia vs contrato de servicio. Si concluyente: resolución automática (~80%). Si ambiguo: arbitraje por pares del mismo vertical.",
     borderColor: "border-l-purple",
   },
   {

@@ -20,7 +20,7 @@ Useful for: agents that help users find and evaluate professional services.
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` obtained from the Servicialo-compatible platform your organization uses (e.g., [Coordinalo](https://coordinalo.com)).
+Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` obtained from the Servicialo-compatible platform your organization uses.
 
 Enables: scheduling, client management, payments, providers, payroll, and notifications — all 23 tools.
 
@@ -49,7 +49,7 @@ Omit the `env` block entirely for discovery-only mode.
 |---|---|---|
 | `SERVICIALO_API_KEY` | No | Bearer token — enables authenticated mode |
 | `SERVICIALO_ORG_ID` | No | Organization slug — enables authenticated mode |
-| `SERVICIALO_BASE_URL` | No | API base URL (default: `https://coordinalo.com`) |
+| `SERVICIALO_BASE_URL` | No | API base URL of the Servicialo-compatible platform |
 
 ## Public Tools (4) — Always Available
 
@@ -118,9 +118,9 @@ Omit the `env` block entirely for discovery-only mode.
 
 The server connects to three platform modules:
 
-- **Coordinalo** — Scheduling and session management
-- **Relacionalo** — Client CRM and relationship management
-- **Planificalo** — Finance, payments, payroll, and provider management
+- **Scheduling** — Session management and calendar coordination
+- **CRM** — Client relationship management
+- **Finance** — Payments, payroll, and provider management
 
 ## Development
 

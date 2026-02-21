@@ -70,8 +70,9 @@ export const LIFECYCLE_STATES = [
 export const ANATOMY = [
   { field: "Qué", desc: "La actividad o resultado que se entrega", example: "Sesión de kinesiología / Reparación eléctrica / Consulta legal" },
   { field: "Quién entrega", desc: "El proveedor del servicio", example: "Kinesiólogo certificado / Electricista SEC / Abogado tributario" },
-  { field: "Quién recibe", desc: "El beneficiario del servicio", example: "Paciente / Propietario / Empresa" },
-  { field: "Quién paga", desc: "No siempre es quien recibe", example: "FONASA paga por el paciente / Empresa paga por el empleado" },
+  { field: "Quién recibe", desc: "El beneficiario directo del servicio", example: "Paciente / Propietario / Alumno" },
+  { field: "Quién solicita", desc: "Quien inicia y gestiona — puede diferir del beneficiario", example: "Hijo agenda para su madre / RRHH agenda para empleado" },
+  { field: "Quién paga", desc: "No siempre es quien recibe ni quien solicita", example: "FONASA paga por el paciente / Empresa paga por el empleado" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual", example: "Clínica / Domicilio / Videollamada" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + ficha clínica firmada" },
@@ -85,6 +86,7 @@ export const PRINCIPLES = [
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
   { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
+  { title: "Las reglas se acuerdan antes, no después", body: "El contrato de servicio define qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Una vez que ambas partes aceptan, las reglas son inmutables. Ni el proveedor, ni el cliente, ni la plataforma pueden cambiarlas unilateralmente." },
 ] as const;
 
 export const SCHEMA_YAML = `servicio:
@@ -97,9 +99,26 @@ export const SCHEMA_YAML = `servicio:
     credenciales: texto[]        # Certificaciones requeridas
     puntaje_confianza: número    # 0-100 calculado por historial
 
-  cliente:
-    id: texto
-    id_pagador: texto            # Puede diferir del cliente
+  partes:
+    beneficiario:                # Quién recibe el servicio
+      id: texto
+      relación: texto            # paciente | alumno | propietario
+    solicitante:                 # Quién inicia y gestiona
+      id: texto
+      relación: texto            # mismo | familiar | empleador
+    pagador:                     # Quién paga
+      id: texto
+      tipo: persona | org | aseguradora
+
+  contrato_de_servicio:          # Reglas acordadas ANTES del compromiso
+    evidencia_requerida: tipo[]  # Qué pruebas se necesitan
+    plazo_disputa: duración      # Ventana para abrir disputa
+    política_cancelación: regla[]
+    política_inasistencia: regla[]
+    arbitraje:
+      habilitado: booleano
+      árbitros: 1 | 3
+      plazo_voto: duración
 
   agenda:
     solicitado_en: fecha_hora
@@ -118,6 +137,16 @@ export const SCHEMA_YAML = `servicio:
     duración_real: minutos
     evidencia: evidencia[]       # GPS, firma, fotos, documentos
 
+  resolución:                    # Mecanismo de resolución de disputas
+    estado: ninguna | en_revisión | en_arbitraje | resuelta
+    evidencia_evaluada: evaluación[]
+    resultado: a_favor_proveedor | a_favor_cliente | ambiguo
+    arbitraje:
+      árbitros: referencia[]
+      votos: voto[]
+    resolución_final: referencia
+    resuelta_en: fecha_hora
+
   documentación:
     tipo_registro: texto         # Ficha clínica, minuta, reporte
     generado_en: fecha_hora
@@ -125,6 +154,113 @@ export const SCHEMA_YAML = `servicio:
 
   facturación:
     monto: dinero
-    pagador: referencia
-    estado: pendiente | facturado | pagado | disputado
+    pagador: referencia          # Apunta a partes.pagador
+    estado: pendiente | facturado | pagado | disputado | reembolsado
     documento_tributario: referencia`;
+
+export const EVIDENCE_BY_VERTICAL = [
+  {
+    vertical: "salud",
+    label: "Salud",
+    icon: "\u{1F3E5}",
+    color: "blue" as const,
+    required: [
+      { type: "check_in", label: "Registro de entrada", desc: "Timestamp GPS del proveedor al llegar", auto: true },
+      { type: "check_out", label: "Registro de salida", desc: "Timestamp GPS del proveedor al salir", auto: true },
+      { type: "clinical_record", label: "Ficha clínica firmada", desc: "Registro clínico firmado por profesional y paciente", auto: false },
+      { type: "treatment_plan", label: "Adherencia al plan", desc: "Checklist del plan de tratamiento ejecutado", auto: false },
+    ],
+    resolution_rule: "Si check-in/out existen y ficha clínica está firmada por ambas partes, servicio entregado. Si falta ficha o firma, escalar.",
+  },
+  {
+    vertical: "hogar",
+    label: "Hogar",
+    icon: "\u{1F3E0}",
+    color: "green" as const,
+    required: [
+      { type: "photo_before", label: "Foto antes", desc: "Foto del estado inicial con timestamp y GPS", auto: false },
+      { type: "photo_after", label: "Foto después", desc: "Foto del resultado final con timestamp y GPS", auto: false },
+      { type: "checklist", label: "Checklist de completitud", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
+      { type: "client_signature", label: "Firma del cliente", desc: "Firma digital del cliente confirmando recepción", auto: false },
+    ],
+    resolution_rule: "Si fotos antes/después existen con metadata válida y checklist completo, servicio entregado. Si falta firma del cliente, escalar.",
+  },
+  {
+    vertical: "legal",
+    label: "Legal",
+    icon: "\u{2696}\u{FE0F}",
+    color: "purple" as const,
+    required: [
+      { type: "meeting_minutes", label: "Minuta de reunión", desc: "Registro de lo discutido y acordado", auto: false },
+      { type: "document_delivery", label: "Entrega de documentos", desc: "Confirmación de entrega de documentos generados", auto: false },
+      { type: "billing_hours", label: "Registro de horas", desc: "Log de horas facturables con descripción de actividades", auto: false },
+    ],
+    resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, servicio entregado. Si horas exceden lo acordado sin justificación, escalar.",
+  },
+  {
+    vertical: "educación",
+    label: "Educación",
+    icon: "\u{1F4DA}",
+    color: "accent" as const,
+    required: [
+      { type: "attendance", label: "Registro de asistencia", desc: "Confirmación de presencia del alumno y profesor", auto: true },
+      { type: "material_delivery", label: "Entrega de material", desc: "Material o tareas entregadas al alumno", auto: false },
+      { type: "evaluation", label: "Registro de evaluación", desc: "Evaluación o feedback de la sesión", auto: false },
+    ],
+    resolution_rule: "Si asistencia registrada y material entregado, servicio entregado. Si falta evaluación y contrato la requiere, escalar.",
+  },
+] as const;
+
+export const DISPUTE_RESOLUTION_FLOW = [
+  {
+    step: 1,
+    id: "apertura",
+    label: "Apertura de disputa",
+    desc: "Cualquier parte puede abrir una disputa dentro del plazo definido en el contrato de servicio. Se congela el pago automáticamente.",
+    actor: "cliente | proveedor | agente",
+  },
+  {
+    step: 2,
+    id: "revision_evidencia",
+    label: "Revisión algorítmica",
+    desc: "El sistema compara la evidencia registrada contra la evidencia_requerida del contrato de servicio. Sin intervención humana.",
+    actor: "sistema",
+  },
+  {
+    step: 3,
+    id: "resolucion_automatica",
+    label: "Resolución automática",
+    desc: "Si toda la evidencia requerida existe y es válida: a favor del proveedor. Si falta evidencia requerida: a favor del cliente. ~80% de disputas se resuelven aquí.",
+    actor: "sistema",
+  },
+  {
+    step: 4,
+    id: "escalamiento",
+    label: "Escalamiento a arbitraje",
+    desc: "Si la evidencia es ambigua o contradictoria, se escala a un panel de árbitros del mismo vertical profesional.",
+    actor: "sistema",
+  },
+  {
+    step: 5,
+    id: "arbitraje",
+    label: "Arbitraje por pares",
+    desc: "1-3 árbitros del mismo vertical con puntaje de confianza >= 80 revisan evidencia y votan. Mayoría simple decide. 48 horas para votar.",
+    actor: "árbitros",
+  },
+  {
+    step: 6,
+    id: "resolucion_final",
+    label: "Resolución final",
+    desc: "Pago liberado o reembolsado según resolución. Puntaje de confianza ajustado para ambas partes. Historial de disputa registrado.",
+    actor: "sistema",
+  },
+] as const;
+
+export const CONTRATO_FIELDS = [
+  { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "check_in + check_out + ficha_clinica_firmada" },
+  { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Completado", example: "48 horas" },
+  { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "0% si >24h, 50% si 2-24h, 100% si <2h" },
+  { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "Cliente: cobra 100%. Proveedor: reasignación + penalidad" },
+  { field: "arbitraje", desc: "Configuración del arbitraje por pares si aplica", example: "1 árbitro si monto < $50, 3 si >= $50" },
+  { field: "monto_máximo_disputa", desc: "Monto máximo que puede disputarse sin escalamiento externo", example: "$500 USD equivalente" },
+] as const;
