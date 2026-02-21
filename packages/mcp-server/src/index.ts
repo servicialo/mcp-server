@@ -18,6 +18,7 @@ import { paymentsTools } from './tools/authenticated/payments.js';
 import { notificationsTools } from './tools/authenticated/notifications.js';
 import { providersTools } from './tools/authenticated/providers.js';
 import { payrollTools } from './tools/authenticated/payroll.js';
+import { contractsTools } from './tools/authenticated/contracts.js';
 
 // --- Detect mode ---
 const mode = detectMode();
@@ -65,6 +66,7 @@ const authenticatedTools: Record<string, ToolDef> = {
   ...notificationsTools as unknown as Record<string, ToolDef>,
   ...providersTools as unknown as Record<string, ToolDef>,
   ...payrollTools as unknown as Record<string, ToolDef>,
+  ...contractsTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Register tools ---

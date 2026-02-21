@@ -22,7 +22,7 @@ SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-se
 
 Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` obtained from the Servicialo-compatible platform your organization uses.
 
-Enables: scheduling, client management, payments, providers, payroll, and notifications — all 23 tools.
+Enables: scheduling, contracts, client management, payments, providers, payroll, and notifications — all 24 tools.
 
 ### Claude Desktop Configuration
 
@@ -51,6 +51,16 @@ Omit the `env` block entirely for discovery-only mode.
 | `SERVICIALO_ORG_ID` | No | Organization slug — enables authenticated mode |
 | `SERVICIALO_BASE_URL` | No | API base URL of the Servicialo-compatible platform |
 
+## Recommended Agent Flow (3 Steps)
+
+```
+1. CONTEXTO  → check_availability, get_organization   (entender qué hay disponible)
+2. CONTRATO  → contract.get                           (conocer las reglas del servicio)
+3. ACCIÓN    → book, reschedule, cancel                (ejecutar con las reglas claras)
+```
+
+Always call `contract.get` before any booking, cancellation, or reschedule to know the service's cancellation policy, required evidence, no-show rules, and dispute resolution terms.
+
 ## Public Tools (4) — Always Available
 
 | Tool | Description |
@@ -60,7 +70,13 @@ Omit the `env` block entirely for discovery-only mode.
 | `scheduling.check_availability` | Check available slots without authentication |
 | `services.list` | List the public service catalog of an organization |
 
-## Authenticated Tools (19) — Require Credentials
+## Authenticated Tools (20) — Require Credentials
+
+### Contracts (1)
+
+| Tool | Description |
+|---|---|
+| `contract.get` | Get the pre-agreed service contract: required evidence, cancellation policy, no-show policy, dispute terms |
 
 ### Scheduling (4)
 
