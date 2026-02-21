@@ -16,6 +16,15 @@ const sections = [
   { name: "Servidor MCP", id: "mcp-server" },
 ];
 
+// Desktop: only key entry points to keep navbar balanced
+const desktopSections = [
+  { name: "Definición", id: "que-es" },
+  { name: "Principios", id: "principios" },
+  { name: "Módulos", id: "modulos" },
+  { name: "Estándar", id: "estandar" },
+  { name: "Servidor MCP", id: "mcp-server" },
+];
+
 export function Navbar() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -67,19 +76,26 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-0.5">
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => handleClick(section.id)}
-              className={`font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 ${
-                activeId === section.id
-                  ? "text-accent border-accent"
-                  : "text-text-muted hover:text-accent border-transparent"
-              }`}
-            >
-              {section.name}
-            </button>
-          ))}
+          {desktopSections.map((section) => {
+            // Map intermediate sections to their parent nav item
+            const isActive =
+              activeId === section.id ||
+              (section.id === "que-es" &&
+                ["que-es", "origen", "anatomia", "ciclo", "resolucion", "evidencia-vertical"].includes(activeId ?? ""));
+            return (
+              <button
+                key={section.id}
+                onClick={() => handleClick(section.id)}
+                className={`font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 ${
+                  isActive
+                    ? "text-accent border-accent"
+                    : "text-text-muted hover:text-accent border-transparent"
+                }`}
+              >
+                {section.name}
+              </button>
+            );
+          })}
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
             <a
               href="https://github.com/servicialo/mcp-server"
