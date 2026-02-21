@@ -50,7 +50,7 @@ Servicialo defines the minimum viable schema for any AI agent to interact with a
 
 ## 2. The 8 Dimensions of a Service
 
-Every professional service — from a physical therapy session to a legal consultation — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
+Every professional service — from a consulting session to a home repair — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
 ### 2.1 Identity (What)
 
@@ -59,11 +59,11 @@ The activity or outcome being delivered.
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
 | `id` | string | Unique identifier | `svc_abc123` |
-| `type` | string | Service category | `physical_therapy_session` |
+| `type` | string | Service category | `professional_session` |
 | `vertical` | enum | Industry vertical | `health`, `legal`, `home`, `education` |
-| `name` | string | Human-readable name | "Kinesiology Session - 45min" |
+| `name` | string | Human-readable name | "Professional Service Session - 45min" |
 | `duration_minutes` | integer | Expected duration | `45` |
-| `requirements` | string[] | Prerequisites | `["medical_referral", "intake_form"]` |
+| `requirements` | string[] | Prerequisites | `["intake_form", "signed_agreement"]` |
 
 ### 2.2 Provider (Who Delivers)
 
@@ -72,7 +72,7 @@ The professional or entity delivering the service.
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
 | `provider.id` | string | Provider identifier | `prov_xyz789` |
-| `provider.credentials` | string[] | Required certifications | `["kinesiologist_cl", "colegio_medico"]` |
+| `provider.credentials` | string[] | Required certifications | `["professional_license", "industry_certification"]` |
 | `provider.trust_score` | number | 0-100, calculated from history | `92` |
 | `provider.organization_id` | string | Parent organization | `org_mamapro` |
 
@@ -164,7 +164,7 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 
 ### Why 9 states?
 
-Fewer states lose critical information — without separating "Completed" from "Documented", you can't know if the clinical record was filed. Without separating "Invoiced" from "Collected", you can't track payment status.
+Fewer states lose critical information — without separating "Completed" from "Documented", you can't know if the service record was filed. Without separating "Invoiced" from "Collected", you can't track payment status.
 
 More states add friction. 9 is the minimum viable set for an AI agent to verify the full service chain with certainty.
 
@@ -274,7 +274,7 @@ Whether it's a massage or an audit, the 9 states are universal. The specifics of
 
 ### Principle 2: Delivery must be verifiable
 
-If you can't prove the service occurred, it didn't occur. Servicialo defines what constitutes valid evidence so that both humans and AI agents can trust it. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation.
+If you can't prove the service occurred, it didn't occur. Servicialo defines what constitutes valid evidence so that both humans and AI agents can trust it. Evidence types include: GPS check-in/checkout, duration tracking, signed service notes, photos, and client confirmation.
 
 ### Principle 3: The payer is not always the client
 
@@ -677,7 +677,9 @@ Any platform can implement the Servicialo specification. Compatible implementati
 
 | Platform | Vertical | Status | URL |
 |----------|----------|--------|-----|
-| Coordinalo | Health (kinesiology) | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| Coordinalo | Professional services | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+
+Currently validated with healthcare clinics in Chile. The platform supports any recurring professional service.
 
 ### Implementing the Protocol
 

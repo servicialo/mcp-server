@@ -142,7 +142,9 @@ Cualquier plataforma puede implementar la especificación Servicialo. Para ser l
 
 | Plataforma | Vertical | Cobertura | Estado | URL |
 |------------|----------|-----------|--------|-----|
-| **Coordinalo** | Salud (kinesiología) | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| **Coordinalo** | Servicios profesionales | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+
+Validado actualmente con clínicas de salud en Chile. La plataforma soporta cualquier servicio profesional recurrente.
 
 Coordinalo implementó compatibilidad Servicialo en 6 fases:
 
