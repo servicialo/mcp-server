@@ -8,6 +8,7 @@ const publicTools = [
 ];
 
 const authenticatedTools = [
+  { tool: "contract.get", desc: "Contrato pre-acordado del servicio" },
   { tool: "scheduling.book", desc: "Agendar una sesión" },
   { tool: "scheduling.reschedule", desc: "Reagendar sesión existente" },
   { tool: "scheduling.cancel", desc: "Cancelar sesión" },
@@ -17,6 +18,34 @@ const authenticatedTools = [
   { tool: "payments.create_sale", desc: "Registrar cobro" },
   { tool: "payments.record_payment", desc: "Registrar pago recibido" },
   { tool: "notifications.send_session_reminder", desc: "Enviar recordatorio" },
+];
+
+const agentLayers = [
+  {
+    num: "1",
+    label: "Contexto",
+    desc: "Qué hay disponible",
+    tools: "registry.* · check_availability · services.list",
+    color: "text-[#7EC8E3]",
+    bg: "bg-[#7EC8E3]/10",
+  },
+  {
+    num: "2",
+    label: "Contrato",
+    desc: "Bajo qué reglas",
+    tools: "contract.get",
+    color: "text-accent",
+    bg: "bg-accent/10",
+    highlight: true,
+  },
+  {
+    num: "3",
+    label: "Acción",
+    desc: "Ejecutar con las reglas claras",
+    tools: "scheduling.book · cancel · reschedule",
+    color: "text-[#98C379]",
+    bg: "bg-[#98C379]/10",
+  },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -88,6 +117,56 @@ export function ConectateSection() {
         </div>
       </div>
 
+      {/* Agent flow — 3 layers */}
+      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
+        <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
+          Flujo del agente
+        </div>
+        <div className="font-mono text-[10px] text-white/40 mb-5">
+          Tres capas antes de actuar — sin business logic hardcodeada
+        </div>
+
+        <div className="grid gap-2.5">
+          {agentLayers.map((layer) => (
+            <div key={layer.num} className="flex items-start gap-3">
+              <div
+                className={`shrink-0 w-6 h-6 rounded-full ${layer.bg} flex items-center justify-center`}
+              >
+                <span className={`font-mono text-[11px] font-semibold ${layer.color}`}>
+                  {layer.num}
+                </span>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className={`font-mono text-[11px] font-semibold ${layer.color}`}>
+                    {layer.label}
+                  </span>
+                  <span className="font-mono text-[10px] text-white/35">
+                    {layer.desc}
+                  </span>
+                </div>
+                <div className="font-mono text-[10px] text-white/50 mt-0.5">
+                  {layer.tools}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Connecting arrows */}
+        <div className="mt-5 pt-5 border-t border-white/10">
+          <div className="text-[12px] text-white/40 leading-[1.7]">
+            <span className="text-accent font-mono text-[10px]">contract.get</span>{" "}
+            es el puente entre descubrir un servicio y ejecutar una acción.
+            El agente lee el contrato antes de actuar: evidencia requerida,
+            política de cancelación, reglas de inasistencia, términos de arbitraje.{" "}
+            <span className="text-white/55">
+              Sin lógica de negocio hardcodeada en el agente — las reglas vienen del contrato.
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Discovery mode */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
@@ -120,7 +199,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 23 herramientas totales
+          Con credenciales — 24 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
@@ -132,7 +211,7 @@ export function ConectateSection() {
             <ToolRow key={t.tool} tool={t.tool} desc={t.desc} />
           ))}
           <div className="font-mono text-[10px] text-white/25 mt-1">
-            + 10 herramientas más (pagos, proveedores, nóminas)
+            + 10 herramientas más (pagos, proveedores, nóminas, notificaciones)
           </div>
         </div>
       </div>
