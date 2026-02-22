@@ -80,7 +80,7 @@ Los módulos son independientes entre sí y se agregan según necesidad:
 La especificación completa vive en [`PROTOCOL.md`](./PROTOCOL.md) e incluye:
 - Las 9 dimensiones de un servicio profesional
 - Los 9 estados universales del ciclo de vida
-- 6 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial)
+- 7 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial, derivación inter-org)
 - 6 principios de diseño
 - Schema canónico en YAML
 - Telemetry Extension (planificada) para benchmarks de industria
@@ -114,7 +114,7 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 ### Lo que cubre Core hoy
 
 - **Modelo de partes** — separación entre beneficiario, solicitante y pagador para cubrir los casos más comunes (salud con aseguradora, corporativo, familiar)
-- **Ciclo de vida** — 9 estados universales con 6 flujos de excepción definidos
+- **Ciclo de vida** — 9 estados universales con 7 flujos de excepción definidos
 - **Evidencia por vertical** — tipos de evidencia requerida para salud, hogar, legal y educación
 - **Contrato de servicio** — reglas pre-acordadas inmutables una vez iniciado el ciclo
 - **Facturación simple** — monto, pagador, estado, documento tributario
@@ -149,7 +149,7 @@ Cualquier plataforma puede implementar la especificación Servicialo. Para ser l
 
 | Plataforma | Vertical | Cobertura | Estado | URL |
 |------------|----------|-----------|--------|-----|
-| **Coordinalo** | Servicios profesionales | 9/9 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| **Coordinalo** | Servicios profesionales | 9/9 dimensiones · 9/9 estados · 7/7 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
 Validado actualmente con clínicas de salud en Chile. La plataforma soporta cualquier servicio profesional recurrente.
 

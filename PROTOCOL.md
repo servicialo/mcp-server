@@ -15,6 +15,7 @@
 4. [Exception Flows](#4-exception-flows)
 5. [The 6 Principles](#5-the-6-principles)
 6. [Schema](#6-schema)
+- [Billing Extension (Servicialo/Finanzas)](#billing-extension-servicialofinanzas)
 7. [Telemetry Extension (Planned)](#7-telemetry-extension-planned)
 8. [MCP Server](#8-mcp-server)
 9. [Implementations](#9-implementations)
@@ -116,6 +117,22 @@ The temporal window for the service.
 | `schedule.requested_at` | datetime | When the request was made | `2026-02-10T08:00:00Z` |
 | `schedule.scheduled_for` | datetime | Agreed start time | `2026-02-10T10:00:00Z` |
 | `schedule.duration_expected` | integer | Expected minutes | `45` |
+| `schedule.recurrence` | object? | Recurring pattern (optional) | See below |
+
+#### Recurring Services
+
+Many professional services are inherently recurring: weekly physiotherapy, biweekly coaching, monthly inspections. The base protocol models a single service instance, but the schedule dimension supports an optional recurrence pattern that links individual sessions to a series.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `recurrence.pattern` | string | iCal RRULE recurrence rule | `"FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10"` |
+| `recurrence.series_id` | string | ID that groups sessions in the same series | `"series_abc"` |
+| `recurrence.index` | integer | Position in the series (1-based) | `3` |
+| `recurrence.total_count` | integer | Total sessions in the series | `10` |
+
+A session can exist without `recurrence` (standalone session) or as part of a series. The `series_id` allows AI agents to operate on the entire series or on individual sessions within it. Each recurrence instance is a full, independent service with its own lifecycle — a no-show on session 3 does not affect session 4.
+
+*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
 
 ### 2.7 Location (Where)
 
@@ -276,6 +293,51 @@ In Progress → Partial
 - Adjusts invoice proportionally
 - Schedules continuation if needed
 
+### 4.7 Inter-Organization Referral
+
+**Trigger:** A provider refers a client to a professional in a different organization.
+
+```
+Completed/Documented → Referral Pending → Referral Accepted (new service in target org)
+```
+
+This flow has three characteristics that distinguish it from an internal reassignment:
+
+1. **Client consent is mandatory.** The client must explicitly authorize the transfer of their data to the receiving organization before any information is shared.
+2. **Data sharing is scoped.** The referring organization defines what data travels with the referral: basic contact info, session history, clinical notes. Each scope requires explicit opt-in.
+3. **Organizations must be connected.** Referrals can only occur between organizations that have established a bilateral connection (both parties consent to the network relationship).
+
+#### Referral States
+
+| State | Description | Trigger |
+|-------|-------------|---------|
+| `referral.pending_consent` | Waiting for client to authorize data transfer | Provider initiates referral |
+| `referral.pending_acceptance` | Client consented, waiting for target org response | Client confirms |
+| `referral.accepted` | Target org accepts the client | Target org accepts |
+| `referral.rejected` | Target org declines | Target org rejects |
+| `referral.expired` | No response within time limit | System |
+
+#### Referral Fields
+
+Additional fields in the `exception` object for this type:
+
+```yaml
+exception:
+  type: "inter_org_referral"
+  consent_token: string        # Unique token for client confirmation
+  client_consent: boolean
+  consent_at: datetime
+  data_sharing_scope:
+    basic_info: boolean        # Name, contact
+    session_history: boolean   # Session history
+    clinical_notes: boolean    # Clinical notes (higher sensitivity)
+  target_organization_id: string
+  referred_service_type: string  # Suggested service at target org
+  expires_at: datetime
+```
+
+*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
+
 ---
 
 ## 5. The 6 Principles
@@ -346,6 +408,11 @@ service:
     requested_at: datetime
     scheduled_for: datetime
     duration_expected: integer   # minutes
+    recurrence:                  # optional — for recurring services
+      pattern: string            # iCal RRULE (e.g. "FREQ=WEEKLY;BYDAY=MO;COUNT=10")
+      series_id: string          # groups sessions in the same series
+      index: integer             # position in series (1-based)
+      total_count: integer       # total sessions in series
 
   # 2.7 Location
   location:
@@ -380,17 +447,93 @@ transition:
   metadata: object
 
 exception:
-  type: enum                    # no_show | cancellation | dispute | reschedule | partial
+  type: enum                    # no_show | cancellation | dispute | reschedule | partial | inter_org_referral
   at: datetime
   initiated_by: string
   resolution: string
   resolved_at: datetime
+  # Additional fields for inter_org_referral:
+  referral:                     # only when type = inter_org_referral
+    consent_token: string
+    client_consent: boolean
+    consent_at: datetime
+    data_sharing_scope:
+      basic_info: boolean
+      session_history: boolean
+      clinical_notes: boolean
+    target_organization_id: string
+    referred_service_type: string
+    expires_at: datetime
 
 evidence:
   type: enum                    # gps | signature | photo | document | duration
   captured_at: datetime
   data: object                  # type-specific payload
+
+# ─────────────────────────────────────────────
+# SERVICIALO/FINANZAS (extension — not required for Core)
+# ─────────────────────────────────────────────
+
+billing:
+  payer:
+    type: enum                  # self | family | institution | other
+    institution_type: enum      # insurance | employer | government | other
+    coverage_percent: number    # % covered by this payer
+    third_party_reimbursement:
+      status: enum              # not_applicable | pending | submitted | reimbursed
+      amount:
+        value: number
+        currency: string        # ISO 4217
+      reimbursed_at: datetime
+  package:
+    id: string                  # pre-purchased package ID
+    total_units: integer        # total sessions in package
+    units_used: integer         # sessions consumed
+    status: enum                # active | exhausted | expired
 ```
+
+---
+
+## Billing Extension (Servicialo/Finanzas)
+
+> **Status:** In design. Patterns validated in production by [Coordinalo](https://coordinalo.com). Not required for Core compliance.
+
+The base protocol (Core) tracks who pays (`payer.id`, `payer.type`) but does not model how payment is structured. The Billing Extension adds three capabilities needed by platforms that intermediate payments, handle insurance reimbursement, or sell session packages.
+
+### Enriched Payer
+
+Expands the Core `payer` reference into a structured object that models coverage and payer type.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `billing.payer.type` | enum | `self`, `family`, `institution`, `other` | `institution` |
+| `billing.payer.institution_type` | enum? | `insurance`, `employer`, `government`, `other` | `insurance` |
+| `billing.payer.coverage_percent` | number | % covered by this payer | `70` |
+
+In healthcare, the insurer covers a percentage. In corporate services, the employer may cover the full amount. The structured `payer` object models this coverage without ambiguity.
+
+### Third-Party Reimbursement
+
+When a third party (insurer, employer, government) covers part of the cost, the reimbursement lifecycle is tracked separately from the service lifecycle.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `billing.payer.third_party_reimbursement.status` | enum | `not_applicable`, `pending`, `submitted`, `reimbursed` | `reimbursed` |
+| `billing.payer.third_party_reimbursement.amount` | money | Reimbursed amount | `{value: 24500, currency: "CLP"}` |
+| `billing.payer.third_party_reimbursement.reimbursed_at` | datetime? | Confirmation date | `2026-02-10T15:00:00Z` |
+
+### Session Packages
+
+Clients often pre-purchase bundles of sessions (e.g., 10-session physiotherapy package). The package tracks consumption across the series.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `billing.package.id` | string | Pre-purchased package ID | `pkg_abc` |
+| `billing.package.total_units` | integer | Total sessions in package | `10` |
+| `billing.package.units_used` | integer | Sessions consumed | `3` |
+| `billing.package.status` | enum | `active`, `exhausted`, `expired` | `active` |
+
+*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
 
 ---
 
