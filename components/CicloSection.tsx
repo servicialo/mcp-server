@@ -7,38 +7,38 @@ import { LIFECYCLE_STATES } from "@/lib/data";
 const EXCEPTIONS = [
   {
     title: "Inasistencia del cliente",
-    transition: "Confirmado → Cancelado",
-    desc: "Cobra penalidad según política, libera horario del proveedor para reasignación.",
+    transition: "Confirmado → Cancelado (no_show)",
+    desc: "Cobra penalidad según política, libera horario del proveedor para reasignación. Incrementa contador de inasistencias del cliente.",
     borderColor: "border-l-rose-500",
   },
   {
     title: "Inasistencia del proveedor",
-    transition: "Confirmado → Reasignación",
-    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio.",
+    transition: "Confirmado → Reasignación → Agendado",
+    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio. Proveedor original flaggeado.",
     borderColor: "border-l-amber-500",
   },
   {
     title: "Cancelación",
-    transition: "Cualquier estado → Cancelado",
+    transition: "Cualquier estado pre-entrega → Cancelado",
     desc: "Aplica política de cancelación según tiempo restante antes del servicio.",
     borderColor: "border-l-gray-400",
   },
   {
     title: "Disputa de calidad",
-    transition: "Completado → En Revisión → Resuelta",
-    desc: "Congela pago. Algoritmo evalúa evidencia vs contrato de servicio. Si concluyente: resolución automática (~80%). Si ambiguo: arbitraje por pares del mismo vertical.",
+    transition: "Entregado → Disputado",
+    desc: "Cobro congelado. Se solicita evidencia adicional de ambas partes. Resuelve a: Verificado → Cobrado (proveedor gana) o Cancelado (cliente gana, balance restaurado).",
     borderColor: "border-l-purple",
   },
   {
     title: "Reagendamiento",
-    transition: "Agendado/Confirmado → Reagendando",
+    transition: "Agendado/Confirmado → Reagendando → Agendado",
     desc: "Busca nuevo horario compatible para ambas partes, mantiene el mismo proveedor.",
     borderColor: "border-l-cyan-500",
   },
   {
     title: "Servicio parcial",
     transition: "En Curso → Parcial",
-    desc: "Documenta lo entregado, ajusta factura proporcionalmente, agenda continuación.",
+    desc: "Documenta lo entregado, ajusta cobro proporcionalmente, agenda continuación si es necesario.",
     borderColor: "border-l-green",
   },
 ];
@@ -51,7 +51,7 @@ export function CicloSection() {
     <section id="ciclo" className="mb-16">
       <SectionTitle
         tag="04 — Ciclo de vida"
-        title="9 estados universales"
+        title="8 estados universales"
         subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
       />
 
@@ -126,15 +126,16 @@ export function CicloSection() {
         </div>
       </div>
 
-      {/* ¿Por qué 9 estados? */}
+      {/* ¿Por qué 8 estados? */}
       <div className="mt-5 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
-          ¿Por qué 9 estados?
+          ¿Por qué 8 estados?
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
           Menos estados pierden información crítica — sin separar
-          &quot;Completado&quot; de &quot;Documentado&quot;, no sabes si el
-          registro fue generado. Más estados agregan fricción. 9 es el mínimo
+          &quot;Entregado&quot; de &quot;Verificado&quot;, no puedes distinguir
+          &quot;el proveedor dice que ocurrió&quot; de &quot;ambas partes
+          confirman que ocurrió&quot;. Más estados agregan fricción. 8 es el mínimo
           viable para que un agente AI pueda verificar con certeza que un
           servicio fue solicitado, entregado, documentado y cobrado.
         </div>

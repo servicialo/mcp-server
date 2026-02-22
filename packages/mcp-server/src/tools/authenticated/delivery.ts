@@ -23,7 +23,7 @@ export const deliveryTools = {
 
   'delivery.checkout': {
     description:
-      '[Fase 5 — Verificar entrega] Registra el check-out al finalizar el servicio, moviendo la sesión a "Completado". Captura timestamp y ubicación GPS. La duración real se calcula automáticamente.',
+      '[Fase 5 — Verificar entrega] Registra el check-out al finalizar el servicio, moviendo la sesión a "Entregado". Captura timestamp y ubicación GPS. La duración real se calcula automáticamente.',
     schema: z.object({
       session_id: z.string().describe('ID de la sesión'),
       actor: ActorSchema.describe('Quién hace check-out (provider o client)'),

@@ -1,8 +1,8 @@
 # Servicialo Protocol Specification
 
-**Version:** 0.1  
-**Status:** Draft  
-**License:** MIT  
+**Version:** 0.2
+**Status:** Draft
+**License:** MIT
 **Reference Implementation:** [Coordinalo](https://coordinalo.com)
 
 ---
@@ -10,12 +10,11 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [The 9 Dimensions of a Service](#2-the-9-dimensions-of-a-service)
-3. [The 9 Universal States](#3-the-9-universal-states)
+2. [The 8 Dimensions of a Service](#2-the-8-dimensions-of-a-service)
+3. [The 8 Universal States](#3-the-8-universal-states)
 4. [Exception Flows](#4-exception-flows)
-5. [The 6 Principles](#5-the-6-principles)
+5. [The 7 Principles](#5-the-7-principles)
 6. [Schema](#6-schema)
-- [Billing Extension (Servicialo/Finanzas)](#billing-extension-servicialofinanzas)
 7. [Telemetry Extension (Planned)](#7-telemetry-extension-planned)
 8. [MCP Server](#8-mcp-server)
 9. [Implementations](#9-implementations)
@@ -49,9 +48,9 @@ Servicialo defines the minimum viable schema for any AI agent to interact with a
 
 ---
 
-## 2. The 9 Dimensions of a Service
+## 2. The 8 Dimensions of a Service
 
-Every professional service — from a consulting session to a home repair — can be described across 9 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
+Every professional service — from a physical therapy session to a legal consultation — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
 ### 2.1 Identity (What)
 
@@ -60,11 +59,11 @@ The activity or outcome being delivered.
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
 | `id` | string | Unique identifier | `svc_abc123` |
-| `type` | string | Service category | `professional_session` |
+| `type` | string | Service category | `physical_therapy_session` |
 | `vertical` | enum | Industry vertical | `health`, `legal`, `home`, `education` |
-| `name` | string | Human-readable name | "Professional Service Session - 45min" |
+| `name` | string | Human-readable name | "Kinesiology Session - 45min" |
 | `duration_minutes` | integer | Expected duration | `45` |
-| `requirements` | string[] | Prerequisites | `["intake_form", "signed_agreement"]` |
+| `requirements` | string[] | Prerequisites | `["medical_referral", "intake_form"]` |
 
 ### 2.2 Provider (Who Delivers)
 
@@ -73,42 +72,22 @@ The professional or entity delivering the service.
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
 | `provider.id` | string | Provider identifier | `prov_xyz789` |
-| `provider.credentials` | string[] | Required certifications | `["professional_license", "industry_certification"]` |
+| `provider.credentials` | string[] | Required certifications | `["kinesiologist_cl", "colegio_medico"]` |
 | `provider.trust_score` | number | 0-100, calculated from history | `92` |
 | `provider.organization_id` | string | Parent organization | `org_mamapro` |
 
-### 2.3 Beneficiary (Who Receives)
+### 2.3 Client (Who Receives)
 
-The person who directly receives the service.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `beneficiary.id` | string | Beneficiary identifier | `cli_def456` |
-| `beneficiary.relationship` | string | Role in the service | `patient`, `student`, `homeowner` |
-
-### 2.4 Requester (Who Initiates)
-
-The person who initiates and manages the service request. May differ from the beneficiary.
+The beneficiary of the service.
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `requester.id` | string | Requester identifier | `req_ghi789` |
-| `requester.relationship` | enum | Relation to beneficiary | `self`, `family`, `employer`, `agent` |
+| `client.id` | string | Client identifier | `cli_def456` |
+| `client.payer_id` | string | May differ from client | `payer_fonasa` |
 
-**Example:** A son schedules a physiotherapy session for his mother. The mother is the beneficiary; the son is the requester.
+**Design decision:** The payer is explicitly separated from the client. In healthcare, insurance pays. In corporate training, the employer pays. In education, the parent pays. Most scheduling APIs ignore this distinction.
 
-### 2.5 Payer (Who Pays)
-
-The entity responsible for payment. Explicitly separated from both the beneficiary and the requester.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `payer.id` | string | Payer identifier | `payer_fonasa` |
-| `payer.type` | enum | `person`, `organization`, `insurer` | `insurer` |
-
-**Design decision:** Most scheduling APIs treat the client as one entity. In reality, three distinct roles exist: who receives the service, who manages it, and who pays for it. In healthcare, the insurer pays. In corporate training, the employer pays. In education, the parent pays. Servicialo makes this separation explicit.
-
-### 2.6 Schedule (When)
+### 2.4 Schedule (When)
 
 The temporal window for the service.
 
@@ -117,24 +96,8 @@ The temporal window for the service.
 | `schedule.requested_at` | datetime | When the request was made | `2026-02-10T08:00:00Z` |
 | `schedule.scheduled_for` | datetime | Agreed start time | `2026-02-10T10:00:00Z` |
 | `schedule.duration_expected` | integer | Expected minutes | `45` |
-| `schedule.recurrence` | object? | Recurring pattern (optional) | See below |
 
-#### Recurring Services
-
-Many professional services are inherently recurring: weekly physiotherapy, biweekly coaching, monthly inspections. The base protocol models a single service instance, but the schedule dimension supports an optional recurrence pattern that links individual sessions to a series.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `recurrence.pattern` | string | iCal RRULE recurrence rule | `"FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10"` |
-| `recurrence.series_id` | string | ID that groups sessions in the same series | `"series_abc"` |
-| `recurrence.index` | integer | Position in the series (1-based) | `3` |
-| `recurrence.total_count` | integer | Total sessions in the series | `10` |
-
-A session can exist without `recurrence` (standalone session) or as part of a series. The `series_id` allows AI agents to operate on the entire series or on individual sessions within it. Each recurrence instance is a full, independent service with its own lifecycle — a no-show on session 3 does not affect session 4.
-
-*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
-
-### 2.7 Location (Where)
+### 2.5 Location (Where)
 
 Physical or virtual location.
 
@@ -145,7 +108,17 @@ Physical or virtual location.
 | `location.room` | string | Specific room/box | `"Box 3"` |
 | `location.coordinates` | object | lat/lng | `{lat: -33.42, lng: -70.61}` |
 
-### 2.8 Proof of Delivery (Evidence)
+### 2.6 Lifecycle (States)
+
+Current position in the 8-state lifecycle. See [Section 3](#3-the-8-universal-states).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `lifecycle.current_state` | enum[8] | Current state |
+| `lifecycle.transitions` | transition[] | State change history |
+| `lifecycle.exceptions` | exception[] | No-shows, disputes, etc. |
+
+### 2.7 Proof of Delivery (Evidence)
 
 How the service proves it occurred.
 
@@ -156,27 +129,29 @@ How the service proves it occurred.
 | `proof.duration_actual` | integer | Actual minutes | `45` |
 | `proof.evidence` | evidence[] | GPS, signatures, photos | `[{type: "gps", ...}]` |
 
-### 2.9 Documentation (Outcome)
+### 2.8 Billing (Payment)
 
-The documented result of the service delivery.
+Financial settlement for the service. Billing has its own status independent from the lifecycle state — a service can be Charged in the lifecycle while its billing is still `invoiced` (e.g., waiting for insurance reimbursement).
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `documentation.type` | enum | Record type | `clinical_note`, `inspection_report`, `class_minutes`, `legal_memo` |
-| `documentation.content` | string | Record content | "Rehabilitation session..." |
-| `documentation.signed_by` | string[] | Who signed the record | `["prov_xyz789", "cli_def456"]` |
-| `documentation.generated_at` | datetime | When the record was created | `2026-02-10T11:00:00Z` |
+| `billing.amount` | money | Service price | `{value: 35000, currency: "CLP"}` |
+| `billing.payer` | reference | Who pays (may differ from client) | `payer_fonasa` |
+| `billing.status` | enum | `pending` \| `charged` \| `invoiced` \| `paid` \| `disputed` | `charged` |
+| `billing.charged_at` | datetime | When charge was applied to account | `2026-02-10T11:05:00Z` |
+| `billing.payment_id` | reference | Linked payment (may be a prepaid package) | `pkg_001` |
+| `billing.tax_document` | reference | Invoice/receipt if issued | `inv_001234` |
 
-**Design decision:** Documentation is a first-class dimension, not a side effect. A completed service without a documented outcome is incomplete. The type of documentation varies by vertical (clinical notes in health, inspection reports in home services, minutes in education), but the requirement is universal.
+**Design decision:** `charged` and `paid` are explicitly separated. **Charged** means the amount was debited from the client's balance or added to their debt — it always happens 1:1 with a Charged session. **Paid** means cash was received, and may have occurred upstream (when the client purchased a prepaid package) or downstream (insurance reimbursement). Most professional service platforms in Latin America operate on prepaid packages — conflating charge and payment loses critical information about cash flow.
 
 ---
 
-## 3. The 9 Universal States
+## 3. The 8 Universal States
 
-Every service — from a medical consultation to a home repair — passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
+Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 8 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
+Requested → Scheduled → Confirmed → In Progress → Delivered → Verified → Documented → Charged
 ```
 
 | # | State | Description | Trigger |
@@ -185,17 +160,24 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 | 2 | **Scheduled** | Time, provider, and location assigned | System matches availability |
 | 3 | **Confirmed** | Both parties acknowledge | Provider + client confirm |
 | 4 | **In Progress** | Service is being delivered | Check-in detected |
-| 5 | **Completed** | Service delivery finished | Provider marks complete |
-| 6 | **Documented** | Record/evidence generated | Clinical note, report, photos filed |
-| 7 | **Invoiced** | Financial document issued | Invoice generated |
-| 8 | **Collected** | Payment received | Payment confirmed |
-| 9 | **Verified** | Delivery confirmed by both parties | Client confirms or silence window expires |
+| 5 | **Delivered** | Provider marks delivery complete | Provider confirms via app or messaging |
+| 6 | **Verified** | Client confirms delivery, or silence window expires | Client responds OK, or auto-verified after window |
+| 7 | **Documented** | Record/evidence generated | Clinical note, report, or evidence filed |
+| 8 | **Charged** | Charge applied to client account | Prepaid balance debited or debt recorded |
 
-### Why 9 states?
+### Why 8 states?
 
-Fewer states lose critical information — without separating "Completed" from "Documented", you can't know if the service record was filed. Without separating "Invoiced" from "Collected", you can't track payment status.
+Fewer states lose critical information — without separating Delivered from Verified, you can't distinguish "the provider says it happened" from "both parties agree it happened". Without separating Verified from Charged, you can't know if the financial settlement was applied.
 
-More states add friction. 9 is the minimum viable set for an AI agent to verify the full service chain with certainty.
+More states add friction. 8 is the minimum viable set for an AI agent to verify the full service chain with certainty.
+
+### Why Verified comes before Documented and Charged
+
+Verification is a delivery fact, not a financial one. The client confirms the service happened — that fact then unlocks both documentation (the record is now trustworthy) and charging (the debit is now justified). You cannot document or charge what hasn't been verified.
+
+### Why there is no "Paid" state in the lifecycle
+
+Payment is tracked in `billing.status`, independently from the lifecycle. In Latin American professional services, the dominant model is prepaid packages — the client pays before the sessions occur. **Charged** means the session consumed credit from that package. **Paid** (in `billing.status`) may have occurred days or weeks earlier. For post-paid models (insurance, corporate invoicing), `billing.status` transitions from `charged → invoiced → paid` after the lifecycle closes. The lifecycle doesn't need to wait for that.
 
 ### State transitions
 
@@ -205,13 +187,17 @@ Each transition records:
 
 ```yaml
 transition:
-  from: "completed"
-  to: "documented"
+  from: "delivered"
+  to: "verified"
   at: "2026-02-10T11:00:00Z"
-  by: "provider_xyz"        # who triggered
+  by: "client_def456"       # who triggered (client, provider, system, or agent)
   method: "auto"             # auto | manual | agent
   metadata: {}               # context-specific data
 ```
+
+### Payroll rule
+
+Implementations that calculate provider compensation must read only sessions in **Charged** state. Sessions in Delivered (pending client verification) are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
 
 ---
 
@@ -258,16 +244,16 @@ Any pre-delivery state → Cancelled
 
 ### 4.4 Quality Dispute
 
-**Trigger:** Client disputes the quality of a completed service.
+**Trigger:** Client disputes the quality of a delivered service within the dispute window.
 
 ```
-Completed → In Review
+Delivered → Disputed
 ```
 
-- Payment frozen
+- Charge frozen — `billing.status` remains `pending` until resolution
 - Additional evidence requested from both parties
 - Admin or arbitration resolves
-- Resolves to: Verified (provider wins) or Cancelled (client wins, refund issued)
+- Resolves to: Verified → Charged (provider wins) or Cancelled (client wins, balance restored)
 
 ### 4.5 Rescheduling
 
@@ -293,62 +279,17 @@ In Progress → Partial
 - Adjusts invoice proportionally
 - Schedules continuation if needed
 
-### 4.7 Inter-Organization Referral
-
-**Trigger:** A provider refers a client to a professional in a different organization.
-
-```
-Completed/Documented → Referral Pending → Referral Accepted (new service in target org)
-```
-
-This flow has three characteristics that distinguish it from an internal reassignment:
-
-1. **Client consent is mandatory.** The client must explicitly authorize the transfer of their data to the receiving organization before any information is shared.
-2. **Data sharing is scoped.** The referring organization defines what data travels with the referral: basic contact info, session history, clinical notes. Each scope requires explicit opt-in.
-3. **Organizations must be connected.** Referrals can only occur between organizations that have established a bilateral connection (both parties consent to the network relationship).
-
-#### Referral States
-
-| State | Description | Trigger |
-|-------|-------------|---------|
-| `referral.pending_consent` | Waiting for client to authorize data transfer | Provider initiates referral |
-| `referral.pending_acceptance` | Client consented, waiting for target org response | Client confirms |
-| `referral.accepted` | Target org accepts the client | Target org accepts |
-| `referral.rejected` | Target org declines | Target org rejects |
-| `referral.expired` | No response within time limit | System |
-
-#### Referral Fields
-
-Additional fields in the `exception` object for this type:
-
-```yaml
-exception:
-  type: "inter_org_referral"
-  consent_token: string        # Unique token for client confirmation
-  client_consent: boolean
-  consent_at: datetime
-  data_sharing_scope:
-    basic_info: boolean        # Name, contact
-    session_history: boolean   # Session history
-    clinical_notes: boolean    # Clinical notes (higher sensitivity)
-  target_organization_id: string
-  referred_service_type: string  # Suggested service at target org
-  expires_at: datetime
-```
-
-*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
-
 ---
 
-## 5. The 6 Principles
+## 5. The 7 Principles
 
 ### Principle 1: Every service has a lifecycle
 
-Whether it's a massage or an audit, the 9 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
+Whether it's a massage or an audit, the 8 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
 
 ### Principle 2: Delivery must be verifiable
 
-If you can't prove the service occurred, it didn't occur. Servicialo defines what constitutes valid evidence so that both humans and AI agents can trust it. Evidence types include: GPS check-in/checkout, duration tracking, signed service notes, photos, and client confirmation.
+If you can't prove the service occurred, it didn't occur. Servicialo defines what constitutes valid evidence so that both humans and AI agents can trust it. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation.
 
 ### Principle 3: The payer is not always the client
 
@@ -365,6 +306,10 @@ It has a name, price, duration, requirements, and expected outcome. Defined this
 ### Principle 6: AI agents are first-class citizens
 
 The standard is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
+
+### Principle 7: Charging is not the same as payment
+
+A charge is applied to a client account when a service is verified — it is always 1:1 with a session. Payment is the movement of money, which may happen before the service (prepaid package), after (insurance reimbursement), or in batch (monthly invoice). These are independent events and must be modeled separately. Conflating them makes financial reporting unreliable and payroll calculations wrong.
 
 ---
 
@@ -388,33 +333,18 @@ service:
     trust_score: number         # 0-100, calculated from history
     organization_id: string     # Parent organization
 
-  # 2.3 Beneficiary
-  beneficiary:
+  # 2.3 Client
+  client:
     id: string
-    relationship: string        # patient | student | homeowner
+    payer_id: string            # May differ from client
 
-  # 2.4 Requester
-  requester:
-    id: string
-    relationship: enum          # self | family | employer | agent
-
-  # 2.5 Payer
-  payer:
-    id: string
-    type: enum                  # person | organization | insurer
-
-  # 2.6 Schedule
+  # 2.4 Schedule
   schedule:
     requested_at: datetime
     scheduled_for: datetime
     duration_expected: integer   # minutes
-    recurrence:                  # optional — for recurring services
-      pattern: string            # iCal RRULE (e.g. "FREQ=WEEKLY;BYDAY=MO;COUNT=10")
-      series_id: string          # groups sessions in the same series
-      index: integer             # position in series (1-based)
-      total_count: integer       # total sessions in series
 
-  # 2.7 Location
+  # 2.5 Location
   location:
     type: enum                  # in_person | virtual | home_visit
     address: string
@@ -423,19 +353,29 @@ service:
       lat: number
       lng: number
 
-  # 2.8 Proof of Delivery
+  # 2.6 Lifecycle
+  lifecycle:
+    current_state: enum         # The 8 universal states
+    transitions: transition[]   # State change history
+    exceptions: exception[]     # No-shows, disputes, etc.
+
+  # 2.7 Proof of Delivery
   proof:
     checkin: datetime
     checkout: datetime
     duration_actual: integer     # minutes
     evidence: evidence[]        # GPS, signatures, photos, docs
 
-  # 2.9 Documentation
-  documentation:
-    type: enum                  # clinical_note | inspection_report | class_minutes | legal_memo
-    content: string
-    signed_by: string[]
-    generated_at: datetime
+  # 2.8 Billing
+  billing:
+    amount:
+      value: number
+      currency: string          # ISO 4217
+    payer: reference            # May differ from client (insurance, employer, guardian)
+    status: enum                # pending | charged | invoiced | paid | disputed
+    charged_at: datetime        # When charge was applied (1:1 with Charged lifecycle state)
+    payment_id: reference       # Linked payment — may be a prepaid package purchased earlier
+    tax_document: reference     # Invoice/receipt if issued (not always generated per session)
 
 # Supporting types
 transition:
@@ -447,93 +387,17 @@ transition:
   metadata: object
 
 exception:
-  type: enum                    # no_show | cancellation | dispute | reschedule | partial | inter_org_referral
+  type: enum                    # no_show | cancellation | dispute | reschedule | partial
   at: datetime
   initiated_by: string
   resolution: string
   resolved_at: datetime
-  # Additional fields for inter_org_referral:
-  referral:                     # only when type = inter_org_referral
-    consent_token: string
-    client_consent: boolean
-    consent_at: datetime
-    data_sharing_scope:
-      basic_info: boolean
-      session_history: boolean
-      clinical_notes: boolean
-    target_organization_id: string
-    referred_service_type: string
-    expires_at: datetime
 
 evidence:
   type: enum                    # gps | signature | photo | document | duration
   captured_at: datetime
   data: object                  # type-specific payload
-
-# ─────────────────────────────────────────────
-# SERVICIALO/FINANZAS (extension — not required for Core)
-# ─────────────────────────────────────────────
-
-billing:
-  payer:
-    type: enum                  # self | family | institution | other
-    institution_type: enum      # insurance | employer | government | other
-    coverage_percent: number    # % covered by this payer
-    third_party_reimbursement:
-      status: enum              # not_applicable | pending | submitted | reimbursed
-      amount:
-        value: number
-        currency: string        # ISO 4217
-      reimbursed_at: datetime
-  package:
-    id: string                  # pre-purchased package ID
-    total_units: integer        # total sessions in package
-    units_used: integer         # sessions consumed
-    status: enum                # active | exhausted | expired
 ```
-
----
-
-## Billing Extension (Servicialo/Finanzas)
-
-> **Status:** In design. Patterns validated in production by [Coordinalo](https://coordinalo.com). Not required for Core compliance.
-
-The base protocol (Core) tracks who pays (`payer.id`, `payer.type`) but does not model how payment is structured. The Billing Extension adds three capabilities needed by platforms that intermediate payments, handle insurance reimbursement, or sell session packages.
-
-### Enriched Payer
-
-Expands the Core `payer` reference into a structured object that models coverage and payer type.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `billing.payer.type` | enum | `self`, `family`, `institution`, `other` | `institution` |
-| `billing.payer.institution_type` | enum? | `insurance`, `employer`, `government`, `other` | `insurance` |
-| `billing.payer.coverage_percent` | number | % covered by this payer | `70` |
-
-In healthcare, the insurer covers a percentage. In corporate services, the employer may cover the full amount. The structured `payer` object models this coverage without ambiguity.
-
-### Third-Party Reimbursement
-
-When a third party (insurer, employer, government) covers part of the cost, the reimbursement lifecycle is tracked separately from the service lifecycle.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `billing.payer.third_party_reimbursement.status` | enum | `not_applicable`, `pending`, `submitted`, `reimbursed` | `reimbursed` |
-| `billing.payer.third_party_reimbursement.amount` | money | Reimbursed amount | `{value: 24500, currency: "CLP"}` |
-| `billing.payer.third_party_reimbursement.reimbursed_at` | datetime? | Confirmation date | `2026-02-10T15:00:00Z` |
-
-### Session Packages
-
-Clients often pre-purchase bundles of sessions (e.g., 10-session physiotherapy package). The package tracks consumption across the series.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `billing.package.id` | string | Pre-purchased package ID | `pkg_abc` |
-| `billing.package.total_units` | integer | Total sessions in package | `10` |
-| `billing.package.units_used` | integer | Sessions consumed | `3` |
-| `billing.package.status` | enum | `active`, `exhausted`, `expired` | `active` |
-
-*Pattern validated in production by [Coordinalo](https://coordinalo.com).*
 
 ---
 
@@ -749,7 +613,7 @@ At different scales, the telemetry network enables different capabilities:
 | Scale | Capability | Example |
 |-------|-----------|---------|
 | 10 orgs | Basic benchmarks per vertical | "Your no-show rate vs. average" |
-| 50 orgs | Regional + service type segmentation | "Physical therapy in Santiago vs. Valparaíso" |
+| 50 orgs | Regional + service type segmentation | "Physical therapy in Santiago vs. Valparaiso" |
 | 200 orgs | Predictive demand models | "Expect 20% demand increase in March" |
 | 500 orgs | Cross-vertical insights | "Healthcare no-shows correlate with seasonal patterns" |
 | 1,000+ orgs | Market intelligence products | Published indices, lending risk models, policy inputs |
@@ -767,7 +631,7 @@ In implementations that include AI capabilities, telemetry data feeds into intel
 | Optimization | Utilization rates, scheduling patterns | Optimal time slot recommendations |
 | Recommendation | Cross-vertical service patterns | Service offering suggestions |
 
-The categorization taxonomy — how services are classified — must be standardized across implementations for benchmarks to be comparable. This is why the protocol includes `vertical` and `service_type` as first-class fields. The open categorization standard ensures that a physical therapy session in Santiago is classified the same way as one in Bogotá.
+The categorization taxonomy — how services are classified — must be standardized across implementations for benchmarks to be comparable. This is why the protocol includes `vertical` and `service_type` as first-class fields. The open categorization standard ensures that a physical therapy session in Santiago is classified the same way as one in Bogota.
 
 ### 7.10 Implementation Timeline
 
@@ -798,7 +662,7 @@ npx -y @servicialo/mcp-server
 | `scheduling.check_availability` | Check available time slots |
 | `services.list` | Public service catalog |
 
-### Authenticated Mode (20 total tools)
+### Authenticated Mode (23 total tools)
 
 ```json
 {
@@ -815,16 +679,7 @@ npx -y @servicialo/mcp-server
 }
 ```
 
-20 tools organized by the 6 lifecycle phases of a service:
-
-| Phase | Tools |
-|-------|-------|
-| **Descubrimiento** (4 public) | `registry.search`, `registry.get_organization`, `scheduling.check_availability`, `services.list` |
-| **Entender** (2) | `service.get`, `contract.get` |
-| **Comprometer** (3) | `clients.get_or_create`, `scheduling.book`, `scheduling.confirm` |
-| **Ciclo de Vida** (4) | `lifecycle.get_state`, `lifecycle.transition`, `scheduling.reschedule`, `scheduling.cancel` |
-| **Verificar Entrega** (3) | `delivery.checkin`, `delivery.checkout`, `delivery.record_evidence` |
-| **Cerrar** (4) | `documentation.create`, `payments.create_sale`, `payments.record_payment`, `payments.get_status` |
+Additional tools include: `scheduling.book`, `scheduling.reschedule`, `scheduling.cancel`, `clients.list`, `clients.get`, `clients.create`, `payments.create_sale`, `payments.record_payment`, `notifications.send_session_reminder`, plus 10 more for payments, providers, and payroll.
 
 **Planned tools (Telemetry Extension):** `telemetry.contribute`, `telemetry.benchmark`
 
@@ -837,22 +692,20 @@ npx -y @servicialo/mcp-server
 
 ## 9. Implementations
 
-Any platform can implement the Servicialo specification. Compatible implementations expose the 9 dimensions and 9 states in their data model and can connect to the MCP server.
+Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 8 states in their data model and can connect to the MCP server.
 
 ### Reference Implementation
 
 | Platform | Vertical | Status | URL |
 |----------|----------|--------|-----|
-| Coordinalo | Professional services | ✅ Live | [coordinalo.com](https://coordinalo.com) |
-
-Currently validated with healthcare clinics in Chile. The platform supports any recurring professional service.
+| Coordinalo | Health (kinesiology) | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
 ### Implementing the Protocol
 
 To be listed as a compatible implementation, a platform must:
 
-1. Model services using the 9 dimensions (Section 2)
-2. Implement the 9 lifecycle states (Section 3)
+1. Model services using the 8 dimensions (Section 2)
+2. Implement the 8 lifecycle states (Section 3)
 3. Handle at least 3 exception flows (Section 4)
 4. Expose an API that the MCP server can connect to
 5. (Optional) Support the Telemetry Extension (Section 7)
@@ -873,7 +726,7 @@ Servicialo is an open standard. Contributions are welcome:
 ### Versioning
 
 The protocol follows semantic versioning:
-- **Patch (0.1.x):** Clarifications, typo fixes, examples
+- **Patch (0.2.x):** Clarifications, typo fixes, examples
 - **Minor (0.x.0):** New optional fields, new exception flows, extensions
 - **Major (x.0.0):** Breaking changes to required fields or state model
 

@@ -2,7 +2,7 @@
 
 MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
 
-20 tools organized by the 6 lifecycle phases of a service — not by database table.
+23 tools organized by the 6 lifecycle phases of a service — not by database table.
 
 ## Two Modes of Operation
 
@@ -20,7 +20,7 @@ No credentials needed. 4 public tools for discovering organizations, services, a
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 20 tools across the full service lifecycle.
+Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 23 tools across the full service lifecycle.
 
 ### Claude Desktop Configuration
 
@@ -75,7 +75,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 
 | Tool | Description |
 |---|---|
-| `service.get` | Get the 9 dimensions of a service: what, who delivers, who receives, who requests, who pays, when, where, evidence, outcome |
+| `service.get` | Get the 8 dimensions of a service: what, who delivers, who receives (with separate payer), when, where, lifecycle, evidence, billing |
 | `contract.get` | Get the pre-agreed service contract: required evidence, cancellation policy, no-show policy, dispute terms |
 
 ## Phase 3 — Comprometer (3 tools)
@@ -91,7 +91,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 | Tool | Description |
 |---|---|
 | `lifecycle.get_state` | Get current lifecycle state, available transitions, and transition history |
-| `lifecycle.transition` | Execute a state transition with evidence. Valid: requested→matched, matched→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→completed, completed→documented, documented→billed, billed→closed, any→cancelled |
+| `lifecycle.transition` | Execute a state transition with evidence. Valid: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→verified, verified→documented, documented→charged, any→cancelled |
 | `scheduling.reschedule` | Exception flow: reschedule to new datetime. Contract rescheduling policy may apply |
 | `scheduling.cancel` | Exception flow: cancel with contract cancellation policy applied |
 
@@ -100,7 +100,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 | Tool | Description |
 |---|---|
 | `delivery.checkin` | Provider/client check-in with GPS + timestamp → state "En Curso" |
-| `delivery.checkout` | Check-out with GPS + timestamp → state "Completado". Duration auto-calculated |
+| `delivery.checkout` | Check-out with GPS + timestamp → state "Entregado". Duration auto-calculated |
 | `delivery.record_evidence` | Record delivery evidence per vertical: GPS, signature, photo, document, duration, notes |
 
 ## Phase 6 — Cerrar (4 tools)
@@ -108,8 +108,8 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 | Tool | Description |
 |---|---|
 | `documentation.create` | Generate service record (clinical note, inspection report, class minutes, etc.) → state "Documentado" |
-| `payments.create_sale` | Create a sale/charge for the documented service → state "Facturado" |
-| `payments.record_payment` | Record payment received. When fully paid → state "Cerrado" |
+| `payments.create_sale` | Create a sale/charge for the documented service → state "Cobrado" |
+| `payments.record_payment` | Record payment received. Payment is independent from lifecycle — billing.status transitions from charged → invoiced → paid |
 | `payments.get_status` | Get payment status for a sale or client account balance |
 
 ## End-to-End Example
@@ -125,14 +125,14 @@ scheduling.check_availability({ org_slug: "clinica-kinesia", date_from: "2026-03
   → available slots
 
 service.get({ service_id: "srv_123" })
-  → 9 dimensions: duration 45min, location presencial, etc.
+  → 8 dimensions: duration 45min, location presencial, billing, etc.
 
 contract.get({ service_id: "srv_123", org_id: "org_456" })
   → evidence: check_in + check_out + clinical_record
   → cancellation: 0% if >24h, 50% if 2-24h, 100% if <2h
   → dispute window: 48 hours
 
-clients.get_or_create({ email: "paciente@mail.com", name: "María", last_name: "López", actor: { type: "agent", id: "agent_1" } })
+clients.get_or_create({ email: "paciente@mail.com", name: "Maria", last_name: "Lopez", actor: { type: "agent", id: "agent_1" } })
   → client_id: "cli_789"
 
 scheduling.book({ service_id: "srv_123", provider_id: "prov_111", client_id: "cli_789", starts_at: "2026-03-03T10:00:00", actor: { type: "agent", id: "agent_1" } })
@@ -145,19 +145,19 @@ delivery.checkin({ session_id: "ses_001", actor: { type: "provider", id: "prov_1
   → state: "in_progress"
 
 delivery.checkout({ session_id: "ses_001", actor: { type: "provider", id: "prov_111" }, location: { lat: -33.45, lng: -70.66 } })
-  → state: "completed", duration: 42min
+  → state: "delivered", duration: 42min
 
 delivery.record_evidence({ session_id: "ses_001", evidence_type: "document", data: { type: "clinical_record", signed_by: ["prov_111", "cli_789"] }, actor: { type: "provider", id: "prov_111" } })
   → evidence recorded
 
-documentation.create({ session_id: "ses_001", content: "Sesión de rehabilitación...", actor: { type: "provider", id: "prov_111" } })
+lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { type: "client", id: "cli_789" } })
+  → state: "verified"
+
+documentation.create({ session_id: "ses_001", content: "Sesion de rehabilitacion...", actor: { type: "provider", id: "prov_111" } })
   → state: "documented"
 
 payments.create_sale({ client_id: "cli_789", service_id: "srv_123", provider_id: "prov_111", unit_price: 35000 })
-  → sale_id: "sale_001", state: "billed"
-
-payments.record_payment({ venta_id: "sale_001", amount: 35000, method: "transferencia" })
-  → state: "closed"
+  → sale_id: "sale_001", state: "charged"
 ```
 
 ## Migration from v0.3
@@ -177,6 +177,17 @@ payments.record_payment({ venta_id: "sale_001", amount: 35000, method: "transfer
 | `providers.get` | Removed (not part of service lifecycle) |
 | `providers.get_commission` | Removed (not part of service lifecycle) |
 | `payroll.*` (5 tools) | Removed (not part of service lifecycle) |
+
+### Lifecycle state changes in v0.2
+
+| v0.1 State | v0.2 State | Notes |
+|---|---|---|
+| Completed | Delivered | Renamed — provider marks delivery, not completion |
+| Documented | Documented | Unchanged — but now comes after Verified |
+| Invoiced | — | Removed from lifecycle — tracked in billing.status |
+| Collected | — | Removed from lifecycle — tracked in billing.status |
+| Verified | Verified | Moved from last to 6th — verification unlocks documentation and charging |
+| — | Charged | New — charge applied 1:1 with verified session |
 
 ## Development
 

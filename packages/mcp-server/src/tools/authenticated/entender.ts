@@ -4,7 +4,7 @@ import type { CoordinaloClient } from '../../client.js';
 export const entenderTools = {
   'service.get': {
     description:
-      '[Fase 2 — Entender] Obtiene las 9 dimensiones de un servicio: qué se entrega, quién lo entrega, quién lo recibe, quién lo solicita, quién paga, cuándo, dónde, evidencia requerida y resultado esperado. Llama esto para entender completamente un servicio antes de comprometerse.',
+      '[Fase 2 — Entender] Obtiene las 8 dimensiones de un servicio: qué se entrega, quién lo entrega, quién lo recibe (con pagador separado), cuándo, dónde, ciclo de vida, evidencia requerida y cobro. Llama esto para entender completamente un servicio antes de comprometerse.',
     schema: z.object({
       service_id: z.string().describe('ID del servicio'),
     }),

@@ -24,14 +24,14 @@ servicialo/
 
 ### servicialo.com
 
-Sitio público que documenta el estándar: definición de servicio, las 9 dimensiones, los 9 estados del ciclo de vida, resolución de disputas, evidencia por vertical, principios de diseño y el esquema del protocolo.
+Sitio público que documenta el estándar: definición de servicio, las 8 dimensiones, los 8 estados del ciclo de vida, resolución de disputas, evidencia por vertical, principios de diseño y el esquema del protocolo.
 
 ### @servicialo/mcp-server
 
 Servidor MCP que permite a agentes de IA interactuar con organizaciones de servicios profesionales. Dos modos de operación:
 
 - **Modo descubrimiento** — sin credenciales, 4 herramientas públicas para buscar organizaciones y consultar disponibilidad
-- **Modo autenticado** — con credenciales, 16 herramientas en 6 fases del ciclo de vida del servicio
+- **Modo autenticado** — con credenciales, 23 herramientas para el ciclo de vida completo del servicio
 
 ```bash
 npx -y @servicialo/mcp-server
@@ -44,12 +44,12 @@ Ver documentación completa en [`packages/mcp-server/README.md`](packages/mcp-se
 Servicialo está diseñado como un estándar por capas. Un implementador adopta lo que necesita según la complejidad de su operación.
 
 ```
-Servicialo Core                    ← estable
-├── Ciclo de vida (9 estados)
-├── 9 dimensiones del servicio
+Servicialo Core                    ← estable (v0.2)
+├── Ciclo de vida (8 estados)
+├── 8 dimensiones del servicio
 ├── Flujos de excepción
 ├── Prueba de entrega
-├── Contrato de servicio
+├── Cobro (cargo vs pago separados)
 └── Protocolo MCP para agentes AI
 
 Servicialo/Finanzas                ← en diseño
@@ -71,54 +71,63 @@ Los módulos son independientes entre sí y se agregan según necesidad:
 
 | Módulo | Para quién | Estado |
 |--------|-----------|--------|
-| **Core** | Cualquier plataforma que coordine servicios | Estable |
+| **Core** | Cualquier plataforma que coordine servicios | Estable (v0.2) |
 | **/Finanzas** | Plataformas que intermedian pagos o cobran comisiones | En diseño |
 | **/Disputas** | Plataformas con volumen o montos que justifican arbitraje formal | En diseño |
 
 ## El estándar
 
 La especificación completa vive en [`PROTOCOL.md`](./PROTOCOL.md) e incluye:
-- Las 9 dimensiones de un servicio profesional
-- Los 9 estados universales del ciclo de vida
-- 7 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial, derivación inter-org)
-- 6 principios de diseño
+- Las 8 dimensiones de un servicio profesional
+- Los 8 estados universales del ciclo de vida
+- 6 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial)
+- 7 principios de diseño
 - Schema canónico en YAML
 - Telemetry Extension (planificada) para benchmarks de industria
 - Referencia del MCP server
 
 ### Resumen rápido
 
-Un servicio profesional tiene 9 dimensiones:
+Un servicio profesional tiene 8 dimensiones:
 1. **Identidad** — qué servicio es y a qué vertical pertenece
 2. **Proveedor** — quién lo entrega, con qué credenciales
-3. **Beneficiario** — quién recibe el servicio directamente
-4. **Solicitante** — quién inicia y gestiona (puede diferir del beneficiario)
-5. **Pagador** — quién paga (puede diferir de ambos)
-6. **Agendamiento** — cuándo y cuánto dura
-7. **Ubicación** — dónde se entrega (presencial, virtual, domicilio)
-8. **Evidencia** — checkin, checkout, GPS, firmas, fotos
-9. **Documentación** — fichas, minutas, reportes, resultado documentado
+3. **Cliente** — quién recibe el servicio, con pagador separado explícitamente
+4. **Agendamiento** — cuándo y cuánto dura
+5. **Ubicación** — dónde se entrega (presencial, virtual, domicilio)
+6. **Ciclo de vida** — posición actual en los 8 estados
+7. **Evidencia** — checkin, checkout, GPS, firmas, fotos
+8. **Cobro** — liquidación financiera con estado independiente del ciclo
+
+### El ciclo de vida
+
+```
+Solicitado → Agendado → Confirmado → En Curso → Entregado → Verificado → Documentado → Cobrado
+```
+
+**Verificado viene antes de Documentado y Cobrado** — la verificación es un hecho de entrega, no financiero. El cliente confirma que el servicio ocurrió; ese hecho habilita tanto la documentación (el registro es confiable) como el cobro (el débito está justificado).
+
+**No hay estado "Pagado" en el ciclo** — el pago se trackea en `billing.status`, independiente del ciclo. En LATAM el modelo dominante es prepago: el cliente paga antes, el cobro consume crédito del paquete. Para modelos post-pago, `billing.status` transiciona de `cobrado → facturado → pagado` después de que el ciclo cierra.
 
 ## Resolución de disputas
 
-> **Nota:** La resolución de disputas está documentada como spec en Servicialo/Disputas (en diseño). En Core, la disputa queda a criterio de la implementación — el contrato de servicio define las reglas, pero el mecanismo de resolución es libre.
+> **Nota:** La resolución de disputas está documentada como spec en Servicialo/Disputas (en diseño). En Core, la disputa queda a criterio de la implementación — el flujo de excepción define la transición (Entregado → Disputado), pero el mecanismo de resolución es libre.
 
 El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un árbitro centralizado:
 
-1. **Contrato de servicio** (Core) — antes de iniciar, ambas partes aceptan qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Las reglas son inmutables una vez aceptadas.
-2. **Resolución algorítmica (~80%)** (Disputas) — el sistema compara evidencia registrada contra la evidencia requerida por el contrato. Si la evidencia es concluyente, se resuelve automáticamente.
+1. **Flujo de excepción** (Core) — Entregado → Disputado. Cobro congelado, evidencia solicitada de ambas partes.
+2. **Resolución algorítmica (~80%)** (Disputas) — el sistema compara evidencia registrada contra la evidencia requerida. Si la evidencia es concluyente, se resuelve automáticamente.
 3. **Arbitraje por pares (~20%)** (Disputas) — cuando la evidencia es ambigua, un panel de 1-3 profesionales del mismo vertical con alta reputación revisa y vota. Mayoría simple en 48 horas.
 
-## Límites del estándar v0.x
+## Límites del estándar v0.2
 
 ### Lo que cubre Core hoy
 
-- **Modelo de partes** — separación entre beneficiario, solicitante y pagador para cubrir los casos más comunes (salud con aseguradora, corporativo, familiar)
-- **Ciclo de vida** — 9 estados universales con 7 flujos de excepción definidos
+- **Modelo de partes** — separación explícita entre cliente y pagador
+- **Ciclo de vida** — 8 estados universales con 6 flujos de excepción definidos
 - **Evidencia por vertical** — tipos de evidencia requerida para salud, hogar, legal y educación
-- **Contrato de servicio** — reglas pre-acordadas inmutables una vez iniciado el ciclo
-- **Facturación simple** — monto, pagador, estado, documento tributario
-- **Agentes AI** — protocolo MCP con 20 herramientas para interacción programática
+- **Cobro** — cargo vs pago como eventos independientes, soporte para paquetes prepago
+- **Agentes AI** — protocolo MCP con 23 herramientas para interacción programática
+- **Regla de payroll** — solo sesiones en estado Cobrado cuentan para compensación
 
 ### Lo que queda para módulos futuros
 
@@ -129,19 +138,17 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 
 - **Servicios recurrentes** — el esquema modela un servicio unitario. Paquetes, suscripciones y contratos de servicio continuo no están definidos
 - **Múltiples proveedores por servicio** — un servicio tiene exactamente un proveedor. Equipos o servicios compuestos requieren coordinación externa
-- **Pagos parciales o escalonados** — la facturación asume un monto único. Planes de pago o milestone-based billing no están modelados
+- **Pagos parciales o escalonados** — el cobro asume un monto único. Planes de pago o milestone-based billing no están modelados
 - **Internacionalización regulatoria** — las reglas tributarias y regulatorias son específicas por país. El estándar no define cumplimiento regulatorio
 - **Marketplace / matching algorithm** — el estándar define el protocolo de entrega, no cómo descubrir o emparejar proveedores con clientes
 - **Reputación cross-platform** — el puntaje de confianza es por implementación. No hay mecanismo para portabilidad de reputación entre plataformas
-- **Escalamiento judicial** — el arbitraje por pares es el último recurso dentro del protocolo. Disputas que requieren acción legal están fuera del alcance
-- **Servicios puramente asíncronos** — servicios sin ventana temporal definida (ej: revisión de documentos) no encajan perfectamente en el modelo presencial/virtual
 
 ## Implementaciones
 
 Cualquier plataforma puede implementar la especificación Servicialo. Para ser listada, debe:
 
-1. Modelar servicios usando las 9 dimensiones
-2. Implementar los 9 estados del ciclo de vida
+1. Modelar servicios usando las 8 dimensiones
+2. Implementar los 8 estados del ciclo de vida
 3. Manejar al menos 3 flujos de excepción
 4. Exponer una API conectable al MCP server
 
@@ -149,20 +156,7 @@ Cualquier plataforma puede implementar la especificación Servicialo. Para ser l
 
 | Plataforma | Vertical | Cobertura | Estado | URL |
 |------------|----------|-----------|--------|-----|
-| **Coordinalo** | Servicios profesionales | 9/9 dimensiones · 9/9 estados · 7/7 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
-
-Validado actualmente con clínicas de salud en Chile. La plataforma soporta cualquier servicio profesional recurrente.
-
-Coordinalo implementó compatibilidad Servicialo en 6 fases:
-
-| Fase | Qué implementa | Dimensiones cubiertas |
-|------|----------------|----------------------|
-| 1 — Ciclo de vida | Timestamps como milestones (`startedAt`, `documentedAt`, `invoicedAt`, `paidAt`) | Agendamiento, Ciclo de vida |
-| 2 — Flujos de excepción | Transiciones de estado, StatusHistory, cancelaciones, no-shows, reagendamiento | Ciclo de vida (excepciones) |
-| 3 — Prueba de entrega | DeliveryProof bilateral (proveedor + cliente confirman) | Prueba de entrega |
-| 4 — Pagador ≠ Receptor | PaymentResponsible (self, family, institution) + PaymentAssignment | Cliente (quién paga) |
-| 5 — Catálogo descubrible | Servicio enriquecido: requisitos, resultado esperado, contraindicaciones, etiquetas, isDiscoverable | Identidad |
-| 6 — Compatibilidad MCP | Exposición vía @servicialo/mcp-server (4 tools discovery + 16 autenticadas) | Todas (via MCP) |
+| **Coordinalo** | Salud (kinesiología) | 8/8 dimensiones · 8/8 estados · 6/6 excepciones · 7/7 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
 > Querés listar tu implementación? [Abrí un issue](https://github.com/servicialo/mcp-server/issues).
 

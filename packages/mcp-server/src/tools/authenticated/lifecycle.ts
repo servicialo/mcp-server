@@ -16,12 +16,12 @@ export const lifecycleTools = {
 
   'lifecycle.transition': {
     description:
-      '[Fase 4 — Ciclo de vida] Ejecuta una transición de estado en el ciclo de vida de una sesión. Transiciones válidas: requested→matched, matched→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→completed, completed→documented, documented→billed, billed→closed, any→cancelled. Cada transición puede requerir evidencia según el contrato del servicio.',
+      '[Fase 4 — Ciclo de vida] Ejecuta una transición de estado en el ciclo de vida de una sesión. Transiciones válidas: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→verified, verified→documented, documented→charged, any→cancelled. Cada transición puede requerir evidencia según el contrato del servicio.',
     schema: z.object({
       session_id: z.string().describe('ID de la sesión'),
       to_state: z.enum([
-        'matched', 'scheduled', 'confirmed', 'in_progress',
-        'completed', 'documented', 'billed', 'closed', 'cancelled',
+        'scheduled', 'confirmed', 'in_progress',
+        'delivered', 'verified', 'documented', 'charged', 'cancelled',
       ]).describe('Estado destino de la transición'),
       actor: ActorSchema.describe('Quién ejecuta la transición'),
       reason: z.string().optional().describe('Motivo de la transición (requerido para cancelled)'),

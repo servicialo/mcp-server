@@ -8,7 +8,7 @@ const publicTools = [
 ];
 
 const authenticatedTools = [
-  { tool: "service.get", desc: "9 dimensiones del servicio" },
+  { tool: "service.get", desc: "8 dimensiones del servicio" },
   { tool: "contract.get", desc: "Contrato pre-acordado" },
   { tool: "clients.get_or_create", desc: "Buscar o crear cliente" },
   { tool: "scheduling.book", desc: "Agendar → Solicitado" },
@@ -18,7 +18,7 @@ const authenticatedTools = [
   { tool: "scheduling.reschedule", desc: "Reagendar (excepción)" },
   { tool: "scheduling.cancel", desc: "Cancelar con política" },
   { tool: "delivery.checkin", desc: "Check-in → En Curso" },
-  { tool: "delivery.checkout", desc: "Check-out → Completado" },
+  { tool: "delivery.checkout", desc: "Check-out → Entregado" },
   { tool: "delivery.record_evidence", desc: "Evidencia por vertical" },
   { tool: "documentation.create", desc: "Registro del servicio" },
   { tool: "payments.create_sale", desc: "Crear venta/cargo" },
@@ -152,7 +152,7 @@ export function ConectateSection() {
           Flujo del agente
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-5">
-          Seis fases del ciclo de vida del servicio — 20 herramientas
+          Seis fases del ciclo de vida del servicio — 23 herramientas
         </div>
 
         <div className="grid gap-2.5">
@@ -226,7 +226,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 20 herramientas totales
+          Con credenciales — 23 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">

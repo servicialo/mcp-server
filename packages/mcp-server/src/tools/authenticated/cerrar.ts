@@ -23,7 +23,7 @@ export const cerrarTools = {
 
   'payments.create_sale': {
     description:
-      '[Fase 6 — Cerrar] Crea una venta (cargo) asociada a un servicio documentado. Mueve la sesión a "Facturado". Debe llamarse después de documentation.create.',
+      '[Fase 6 — Cerrar] Crea una venta (cargo) asociada a un servicio documentado. Mueve la sesión a "Cobrado". Debe llamarse después de documentation.create.',
     schema: z.object({
       client_id: z.string().describe('ID del cliente'),
       service_id: z.string().describe('ID del servicio'),
@@ -44,7 +44,7 @@ export const cerrarTools = {
 
   'payments.record_payment': {
     description:
-      '[Fase 6 — Cerrar] Registra un cobro (pago recibido) contra una venta existente. Cuando el pago cubre el total, mueve la sesión a "Cerrado".',
+      '[Fase 6 — Cerrar] Registra un pago recibido contra una venta existente. El pago es independiente del ciclo de vida — billing.status transiciona de charged → invoiced → paid.',
     schema: z.object({
       venta_id: z.string().describe('ID de la venta'),
       amount: z.number().describe('Monto cobrado'),

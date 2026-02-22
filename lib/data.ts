@@ -57,82 +57,73 @@ export const SERVICE_ORIGINS = [
 
 export const LIFECYCLE_STATES = [
   { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde. El sistema busca proveedores compatibles." },
-  { id: "matched", label: "Asignado", icon: "2", desc: "Se selecciona el mejor proveedor según disponibilidad, ubicación, especialidad, calificación y precio. El proveedor acepta." },
-  { id: "scheduled", label: "Agendado", icon: "3", desc: "Se bloquea el horario en los calendarios de ambas partes. Confirmaciones automáticas enviadas." },
-  { id: "confirmed", label: "Confirmado", icon: "4", desc: "Ambas partes reconfirmaron. Recordatorios programados. Prerrequisitos verificados (documentos, pagos previos, etc)." },
-  { id: "in_progress", label: "En Curso", icon: "5", desc: "Registro de entrada del proveedor verificado. Cronómetro activo. El servicio está siendo entregado." },
-  { id: "completed", label: "Completado", icon: "6", desc: "El servicio terminó. Evidencia capturada: duración real, notas, firma del cliente, fotos si aplica." },
-  { id: "documented", label: "Documentado", icon: "7", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta de reunión — según la vertical." },
-  { id: "billed", label: "Facturado", icon: "8", desc: "Cobro emitido al pagador: cliente directo, aseguradora, empresa, o plataforma. Documento tributario generado." },
-  { id: "closed", label: "Cerrado", icon: "9", desc: "Ciclo completo. Calificación bidireccional registrada. Datos disponibles para análisis y para agentes AI." },
+  { id: "scheduled", label: "Agendado", icon: "2", desc: "Se asigna hora, proveedor y ubicación. Se bloquea el horario en los calendarios de ambas partes." },
+  { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes reconocen el compromiso. Recordatorios programados. Prerrequisitos verificados." },
+  { id: "in_progress", label: "En Curso", icon: "4", desc: "Registro de entrada detectado. El servicio está siendo entregado." },
+  { id: "delivered", label: "Entregado", icon: "5", desc: "El proveedor marca la entrega como completa. Evidencia capturada: duración real, notas, fotos si aplica." },
+  { id: "verified", label: "Verificado", icon: "6", desc: "El cliente confirma que el servicio ocurrió, o se auto-verifica tras la ventana de silencio. Hecho de entrega establecido." },
+  { id: "documented", label: "Documentado", icon: "7", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta — según la vertical. El registro es confiable porque la entrega ya fue verificada." },
+  { id: "charged", label: "Cobrado", icon: "8", desc: "Cargo aplicado a la cuenta del cliente. Saldo prepago debitado o deuda registrada. El cobro está justificado porque la entrega fue verificada." },
 ] as const;
 
 export const ANATOMY = [
   { field: "Qué", desc: "La actividad o resultado que se entrega", example: "Sesión de kinesiología / Reparación eléctrica / Consulta legal" },
   { field: "Quién entrega", desc: "El proveedor del servicio", example: "Kinesiólogo certificado / Electricista SEC / Abogado tributario" },
-  { field: "Quién recibe", desc: "El beneficiario directo del servicio", example: "Paciente / Propietario / Alumno" },
-  { field: "Quién solicita", desc: "Quien inicia y gestiona — puede diferir del beneficiario", example: "Hijo agenda para su madre / RRHH agenda para empleado" },
-  { field: "Quién paga", desc: "No siempre es quien recibe ni quien solicita", example: "FONASA paga por el paciente / Empresa paga por el empleado" },
+  { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual", example: "Clínica / Domicilio / Videollamada" },
-  { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + ficha clínica firmada" },
-  { field: "Resultado", desc: "Qué quedó como resultado documentado", example: "Ficha clínica / Fotos antes-después / Minuta" },
+  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Verificado → próximo: Documentado" },
+  { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
+  { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados son universales." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 8 estados son universales." },
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella." },
-  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa beneficiario, solicitante y pagador." },
+  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
   { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
-  { title: "Las reglas se acuerdan antes, no después", body: "El contrato de servicio define qué evidencia se requiere, qué pasa si alguien cancela, y cómo se resuelven disputas. Una vez que ambas partes aceptan, las reglas son inmutables. Ni el proveedor, ni el cliente, ni la plataforma pueden cambiarlas unilateralmente." },
+  { title: "Cobrar no es lo mismo que pagar", body: "Un cobro se aplica a la cuenta del cliente cuando el servicio es verificado — siempre 1:1 con una sesión. El pago es el movimiento de dinero, que puede ocurrir antes (paquete prepago), después (reembolso) o en lote (factura mensual). Son eventos independientes." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO CORE
-# Todo lo necesario para modelar un servicio
+# SERVICIALO v0.2
+# Las 8 dimensiones de un servicio profesional
 # ─────────────────────────────────────────────
 
 servicio:
   id: texto                      # Identificador único
   tipo: texto                    # Categoría del servicio
   vertical: texto                # salud | legal | hogar | educación | ...
+  nombre: texto                  # Nombre legible
+  duración_minutos: entero       # Duración esperada
 
   proveedor:
     id: texto
     credenciales: texto[]        # Certificaciones requeridas
     puntaje_confianza: número    # 0-100 calculado por historial
+    organización_id: texto       # Organización padre
 
-  partes:
-    beneficiario:                # Quién recibe el servicio
-      id: texto
-      relación: texto            # paciente | alumno | propietario
-    solicitante:                 # Quién inicia y gestiona
-      id: texto
-      relación: texto            # mismo | familiar | empleador
-    pagador:                     # Quién paga
-      id: texto
-      tipo: persona | org | aseguradora
-
-  contrato_de_servicio:          # Reglas acordadas ANTES del compromiso
-    evidencia_requerida: tipo[]  # Qué pruebas se necesitan
-    plazo_disputa: duración      # Ventana para abrir disputa
-    política_cancelación: regla[]
-    política_inasistencia: regla[]
-    arbitraje:
-      habilitado: booleano
-      árbitros: 1 | 3
-      plazo_voto: duración
+  cliente:
+    id: texto
+    pagador_id: texto            # Puede diferir del cliente
 
   agenda:
     solicitado_en: fecha_hora
     agendado_para: fecha_hora
     duración_esperada: minutos
-    ubicación: presencial | virtual
+
+  ubicación:
+    tipo: presencial | virtual | domicilio
+    dirección: texto
+    sala: texto
+    coordenadas:
+      lat: número
+      lng: número
 
   ciclo_de_vida:
-    estado_actual: enum[9]       # Los 9 estados universales
+    estado_actual: enum[8]       # Los 8 estados universales
     transiciones: transición[]   # Historial de cambios
     excepciones: excepción[]     # Inasistencias, disputas, etc
 
@@ -142,49 +133,15 @@ servicio:
     duración_real: minutos
     evidencia: evidencia[]       # GPS, firma, fotos, documentos
 
-  documentación:
-    tipo_registro: texto         # Ficha clínica, minuta, reporte
-    generado_en: fecha_hora
-    firmado_por: texto[]
-
-  facturación:
-    monto: dinero
-    pagador: referencia          # Apunta a partes.pagador
-    estado: pendiente | facturado | pagado | disputado | reembolsado
-    documento_tributario: referencia
-
-# ─────────────────────────────────────────────
-# MÓDULO: Servicialo/Finanzas (en diseño)
-# Distribución de pagos entre partes
-# ─────────────────────────────────────────────
-
-  distribución:                  # Servicialo/Finanzas
-    profesional:
-      tipo: porcentaje | monto_fijo | mixto
+  cobro:
+    monto:
       valor: número
-      liquidación: por_sesión | mensual
-    organización:
-      tipo: porcentaje | monto_fijo
-      valor: número
-    infraestructura:
-      tipo: monto_fijo | porcentaje
-      valor: número
-      concepto: box | equipamiento | sala
-
-# ─────────────────────────────────────────────
-# MÓDULO: Servicialo/Disputas (en diseño)
-# Resolución formal de disputas
-# ─────────────────────────────────────────────
-
-  resolución:                    # Servicialo/Disputas
-    estado: ninguna | en_revisión | en_arbitraje | resuelta
-    evidencia_evaluada: evaluación[]
-    resultado: a_favor_proveedor | a_favor_cliente | ambiguo
-    arbitraje:
-      árbitros: referencia[]
-      votos: voto[]
-    resolución_final: referencia
-    resuelta_en: fecha_hora`;
+      moneda: texto              # ISO 4217
+    pagador: referencia          # Puede diferir del cliente
+    estado: pendiente | cobrado | facturado | pagado | disputado
+    cobrado_en: fecha_hora       # 1:1 con estado Cobrado del ciclo
+    pago_id: referencia          # Pago vinculado (puede ser paquete prepago)
+    documento_tributario: ref    # Boleta/factura si se emitió`;
 
 export const EVIDENCE_BY_VERTICAL = [
   {
@@ -244,43 +201,22 @@ export const DISPUTE_RESOLUTION_FLOW = [
     step: 1,
     id: "apertura",
     label: "Apertura de disputa",
-    desc: "Cualquier parte puede abrir una disputa dentro del plazo definido en el contrato de servicio. Se congela el pago automáticamente.",
+    desc: "Cualquier parte puede abrir una disputa dentro del plazo definido. Se congela el cobro automáticamente.",
     actor: "cliente | proveedor | agente",
   },
   {
     step: 2,
     id: "revision_evidencia",
-    label: "Revisión algorítmica",
-    desc: "El sistema compara la evidencia registrada contra la evidencia_requerida del contrato de servicio. Sin intervención humana.",
-    actor: "sistema",
+    label: "Revisión de evidencia",
+    desc: "Se solicita evidencia adicional de ambas partes. Admin o arbitraje evalúa.",
+    actor: "sistema | admin",
   },
   {
     step: 3,
-    id: "resolucion_automatica",
-    label: "Resolución automática",
-    desc: "Si toda la evidencia requerida existe y es válida: a favor del proveedor. Si falta evidencia requerida: a favor del cliente. ~80% de disputas se resuelven aquí.",
-    actor: "sistema",
-  },
-  {
-    step: 4,
-    id: "escalamiento",
-    label: "Escalamiento a arbitraje",
-    desc: "Si la evidencia es ambigua o contradictoria, se escala a un panel de árbitros del mismo vertical profesional.",
-    actor: "sistema",
-  },
-  {
-    step: 5,
-    id: "arbitraje",
-    label: "Arbitraje por pares",
-    desc: "1-3 árbitros del mismo vertical con puntaje de confianza >= 80 revisan evidencia y votan. Mayoría simple decide. 48 horas para votar.",
-    actor: "árbitros",
-  },
-  {
-    step: 6,
-    id: "resolucion_final",
-    label: "Resolución final",
-    desc: "Pago liberado o reembolsado según resolución. Puntaje de confianza ajustado para ambas partes. Historial de disputa registrado.",
-    actor: "sistema",
+    id: "resolucion",
+    label: "Resolución",
+    desc: "Si proveedor gana: Verificado → Cobrado. Si cliente gana: Cancelado con balance restaurado.",
+    actor: "admin | arbitraje",
   },
 ] as const;
 
@@ -290,15 +226,15 @@ export const MODULES = [
     name: "Servicialo Core",
     status: "estable" as const,
     statusColor: "green" as const,
-    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 9 dimensiones del servicio, flujos de excepción y prueba de entrega.",
+    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega y cobro.",
     audience: "Cualquier plataforma que coordine servicios profesionales — desde una clínica de kinesiología hasta un marketplace de limpieza.",
     includes: [
-      "Ciclo de vida (9 estados universales)",
-      "9 dimensiones del servicio",
-      "Flujos de excepción (cancelación, inasistencia, reagendamiento)",
+      "Ciclo de vida (8 estados universales)",
+      "8 dimensiones del servicio",
+      "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Contrato de servicio pre-acordado",
-      "Protocolo MCP para agentes AI",
+      "Cobro con separación explícita de cargo vs pago",
+      "Protocolo MCP para agentes AI (23 herramientas)",
     ],
   },
   {
@@ -323,7 +259,7 @@ export const MODULES = [
     desc: "Resolución formal de disputas con arbitraje algorítmico y por pares. Define el flujo completo desde apertura hasta resolución final, con evidencia válida por vertical.",
     audience: "Plataformas con volumen suficiente para justificar arbitraje estructurado — o donde el monto por servicio hace que las disputas sean económicamente relevantes.",
     includes: [
-      "Flujo de disputa en 6 pasos",
+      "Flujo de disputa estructurado",
       "Resolución algorítmica (~80% de los casos)",
       "Arbitraje por pares del mismo vertical",
       "Evidencia válida definida por vertical",
@@ -333,7 +269,7 @@ export const MODULES = [
 
 export const CONTRATO_FIELDS = [
   { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "check_in + check_out + ficha_clinica_firmada" },
-  { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Completado", example: "48 horas" },
+  { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Entregado", example: "48 horas" },
   { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "0% si >24h, 50% si 2-24h, 100% si <2h" },
   { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "Cliente: cobra 100%. Proveedor: reasignación + penalidad" },
   { field: "arbitraje", desc: "Configuración del arbitraje por pares si aplica", example: "1 árbitro si monto < $50, 3 si >= $50" },
