@@ -1,17 +1,17 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.servicialo/mcp-server",
-  "description": "Open protocol for professional service delivery — connects AI agents with scheduling, verification and settlement of professional services",
+  "name": "io.github.danioni/servicialo",
+  "description": "Open protocol for professional service delivery via AI agents",
   "repository": {
     "url": "https://github.com/servicialo/mcp-server",
     "source": "github"
   },
-  "version": "0.5.1",
+  "version": "0.5.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "transport": {
         "type": "stdio"
       }
