@@ -1,6 +1,6 @@
 # Servicialo Protocol Specification
 
-**Version:** 0.2
+**Version:** 0.3
 **Status:** Draft
 **License:** MIT
 **Reference Implementation:** [Coordinalo](https://coordinalo.com)
@@ -151,7 +151,7 @@ Financial settlement for the service. Billing has its own status independent fro
 Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 8 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Delivered → Verified → Documented → Charged
+Requested → Scheduled → Confirmed → In Progress → Delivered → Documented → Charged → Verified
 ```
 
 | # | State | Description | Trigger |
@@ -161,19 +161,42 @@ Requested → Scheduled → Confirmed → In Progress → Delivered → Verified
 | 3 | **Confirmed** | Both parties acknowledge | Provider + client confirm |
 | 4 | **In Progress** | Service is being delivered | Check-in detected |
 | 5 | **Delivered** | Provider marks delivery complete | Provider confirms via app or messaging |
-| 6 | **Verified** | Client confirms delivery, or silence window expires | Client responds OK, or auto-verified after window |
-| 7 | **Documented** | Record/evidence generated | Clinical note, report, or evidence filed |
-| 8 | **Charged** | Charge applied to client account | Prepaid balance debited or debt recorded |
+| 6 | **Documented** | Record/evidence generated | Clinical note, report, or evidence filed |
+| 7 | **Charged** | Charge applied to client account | Prepaid balance debited or debt recorded |
+| 8 | **Verified** | Client confirms delivery, or silence window expires | Client responds OK, or auto-verified after window |
 
 ### Why 8 states?
 
-Fewer states lose critical information — without separating Delivered from Verified, you can't distinguish "the provider says it happened" from "both parties agree it happened". Without separating Verified from Charged, you can't know if the financial settlement was applied.
+Fewer states lose critical information — without separating Delivered from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Charged from Verified, you can't know if the client accepted the outcome.
 
 More states add friction. 8 is the minimum viable set for an AI agent to verify the full service chain with certainty.
 
-### Why Verified comes before Documented and Charged
+### Why Verified comes last
 
-Verification is a delivery fact, not a financial one. The client confirms the service happened — that fact then unlocks both documentation (the record is now trustworthy) and charging (the debit is now justified). You cannot document or charge what hasn't been verified.
+Verification is the closure of the cycle, not a step in the middle. In practice:
+
+1. The provider delivers the service
+2. The provider documents (writes the clinical note, files the report)
+3. The charge is applied (balance debited or invoice issued)
+4. The client verifies — or the verification window expires and it auto-closes
+
+The client cannot meaningfully verify until the service has been documented and charged. They need the complete picture — the clinical note, the receipt — before they can confirm or dispute. Verification that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
+
+### Intermediate states
+
+Implementations may add states between the universal eight to match their operational reality. For example, an invoicing step between Documented and Charged, or an assignment step between Requested and Scheduled. The 8 universal states are the minimum — not the maximum.
+
+### Revenue recognition
+
+What triggers the transition from Delivered to the financial cycle (Documented → Charged) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
+
+| Method | When revenue is recognized | Example |
+|--------|---------------------------|---------|
+| Per delivery | Each completed session | Individual therapy session |
+| Percentage of completion | Proportional to treatment progress | Orthodontics: each session = X% |
+| Milestones | At defined checkpoints | Consulting: interim deliverable, final deliverable |
+
+The protocol does not prescribe which method to use. Each implementation resolves this based on its vertical.
 
 ### Why there is no "Paid" state in the lifecycle
 
@@ -181,13 +204,13 @@ Payment is tracked in `billing.status`, independently from the lifecycle. In Lat
 
 ### State transitions
 
-States are strictly ordered. A service cannot skip states (e.g., jump from Scheduled to Documented). However, exception flows can redirect a service out of the happy path at any point. See [Section 4](#4-exception-flows).
+States are strictly ordered. The 8 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 4](#4-exception-flows).
 
 Each transition records:
 
 ```yaml
 transition:
-  from: "delivered"
+  from: "charged"
   to: "verified"
   at: "2026-02-10T11:00:00Z"
   by: "client_def456"       # who triggered (client, provider, system, or agent)
@@ -197,7 +220,7 @@ transition:
 
 ### Payroll rule
 
-Implementations that calculate provider compensation must read only sessions in **Charged** state. Sessions in Delivered (pending client verification) are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
+Implementations that calculate provider compensation must read only sessions in **Charged** state. Sessions that have not yet reached Charged are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
 
 ---
 
@@ -253,7 +276,7 @@ Delivered → Disputed
 - Charge frozen — `billing.status` remains `pending` until resolution
 - Additional evidence requested from both parties
 - Admin or arbitration resolves
-- Resolves to: Verified → Charged (provider wins) or Cancelled (client wins, balance restored)
+- Resolves to: Charged → Verified (provider wins) or Cancelled (client wins, balance restored)
 
 ### 4.5 Rescheduling
 
@@ -309,7 +332,7 @@ The standard is designed so that an AI agent can request, verify, and settle a s
 
 ### Principle 7: Charging is not the same as payment
 
-A charge is applied to a client account when a service is verified — it is always 1:1 with a session. Payment is the movement of money, which may happen before the service (prepaid package), after (insurance reimbursement), or in batch (monthly invoice). These are independent events and must be modeled separately. Conflating them makes financial reporting unreliable and payroll calculations wrong.
+A charge is applied to a client account when a service is delivered and documented — it is always 1:1 with a session. Payment is the movement of money, which may happen before the service (prepaid package), after (insurance reimbursement), or in batch (monthly invoice). These are independent events and must be modeled separately. Conflating them makes financial reporting unreliable and payroll calculations wrong.
 
 ---
 
@@ -726,9 +749,27 @@ Servicialo is an open standard. Contributions are welcome:
 ### Versioning
 
 The protocol follows semantic versioning:
-- **Patch (0.2.x):** Clarifications, typo fixes, examples
+- **Patch (0.3.x):** Clarifications, typo fixes, examples
 - **Minor (0.x.0):** New optional fields, new exception flows, extensions
 - **Major (x.0.0):** Breaking changes to required fields or state model
+
+The protocol version is independent from the MCP server package version (`@servicialo/mcp-server`). Both are tracked separately.
+
+### Changelog
+
+#### 0.3 (2026-02-22)
+
+- **State order changed:** Verified moved from position 6 to position 8 (final). The lifecycle is now: Requested → Scheduled → Confirmed → In Progress → Delivered → Documented → Charged → Verified.
+- **Rationale rewritten:** "Why Verified comes last" — client needs the complete picture (documentation + charge) before confirming.
+- **Intermediate states:** Implementations may add states between the universal eight (e.g., Invoiced between Documented and Charged).
+- **Revenue recognition:** New section defining three methods (per delivery, percentage of completion, milestones) as a service/package attribute.
+
+#### 0.2 (2026-02-01)
+
+- Initial public draft with 8 dimensions, 8 states, 6 exception flows, 7 principles.
+- Billing section with independent `billing.status`.
+- Telemetry Extension (planned).
+- MCP server reference.
 
 ---
 

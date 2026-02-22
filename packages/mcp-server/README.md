@@ -2,6 +2,8 @@
 
 MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
 
+**Protocol version:** 0.3 · **Package version:** 0.5.0
+
 23 tools organized by the 6 lifecycle phases of a service — not by database table.
 
 ## Two Modes of Operation
@@ -91,7 +93,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 | Tool | Description |
 |---|---|
 | `lifecycle.get_state` | Get current lifecycle state, available transitions, and transition history |
-| `lifecycle.transition` | Execute a state transition with evidence. Valid: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→verified, verified→documented, documented→charged, any→cancelled |
+| `lifecycle.transition` | Execute a state transition with evidence. Valid: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→documented, documented→charged, charged→verified, any→cancelled |
 | `scheduling.reschedule` | Exception flow: reschedule to new datetime. Contract rescheduling policy may apply |
 | `scheduling.cancel` | Exception flow: cancel with contract cancellation policy applied |
 
@@ -150,17 +152,21 @@ delivery.checkout({ session_id: "ses_001", actor: { type: "provider", id: "prov_
 delivery.record_evidence({ session_id: "ses_001", evidence_type: "document", data: { type: "clinical_record", signed_by: ["prov_111", "cli_789"] }, actor: { type: "provider", id: "prov_111" } })
   → evidence recorded
 
-lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { type: "client", id: "cli_789" } })
-  → state: "verified"
-
 documentation.create({ session_id: "ses_001", content: "Sesion de rehabilitacion...", actor: { type: "provider", id: "prov_111" } })
   → state: "documented"
 
 payments.create_sale({ client_id: "cli_789", service_id: "srv_123", provider_id: "prov_111", unit_price: 35000 })
   → sale_id: "sale_001", state: "charged"
+
+lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { type: "client", id: "cli_789" } })
+  → state: "verified"
 ```
 
-## Migration from v0.3
+## Changelog
+
+### Package 0.5.0 (current)
+
+Consolidated from 38 tools to 23. Tools are now organized by lifecycle phase instead of database entity.
 
 | Removed Tool | Replacement |
 |---|---|
@@ -178,16 +184,18 @@ payments.create_sale({ client_id: "cli_789", service_id: "srv_123", provider_id:
 | `providers.get_commission` | Removed (not part of service lifecycle) |
 | `payroll.*` (5 tools) | Removed (not part of service lifecycle) |
 
-### Lifecycle state changes in v0.2
+### Protocol 0.3 (current)
 
-| v0.1 State | v0.2 State | Notes |
+Lifecycle state order changed. Verified moved from position 6 to position 8 (final). Verification is the closure of the cycle — the client needs the full picture (documentation + charge) before confirming.
+
+| Previous State | Current State | Notes |
 |---|---|---|
 | Completed | Delivered | Renamed — provider marks delivery, not completion |
-| Documented | Documented | Unchanged — but now comes after Verified |
+| Documented | Documented | Unchanged — comes after Delivered |
 | Invoiced | — | Removed from lifecycle — tracked in billing.status |
 | Collected | — | Removed from lifecycle — tracked in billing.status |
-| Verified | Verified | Moved from last to 6th — verification unlocks documentation and charging |
-| — | Charged | New — charge applied 1:1 with verified session |
+| — | Charged | New — charge applied 1:1 with delivered + documented session |
+| Verified (pos 6) | Verified (pos 8) | Moved to final — client confirms or auto-verified after silence window |
 
 ## Development
 

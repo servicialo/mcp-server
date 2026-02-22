@@ -37,7 +37,7 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={h}># ── SERVICIALO v0.2 ──────────────────</span></Line>
+      <Line><span className={h}># ── SERVICIALO v0.3 ──────────────────</span></Line>
       <Line><span className={h}># Las 8 dimensiones de un servicio</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={a}>servicio:</span></Line>
@@ -133,7 +133,7 @@ export function EstandarSection() {
       {/* Schema block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Protocolo de Entrega de Servicios v0.2
+          Protocolo de Entrega de Servicios v0.3
         </div>
         <SchemaBlock />
       </div>

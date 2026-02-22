@@ -119,7 +119,7 @@ export function ResolucionSection() {
         </div>
         <div className="text-sm text-text-body leading-[1.8] mb-4">
           Antes de que un servicio pase de &quot;Solicitado&quot; a
-          &quot;Asignado&quot;, ambas partes aceptan un contrato que define las
+          &quot;Agendado&quot;, ambas partes aceptan un contrato que define las
           reglas del juego. Una vez aceptado, ninguna parte puede modificarlo
           unilateralmente — ni el proveedor, ni el cliente, ni la plataforma.
         </div>

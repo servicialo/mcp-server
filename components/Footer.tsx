@@ -6,7 +6,7 @@ export function Footer() {
           servicialo<span className="text-accent">.com</span>
         </div>
         <div className="text-xs text-text-dim mt-1">
-          El estándar abierto para servicios — v0.4
+          El estándar abierto para servicios — v0.3
         </div>
       </div>
       <div className="flex items-center gap-4 font-mono text-[11px] text-text-dim">

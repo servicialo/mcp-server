@@ -26,7 +26,7 @@ const EXCEPTIONS = [
   {
     title: "Disputa de calidad",
     transition: "Entregado → Disputado",
-    desc: "Cobro congelado. Se solicita evidencia adicional de ambas partes. Resuelve a: Verificado → Cobrado (proveedor gana) o Cancelado (cliente gana, balance restaurado).",
+    desc: "Cobro congelado. Se solicita evidencia adicional de ambas partes. Resuelve a: Cobrado → Verificado (proveedor gana) o Cancelado (cliente gana, balance restaurado).",
     borderColor: "border-l-purple",
   },
   {
@@ -133,11 +133,12 @@ export function CicloSection() {
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
           Menos estados pierden información crítica — sin separar
-          &quot;Entregado&quot; de &quot;Verificado&quot;, no puedes distinguir
-          &quot;el proveedor dice que ocurrió&quot; de &quot;ambas partes
-          confirman que ocurrió&quot;. Más estados agregan fricción. 8 es el mínimo
+          &quot;Entregado&quot; de &quot;Documentado&quot;, no puedes distinguir
+          &quot;el proveedor dice que ocurrió&quot; de &quot;la evidencia está
+          registrada&quot;. Sin separar &quot;Cobrado&quot; de &quot;Verificado&quot;,
+          no puedes saber si el cliente aceptó el resultado. 8 es el mínimo
           viable para que un agente AI pueda verificar con certeza que un
-          servicio fue solicitado, entregado, documentado y cobrado.
+          servicio fue solicitado, entregado, documentado, cobrado y verificado.
         </div>
       </div>
 

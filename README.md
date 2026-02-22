@@ -4,6 +4,11 @@ Protocolo abierto para que agentes AI coordinen servicios profesionales.
 
 Si estás construyendo un agente que necesita agendar, verificar entrega o cobrar un servicio — sin integrarte con cada plataforma por separado — este es el protocolo.
 
+| | Versión |
+|---|---|
+| **Protocol** | 0.3 |
+| **@servicialo/mcp-server** | 0.5.0 |
+
 **Quickstart**
 
 ```bash
@@ -44,7 +49,7 @@ Ver documentación completa en [`packages/mcp-server/README.md`](packages/mcp-se
 Servicialo está diseñado como un estándar por capas. Un implementador adopta lo que necesita según la complejidad de su operación.
 
 ```
-Servicialo Core                    ← estable (v0.2)
+Servicialo Core                    ← estable (v0.3)
 ├── Ciclo de vida (8 estados)
 ├── 8 dimensiones del servicio
 ├── Flujos de excepción
@@ -71,7 +76,7 @@ Los módulos son independientes entre sí y se agregan según necesidad:
 
 | Módulo | Para quién | Estado |
 |--------|-----------|--------|
-| **Core** | Cualquier plataforma que coordine servicios | Estable (v0.2) |
+| **Core** | Cualquier plataforma que coordine servicios | Estable (v0.3) |
 | **/Finanzas** | Plataformas que intermedian pagos o cobran comisiones | En diseño |
 | **/Disputas** | Plataformas con volumen o montos que justifican arbitraje formal | En diseño |
 
@@ -101,10 +106,10 @@ Un servicio profesional tiene 8 dimensiones:
 ### El ciclo de vida
 
 ```
-Solicitado → Agendado → Confirmado → En Curso → Entregado → Verificado → Documentado → Cobrado
+Solicitado → Agendado → Confirmado → En Curso → Entregado → Documentado → Cobrado → Verificado
 ```
 
-**Verificado viene antes de Documentado y Cobrado** — la verificación es un hecho de entrega, no financiero. El cliente confirma que el servicio ocurrió; ese hecho habilita tanto la documentación (el registro es confiable) como el cobro (el débito está justificado).
+**Verificado es el cierre del ciclo** — el cliente no puede verificar hasta tener el cuadro completo: la evidencia documentada y el cobro aplicado. Verificación prematura (antes de documentar y cobrar) obliga al cliente a confirmar algo que aún no tiene registro formal.
 
 **No hay estado "Pagado" en el ciclo** — el pago se trackea en `billing.status`, independiente del ciclo. En LATAM el modelo dominante es prepago: el cliente paga antes, el cobro consume crédito del paquete. Para modelos post-pago, `billing.status` transiciona de `cobrado → facturado → pagado` después de que el ciclo cierra.
 
@@ -118,7 +123,7 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 2. **Resolución algorítmica (~80%)** (Disputas) — el sistema compara evidencia registrada contra la evidencia requerida. Si la evidencia es concluyente, se resuelve automáticamente.
 3. **Arbitraje por pares (~20%)** (Disputas) — cuando la evidencia es ambigua, un panel de 1-3 profesionales del mismo vertical con alta reputación revisa y vota. Mayoría simple en 48 horas.
 
-## Límites del estándar v0.2
+## Límites del estándar v0.3
 
 ### Lo que cubre Core hoy
 

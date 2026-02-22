@@ -61,9 +61,9 @@ export const LIFECYCLE_STATES = [
   { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes reconocen el compromiso. Recordatorios programados. Prerrequisitos verificados." },
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Registro de entrada detectado. El servicio está siendo entregado." },
   { id: "delivered", label: "Entregado", icon: "5", desc: "El proveedor marca la entrega como completa. Evidencia capturada: duración real, notas, fotos si aplica." },
-  { id: "verified", label: "Verificado", icon: "6", desc: "El cliente confirma que el servicio ocurrió, o se auto-verifica tras la ventana de silencio. Hecho de entrega establecido." },
-  { id: "documented", label: "Documentado", icon: "7", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta — según la vertical. El registro es confiable porque la entrega ya fue verificada." },
-  { id: "charged", label: "Cobrado", icon: "8", desc: "Cargo aplicado a la cuenta del cliente. Saldo prepago debitado o deuda registrada. El cobro está justificado porque la entrega fue verificada." },
+  { id: "documented", label: "Documentado", icon: "6", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta — según la vertical." },
+  { id: "charged", label: "Cobrado", icon: "7", desc: "Cargo aplicado a la cuenta del cliente. Saldo prepago debitado o deuda registrada." },
+  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
 ] as const;
 
 export const ANATOMY = [
@@ -72,7 +72,7 @@ export const ANATOMY = [
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual", example: "Clínica / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Verificado → próximo: Documentado" },
+  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
@@ -84,11 +84,11 @@ export const PRINCIPLES = [
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
   { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
-  { title: "Cobrar no es lo mismo que pagar", body: "Un cobro se aplica a la cuenta del cliente cuando el servicio es verificado — siempre 1:1 con una sesión. El pago es el movimiento de dinero, que puede ocurrir antes (paquete prepago), después (reembolso) o en lote (factura mensual). Son eventos independientes." },
+  { title: "Cobrar no es lo mismo que pagar", body: "Un cobro se aplica a la cuenta del cliente cuando el servicio es entregado y documentado — siempre 1:1 con una sesión. El pago es el movimiento de dinero, que puede ocurrir antes (paquete prepago), después (reembolso) o en lote (factura mensual). Son eventos independientes." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.2
+# SERVICIALO v0.3
 # Las 8 dimensiones de un servicio profesional
 # ─────────────────────────────────────────────
 
@@ -215,7 +215,7 @@ export const DISPUTE_RESOLUTION_FLOW = [
     step: 3,
     id: "resolucion",
     label: "Resolución",
-    desc: "Si proveedor gana: Verificado → Cobrado. Si cliente gana: Cancelado con balance restaurado.",
+    desc: "Si proveedor gana: Cobrado → Verificado. Si cliente gana: Cancelado con balance restaurado.",
     actor: "admin | arbitraje",
   },
 ] as const;
