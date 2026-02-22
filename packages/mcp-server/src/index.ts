@@ -38,7 +38,7 @@ const apiClient = new CoordinaloClient({
 // --- Init MCP server ---
 const server = new McpServer({
   name: 'servicialo',
-  version: '0.4.0',
+  version: '0.5.0',
 });
 
 // --- Tool type ---
