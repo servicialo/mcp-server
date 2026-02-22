@@ -290,11 +290,11 @@ export const MODULES = [
     name: "Servicialo Core",
     status: "estable" as const,
     statusColor: "green" as const,
-    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción y prueba de entrega.",
+    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 9 dimensiones del servicio, flujos de excepción y prueba de entrega.",
     audience: "Cualquier plataforma que coordine servicios profesionales — desde una clínica de kinesiología hasta un marketplace de limpieza.",
     includes: [
       "Ciclo de vida (9 estados universales)",
-      "8 dimensiones del servicio",
+      "9 dimensiones del servicio",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento)",
       "Prueba de entrega con evidencia por vertical",
       "Contrato de servicio pre-acordado",

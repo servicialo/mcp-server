@@ -10,7 +10,7 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [The 8 Dimensions of a Service](#2-the-8-dimensions-of-a-service)
+2. [The 9 Dimensions of a Service](#2-the-9-dimensions-of-a-service)
 3. [The 9 Universal States](#3-the-9-universal-states)
 4. [Exception Flows](#4-exception-flows)
 5. [The 6 Principles](#5-the-6-principles)
@@ -48,9 +48,9 @@ Servicialo defines the minimum viable schema for any AI agent to interact with a
 
 ---
 
-## 2. The 8 Dimensions of a Service
+## 2. The 9 Dimensions of a Service
 
-Every professional service — from a consulting session to a home repair — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
+Every professional service — from a consulting session to a home repair — can be described across 9 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
 ### 2.1 Identity (What)
 
@@ -76,18 +76,38 @@ The professional or entity delivering the service.
 | `provider.trust_score` | number | 0-100, calculated from history | `92` |
 | `provider.organization_id` | string | Parent organization | `org_mamapro` |
 
-### 2.3 Client (Who Receives)
+### 2.3 Beneficiary (Who Receives)
 
-The beneficiary of the service.
+The person who directly receives the service.
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `client.id` | string | Client identifier | `cli_def456` |
-| `client.payer_id` | string | May differ from client | `payer_fonasa` |
+| `beneficiary.id` | string | Beneficiary identifier | `cli_def456` |
+| `beneficiary.relationship` | string | Role in the service | `patient`, `student`, `homeowner` |
 
-**Design decision:** The payer is explicitly separated from the client. In healthcare, insurance pays. In corporate training, the employer pays. In education, the parent pays. Most scheduling APIs ignore this distinction.
+### 2.4 Requester (Who Initiates)
 
-### 2.4 Schedule (When)
+The person who initiates and manages the service request. May differ from the beneficiary.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `requester.id` | string | Requester identifier | `req_ghi789` |
+| `requester.relationship` | enum | Relation to beneficiary | `self`, `family`, `employer`, `agent` |
+
+**Example:** A son schedules a physiotherapy session for his mother. The mother is the beneficiary; the son is the requester.
+
+### 2.5 Payer (Who Pays)
+
+The entity responsible for payment. Explicitly separated from both the beneficiary and the requester.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `payer.id` | string | Payer identifier | `payer_fonasa` |
+| `payer.type` | enum | `person`, `organization`, `insurer` | `insurer` |
+
+**Design decision:** Most scheduling APIs treat the client as one entity. In reality, three distinct roles exist: who receives the service, who manages it, and who pays for it. In healthcare, the insurer pays. In corporate training, the employer pays. In education, the parent pays. Servicialo makes this separation explicit.
+
+### 2.6 Schedule (When)
 
 The temporal window for the service.
 
@@ -97,7 +117,7 @@ The temporal window for the service.
 | `schedule.scheduled_for` | datetime | Agreed start time | `2026-02-10T10:00:00Z` |
 | `schedule.duration_expected` | integer | Expected minutes | `45` |
 
-### 2.5 Location (Where)
+### 2.7 Location (Where)
 
 Physical or virtual location.
 
@@ -108,17 +128,7 @@ Physical or virtual location.
 | `location.room` | string | Specific room/box | `"Box 3"` |
 | `location.coordinates` | object | lat/lng | `{lat: -33.42, lng: -70.61}` |
 
-### 2.6 Lifecycle (States)
-
-Current position in the 9-state lifecycle. See [Section 3](#3-the-9-universal-states).
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `lifecycle.current_state` | enum[9] | Current state |
-| `lifecycle.transitions` | transition[] | State change history |
-| `lifecycle.exceptions` | exception[] | No-shows, disputes, etc. |
-
-### 2.7 Proof of Delivery (Evidence)
+### 2.8 Proof of Delivery (Evidence)
 
 How the service proves it occurred.
 
@@ -129,16 +139,18 @@ How the service proves it occurred.
 | `proof.duration_actual` | integer | Actual minutes | `45` |
 | `proof.evidence` | evidence[] | GPS, signatures, photos | `[{type: "gps", ...}]` |
 
-### 2.8 Billing (Payment)
+### 2.9 Documentation (Outcome)
 
-Financial settlement for the service.
+The documented result of the service delivery.
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
-| `billing.amount` | money | Service price | `{value: 35000, currency: "CLP"}` |
-| `billing.payer` | reference | Who pays | `payer_fonasa` |
-| `billing.status` | enum | `pending`, `invoiced`, `paid`, `disputed` | `paid` |
-| `billing.tax_document` | reference | Invoice/receipt | `inv_001234` |
+| `documentation.type` | enum | Record type | `clinical_note`, `inspection_report`, `class_minutes`, `legal_memo` |
+| `documentation.content` | string | Record content | "Rehabilitation session..." |
+| `documentation.signed_by` | string[] | Who signed the record | `["prov_xyz789", "cli_def456"]` |
+| `documentation.generated_at` | datetime | When the record was created | `2026-02-10T11:00:00Z` |
+
+**Design decision:** Documentation is a first-class dimension, not a side effect. A completed service without a documented outcome is incomplete. The type of documentation varies by vertical (clinical notes in health, inspection reports in home services, minutes in education), but the requirement is universal.
 
 ---
 
@@ -314,18 +326,28 @@ service:
     trust_score: number         # 0-100, calculated from history
     organization_id: string     # Parent organization
 
-  # 2.3 Client
-  client:
+  # 2.3 Beneficiary
+  beneficiary:
     id: string
-    payer_id: string            # May differ from client
+    relationship: string        # patient | student | homeowner
 
-  # 2.4 Schedule
+  # 2.4 Requester
+  requester:
+    id: string
+    relationship: enum          # self | family | employer | agent
+
+  # 2.5 Payer
+  payer:
+    id: string
+    type: enum                  # person | organization | insurer
+
+  # 2.6 Schedule
   schedule:
     requested_at: datetime
     scheduled_for: datetime
     duration_expected: integer   # minutes
 
-  # 2.5 Location
+  # 2.7 Location
   location:
     type: enum                  # in_person | virtual | home_visit
     address: string
@@ -334,27 +356,19 @@ service:
       lat: number
       lng: number
 
-  # 2.6 Lifecycle
-  lifecycle:
-    current_state: enum         # The 9 universal states
-    transitions: transition[]   # State change history
-    exceptions: exception[]     # No-shows, disputes, etc.
-
-  # 2.7 Proof of Delivery
+  # 2.8 Proof of Delivery
   proof:
     checkin: datetime
     checkout: datetime
     duration_actual: integer     # minutes
     evidence: evidence[]        # GPS, signatures, photos, docs
 
-  # 2.8 Billing
-  billing:
-    amount:
-      value: number
-      currency: string          # ISO 4217
-    payer: reference
-    status: enum                # pending | invoiced | paid | disputed
-    tax_document: reference
+  # 2.9 Documentation
+  documentation:
+    type: enum                  # clinical_note | inspection_report | class_minutes | legal_memo
+    content: string
+    signed_by: string[]
+    generated_at: datetime
 
 # Supporting types
 transition:
@@ -641,7 +655,7 @@ npx -y @servicialo/mcp-server
 | `scheduling.check_availability` | Check available time slots |
 | `services.list` | Public service catalog |
 
-### Authenticated Mode (23 total tools)
+### Authenticated Mode (20 total tools)
 
 ```json
 {
@@ -658,7 +672,16 @@ npx -y @servicialo/mcp-server
 }
 ```
 
-**Additional tools include:** `scheduling.book`, `scheduling.reschedule`, `scheduling.cancel`, `clients.list`, `clients.get`, `clients.create`, `payments.create_sale`, `payments.record_payment`, `notifications.send_session_reminder`, plus 10 more for payments, providers, and payroll.
+20 tools organized by the 6 lifecycle phases of a service:
+
+| Phase | Tools |
+|-------|-------|
+| **Descubrimiento** (4 public) | `registry.search`, `registry.get_organization`, `scheduling.check_availability`, `services.list` |
+| **Entender** (2) | `service.get`, `contract.get` |
+| **Comprometer** (3) | `clients.get_or_create`, `scheduling.book`, `scheduling.confirm` |
+| **Ciclo de Vida** (4) | `lifecycle.get_state`, `lifecycle.transition`, `scheduling.reschedule`, `scheduling.cancel` |
+| **Verificar Entrega** (3) | `delivery.checkin`, `delivery.checkout`, `delivery.record_evidence` |
+| **Cerrar** (4) | `documentation.create`, `payments.create_sale`, `payments.record_payment`, `payments.get_status` |
 
 **Planned tools (Telemetry Extension):** `telemetry.contribute`, `telemetry.benchmark`
 
@@ -671,7 +694,7 @@ npx -y @servicialo/mcp-server
 
 ## 9. Implementations
 
-Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 9 states in their data model and can connect to the MCP server.
+Any platform can implement the Servicialo specification. Compatible implementations expose the 9 dimensions and 9 states in their data model and can connect to the MCP server.
 
 ### Reference Implementation
 
@@ -685,7 +708,7 @@ Currently validated with healthcare clinics in Chile. The platform supports any 
 
 To be listed as a compatible implementation, a platform must:
 
-1. Model services using the 8 dimensions (Section 2)
+1. Model services using the 9 dimensions (Section 2)
 2. Implement the 9 lifecycle states (Section 3)
 3. Handle at least 3 exception flows (Section 4)
 4. Expose an API that the MCP server can connect to

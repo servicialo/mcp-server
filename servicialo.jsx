@@ -558,8 +558,8 @@ export default function Servicialo() {
         <Section id="anatomia">
           <SectionTitle
             tag="03 — Anatomía"
-            title="Las 8 dimensiones de un servicio"
-            subtitle="Para que un agente AI pueda coordinar un servicio, necesita entender estas 8 dimensiones."
+            title="Las 9 dimensiones de un servicio"
+            subtitle="Para que un agente AI pueda coordinar un servicio, necesita entender estas 9 dimensiones."
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {ANATOMY.map((item, i) => (

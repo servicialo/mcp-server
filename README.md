@@ -46,7 +46,7 @@ Servicialo está diseñado como un estándar por capas. Un implementador adopta 
 ```
 Servicialo Core                    ← estable
 ├── Ciclo de vida (9 estados)
-├── 8 dimensiones del servicio
+├── 9 dimensiones del servicio
 ├── Flujos de excepción
 ├── Prueba de entrega
 ├── Contrato de servicio
@@ -78,7 +78,7 @@ Los módulos son independientes entre sí y se agregan según necesidad:
 ## El estándar
 
 La especificación completa vive en [`PROTOCOL.md`](./PROTOCOL.md) e incluye:
-- Las 8 dimensiones de un servicio profesional
+- Las 9 dimensiones de un servicio profesional
 - Los 9 estados universales del ciclo de vida
 - 6 flujos de excepción (inasistencias, cancelaciones, disputas, reagendamiento, entrega parcial)
 - 6 principios de diseño
@@ -88,15 +88,16 @@ La especificación completa vive en [`PROTOCOL.md`](./PROTOCOL.md) e incluye:
 
 ### Resumen rápido
 
-Un servicio profesional tiene 8 dimensiones:
+Un servicio profesional tiene 9 dimensiones:
 1. **Identidad** — qué servicio es y a qué vertical pertenece
 2. **Proveedor** — quién lo entrega, con qué credenciales
-3. **Cliente** — quién lo recibe, quién paga
-4. **Agendamiento** — cuándo, dónde, cuánto dura
-5. **Ciclo de vida** — 9 estados universales desde solicitud hasta cierre
-6. **Prueba de entrega** — checkin, checkout, evidencia
-7. **Documentación** — fichas, minutas, reportes
-8. **Facturación** — monto, pagador, estado de pago
+3. **Beneficiario** — quién recibe el servicio directamente
+4. **Solicitante** — quién inicia y gestiona (puede diferir del beneficiario)
+5. **Pagador** — quién paga (puede diferir de ambos)
+6. **Agendamiento** — cuándo y cuánto dura
+7. **Ubicación** — dónde se entrega (presencial, virtual, domicilio)
+8. **Evidencia** — checkin, checkout, GPS, firmas, fotos
+9. **Documentación** — fichas, minutas, reportes, resultado documentado
 
 ## Resolución de disputas
 
@@ -139,7 +140,7 @@ El módulo Servicialo/Disputas define un mecanismo híbrido que no depende de un
 
 Cualquier plataforma puede implementar la especificación Servicialo. Para ser listada, debe:
 
-1. Modelar servicios usando las 8 dimensiones
+1. Modelar servicios usando las 9 dimensiones
 2. Implementar los 9 estados del ciclo de vida
 3. Manejar al menos 3 flujos de excepción
 4. Exponer una API conectable al MCP server
@@ -148,7 +149,7 @@ Cualquier plataforma puede implementar la especificación Servicialo. Para ser l
 
 | Plataforma | Vertical | Cobertura | Estado | URL |
 |------------|----------|-----------|--------|-----|
-| **Coordinalo** | Servicios profesionales | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| **Coordinalo** | Servicios profesionales | 9/9 dimensiones · 9/9 estados · 6/6 excepciones · 6/6 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
 Validado actualmente con clínicas de salud en Chile. La plataforma soporta cualquier servicio profesional recurrente.
 
