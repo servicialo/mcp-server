@@ -1,6 +1,6 @@
 # Servicialo Protocol Specification
 
-**Version:** 0.3
+**Version:** 0.2
 **Status:** Draft
 **License:** MIT
 **Reference Implementation:** [Coordinalo](https://coordinalo.com)
@@ -10,15 +10,18 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [The 8 Dimensions of a Service](#2-the-8-dimensions-of-a-service)
-3. [The 8 Universal States](#3-the-8-universal-states)
-4. [Exception Flows](#4-exception-flows)
-5. [The 7 Principles](#5-the-7-principles)
-6. [Schema](#6-schema)
-7. [Telemetry Extension (Planned)](#7-telemetry-extension-planned)
-8. [MCP Server](#8-mcp-server)
-9. [Implementations](#9-implementations)
-10. [Contributing](#10-contributing)
+2. [Core Entities](#2-core-entities)
+3. [The 8 Dimensions of a Service](#3-the-8-dimensions-of-a-service)
+4. [The 9 Universal States](#4-the-9-universal-states)
+5. [Exception Flows](#5-exception-flows)
+6. [Service Order](#6-service-order)
+7. [The Principles](#7-the-principles)
+8. [Schema](#8-schema)
+9. [Agent Decision Model](#9-agent-decision-model)
+10. [MCP Server](#10-mcp-server)
+11. [Telemetry Extension](#11-telemetry-extension)
+12. [Implementations](#12-implementations)
+13. [Contributing](#13-contributing)
 
 ---
 
@@ -48,11 +51,37 @@ Servicialo defines the minimum viable schema for any AI agent to interact with a
 
 ---
 
-## 2. The 8 Dimensions of a Service
+## 2. Core Entities
+
+The protocol is built around two objects and their relationship.
+
+**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 3](#3-the-8-dimensions-of-a-service). A Service can exist standalone or within a Service Order.
+
+**Service Order** is the commercial agreement that groups one or more Services under a defined scope, an agreed price, and a payment schedule. It is optional — not every Service belongs to an Order.
+
+The key relationship: when a Service belongs to a Service Order, its `billing` dimension is **informative** (it records the economic value of the individual service unit) but **not transactional** (it does not generate an invoice). Invoicing is the exclusive responsibility of the Service Order, which triggers it according to its own payment schedule.
+
+A Service without a Service Order is a valid, complete object. The Order is an optional upper layer, not a requirement.
+
+```
+Organization
+└── Service Order (optional)
+    ├── scope: what services, how many, what type
+    ├── pricing: how value is calculated
+    ├── payment_schedule: when money moves
+    └── Services (atomic units)
+        └── 8 dimensions each
+```
+
+---
+
+## 3. The 8 Dimensions of a Service
 
 Every professional service — from a physical therapy session to a legal consultation — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
-### 2.1 Identity (What)
+> When a Service belongs to a Service Order, the `billing` dimension is informative — it records the economic value of the individual service unit. The Service Order determines when and how invoicing occurs.
+
+### 3.1 Identity (What)
 
 The activity or outcome being delivered.
 
@@ -65,7 +94,7 @@ The activity or outcome being delivered.
 | `duration_minutes` | integer | Expected duration | `45` |
 | `requirements` | string[] | Prerequisites | `["medical_referral", "intake_form"]` |
 
-### 2.2 Provider (Who Delivers)
+### 3.2 Provider (Who Delivers)
 
 The professional or entity delivering the service.
 
@@ -76,7 +105,7 @@ The professional or entity delivering the service.
 | `provider.trust_score` | number | 0-100, calculated from history | `92` |
 | `provider.organization_id` | string | Parent organization | `org_mamapro` |
 
-### 2.3 Client (Who Receives)
+### 3.3 Client (Who Receives)
 
 The beneficiary of the service.
 
@@ -87,7 +116,7 @@ The beneficiary of the service.
 
 **Design decision:** The payer is explicitly separated from the client. In healthcare, insurance pays. In corporate training, the employer pays. In education, the parent pays. Most scheduling APIs ignore this distinction.
 
-### 2.4 Schedule (When)
+### 3.4 Schedule (When)
 
 The temporal window for the service.
 
@@ -97,7 +126,7 @@ The temporal window for the service.
 | `schedule.scheduled_for` | datetime | Agreed start time | `2026-02-10T10:00:00Z` |
 | `schedule.duration_expected` | integer | Expected minutes | `45` |
 
-### 2.5 Location (Where)
+### 3.5 Location (Where)
 
 Physical or virtual location.
 
@@ -108,17 +137,17 @@ Physical or virtual location.
 | `location.room` | string | Specific room/box | `"Box 3"` |
 | `location.coordinates` | object | lat/lng | `{lat: -33.42, lng: -70.61}` |
 
-### 2.6 Lifecycle (States)
+### 3.6 Lifecycle (States)
 
-Current position in the 8-state lifecycle. See [Section 3](#3-the-8-universal-states).
+Current position in the 9-state lifecycle. See [Section 4](#4-the-9-universal-states).
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `lifecycle.current_state` | enum[8] | Current state |
+| `lifecycle.current_state` | enum[9] | Current state |
 | `lifecycle.transitions` | transition[] | State change history |
 | `lifecycle.exceptions` | exception[] | No-shows, disputes, etc. |
 
-### 2.7 Proof of Delivery (Evidence)
+### 3.7 Proof of Delivery (Evidence)
 
 How the service proves it occurred.
 
@@ -129,9 +158,9 @@ How the service proves it occurred.
 | `proof.duration_actual` | integer | Actual minutes | `45` |
 | `proof.evidence` | evidence[] | GPS, signatures, photos | `[{type: "gps", ...}]` |
 
-### 2.8 Billing (Payment)
+### 3.8 Billing (Payment)
 
-Financial settlement for the service. Billing has its own status independent from the lifecycle state — a service can be Charged in the lifecycle while its billing is still `invoiced` (e.g., waiting for insurance reimbursement).
+Financial settlement for the service. Billing has its own status independent from the lifecycle state — a service can be Collected in the lifecycle while its billing is still `invoiced` (e.g., waiting for insurance reimbursement).
 
 | Field | Type | Description | Example |
 |-------|------|-------------|---------|
@@ -142,16 +171,16 @@ Financial settlement for the service. Billing has its own status independent fro
 | `billing.payment_id` | reference | Linked payment (may be a prepaid package) | `pkg_001` |
 | `billing.tax_document` | reference | Invoice/receipt if issued | `inv_001234` |
 
-**Design decision:** `charged` and `paid` are explicitly separated. **Charged** means the amount was debited from the client's balance or added to their debt — it always happens 1:1 with a Charged session. **Paid** means cash was received, and may have occurred upstream (when the client purchased a prepaid package) or downstream (insurance reimbursement). Most professional service platforms in Latin America operate on prepaid packages — conflating charge and payment loses critical information about cash flow.
+**Design decision:** `charged` and `paid` are explicitly separated. **Charged** means the amount was debited from the client's balance or added to their debt — it always happens 1:1 with a Completed session. **Paid** means cash was received, and may have occurred upstream (when the client purchased a prepaid package) or downstream (insurance reimbursement). Most professional service platforms in Latin America operate on prepaid packages — conflating charge and payment loses critical information about cash flow.
 
 ---
 
-## 3. The 8 Universal States
+## 4. The 9 Universal States
 
-Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 8 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
+Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
 ```
-Solicitado → Agendado → Confirmado → Entregado → Documentado → Facturado → Cobrado → Acreditado
+Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
 ```
 
 | # | Key (enum) | Nombre | Description | Trigger |
@@ -159,37 +188,38 @@ Solicitado → Agendado → Confirmado → Entregado → Documentado → Factura
 | 1 | **requested** | Solicitado | Client or agent defines what they need | Client submits request |
 | 2 | **scheduled** | Agendado | Time, provider, and location assigned | System matches availability |
 | 3 | **confirmed** | Confirmado | Both parties acknowledge | Provider + client confirm |
-| 4 | **delivered** | Entregado | Provider marks delivery complete | Provider confirms (1-tap WhatsApp or app) |
-| 5 | **documented** | Documentado | Record/evidence generated | Clinical note, report, or evidence filed |
-| 6 | **invoiced** | Facturado | Tax document issued | Tax document emitted |
-| 7 | **collected** | Cobrado | Payment received and confirmed | Payment received and confirmed |
-| 8 | **credited** | Acreditado | Client confirms OK or silence window expires | Client responds OK, or auto-credited after window |
+| 4 | **in_progress** | En Curso | Service is being delivered | Check-in detected |
+| 5 | **completed** | Completado | Provider marks delivery complete | Provider confirms (1-tap WhatsApp or app) |
+| 6 | **documented** | Documentado | Record/evidence generated | Clinical note, report, or evidence filed |
+| 7 | **invoiced** | Facturado | Tax document issued | Tax document emitted |
+| 8 | **collected** | Cobrado | Payment received and confirmed | Payment received and confirmed |
+| 9 | **verified** | Verificado | Client confirms OK or silence window expires | Client responds OK, or auto-verified after window |
 
-### Why 8 states?
+### Why 9 states?
 
-"In Progress" was eliminated because it is the only state inferred by the system, not verified by an external party. The remaining 8 states each have a clean trigger actioned by at least one party. Without separating Delivered from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Invoiced from Collected, you can't know if the payment was actually received. Without separating Collected from Credited, you can't know if the client accepted the outcome.
+Fewer states lose critical information — without separating Completed from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Invoiced from Collected, you can't know if the payment was actually received. Without separating Collected from Verified, you can't know if the client accepted the outcome.
 
-More states add friction. 8 is the minimum viable set for an AI agent to verify the full service chain with certainty.
+More states add friction. 9 is the minimum viable set for an AI agent to verify the full service chain with certainty.
 
-### Why Credited comes last
+### Why Verified comes last
 
-Credit is the closure of the cycle, not a step in the middle. In practice:
+Verification is the closure of the cycle, not a step in the middle. In practice:
 
-1. The provider delivers the service (Entregado)
+1. The provider delivers the service (Completado)
 2. The provider documents (writes the clinical note, files the report) (Documentado)
 3. The tax document is issued (Facturado)
 4. Payment is collected (Cobrado)
-5. The client credits — or the credit window expires and it auto-closes (Acreditado)
+5. The client verifies — or the verification window expires and it auto-closes (Verificado)
 
-The client cannot meaningfully credit until the service has been documented, invoiced, and collected. They need the complete picture — the clinical note, the invoice, the payment confirmation — before they can confirm or dispute. Credit that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
+The client cannot meaningfully verify until the service has been documented, invoiced, and collected. They need the complete picture — the clinical note, the invoice, the payment confirmation — before they can confirm or dispute. Verification that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
 
 ### Intermediate states
 
-Implementations may add states between the universal eight to match their operational reality. For example, an assignment step between Requested and Scheduled, or a quality review step between Documented and Invoiced. The 8 universal states are the minimum — not the maximum.
+Implementations may add states between the universal nine to match their operational reality. For example, an assignment step between Requested and Scheduled, or a quality review step between Documented and Invoiced. The 9 universal states are the minimum — not the maximum.
 
 ### Revenue recognition
 
-What triggers the transition from Delivered to the financial cycle (Documented → Invoiced → Collected) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
+What triggers the transition from Completed to the financial cycle (Documented → Invoiced → Collected) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
 
 | Method | When revenue is recognized | Example |
 |--------|---------------------------|---------|
@@ -205,14 +235,14 @@ Payment flow is tracked in `billing.status`, independently from the lifecycle. I
 
 ### State transitions
 
-States are strictly ordered. The 8 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 4](#4-exception-flows).
+States are strictly ordered. The 9 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 5](#5-exception-flows).
 
 Each transition records:
 
 ```yaml
 transition:
-  from: "delivered"
-  to: "documented"
+  from: "collected"
+  to: "verified"
   at: "2026-02-10T11:00:00Z"
   by: "client_def456"       # who triggered (client, provider, system, or agent)
   method: "auto"             # auto | manual | agent
@@ -225,11 +255,11 @@ Implementations that calculate provider compensation must read only sessions in 
 
 ---
 
-## 4. Exception Flows
+## 5. Exception Flows
 
 A robust standard doesn't just define the happy path. It defines what happens when things go wrong. These are first-class flows, not edge cases.
 
-### 4.1 Client No-Show
+### 5.1 Client No-Show
 
 **Trigger:** Client doesn't arrive within the grace period.
 
@@ -242,7 +272,7 @@ Confirmed → Cancelled (no_show)
 - Increments client's no-show counter (strike system)
 - Provider is compensated per policy
 
-### 4.2 Provider No-Show
+### 5.2 Provider No-Show
 
 **Trigger:** Provider doesn't arrive or cancels last-minute.
 
@@ -254,7 +284,7 @@ Confirmed → Reassigning → Scheduled (new provider)
 - Client notified of change
 - Original provider flagged
 
-### 4.3 Cancellation
+### 5.3 Cancellation
 
 **Trigger:** Either party cancels before the service.
 
@@ -266,20 +296,20 @@ Any pre-delivery state → Cancelled
 - Full refund if outside penalty window
 - Partial/no refund within penalty window
 
-### 4.4 Quality Dispute
+### 5.4 Quality Dispute
 
-**Trigger:** Client disputes the quality of a delivered service within the dispute window.
+**Trigger:** Client disputes the quality of a completed service within the dispute window.
 
 ```
-Delivered → Disputed
+Completed → Disputed
 ```
 
 - Charge frozen — `billing.status` remains `pending` until resolution
 - Additional evidence requested from both parties
 - Admin or arbitration resolves
-- Resolves to: Collected → Credited (provider wins) or Cancelled (client wins, balance restored)
+- Resolves to: Collected → Verified (provider wins) or Cancelled (client wins, balance restored)
 
-### 4.5 Rescheduling
+### 5.5 Rescheduling
 
 **Trigger:** Either party needs to change the time.
 
@@ -291,12 +321,12 @@ Scheduled/Confirmed → Rescheduling → Scheduled (new time)
 - Maintains same provider when possible
 - Rescheduling policy may apply
 
-### 4.6 Partial Delivery
+### 5.6 Partial Delivery
 
 **Trigger:** Service cannot be completed in full.
 
 ```
-Confirmed → Partial
+In Progress → Partial
 ```
 
 - Documents what was delivered
@@ -305,11 +335,117 @@ Confirmed → Partial
 
 ---
 
-## 5. The 7 Principles
+## 6. Service Order
+
+### Concept
+
+A Service Order is a bilateral agreement to deliver a set of services under defined commercial terms. Three axes define it completely:
+
+- **Scope** — what services are authorized, how many, of what type
+- **Pricing** — how delivery is valued (fixed, time & materials, rate card, mixed)
+- **Payment schedule** — when money moves (upfront, by milestones, periodic, on delivery, custom)
+
+A Service Order can be episodic (10 post-surgery sessions), milestone-based (due diligence in 3 phases), time-and-materials-bounded (40 hours of consulting), or permanent (monthly retainer with no end date). The duration type is an attribute of the Order, not a separate entity.
+
+Examples across verticals that the protocol supports with the same object:
+
+- ISAPRE issues authorization for 12 kinesiology sessions → Service Order, payer = ISAPRE, term.type = per_event (medical authorization)
+- Company contracts 40 hours of consulting → Service Order, pricing.model = t&m, term.type = project
+- Patient purchases unlimited monthly package → Service Order, term.type = monthly, term.auto_renews = true
+- Client contracts due diligence paid in 3 milestones → Service Order, payment_schedule.type = milestone
+
+### Lifecycle
+
+```
+draft → proposed → negotiating → active → paused → completed
+                                   ↘ cancelled
+```
+
+| State | Description |
+|-------|-------------|
+| `draft` | Created but not sent to the client. Equivalent to a draft quote. |
+| `proposed` | Sent to the client, awaiting acceptance. Equivalent to a commercial proposal. |
+| `negotiating` | Active negotiation of terms. |
+| `active` | Accepted and in execution. Verified Services feed the ledger. |
+| `paused` | Temporarily suspended (e.g., client hospitalized, budget frozen). |
+| `completed` | Scope fulfilled or term expired per defined condition. |
+| `cancelled` | Terminated before completion by either party. |
+
+**Design decision:** The `draft` and `proposed` states turn the Service Order into the central object for Estimalo (quoting). A quote IS a Service Order in pre-active state. There is no separate "quote" object.
+
+### Schema
+
+```yaml
+service_order:
+  # Required fields (marked with *)
+  id: string*                       # Unique identifier, e.g. "so_abc123"
+  organization_id: string*          # Issuing organization
+  client_id: string*                # Beneficiary
+  payer_id: string*                 # Who pays (may differ from client)
+
+  # Scope — what is authorized
+  scope:
+    description: string*            # Human-readable scope definition
+    service_types: string[]*        # Authorized service types, e.g. ["physical_therapy_session"]
+    quantity_limit: integer         # Max services. null = unlimited
+    hours_limit: number             # Max hours. null = not applicable
+    expiry_condition: string        # Human-readable completion condition
+                                    # e.g. "12 sessions" | "90 days" | "milestone 3 approved"
+
+  # Term — duration and renewal
+  term:
+    type: enum*                     # permanent | annual | monthly | per_milestone | per_event
+    starts_at: datetime*
+    ends_at: datetime               # null if permanent or open-ended
+    auto_renews: boolean            # default: false
+    renewal_notice_days: integer    # days before end to notify. null if auto_renews = false
+
+  # Pricing — how value is calculated
+  pricing:
+    model: enum*                    # fixed | t&m | rate_card | mixed
+    currency: string*               # ISO 4217, e.g. "CLP"
+    fixed_amount: number            # required if model = fixed
+    rate_card:                      # required if model = t&m or rate_card
+      - level: string               # e.g. "junior" | "senior" | "partner"
+        billable_rate: number       # what is charged to client per hour
+        cost_rate: number           # internal cost per hour
+
+  # Payment schedule — when money moves
+  payment_schedule:
+    type: enum*                     # upfront | milestone | periodic | on_delivery | custom
+    installments:                   # required if type = milestone or custom
+      - trigger: string             # e.g. "contract_signed" | "milestone_1_approved" | "2026-03-01"
+        amount: number              # fixed amount. null if percentage is used
+        percentage: number          # % of total. null if amount is used
+        due_days: integer           # days from trigger to payment due date
+
+  # Ledger — computed from verified Services, never manually entered
+  ledger:                           # read-only, calculated by the system
+    services_verified: integer      # count of verified atomic services
+    hours_consumed: number          # total hours across verified services
+    amount_consumed: number         # value consumed at pricing rates
+    amount_billed: number           # total invoiced to date
+    amount_collected: number        # total payments received
+    amount_remaining: number        # authorized scope not yet consumed
+
+  # Lifecycle
+  lifecycle:
+    current_state: enum*            # draft | proposed | negotiating | active | paused | completed | cancelled
+    transitions: transition[]       # full audit trail of state changes
+
+  # Services that belong to this order
+  service_ids: string[]             # references to atomic Service objects
+```
+
+> **Design decision:** The `ledger` is entirely computed — it is never manually entered. As atomic Services transition to `verified` state, the system automatically updates `services_verified`, `hours_consumed`, and `amount_consumed`. This means the Service Order always reflects the real state of delivery without any reconciliation step. The admin's month-end close becomes a review of exceptions, not a reconstruction from scratch.
+
+---
+
+## 7. The Principles
 
 ### Principle 1: Every service has a lifecycle
 
-Whether it's a massage or an audit, the 8 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
+Whether it's a massage or an audit, the 9 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
 
 ### Principle 2: Delivery must be verifiable
 
@@ -331,77 +467,149 @@ It has a name, price, duration, requirements, and expected outcome. Defined this
 
 The standard is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
 
-### Principle 7: Charging is not the same as payment
+### Principle 7: The agreement is separate from the delivery
 
-A charge is applied to a client account when a service is delivered and documented — it is always 1:1 with a session. Payment is the movement of money, which may happen before the service (prepaid package), after (insurance reimbursement), or in batch (monthly invoice). These are independent events and must be modeled separately. Conflating them makes financial reporting unreliable and payroll calculations wrong.
+A Service Order defines *what was agreed*. Atomic Services define *what was delivered*. These are two different objects with two different lifecycles. Conflating them — as most scheduling and billing systems do — creates a fundamental data integrity problem: you can't know whether a dispute is about the terms of the agreement or the quality of the delivery.
+
+Servicialo keeps them separate by design. The Service Order owns the commercial relationship. The atomic Service owns the proof of delivery. The ledger on the Service Order is the computed bridge between the two.
 
 ---
 
-## 6. Schema
+## 8. Schema
 
 The canonical schema in YAML. Implementations may use JSON, protobuf, or any serialization format that preserves the structure.
 
+### Service
+
 ```yaml
 service:
-  # 2.1 Identity
-  id: string                    # Unique identifier
-  type: string                  # Service category
-  vertical: string              # health | legal | home | education | ...
-  name: string                  # Human-readable name
-  duration_minutes: integer     # Expected duration
+  # 3.1 Identity
+  id: string*                     # Unique identifier
+  service_order_id: string        # optional — reference to parent Service Order
+  type: string*                   # Service category
+  vertical: string*               # health | legal | home | education | ...
+  name: string*                   # Human-readable name
+  duration_minutes: integer*      # Expected duration
 
-  # 2.2 Provider
+  # 3.2 Provider
   provider:
-    id: string
-    credentials: string[]       # Required certifications
-    trust_score: number         # 0-100, calculated from history
-    organization_id: string     # Parent organization
+    id: string*
+    credentials: string[]         # Required certifications
+    trust_score: number           # 0-100, calculated from history
+    organization_id: string*      # Parent organization
 
-  # 2.3 Client
+  # 3.3 Client
   client:
-    id: string
-    payer_id: string            # May differ from client
+    id: string*
+    payer_id: string              # May differ from client
 
-  # 2.4 Schedule
+  # 3.4 Schedule
   schedule:
-    requested_at: datetime
-    scheduled_for: datetime
-    duration_expected: integer   # minutes
+    requested_at: datetime*
+    scheduled_for: datetime       # Set when scheduled
+    duration_expected: integer    # minutes
 
-  # 2.5 Location
+  # 3.5 Location
   location:
-    type: enum                  # in_person | virtual | home_visit
+    type: enum                    # in_person | virtual | home_visit
     address: string
     room: string
     coordinates:
       lat: number
       lng: number
 
-  # 2.6 Lifecycle
+  # 3.6 Lifecycle
   lifecycle:
-    current_state: enum         # The 8 universal states (solicitado | agendado | confirmado | entregado | documentado | facturado | cobrado | acreditado)
-    transitions: transition[]   # State change history
-    exceptions: exception[]     # No-shows, disputes, etc.
+    current_state: enum*          # The 9 universal states
+    transitions: transition[]     # State change history
+    exceptions: exception[]       # No-shows, disputes, etc.
 
-  # 2.7 Proof of Delivery
+  # 3.7 Proof of Delivery
   proof:
     checkin: datetime
     checkout: datetime
-    duration_actual: integer     # minutes
-    evidence: evidence[]        # GPS, signatures, photos, docs
+    duration_actual: integer      # minutes
+    evidence: evidence[]          # GPS, signatures, photos, docs
 
-  # 2.8 Billing
-  billing:
+  # 3.8 Billing
+  billing:                        # informative when service belongs to a Service Order — invoicing is handled by the Order
     amount:
-      value: number
-      currency: string          # ISO 4217
-    payer: reference            # May differ from client (insurance, employer, guardian)
-    status: enum                # pending | charged | invoiced | paid | disputed
-    charged_at: datetime        # When charge was applied (1:1 with Charged lifecycle state)
-    payment_id: reference       # Linked payment — may be a prepaid package purchased earlier
-    tax_document: reference     # Invoice/receipt if issued (not always generated per session)
+      value: number*
+      currency: string*           # ISO 4217
+    payer: reference              # May differ from client (insurance, employer, guardian)
+    status: enum                  # pending | charged | invoiced | paid | disputed
+    charged_at: datetime          # When charge was applied
+    payment_id: reference         # Linked payment — may be a prepaid package purchased earlier
+    tax_document: reference       # Invoice/receipt if issued
+```
 
-# Supporting types
+### Service Order
+
+```yaml
+service_order:
+  # Required fields (marked with *)
+  id: string*                       # Unique identifier, e.g. "so_abc123"
+  organization_id: string*          # Issuing organization
+  client_id: string*                # Beneficiary
+  payer_id: string*                 # Who pays (may differ from client)
+
+  # Scope — what is authorized
+  scope:
+    description: string*            # Human-readable scope definition
+    service_types: string[]*        # Authorized service types, e.g. ["physical_therapy_session"]
+    quantity_limit: integer         # Max services. null = unlimited
+    hours_limit: number             # Max hours. null = not applicable
+    expiry_condition: string        # Human-readable completion condition
+                                    # e.g. "12 sessions" | "90 days" | "milestone 3 approved"
+
+  # Term — duration and renewal
+  term:
+    type: enum*                     # permanent | annual | monthly | per_milestone | per_event
+    starts_at: datetime*
+    ends_at: datetime               # null if permanent or open-ended
+    auto_renews: boolean            # default: false
+    renewal_notice_days: integer    # days before end to notify. null if auto_renews = false
+
+  # Pricing — how value is calculated
+  pricing:
+    model: enum*                    # fixed | t&m | rate_card | mixed
+    currency: string*               # ISO 4217, e.g. "CLP"
+    fixed_amount: number            # required if model = fixed
+    rate_card:                      # required if model = t&m or rate_card
+      - level: string               # e.g. "junior" | "senior" | "partner"
+        billable_rate: number       # what is charged to client per hour
+        cost_rate: number           # internal cost per hour
+
+  # Payment schedule — when money moves
+  payment_schedule:
+    type: enum*                     # upfront | milestone | periodic | on_delivery | custom
+    installments:                   # required if type = milestone or custom
+      - trigger: string             # e.g. "contract_signed" | "milestone_1_approved" | "2026-03-01"
+        amount: number              # fixed amount. null if percentage is used
+        percentage: number          # % of total. null if amount is used
+        due_days: integer           # days from trigger to payment due date
+
+  # Ledger — computed from verified Services, never manually entered
+  ledger:                           # read-only, calculated by the system
+    services_verified: integer      # count of verified atomic services
+    hours_consumed: number          # total hours across verified services
+    amount_consumed: number         # value consumed at pricing rates
+    amount_billed: number           # total invoiced to date
+    amount_collected: number        # total payments received
+    amount_remaining: number        # authorized scope not yet consumed
+
+  # Lifecycle
+  lifecycle:
+    current_state: enum*            # draft | proposed | negotiating | active | paused | completed | cancelled
+    transitions: transition[]       # full audit trail of state changes
+
+  # Services that belong to this order
+  service_ids: string[]             # references to atomic Service objects
+```
+
+### Supporting Types
+
+```yaml
 transition:
   from: string
   to: string
@@ -425,251 +633,36 @@ evidence:
 
 ---
 
-## 7. Telemetry Extension (Planned)
+## 9. Agent Decision Model
 
-> **Status:** Design phase. Not yet implemented. Included in the specification to signal architectural intent and reserve the extension point.
+The protocol defines that agents are first-class citizens, but not all states are equal from an autonomy perspective. Some transitions are deterministic and safe for an agent to execute alone. Others involve ambiguity, real money, or irreversible consequences that require human confirmation. This section establishes that boundary.
 
-### 7.1 Purpose
+| Transition | Agent can act autonomously | Requires human confirmation |
+|---|---|---|
+| Requested → Scheduled | ✅ System matches availability | — |
+| Scheduled → Confirmed | ✅ If both parties have confirmed via registered channel | ⚠️ If confirmation is ambiguous or missing |
+| Confirmed → In Progress | ✅ On check-in detection | — |
+| In Progress → Completed | — | ✅ Provider must mark |
+| Completed → Documented | ✅ If evidence auto-captured (GPS, duration) | ⚠️ If evidence requires human filing (clinical notes) |
+| Documented → Invoiced | ✅ If billing rules are fully defined in Service Order | ⚠️ If pricing requires manual calculation |
+| Invoiced → Collected | ✅ On payment confirmation from payment system | — |
+| Collected → Verified | ✅ On client confirmation or after silence window expires | — |
+| Any state → Cancelled | — | ✅ Always requires human or explicit client action |
+| Any state → Disputed | — | ✅ Client must initiate |
+| Disputed → Resolved | — | ✅ Admin must resolve |
+| Service Order: draft → proposed | — | ✅ Human sends proposal |
+| Service Order: proposed → active | — | ✅ Client acceptance required |
+| Service Order: active → paused | — | ✅ Human decision |
+| Service Order: ledger update | ✅ Automatic on service verified | — |
+| Service Order: payment trigger | ✅ If trigger condition is deterministic (date, count) | ⚠️ If trigger requires judgment (milestone approval) |
 
-Individual service organizations operate in isolation. A clinic with a 15% no-show rate has no way of knowing whether that's above or below average for their vertical, region, or service type. A professional wondering if their session completion rate is competitive has no benchmark.
+**The ambiguity rule:** When a transition falls in the ⚠️ category, the agent must pause and surface the ambiguity to a human before proceeding. The agent should never resolve ambiguity by assumption. It should present the available information and the decision required, then wait.
 
-The Telemetry Extension enables **voluntary, anonymized data sharing** across Servicialo implementations. Organizations that opt in contribute aggregate operational metrics and, in return, receive market benchmarks that no individual actor could produce alone.
-
-This is analogous to how payment networks generate aggregate market intelligence (spending indices, fraud models, sector benchmarks) from the transaction flow across their rails. The difference: Servicialo captures the complete service delivery cycle, not just the financial transaction. It sees not only "how much was paid" but "how the value was delivered" — from scheduling patterns to verification rates to dispute resolution times.
-
-### 7.2 Design Principles
-
-1. **Optional, not required.** The base protocol (Sections 1-6) works without telemetry. Telemetry is a separate extension that implementations may choose to support.
-
-2. **Aggregate only.** No individual client, provider, or session data is ever shared. Only organization-level aggregates are transmitted.
-
-3. **Symmetric incentive.** Contribute data → access benchmarks. Don't contribute → don't access. This creates natural network effects where participation grows because the benchmarks become more valuable with more participants.
-
-4. **Privacy by design.** Organizations are anonymized in the benchmark dataset. Individual identities are never exposed to other participants.
-
-5. **Open computation.** The aggregation methodology is published. Any participant can verify how benchmarks are calculated.
-
-### 7.3 What Gets Shared
-
-Organizations that opt in contribute periodic snapshots (recommended: monthly) containing aggregate metrics only.
-
-#### Operational Metrics
-
-| Metric | Description | Granularity |
-|--------|-------------|-------------|
-| `session_count` | Total sessions in period | By service type |
-| `state_distribution` | Sessions per lifecycle state | Counts per state |
-| `completion_rate` | % of scheduled sessions reaching Verified | Overall + by service type |
-| `no_show_rate` | % of confirmed sessions resulting in no-show | Client + provider split |
-| `cancellation_rate` | % cancelled, with timing breakdown | By cancellation window |
-| `dispute_rate` | % of completed sessions disputed | Overall |
-| `dispute_resolution_time` | Median time to resolve disputes | Hours |
-| `verification_rate` | % verified by client vs auto-verified | Split |
-| `avg_time_between_states` | Median transition time per state pair | Per transition |
-
-#### Financial Metrics (Optional Tier)
-
-| Metric | Description | Granularity |
-|--------|-------------|-------------|
-| `avg_session_price` | Average price per session | By service type |
-| `collection_rate` | % of invoiced amount collected | Overall |
-| `avg_days_to_collect` | Median days from invoice to payment | Overall |
-| `payer_distribution` | % self-pay vs third-party payer | Split |
-| `revenue_per_provider` | Average monthly revenue per provider | Anonymized range |
-
-#### Demand Metrics (Optional Tier)
-
-| Metric | Description | Granularity |
-|--------|-------------|-------------|
-| `demand_by_day` | Session count by day of week | Distribution |
-| `demand_by_hour` | Session count by hour of day | Distribution |
-| `utilization_rate` | % of available slots filled | Overall |
-| `booking_lead_time` | Median days between booking and session | Overall |
-| `seasonality_index` | Month-over-month demand variation | 12-month rolling |
-
-### 7.4 What Gets Returned (Benchmarks)
-
-Participants receive benchmarks segmented by dimensions they can act on.
-
-#### Segmentation Dimensions
-
-| Dimension | Values | Example |
-|-----------|--------|---------|
-| `vertical` | health, legal, education, home, beauty, ... | "health" |
-| `service_type` | Per vertical | "physical_therapy" |
-| `region` | Country, city, zone | "CL-RM" (Santiago metro) |
-| `org_size` | solo, small (2-5), medium (6-15), large (16+) | "small" |
-| `period` | month, quarter, year | "2026-Q1" |
-
-#### Benchmark Response
-
-```yaml
-benchmark:
-  segment:
-    vertical: "health"
-    service_type: "physical_therapy"
-    region: "CL-RM"
-    org_size: "small"
-    period: "2026-01"
-    sample_size: 47           # organizations in this segment
-
-  metrics:
-    no_show_rate:
-      p25: 0.08               # 25th percentile
-      p50: 0.12               # median
-      p75: 0.18               # 75th percentile
-      your_value: 0.15        # this organization's value
-      your_percentile: 62     # where you rank
-
-    completion_rate:
-      p25: 0.78
-      p50: 0.85
-      p75: 0.91
-      your_value: 0.88
-      your_percentile: 58
-
-    avg_session_price:
-      p25: 25000              # CLP
-      p50: 32000
-      p75: 40000
-      your_value: 35000
-      your_percentile: 65
-
-    utilization_rate:
-      p25: 0.55
-      p50: 0.68
-      p75: 0.80
-      your_value: 0.72
-      your_percentile: 59
-
-    # ... additional metrics per tier
-```
-
-### 7.5 Protocol Endpoints
-
-Two new MCP tools added to the authenticated toolset:
-
-#### `telemetry.contribute`
-
-Submit an anonymized operational snapshot.
-
-```yaml
-# Request
-telemetry.contribute:
-  period: "2026-01"            # reporting period
-  vertical: "health"
-  service_type: "physical_therapy"
-  region: "CL-RM"
-  org_size: "small"
-  metrics:
-    session_count: 312
-    completion_rate: 0.88
-    no_show_rate: 0.15
-    cancellation_rate: 0.07
-    dispute_rate: 0.02
-    verification_rate: 0.91    # client-verified (vs auto)
-    avg_session_price: 35000
-    collection_rate: 0.94
-    utilization_rate: 0.72
-    demand_by_day: [0.08, 0.18, 0.20, 0.19, 0.18, 0.12, 0.05]  # Sun-Sat
-    booking_lead_time_days: 3.2
-
-# Response
-{
-  "status": "accepted",
-  "benchmark_access_until": "2026-03-01T00:00:00Z",
-  "contribution_id": "contrib_abc123"
-}
-```
-
-#### `telemetry.benchmark`
-
-Retrieve benchmarks for a segment.
-
-```yaml
-# Request
-telemetry.benchmark:
-  vertical: "health"
-  service_type: "physical_therapy"
-  region: "CL-RM"
-  org_size: "small"
-  period: "2026-01"
-  metrics: ["no_show_rate", "completion_rate", "utilization_rate"]
-
-# Response
-# See benchmark response format in 7.4
-```
-
-### 7.6 Privacy & Security
-
-| Concern | Mitigation |
-|---------|------------|
-| Individual client data | Never collected. Only aggregate counts. |
-| Provider identification | Never included. Revenue ranges, not individual figures. |
-| Organization identification | Anonymized in benchmark dataset. Participants see only their own position. |
-| Small segment re-identification | Minimum sample size of 5 organizations per segment. Below threshold → segment broadened automatically. |
-| Data retention | Snapshots retained for 24 months rolling. Older data purged. |
-| Withdrawal | Organizations can stop contributing at any time. Historical contributions are removed within 30 days. Benchmark access revoked immediately. |
-| Competitive intelligence | No participant can identify or reverse-engineer another participant's data. |
-
-### 7.7 Incentive Model
-
-The telemetry extension operates on a **contribute-to-access** model:
-
-```
-Contribute monthly snapshot → Access benchmarks for 30 days
-Stop contributing → Lose benchmark access
-```
-
-This creates a virtuous cycle:
-- More organizations contribute → benchmarks become more accurate
-- More accurate benchmarks → more organizations want access
-- More participants → richer segmentation possible
-- Richer segmentation → more actionable insights
-- More actionable insights → higher willingness to contribute
-
-There is no monetary cost to participate. The "price" is the data contribution itself.
-
-### 7.8 Network Effects & Value Accumulation
-
-At different scales, the telemetry network enables different capabilities:
-
-| Scale | Capability | Example |
-|-------|-----------|---------|
-| 10 orgs | Basic benchmarks per vertical | "Your no-show rate vs. average" |
-| 50 orgs | Regional + service type segmentation | "Physical therapy in Santiago vs. Valparaiso" |
-| 200 orgs | Predictive demand models | "Expect 20% demand increase in March" |
-| 500 orgs | Cross-vertical insights | "Healthcare no-shows correlate with seasonal patterns" |
-| 1,000+ orgs | Market intelligence products | Published indices, lending risk models, policy inputs |
-
-The protocol is designed so that value grows superlinearly with participation. The 1,000th organization gets dramatically more value than the 10th — but the 10th still gets something useful.
-
-### 7.9 Relationship to AI Engines
-
-In implementations that include AI capabilities, telemetry data feeds into intelligence engines:
-
-| Engine | Telemetry Input | Output |
-|--------|----------------|--------|
-| Categorization | Service type distribution across network | Standardized service taxonomy |
-| Forecasting | Demand patterns, seasonality, booking lead times | Demand predictions for capacity planning |
-| Optimization | Utilization rates, scheduling patterns | Optimal time slot recommendations |
-| Recommendation | Cross-vertical service patterns | Service offering suggestions |
-
-The categorization taxonomy — how services are classified — must be standardized across implementations for benchmarks to be comparable. This is why the protocol includes `vertical` and `service_type` as first-class fields. The open categorization standard ensures that a physical therapy session in Santiago is classified the same way as one in Bogota.
-
-### 7.10 Implementation Timeline
-
-The telemetry extension is not required for protocol compliance. It will be activated when:
-
-1. **Prerequisite:** 10+ organizations on a single implementation generating consistent data
-2. **Phase 1:** Basic operational benchmarks (no-show rate, completion rate, utilization)
-3. **Phase 2:** Financial benchmarks (pricing, collection rates) — requires additional opt-in
-4. **Phase 3:** Demand intelligence (seasonality, predictions) — requires 50+ organizations
-5. **Phase 4:** Cross-implementation benchmarks — requires 2+ implementations sharing anonymized data
+**The irreversibility rule:** Any transition that moves money, generates a legal document, or closes a Service Order is irreversible by default. Agents must treat these as requiring explicit human confirmation regardless of how deterministic the trigger appears.
 
 ---
 
-## 8. MCP Server
+## 10. MCP Server
 
 Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
 
@@ -686,7 +679,7 @@ npx -y @servicialo/mcp-server
 | `scheduling.check_availability` | Check available time slots |
 | `services.list` | Public service catalog |
 
-### Authenticated Mode (23 total tools)
+### Authenticated Mode (29 total tools)
 
 ```json
 {
@@ -705,6 +698,15 @@ npx -y @servicialo/mcp-server
 
 Additional tools include: `scheduling.book`, `scheduling.reschedule`, `scheduling.cancel`, `clients.list`, `clients.get`, `clients.create`, `payments.create_sale`, `payments.record_payment`, `notifications.send_session_reminder`, plus 10 more for payments, providers, and payroll.
 
+| Tool | Description |
+|------|-------------|
+| `service_orders.list` | List Service Orders for an organization |
+| `service_orders.get` | Get full details of a Service Order including ledger |
+| `service_orders.create` | Create a Service Order in draft state |
+| `service_orders.propose` | Transition a Service Order from draft to proposed |
+| `service_orders.activate` | Transition a Service Order to active (on client acceptance) |
+| `service_orders.get_ledger` | Get real-time ledger of a Service Order |
+
 **Planned tools (Telemetry Extension):** `telemetry.contribute`, `telemetry.benchmark`
 
 ### Package
@@ -714,9 +716,23 @@ Additional tools include: `scheduling.book`, `scheduling.reschedule`, `schedulin
 
 ---
 
-## 9. Implementations
+## 11. Telemetry Extension
 
-Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 8 states in their data model and can connect to the MCP server.
+> **Status:** Design phase. Not yet implemented.
+
+The goal is to enable anonymous, aggregate benchmarks across organizations that implement the protocol. Organizations contribute monthly snapshots of operational metrics and receive in return benchmarks segmented by vertical, region, and size.
+
+The model is contribute-to-access — you contribute data, you access benchmarks. Everything is anonymous and aggregated. Individual client, provider, or session information is never shared. The minimum segment size is 5 organizations to prevent re-identification.
+
+The extension will be activated when the ecosystem reaches 10+ organizations with consistent data.
+
+> Full specification: [telemetry-extension.md](./telemetry-extension.md) *(forthcoming)*
+
+---
+
+## 12. Implementations
+
+Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 9 states in their data model and can connect to the MCP server.
 
 ### Reference Implementation
 
@@ -728,17 +744,18 @@ Any platform can implement the Servicialo specification. Compatible implementati
 
 To be listed as a compatible implementation, a platform must:
 
-1. Model services using the 8 dimensions (Section 2)
-2. Implement the 8 lifecycle states (Section 3)
-3. Handle at least 3 exception flows (Section 4)
+1. Model services using the 8 dimensions (Section 3)
+2. Implement the 9 lifecycle states (Section 4)
+3. Handle at least 3 exception flows (Section 5)
 4. Expose an API that the MCP server can connect to
-5. (Optional) Support the Telemetry Extension (Section 7)
+5. (Optional) Model Service Orders using the schema in Section 6
+6. (Optional) Support the Telemetry Extension (Section 11)
 
 Submit an implementation for listing via [GitHub Issues](https://github.com/servicialo/mcp-server/issues).
 
 ---
 
-## 10. Contributing
+## 13. Contributing
 
 Servicialo is an open standard. Contributions are welcome:
 
@@ -750,7 +767,7 @@ Servicialo is an open standard. Contributions are welcome:
 ### Versioning
 
 The protocol follows semantic versioning:
-- **Patch (0.3.x):** Clarifications, typo fixes, examples
+- **Patch (0.2.x):** Clarifications, typo fixes, examples
 - **Minor (0.x.0):** New optional fields, new exception flows, extensions
 - **Major (x.0.0):** Breaking changes to required fields or state model
 
@@ -758,16 +775,19 @@ The protocol version is independent from the MCP server package version (`@servi
 
 ### Changelog
 
-#### 0.3 (2026-02-22)
+#### 0.2 (2026-02-22)
 
-- **State order changed:** Verified moved from position 6 to position 8 (final). The lifecycle is now: Requested → Scheduled → Confirmed → In Progress → Delivered → Documented → Charged → Verified.
-- **Rationale rewritten:** "Why Verified comes last" — client needs the complete picture (documentation + charge) before confirming.
-- **Intermediate states:** Implementations may add states between the universal eight (e.g., Invoiced between Documented and Charged).
-- **Revenue recognition:** New section defining three methods (per delivery, percentage of completion, milestones) as a service/package attribute.
+- **Core Entities:** Introduced Service and Service Order as the two central protocol objects.
+- **Service Order:** Full lifecycle (draft → proposed → negotiating → active → paused → completed | cancelled), schema with scope/pricing/payment_schedule/ledger.
+- **Agent Decision Model:** Explicit autonomy boundaries for AI agents acting on services and orders.
+- **Principle 7:** "The agreement is separate from the delivery."
+- **Schema:** Annotated with required/optional fields, added `service_order_id` to Service.
+- **MCP Server:** 29 tools (added 6 `service_orders.*` tools).
+- **Telemetry Extension:** Collapsed to design-phase summary with link to forthcoming full spec.
 
-#### 0.2 (2026-02-01)
+#### 0.1 (2026-02-01)
 
-- Initial public draft with 8 dimensions, 8 states, 6 exception flows, 7 principles.
+- Initial public draft with 8 dimensions, 9 states, 6 exception flows, 6 principles.
 - Billing section with independent `billing.status`.
 - Telemetry Extension (planned).
 - MCP server reference.
