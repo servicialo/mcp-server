@@ -1,0 +1,21 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      apiKey:
+        type: string
+        description: Servicialo API key (optional — 4 discovery tools work without auth)
+      orgId:
+        type: string
+        description: Your organization ID (required for authenticated tools)
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', '@servicialo/mcp-server@latest'],
+      env: Object.assign({},
+        config.apiKey ? { SERVICIALO_API_KEY: config.apiKey } : {},
+        config.orgId ? { SERVICIALO_ORG_ID: config.orgId } : {}
+      )
+    })
