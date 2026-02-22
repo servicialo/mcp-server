@@ -1,8 +1,13 @@
 {
   "name": "@servicialo/mcp-server",
-  "version": "0.5.0",
-  "description": "Servidor MCP del protocolo Servicialo — conecta agentes de IA con servicios profesionales vía la API de Coordinalo",
+  "version": "0.5.1",
+  "description": "Open protocol for professional service delivery — connects AI agents with scheduling, verification and settlement of professional services",
   "license": "MIT",
+  "homepage": "https://servicialo.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/servicialo/mcp-server.git"
+  },
   "type": "module",
   "bin": {
     "servicialo-mcp": "./dist/index.js"
@@ -29,10 +34,11 @@
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "servicialo",
-    "coordinalo",
-    "ai-agents",
     "professional-services",
-    "model-context-protocol"
+    "scheduling",
+    "healthcare",
+    "ai-agents"
   ]
 }
