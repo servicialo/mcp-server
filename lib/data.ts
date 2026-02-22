@@ -60,10 +60,11 @@ export const LIFECYCLE_STATES = [
   { id: "scheduled", label: "Agendado", icon: "2", desc: "Se asigna hora, proveedor y ubicación. Se bloquea el horario en los calendarios de ambas partes." },
   { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes reconocen el compromiso. Recordatorios programados. Prerrequisitos verificados." },
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Registro de entrada detectado. El servicio está siendo entregado." },
-  { id: "delivered", label: "Entregado", icon: "5", desc: "El proveedor marca la entrega como completa. Evidencia capturada: duración real, notas, fotos si aplica." },
+  { id: "completed", label: "Completado", icon: "5", desc: "El proveedor marca la entrega como completa. Evidencia capturada: duración real, notas, fotos si aplica." },
   { id: "documented", label: "Documentado", icon: "6", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta — según la vertical." },
-  { id: "charged", label: "Cobrado", icon: "7", desc: "Cargo aplicado a la cuenta del cliente. Saldo prepago debitado o deuda registrada." },
-  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
+  { id: "invoiced", label: "Facturado", icon: "7", desc: "Documento tributario emitido. Boleta o factura generada según corresponda." },
+  { id: "collected", label: "Cobrado", icon: "8", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
+  { id: "verified", label: "Verificado", icon: "9", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
 ] as const;
 
 export const ANATOMY = [
@@ -72,7 +73,7 @@ export const ANATOMY = [
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual", example: "Clínica / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
+  { field: "Ciclo", desc: "Posición actual en los 9 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
@@ -84,16 +85,17 @@ export const PRINCIPLES = [
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
   { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
-  { title: "Cobrar no es lo mismo que pagar", body: "Un cobro se aplica a la cuenta del cliente cuando el servicio es entregado y documentado — siempre 1:1 con una sesión. El pago es el movimiento de dinero, que puede ocurrir antes (paquete prepago), después (reembolso) o en lote (factura mensual). Son eventos independientes." },
+  { title: "El acuerdo es separado de la entrega", body: "Una Orden de Servicio define lo que se acordó. Los servicios atómicos definen lo que se entregó. Son dos objetos distintos con dos ciclos de vida distintos. La Orden de Servicio es dueña de la relación comercial. El servicio atómico es dueño de la prueba de entrega. El ledger en la Orden es el puente computado entre ambos." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.3
+# SERVICIALO v0.2
 # Las 8 dimensiones de un servicio profesional
 # ─────────────────────────────────────────────
 
 servicio:
   id: texto                      # Identificador único
+  orden_de_servicio_id: texto    # Opcional — referencia a Orden padre
   tipo: texto                    # Categoría del servicio
   vertical: texto                # salud | legal | hogar | educación | ...
   nombre: texto                  # Nombre legible
@@ -123,7 +125,7 @@ servicio:
       lng: número
 
   ciclo_de_vida:
-    estado_actual: enum[8]       # Los 8 estados universales
+    estado_actual: enum[9]       # Los 9 estados universales
     transiciones: transición[]   # Historial de cambios
     excepciones: excepción[]     # Inasistencias, disputas, etc
 
@@ -133,7 +135,7 @@ servicio:
     duración_real: minutos
     evidencia: evidencia[]       # GPS, firma, fotos, documentos
 
-  cobro:
+  cobro:                         # Informativo si pertenece a una Orden
     monto:
       valor: número
       moneda: texto              # ISO 4217
@@ -226,15 +228,15 @@ export const MODULES = [
     name: "Servicialo Core",
     status: "estable" as const,
     statusColor: "green" as const,
-    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega y cobro.",
+    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega, cobro y órdenes de servicio.",
     audience: "Cualquier plataforma que coordine servicios profesionales — desde una clínica de kinesiología hasta un marketplace de limpieza.",
     includes: [
-      "Ciclo de vida (8 estados universales)",
+      "Ciclo de vida (9 estados universales)",
       "8 dimensiones del servicio",
+      "Órdenes de servicio (acuerdo comercial + ledger computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Cobro con separación explícita de cargo vs pago",
-      "Protocolo MCP para agentes AI (23 herramientas)",
+      "Protocolo MCP para agentes AI (29 herramientas)",
     ],
   },
   {

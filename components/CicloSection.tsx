@@ -25,7 +25,7 @@ const EXCEPTIONS = [
   },
   {
     title: "Disputa de calidad",
-    transition: "Entregado → Disputado",
+    transition: "Completado → Disputado",
     desc: "Cobro congelado. Se solicita evidencia adicional de ambas partes. Resuelve a: Cobrado → Verificado (proveedor gana) o Cancelado (cliente gana, balance restaurado).",
     borderColor: "border-l-purple",
   },
@@ -51,7 +51,7 @@ export function CicloSection() {
     <section id="ciclo" className="mb-16">
       <SectionTitle
         tag="04 — Ciclo de vida"
-        title="8 estados universales"
+        title="9 estados universales"
         subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
       />
 
@@ -126,19 +126,21 @@ export function CicloSection() {
         </div>
       </div>
 
-      {/* ¿Por qué 8 estados? */}
+      {/* ¿Por qué 9 estados? */}
       <div className="mt-5 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
-          ¿Por qué 8 estados?
+          ¿Por qué 9 estados?
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
           Menos estados pierden información crítica — sin separar
-          &quot;Entregado&quot; de &quot;Documentado&quot;, no puedes distinguir
+          &quot;Completado&quot; de &quot;Documentado&quot;, no puedes distinguir
           &quot;el proveedor dice que ocurrió&quot; de &quot;la evidencia está
-          registrada&quot;. Sin separar &quot;Cobrado&quot; de &quot;Verificado&quot;,
-          no puedes saber si el cliente aceptó el resultado. 8 es el mínimo
-          viable para que un agente AI pueda verificar con certeza que un
-          servicio fue solicitado, entregado, documentado, cobrado y verificado.
+          registrada&quot;. Sin separar &quot;Facturado&quot; de &quot;Cobrado&quot;,
+          no puedes saber si el pago fue efectivamente recibido. Sin separar
+          &quot;Cobrado&quot; de &quot;Verificado&quot;, no puedes saber si el
+          cliente aceptó el resultado. 9 es el mínimo viable para que un agente
+          AI pueda verificar con certeza que un servicio fue solicitado,
+          entregado, documentado, facturado, cobrado y verificado.
         </div>
       </div>
 

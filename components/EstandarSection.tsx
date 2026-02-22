@@ -37,11 +37,12 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={h}># ── SERVICIALO v0.3 ──────────────────</span></Line>
+      <Line><span className={h}># ── SERVICIALO v0.2 ──────────────────</span></Line>
       <Line><span className={h}># Las 8 dimensiones de un servicio</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={a}>servicio:</span></Line>
       <Line>  <span className={k}>id:</span> <span className={t}>texto</span>                   <span className={c}># Identificador único</span></Line>
+      <Line>  <span className={k}>orden_de_servicio_id:</span> <span className={t}>texto</span>  <span className={c}># Opcional — referencia a Orden padre</span></Line>
       <Line>  <span className={k}>tipo:</span> <span className={t}>texto</span>                 <span className={c}># Categoría del servicio</span></Line>
       <Line>  <span className={k}>vertical:</span> <span className={t}>texto</span>             <span className={c}># salud | legal | hogar | educación | ...</span></Line>
       <Line>  <span className={k}>nombre:</span> <span className={t}>texto</span>               <span className={c}># Nombre legible</span></Line>
@@ -71,7 +72,7 @@ function SchemaBlock() {
       <Line>      <span className={k}>lng:</span> <span className={t}>número</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>ciclo_de_vida:</span></Line>
-      <Line>    <span className={k}>estado_actual:</span> <span className={t}>enum[8]</span>    <span className={c}># Los 8 estados universales</span></Line>
+      <Line>    <span className={k}>estado_actual:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
       <Line>    <span className={k}>transiciones:</span> <span className={t}>transición[]</span></Line>
       <Line>    <span className={k}>excepciones:</span> <span className={t}>excepción[]</span></Line>
       <Line>&nbsp;</Line>
@@ -81,7 +82,7 @@ function SchemaBlock() {
       <Line>    <span className={k}>duración_real:</span> <span className={t}>minutos</span></Line>
       <Line>    <span className={k}>evidencia:</span> <span className={t}>evidencia[]</span>    <span className={c}># GPS, firma, fotos, documentos</span></Line>
       <Line>&nbsp;</Line>
-      <Line>  <span className={a}>cobro:</span></Line>
+      <Line>  <span className={a}>cobro:</span>                             <span className={c}># Informativo si pertenece a una Orden</span></Line>
       <Line>    <span className={a}>monto:</span></Line>
       <Line>      <span className={k}>valor:</span> <span className={t}>número</span></Line>
       <Line>      <span className={k}>moneda:</span> <span className={t}>texto</span>           <span className={c}># ISO 4217</span></Line>
@@ -133,7 +134,7 @@ export function EstandarSection() {
       {/* Schema block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Protocolo de Entrega de Servicios v0.3
+          Protocolo de Entrega de Servicios v0.2
         </div>
         <SchemaBlock />
       </div>
