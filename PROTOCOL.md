@@ -721,7 +721,7 @@ Any platform can implement the Servicialo specification. Compatible implementati
 
 | Platform | Vertical | Status | URL |
 |----------|----------|--------|-----|
-| Coordinalo | Health (kinesiology) | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| Coordinalo | Healthcare | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
 ### Implementing the Protocol
 

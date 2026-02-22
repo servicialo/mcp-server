@@ -4,6 +4,8 @@ MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI ag
 
 **Protocol version:** 0.3 · **Package version:** 0.5.0
 
+> **Status:** Early-stage protocol with a live reference implementation in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. We're onboarding pilot implementations — [get in touch](https://servicialo.com) if you're building for professional services.
+
 23 tools organized by the 6 lifecycle phases of a service — not by database table.
 
 ## Two Modes of Operation

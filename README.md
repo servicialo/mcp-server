@@ -161,9 +161,9 @@ Cualquier plataforma puede implementar la especificación Servicialo. Para ser l
 
 | Plataforma | Vertical | Cobertura | Estado | URL |
 |------------|----------|-----------|--------|-----|
-| **Coordinalo** | Salud (kinesiología) | 8/8 dimensiones · 8/8 estados · 6/6 excepciones · 7/7 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
+| **Coordinalo** | Healthcare | 8/8 dimensiones · 8/8 estados · 6/6 excepciones · 7/7 principios | ✅ Live | [coordinalo.com](https://coordinalo.com) |
 
-> Querés listar tu implementación? [Abrí un issue](https://github.com/servicialo/mcp-server/issues).
+> ¿Estás construyendo para servicios profesionales? [Abrí un issue](https://github.com/servicialo/mcp-server/issues) para listar tu implementación.
 
 ## Licencia
 
