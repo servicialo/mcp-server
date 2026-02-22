@@ -151,44 +151,45 @@ Financial settlement for the service. Billing has its own status independent fro
 Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 8 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Delivered → Documented → Charged → Verified
+Solicitado → Agendado → Confirmado → Entregado → Documentado → Facturado → Cobrado → Acreditado
 ```
 
-| # | State | Description | Trigger |
-|---|-------|-------------|---------|
-| 1 | **Requested** | Client or agent defines what they need | Client submits request |
-| 2 | **Scheduled** | Time, provider, and location assigned | System matches availability |
-| 3 | **Confirmed** | Both parties acknowledge | Provider + client confirm |
-| 4 | **In Progress** | Service is being delivered | Check-in detected |
-| 5 | **Delivered** | Provider marks delivery complete | Provider confirms via app or messaging |
-| 6 | **Documented** | Record/evidence generated | Clinical note, report, or evidence filed |
-| 7 | **Charged** | Charge applied to client account | Prepaid balance debited or debt recorded |
-| 8 | **Verified** | Client confirms delivery, or silence window expires | Client responds OK, or auto-verified after window |
+| # | Key (enum) | Nombre | Description | Trigger |
+|---|------------|--------|-------------|---------|
+| 1 | **requested** | Solicitado | Client or agent defines what they need | Client submits request |
+| 2 | **scheduled** | Agendado | Time, provider, and location assigned | System matches availability |
+| 3 | **confirmed** | Confirmado | Both parties acknowledge | Provider + client confirm |
+| 4 | **delivered** | Entregado | Provider marks delivery complete | Provider confirms (1-tap WhatsApp or app) |
+| 5 | **documented** | Documentado | Record/evidence generated | Clinical note, report, or evidence filed |
+| 6 | **invoiced** | Facturado | Tax document issued | Tax document emitted |
+| 7 | **collected** | Cobrado | Payment received and confirmed | Payment received and confirmed |
+| 8 | **credited** | Acreditado | Client confirms OK or silence window expires | Client responds OK, or auto-credited after window |
 
 ### Why 8 states?
 
-Fewer states lose critical information — without separating Delivered from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Charged from Verified, you can't know if the client accepted the outcome.
+"In Progress" was eliminated because it is the only state inferred by the system, not verified by an external party. The remaining 8 states each have a clean trigger actioned by at least one party. Without separating Delivered from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Invoiced from Collected, you can't know if the payment was actually received. Without separating Collected from Credited, you can't know if the client accepted the outcome.
 
 More states add friction. 8 is the minimum viable set for an AI agent to verify the full service chain with certainty.
 
-### Why Verified comes last
+### Why Credited comes last
 
-Verification is the closure of the cycle, not a step in the middle. In practice:
+Credit is the closure of the cycle, not a step in the middle. In practice:
 
-1. The provider delivers the service
-2. The provider documents (writes the clinical note, files the report)
-3. The charge is applied (balance debited or invoice issued)
-4. The client verifies — or the verification window expires and it auto-closes
+1. The provider delivers the service (Entregado)
+2. The provider documents (writes the clinical note, files the report) (Documentado)
+3. The tax document is issued (Facturado)
+4. Payment is collected (Cobrado)
+5. The client credits — or the credit window expires and it auto-closes (Acreditado)
 
-The client cannot meaningfully verify until the service has been documented and charged. They need the complete picture — the clinical note, the receipt — before they can confirm or dispute. Verification that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
+The client cannot meaningfully credit until the service has been documented, invoiced, and collected. They need the complete picture — the clinical note, the invoice, the payment confirmation — before they can confirm or dispute. Credit that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
 
 ### Intermediate states
 
-Implementations may add states between the universal eight to match their operational reality. For example, an invoicing step between Documented and Charged, or an assignment step between Requested and Scheduled. The 8 universal states are the minimum — not the maximum.
+Implementations may add states between the universal eight to match their operational reality. For example, an assignment step between Requested and Scheduled, or a quality review step between Documented and Invoiced. The 8 universal states are the minimum — not the maximum.
 
 ### Revenue recognition
 
-What triggers the transition from Delivered to the financial cycle (Documented → Charged) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
+What triggers the transition from Delivered to the financial cycle (Documented → Invoiced → Collected) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
 
 | Method | When revenue is recognized | Example |
 |--------|---------------------------|---------|
@@ -200,7 +201,7 @@ The protocol does not prescribe which method to use. Each implementation resolve
 
 ### Why there is no "Paid" state in the lifecycle
 
-Payment is tracked in `billing.status`, independently from the lifecycle. In Latin American professional services, the dominant model is prepaid packages — the client pays before the sessions occur. **Charged** means the session consumed credit from that package. **Paid** (in `billing.status`) may have occurred days or weeks earlier. For post-paid models (insurance, corporate invoicing), `billing.status` transitions from `charged → invoiced → paid` after the lifecycle closes. The lifecycle doesn't need to wait for that.
+Payment flow is tracked in `billing.status`, independently from the lifecycle. In Latin American professional services, the dominant model is prepaid packages — the client pays before the sessions occur. **Collected** means the payment for the session was received or accounted for. **Paid** (in `billing.status`) may have occurred days or weeks earlier when the client purchased the package. For post-paid models (insurance, corporate invoicing), `billing.status` transitions from `pending → invoiced → paid` after the lifecycle closes. The lifecycle captures the milestone; `billing.status` captures the flow.
 
 ### State transitions
 
@@ -210,8 +211,8 @@ Each transition records:
 
 ```yaml
 transition:
-  from: "charged"
-  to: "verified"
+  from: "delivered"
+  to: "documented"
   at: "2026-02-10T11:00:00Z"
   by: "client_def456"       # who triggered (client, provider, system, or agent)
   method: "auto"             # auto | manual | agent
@@ -220,7 +221,7 @@ transition:
 
 ### Payroll rule
 
-Implementations that calculate provider compensation must read only sessions in **Charged** state. Sessions that have not yet reached Charged are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
+Implementations that calculate provider compensation must read only sessions in **Collected** (Cobrado) state. Sessions that have not yet reached Collected are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
 
 ---
 
@@ -276,7 +277,7 @@ Delivered → Disputed
 - Charge frozen — `billing.status` remains `pending` until resolution
 - Additional evidence requested from both parties
 - Admin or arbitration resolves
-- Resolves to: Charged → Verified (provider wins) or Cancelled (client wins, balance restored)
+- Resolves to: Collected → Credited (provider wins) or Cancelled (client wins, balance restored)
 
 ### 4.5 Rescheduling
 
@@ -295,7 +296,7 @@ Scheduled/Confirmed → Rescheduling → Scheduled (new time)
 **Trigger:** Service cannot be completed in full.
 
 ```
-In Progress → Partial
+Confirmed → Partial
 ```
 
 - Documents what was delivered
@@ -378,7 +379,7 @@ service:
 
   # 2.6 Lifecycle
   lifecycle:
-    current_state: enum         # The 8 universal states
+    current_state: enum         # The 8 universal states (solicitado | agendado | confirmado | entregado | documentado | facturado | cobrado | acreditado)
     transitions: transition[]   # State change history
     exceptions: exception[]     # No-shows, disputes, etc.
 
