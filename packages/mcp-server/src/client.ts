@@ -2,7 +2,7 @@
  * HTTP client for Coordinalo REST API.
  *
  * Supports two modes:
- * - Public: calls to /api/v1/public/* without Authorization header
+ * - Public: calls to /api/servicialo/* without Authorization header
  * - Authenticated: calls to /api/organizations/{orgSlug}/* with Bearer token
  */
 

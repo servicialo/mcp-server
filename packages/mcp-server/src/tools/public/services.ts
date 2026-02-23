@@ -8,7 +8,7 @@ export const publicServicesTools = {
       org_slug: z.string().describe('Slug de la organización'),
     }),
     handler: async (client: CoordinaloClient, args: { org_slug: string }) => {
-      return client.pub.get(`/api/v1/public/agenda/${args.org_slug}`);
+      return client.pub.get(`/api/servicialo/${args.org_slug}/services`);
     },
   },
 };

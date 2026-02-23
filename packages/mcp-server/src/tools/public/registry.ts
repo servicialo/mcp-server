@@ -10,11 +10,8 @@ export const registryTools = {
       limit: z.number().default(10).describe('Cantidad máxima de resultados'),
     }),
     handler: async (client: CoordinaloClient, args: { vertical: string; location?: string; limit?: number }) => {
-      return client.pub.get('/api/v1/public/registry', {
-        vertical: args.vertical,
-        location: args.location,
-        limit: args.limit ?? 10,
-      });
+      // TODO: No existe endpoint de registry global aún — retorna manifest como fallback
+      return client.pub.get('/api/servicialo/manifest');
     },
   },
 
@@ -24,7 +21,7 @@ export const registryTools = {
       org_slug: z.string().describe('Slug de la organización (ej: clinica-dental-sur)'),
     }),
     handler: async (client: CoordinaloClient, args: { org_slug: string }) => {
-      return client.pub.get(`/api/v1/public/agenda/${args.org_slug}`);
+      return client.pub.get(`/api/servicialo/${args.org_slug}/services`);
     },
   },
 };
