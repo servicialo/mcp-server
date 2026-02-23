@@ -12,7 +12,7 @@ export const publicAvailabilityTools = {
       date_to: z.string().describe('Fecha fin (ISO date, ej: 2025-03-07)'),
     }),
     handler: async (client: CoordinaloClient, args: { org_slug: string; service_id?: string; provider_id?: string; date_from: string; date_to: string }) => {
-      return client.pub.get(`/api/public/agenda/${args.org_slug}/slots`, {
+      return client.pub.get(`/api/v1/public/agenda/${args.org_slug}/slots`, {
         serviceId: args.service_id,
         providerId: args.provider_id,
         from: args.date_from,

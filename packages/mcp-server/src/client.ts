@@ -87,10 +87,24 @@ export class CoordinaloClient {
         }
       }
 
-      const res = await fetch(url.toString(), {
+      let res = await fetch(url.toString(), {
         method: 'GET',
         headers: this.publicHeaders(),
       });
+
+      // If 401, retry with auth headers when API key is available
+      if (res.status === 401 && this.apiKey) {
+        res = await fetch(url.toString(), {
+          method: 'GET',
+          headers: this.authHeaders(),
+        });
+      }
+
+      if (res.status === 401) {
+        throw new Error(
+          `GET ${path} returned 401 Unauthorized. Configure SERVICIALO_API_KEY to access this endpoint.`,
+        );
+      }
 
       if (!res.ok) {
         const body = await res.text();
