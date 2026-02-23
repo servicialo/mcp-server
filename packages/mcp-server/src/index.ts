@@ -38,7 +38,7 @@ const apiClient = new CoordinaloClient({
 // --- Init MCP server ---
 const server = new McpServer({
   name: 'servicialo',
-  version: '0.5.0',
+  version: '0.5.3',
 });
 
 // --- Tool type ---
@@ -104,27 +104,10 @@ function registerTools(tools: Record<string, ToolDef>) {
 registerTools(publicTools);
 
 if (mode === 'authenticated') {
-  // Register authenticated tools
+  // Register authenticated tools only when credentials are present
   registerTools(authenticatedTools);
-} else {
-  // Register stubs for authenticated tools that return a descriptive error
-  for (const [name, tool] of Object.entries(authenticatedTools)) {
-    server.tool(
-      name,
-      tool.description,
-      tool.schema.shape,
-      async () => ({
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Esta operación requiere autenticación. Configura SERVICIALO_API_KEY y SERVICIALO_ORG_ID para operar en nombre de una organización.',
-          },
-        ],
-        isError: true,
-      }),
-    );
-  }
 }
+// Discovery mode: only the 4 public tools are exposed
 
 // --- Connect via stdio ---
 async function main() {

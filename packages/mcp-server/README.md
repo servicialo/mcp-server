@@ -2,11 +2,11 @@
 
 MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
 
-**Protocol version:** 0.3 · **Package version:** 0.5.0
+**Protocol version:** 0.3 · **Package version:** 0.5.3
 
 > **Status:** Early-stage protocol with a live reference implementation in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. We're onboarding pilot implementations — [get in touch](https://servicialo.com) if you're building for professional services.
 
-23 tools organized by the 6 lifecycle phases of a service — not by database table.
+20 tools organized by the 6 lifecycle phases of a service — not by database table.
 
 ## Two Modes of Operation
 
@@ -24,7 +24,7 @@ No credentials needed. 4 public tools for discovering organizations, services, a
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 23 tools across the full service lifecycle.
+Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 20 tools across the full service lifecycle.
 
 ### Claude Desktop Configuration
 
@@ -168,7 +168,7 @@ lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { typ
 
 ### Package 0.5.0 (current)
 
-Consolidated from 38 tools to 23. Tools are now organized by lifecycle phase instead of database entity.
+Consolidated from 38 tools to 20. Tools are now organized by lifecycle phase instead of database entity.
 
 | Removed Tool | Replacement |
 |---|---|

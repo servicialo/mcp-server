@@ -1,6 +1,6 @@
 {
   "name": "@servicialo/mcp-server",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "mcpName": "io.github.danioni/servicialo",
   "description": "Open protocol for professional service delivery — connects AI agents with scheduling, verification and settlement of professional services",
   "license": "MIT",
