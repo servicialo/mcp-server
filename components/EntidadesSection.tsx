@@ -25,10 +25,10 @@ const examples = [
   {
     vertical: "Salud",
     icon: "\u{1F3E5}",
-    title: "Autorización ISAPRE",
+    title: "Plan de kinesiología",
     order: "12 sesiones de kinesiología",
     pricing: "Precio fijo por sesión",
-    schedule: "Pago por evento (ISAPRE reembolsa)",
+    schedule: "Pago por sesión, cliente gestiona reembolso ISAPRE",
     borderColor: "border-l-[#7EC8E3]",
   },
   {
@@ -43,7 +43,7 @@ const examples = [
   {
     vertical: "Proyectos",
     icon: "\u{1F3D7}\u{FE0F}",
-    title: "Debida diligencia en 3 fases",
+    title: "Due diligence en 3 fases",
     order: "Alcance definido por hitos",
     pricing: "Monto fijo por fase",
     schedule: "Pago por hito aprobado",
