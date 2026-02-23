@@ -236,7 +236,7 @@ export const MODULES = [
       "Órdenes de servicio (acuerdo comercial + ledger computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Protocolo MCP para agentes AI (29 herramientas)",
+      "Protocolo MCP para agentes AI (20 herramientas)",
     ],
   },
   {

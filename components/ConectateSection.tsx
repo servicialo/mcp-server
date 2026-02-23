@@ -152,7 +152,7 @@ export function ConectateSection() {
           Flujo del agente
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-5">
-          Seis fases del ciclo de vida del servicio — 29 herramientas
+          Seis fases del ciclo de vida del servicio — 20 herramientas
         </div>
 
         <div className="grid gap-2.5">
@@ -226,7 +226,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 29 herramientas totales
+          Con credenciales — 20 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
