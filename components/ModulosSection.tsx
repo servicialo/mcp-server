@@ -10,7 +10,7 @@ export function ModulosSection() {
   return (
     <section id="modulos" className="mb-16">
       <SectionTitle
-        tag="08 — Módulos"
+        tag="09 — Módulos"
         title="Arquitectura por capas"
         subtitle="Adopta solo lo que necesitas. Core cubre el ciclo completo de un servicio. Los módulos agregan capacidades para operaciones más complejas."
       />

@@ -10,7 +10,7 @@ export function ResolucionSection() {
   return (
     <section id="resolucion" className="mb-16">
       <SectionTitle
-        tag="05 — Resolución de disputas"
+        tag="06 — Resolución de disputas"
         title="Cuando hay desacuerdo"
         subtitle="Un mecanismo que no depende de buena voluntad, no requiere un juez centralizado, y que un agente AI puede ejecutar con la misma confianza que un humano."
       />

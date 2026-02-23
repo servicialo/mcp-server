@@ -128,7 +128,7 @@ export function ConectateSection() {
   return (
     <section id="mcp-server" className="mb-16">
       <SectionTitle
-        tag="11 — Servidor MCP"
+        tag="12 — Servidor MCP"
         title="Hecho para agentes"
         subtitle="Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa."
       />

@@ -126,7 +126,7 @@ export function EstandarSection() {
   return (
     <section id="estandar" className="mb-16">
       <SectionTitle
-        tag="09 — El estándar"
+        tag="10 — El estándar"
         title="Protocolo de Entrega de Servicios"
         subtitle="Cualquiera puede implementarlo."
       />

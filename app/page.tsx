@@ -2,6 +2,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { QueEsSection } from "@/components/QueEsSection";
 import { OrigenSection } from "@/components/OrigenSection";
 import { AnatomiaSection } from "@/components/AnatomiaSection";
+import { EntidadesSection } from "@/components/EntidadesSection";
 import { CicloSection } from "@/components/CicloSection";
 import { ResolucionSection } from "@/components/ResolucionSection";
 import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection";
@@ -25,6 +26,9 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <AnatomiaSection />
+      </FadeIn>
+      <FadeIn>
+        <EntidadesSection />
       </FadeIn>
       <FadeIn>
         <CicloSection />

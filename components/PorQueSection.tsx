@@ -4,7 +4,7 @@ export function PorQueSection() {
   return (
     <section id="por-que" className="mb-16">
       <SectionTitle
-        tag="10 — Por qué Servicialo"
+        tag="11 — Por qué Servicialo"
         title="Un idioma común para agentes"
       />
 

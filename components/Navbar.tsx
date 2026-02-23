@@ -7,6 +7,7 @@ const sections = [
   { name: "Definición", id: "que-es" },
   { name: "Origen", id: "origen" },
   { name: "Anatomía", id: "anatomia" },
+  { name: "Entidades", id: "entidades" },
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Disputas", id: "resolucion" },
   { name: "Evidencia", id: "evidencia-vertical" },
@@ -82,7 +83,7 @@ export function Navbar() {
             const isActive =
               activeId === section.id ||
               (section.id === "que-es" &&
-                ["que-es", "origen", "anatomia", "ciclo", "resolucion", "evidencia-vertical"].includes(activeId ?? ""));
+                ["que-es", "origen", "anatomia", "entidades", "ciclo", "resolucion", "evidencia-vertical"].includes(activeId ?? ""));
             return (
               <button
                 key={section.id}

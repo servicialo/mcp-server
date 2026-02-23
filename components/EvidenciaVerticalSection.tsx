@@ -37,7 +37,7 @@ export function EvidenciaVerticalSection() {
   return (
     <section id="evidencia-vertical" className="mb-16">
       <SectionTitle
-        tag="06 — Evidencia por vertical"
+        tag="07 — Evidencia por vertical"
         title="Qué constituye prueba"
         subtitle="Cada vertical define qué evidencia se necesita para que un algoritmo pueda resolver el 80% de las disputas sin intervención humana."
       />

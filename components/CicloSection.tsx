@@ -50,7 +50,7 @@ export function CicloSection() {
   return (
     <section id="ciclo" className="mb-16">
       <SectionTitle
-        tag="04 — Ciclo de vida"
+        tag="05 — Ciclo de vida"
         title="9 estados universales"
         subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
       />
