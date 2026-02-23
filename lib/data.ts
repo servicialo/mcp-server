@@ -79,7 +79,7 @@ export const ANATOMY = [
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 8 estados son universales." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados son universales." },
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
