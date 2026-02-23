@@ -46,7 +46,7 @@ const agentPhases = [
   {
     num: "3",
     label: "Comprometer",
-    desc: "Identidad del cliente y booking",
+    desc: "Identidad del cliente y reserva",
     tools: "clients.get_or_create · scheduling.book · confirm",
     color: "text-[#98C379]",
     bg: "bg-[#98C379]/10",
@@ -136,7 +136,7 @@ export function ConectateSection() {
       {/* Intro block */}
       <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
         <div className="text-[13px] text-text-body leading-relaxed mb-3">
-          Diseñado para developers que construyen agentes AI sobre negocios de servicios
+          Diseñado para desarrolladores que construyen agentes AI sobre negocios de servicios
           profesionales en LATAM. Si tu agente necesita agendar, verificar entrega o cobrar
           un servicio — sin importar la plataforma — este es el protocolo.
         </div>
@@ -188,7 +188,7 @@ export function ConectateSection() {
             <span className="text-white/55">
               Descubrir &rarr; Entender &rarr; Comprometer &rarr; Gestionar &rarr; Verificar &rarr; Cerrar.
             </span>{" "}
-            Cada fase tiene sus tools. El estándar garantiza que cualquier agente pueda
+            Cada fase tiene sus herramientas. El estándar garantiza que cualquier agente pueda
             completar el ciclo completo con cualquier implementación compatible.
           </div>
         </div>

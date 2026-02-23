@@ -16,7 +16,7 @@ export function PorQueSection() {
         <div className="text-[13px] text-text-muted leading-[1.7] mb-3">
           Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma.
           Un agente AI que quiere operar un negocio de servicios necesita una integración
-          custom para cada uno.
+          personalizada para cada uno.
         </div>
         <div className="text-[13px] text-text-body leading-[1.7]">
           <span className="font-semibold text-text">Servicialo es el idioma común.</span>{" "}

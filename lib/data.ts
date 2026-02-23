@@ -85,7 +85,7 @@ export const PRINCIPLES = [
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
   { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
   { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
-  { title: "El acuerdo es separado de la entrega", body: "Una Orden de Servicio define lo que se acordó. Los servicios atómicos definen lo que se entregó. Son dos objetos distintos con dos ciclos de vida distintos. La Orden de Servicio es dueña de la relación comercial. El servicio atómico es dueño de la prueba de entrega. El ledger en la Orden es el puente computado entre ambos." },
+  { title: "El acuerdo es separado de la entrega", body: "Una Orden de Servicio define lo que se acordó. Los servicios atómicos definen lo que se entregó. Son dos objetos distintos con dos ciclos de vida distintos. La Orden de Servicio es dueña de la relación comercial. El servicio atómico es dueño de la prueba de entrega. El libro mayor en la Orden es el puente computado entre ambos." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
@@ -167,10 +167,10 @@ export const EVIDENCE_BY_VERTICAL = [
     required: [
       { type: "photo_before", label: "Foto antes", desc: "Foto del estado inicial con timestamp y GPS", auto: false },
       { type: "photo_after", label: "Foto después", desc: "Foto del resultado final con timestamp y GPS", auto: false },
-      { type: "checklist", label: "Checklist de completitud", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
+      { type: "checklist", label: "Lista de verificación", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
       { type: "client_signature", label: "Firma del cliente", desc: "Firma digital del cliente confirmando recepción", auto: false },
     ],
-    resolution_rule: "Si fotos antes/después existen con metadata válida y checklist completo, servicio entregado. Si falta firma del cliente, escalar.",
+    resolution_rule: "Si fotos antes/después existen con metadata válida y lista de verificación completa, servicio entregado. Si falta firma del cliente, escalar.",
   },
   {
     vertical: "legal",
@@ -180,7 +180,7 @@ export const EVIDENCE_BY_VERTICAL = [
     required: [
       { type: "meeting_minutes", label: "Minuta de reunión", desc: "Registro de lo discutido y acordado", auto: false },
       { type: "document_delivery", label: "Entrega de documentos", desc: "Confirmación de entrega de documentos generados", auto: false },
-      { type: "billing_hours", label: "Registro de horas", desc: "Log de horas facturables con descripción de actividades", auto: false },
+      { type: "billing_hours", label: "Registro de horas", desc: "Registro de horas facturables con descripción de actividades", auto: false },
     ],
     resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, servicio entregado. Si horas exceden lo acordado sin justificación, escalar.",
   },
@@ -192,7 +192,7 @@ export const EVIDENCE_BY_VERTICAL = [
     required: [
       { type: "attendance", label: "Registro de asistencia", desc: "Confirmación de presencia del alumno y profesor", auto: true },
       { type: "material_delivery", label: "Entrega de material", desc: "Material o tareas entregadas al alumno", auto: false },
-      { type: "evaluation", label: "Registro de evaluación", desc: "Evaluación o feedback de la sesión", auto: false },
+      { type: "evaluation", label: "Registro de evaluación", desc: "Evaluación o retroalimentación de la sesión", auto: false },
     ],
     resolution_rule: "Si asistencia registrada y material entregado, servicio entregado. Si falta evaluación y contrato la requiere, escalar.",
   },

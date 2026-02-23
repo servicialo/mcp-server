@@ -70,7 +70,7 @@ export function ModulosSection() {
 
       <div className="mt-4 bg-surface rounded-[14px] py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="text-[13px] text-text-muted leading-[1.7]">
-          <span className="font-semibold text-text">Un implementador puede ser Servicialo Core certified sin adoptar los módulos opcionales.</span>{" "}
+          <span className="font-semibold text-text">Un implementador puede ser Servicialo Core certificado sin adoptar los módulos opcionales.</span>{" "}
           Los módulos están diseñados para agregarse de forma independiente según la complejidad de tu operación.
         </div>
       </div>

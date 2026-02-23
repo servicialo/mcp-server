@@ -14,7 +14,7 @@ const EXCEPTIONS = [
   {
     title: "Inasistencia del proveedor",
     transition: "Confirmado → Reasignación → Agendado",
-    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio. Proveedor original flaggeado.",
+    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio. Proveedor original marcado.",
     borderColor: "border-l-amber-500",
   },
   {

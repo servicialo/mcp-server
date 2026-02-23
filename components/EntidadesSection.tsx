@@ -5,19 +5,19 @@ const axes = [
     icon: "\u{1F3AF}",
     label: "Alcance",
     title: "Qué se entrega",
-    desc: "Qué servicios están autorizados, cuántos, de qué tipo. Puede ser episódico (12 sesiones), por horas (40h de consultoría) o permanente (retainer mensual).",
+    desc: "Qué servicios están autorizados, cuántos, de qué tipo. Puede ser episódico (12 sesiones), por horas (40h de consultoría) o permanente (contrato de retención mensual).",
   },
   {
     icon: "\u{1F4B0}",
     label: "Precio",
     title: "Cómo se valora",
-    desc: "El modelo de pricing: monto fijo, time & materials, tarifa por nivel profesional, o mixto. La moneda y las tarifas se definen una vez.",
+    desc: "El modelo de tarificación: monto fijo, tiempo y materiales, tarifa por nivel profesional, o mixto. La moneda y las tarifas se definen una vez.",
   },
   {
     icon: "\u{1F4C5}",
     label: "Esquema de pagos",
     title: "Cuándo se mueve el dinero",
-    desc: "Anticipado, por hitos, periódico, contra entrega, o un esquema personalizado con cuotas y triggers definidos.",
+    desc: "Anticipado, por hitos, periódico, contra entrega, o un esquema personalizado con cuotas y disparadores definidos.",
   },
 ];
 
@@ -36,14 +36,14 @@ const examples = [
     icon: "\u{1F4BC}",
     title: "Contrato por horas",
     order: "40 horas de asesoría legal",
-    pricing: "Time & materials con tarifa por nivel",
+    pricing: "Tiempo y materiales con tarifa por nivel",
     schedule: "Pago mensual según horas consumidas",
     borderColor: "border-l-[#E5C07B]",
   },
   {
     vertical: "Proyectos",
     icon: "\u{1F3D7}\u{FE0F}",
-    title: "Due diligence en 3 fases",
+    title: "Debida diligencia en 3 fases",
     order: "Alcance definido por hitos",
     pricing: "Monto fijo por fase",
     schedule: "Pago por hito aprobado",
@@ -81,7 +81,7 @@ function HierarchyBlock() {
 function LedgerBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={h}># Ledger — calculado desde Servicios verificados</span></Line>
+      <Line><span className={h}># Libro mayor — calculado desde Servicios verificados</span></Line>
       <Line><span className={h}># Nunca se edita manualmente</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={a}>ledger:</span>                          <span className={c}># solo lectura</span></Line>
@@ -158,10 +158,10 @@ export function EntidadesSection() {
       {/* Block 3: Ledger */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
-          Ledger computado
+          Libro mayor computado
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          El estado financiero de la Orden se calcula automáticamente desde los Servicios verificados
+          El estado financiero de la Orden se calcula automáticamente desde los servicios verificados
         </div>
         <LedgerBlock />
       </div>
