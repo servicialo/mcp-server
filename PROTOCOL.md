@@ -1,7 +1,7 @@
 # Servicialo Protocol Specification
 
-**Version:** 0.2
-**Status:** Draft
+**Version:** 0.3
+**Status:** Stable
 **License:** MIT
 **Reference Implementation:** [Coordinalo](https://coordinalo.com)
 

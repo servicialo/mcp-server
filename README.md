@@ -250,6 +250,10 @@ Un agente bien diseñado sigue este orden:
 
 El estándar garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
+### Ejemplo completo
+
+**[Sesión de kinesiología](./examples/kinesiology-session.md)** — Un agente coordina una sesión de rehabilitación de principio a fin: buscar clínica, consultar disponibilidad, agendar, check-in con GPS, registrar ficha clínica, cobrar. Cada paso con la herramienta MCP, los parámetros y la respuesta.
+
 ---
 
 ## Los 7 principios
@@ -371,6 +375,7 @@ Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar
 servicialo/
 ├── app/                  # servicialo.com — sitio del estándar (Next.js)
 ├── components/           # Componentes del sitio
+├── examples/             # Conversaciones agente-servidor
 ├── lib/                  # Datos del protocolo
 ├── packages/
 │   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)

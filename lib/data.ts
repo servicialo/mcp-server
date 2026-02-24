@@ -89,7 +89,7 @@ export const PRINCIPLES = [
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.2
+# SERVICIALO v0.3
 # Las 8 dimensiones de un servicio profesional
 # ─────────────────────────────────────────────
 
@@ -229,7 +229,7 @@ export const MODULES = [
     status: "estable" as const,
     statusColor: "green" as const,
     desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega, cobro y órdenes de servicio.",
-    audience: "Cualquier plataforma que coordine servicios profesionales — desde una clínica de kinesiología hasta un marketplace de limpieza.",
+    audience: "Cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza de oficinas con múltiples cuentas, equipos y personal con alta rotación.",
     includes: [
       "Ciclo de vida (9 estados universales)",
       "8 dimensiones del servicio",
