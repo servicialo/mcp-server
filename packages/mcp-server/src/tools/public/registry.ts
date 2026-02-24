@@ -10,8 +10,11 @@ export const registryTools = {
       limit: z.number().default(10).describe('Cantidad máxima de resultados'),
     }),
     handler: async (client: CoordinaloClient, args: { vertical: string; location?: string; limit?: number }) => {
-      // TODO: No existe endpoint de registry global aún — retorna manifest como fallback
-      return client.pub.get('/api/servicialo/manifest');
+      return client.pub.get('/api/servicialo/registry', {
+        vertical: args.vertical,
+        location: args.location,
+        limit: args.limit,
+      });
     },
   },
 
