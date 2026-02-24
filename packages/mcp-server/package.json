@@ -4,7 +4,7 @@
   "mcpName": "io.github.danioni/servicialo",
   "description": "Open protocol for professional service delivery — connects AI agents with scheduling, verification and settlement of professional services",
   "license": "MIT",
-  "homepage": "https://servicialo.ai",
+  "homepage": "https://servicialo.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/servicialo/mcp-server.git"
