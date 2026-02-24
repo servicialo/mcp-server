@@ -479,6 +479,8 @@ Servicialo keeps them separate by design. The Service Order owns the commercial 
 
 The canonical schema in YAML. Implementations may use JSON, protobuf, or any serialization format that preserves the structure.
 
+**Machine-readable JSON Schemas:** [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json) — use these to validate your implementation programmatically.
+
 ### Service
 
 ```yaml
@@ -767,13 +769,20 @@ Servicialo is an open standard. Contributions are welcome:
 ### Versioning
 
 The protocol follows semantic versioning:
-- **Patch (0.2.x):** Clarifications, typo fixes, examples
+- **Patch (0.3.x):** Clarifications, typo fixes, examples
 - **Minor (0.x.0):** New optional fields, new exception flows, extensions
 - **Major (x.0.0):** Breaking changes to required fields or state model
 
 The protocol version is independent from the MCP server package version (`@servicialo/mcp-server`). Both are tracked separately.
 
 ### Changelog
+
+#### 0.3 (2026-02-23)
+
+- **Status:** Draft → Stable. The core protocol (8 dimensions, 9 states, 6 exception flows, 7 principles) is considered stable for implementation.
+- **JSON Schema:** Published `schema/service.schema.json` and `schema/service-order.schema.json` for machine-readable validation.
+- **Agent conversation example:** Added `examples/kinesiology-session.md` with a complete lifecycle walkthrough.
+- **Version alignment:** All references across site, README, and spec now consistently say v0.3.
 
 #### 0.2 (2026-02-22)
 

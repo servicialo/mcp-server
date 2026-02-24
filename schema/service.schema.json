@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/service.schema.json",
+  "title": "Servicialo Service",
+  "description": "Atomic unit of professional service delivery — modeled across the 8 dimensions defined in the Servicialo protocol v0.3.",
+  "type": "object",
+  "required": ["id", "type", "vertical", "name", "duration_minutes", "provider", "client", "schedule", "lifecycle", "billing"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this service instance."
+    },
+    "service_order_id": {
+      "type": "string",
+      "description": "Optional reference to a parent Service Order. When present, the billing dimension is informative — invoicing is handled by the Order."
+    },
+    "type": {
+      "type": "string",
+      "description": "Service category.",
+      "examples": ["physical_therapy_session", "home_repair", "legal_consultation", "tutoring_session"]
+    },
+    "vertical": {
+      "type": "string",
+      "description": "Industry vertical.",
+      "examples": ["health", "legal", "home", "education"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable service name.",
+      "examples": ["Sesión de rehabilitación — 45 min"]
+    },
+    "duration_minutes": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Expected duration in minutes."
+    },
+    "requirements": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Prerequisites for this service.",
+      "examples": [["medical_referral", "intake_form"]]
+    },
+
+    "provider": {
+      "type": "object",
+      "description": "Dimension 2 — Who delivers the service.",
+      "required": ["id", "organization_id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Provider identifier."
+        },
+        "credentials": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required certifications.",
+          "examples": [["kinesiologist_cl", "sports_rehab_cert"]]
+        },
+        "trust_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Trust score calculated from service history. 0-100."
+        },
+        "organization_id": {
+          "type": "string",
+          "description": "Parent organization."
+        }
+      }
+    },
+
+    "client": {
+      "type": "object",
+      "description": "Dimension 3 — Who receives the service. The payer is explicitly separated from the client.",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Client (beneficiary) identifier."
+        },
+        "payer_id": {
+          "type": "string",
+          "description": "Who pays. May differ from client — insurance, employer, guardian, etc."
+        }
+      }
+    },
+
+    "schedule": {
+      "type": "object",
+      "description": "Dimension 4 — When the service occurs.",
+      "required": ["requested_at"],
+      "properties": {
+        "requested_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the service was originally requested."
+        },
+        "scheduled_for": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Agreed start time. Set when the service transitions to 'scheduled'."
+        },
+        "duration_expected": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Expected duration in minutes."
+        }
+      }
+    },
+
+    "location": {
+      "type": "object",
+      "description": "Dimension 5 — Where the service is delivered.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["in_person", "virtual", "home_visit"],
+          "description": "Delivery modality."
+        },
+        "address": {
+          "type": "string",
+          "description": "Physical address."
+        },
+        "room": {
+          "type": "string",
+          "description": "Specific room, box, or office.",
+          "examples": ["Box 3", "Sala 2B"]
+        },
+        "coordinates": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+            "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+          },
+          "required": ["lat", "lng"]
+        }
+      }
+    },
+
+    "lifecycle": {
+      "type": "object",
+      "description": "Dimension 6 — Current position in the 9 universal states.",
+      "required": ["current_state"],
+      "properties": {
+        "current_state": {
+          "type": "string",
+          "enum": ["requested", "scheduled", "confirmed", "in_progress", "completed", "documented", "invoiced", "collected", "verified", "cancelled", "disputed", "reassigning", "rescheduling", "partial"],
+          "description": "Current lifecycle state. The 9 universal states plus exception states."
+        },
+        "transitions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/transition" },
+          "description": "Full audit trail of state changes."
+        },
+        "exceptions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/exception" },
+          "description": "Exception events: no-shows, cancellations, disputes, rescheduling, partial delivery."
+        }
+      }
+    },
+
+    "proof": {
+      "type": "object",
+      "description": "Dimension 7 — Proof of delivery.",
+      "properties": {
+        "checkin": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the provider or client checked in."
+        },
+        "checkout": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the session ended."
+        },
+        "duration_actual": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual duration in minutes. Auto-calculated from checkin/checkout."
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" },
+          "description": "Evidence items: GPS, signatures, photos, documents, etc."
+        }
+      }
+    },
+
+    "billing": {
+      "type": "object",
+      "description": "Dimension 8 — Financial settlement. When this service belongs to a Service Order, billing is informative (records value) but not transactional (doesn't generate invoice).",
+      "required": ["amount"],
+      "properties": {
+        "amount": {
+          "type": "object",
+          "required": ["value", "currency"],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Service price."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "ISO 4217 currency code.",
+              "examples": ["CLP", "USD", "MXN"]
+            }
+          }
+        },
+        "payer": {
+          "type": "string",
+          "description": "Reference to who pays. May differ from client (insurance, employer, guardian)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "charged", "invoiced", "paid", "disputed"],
+          "description": "Billing status, independent from lifecycle state. 'charged' = amount debited from balance (1:1 with completed session). 'paid' = cash received (may have occurred earlier via prepaid package)."
+        },
+        "charged_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the charge was applied."
+        },
+        "payment_id": {
+          "type": "string",
+          "description": "Linked payment — may reference a prepaid package purchased earlier."
+        },
+        "tax_document": {
+          "type": "string",
+          "description": "Reference to invoice or receipt if issued."
+        }
+      }
+    }
+  },
+
+  "$defs": {
+    "transition": {
+      "type": "object",
+      "description": "A state change in the lifecycle.",
+      "required": ["from", "to", "at", "by"],
+      "properties": {
+        "from": {
+          "type": ["string", "null"],
+          "description": "Previous state. null for the initial state."
+        },
+        "to": {
+          "type": "string",
+          "description": "New state."
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the transition occurred."
+        },
+        "by": {
+          "type": "string",
+          "description": "Who triggered the transition: client ID, provider ID, 'system', or agent ID."
+        },
+        "method": {
+          "type": "string",
+          "enum": ["auto", "manual", "agent"],
+          "description": "How the transition was triggered."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Context-specific data for this transition."
+        }
+      }
+    },
+
+    "exception": {
+      "type": "object",
+      "description": "An exception event in the service lifecycle.",
+      "required": ["type", "at", "initiated_by"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["no_show", "cancellation", "dispute", "reschedule", "partial"],
+          "description": "Exception type."
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the exception occurred."
+        },
+        "initiated_by": {
+          "type": "string",
+          "description": "Who initiated the exception."
+        },
+        "resolution": {
+          "type": "string",
+          "description": "How the exception was resolved."
+        },
+        "resolved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the exception was resolved."
+        }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "description": "A piece of delivery evidence.",
+      "required": ["type", "captured_at", "data"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["gps", "signature", "photo", "document", "duration", "notes"],
+          "description": "Evidence type."
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the evidence was captured."
+        },
+        "data": {
+          "type": "object",
+          "description": "Type-specific payload. Structure varies by evidence type."
+        }
+      }
+    }
+  }
+}

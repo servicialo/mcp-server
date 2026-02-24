@@ -250,9 +250,11 @@ Un agente bien diseñado sigue este orden:
 
 El estándar garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
-### Ejemplo completo
+### Ejemplos completos
 
-**[Sesión de kinesiología](./examples/kinesiology-session.md)** — Un agente coordina una sesión de rehabilitación de principio a fin: buscar clínica, consultar disponibilidad, agendar, check-in con GPS, registrar ficha clínica, cobrar. Cada paso con la herramienta MCP, los parámetros y la respuesta.
+**[Sesión de kinesiología](./examples/kinesiology-session.md)** — Vertical salud. Check-in con GPS, ficha clínica firmada, pago por transferencia.
+
+**[Reparación eléctrica](./examples/home-repair.md)** — Vertical hogar. Visita a domicilio, fotos antes/después, checklist de tareas, firma del cliente, pago en efectivo.
 
 ---
 
@@ -297,6 +299,8 @@ Para plataformas con volumen suficiente o donde el monto por servicio hace que l
 ---
 
 ## Schema
+
+JSON Schemas para validación automática: [`schema/service.schema.json`](./schema/service.schema.json) y [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
 # ── SERVICIALO v0.3 ──────────────────
@@ -379,7 +383,9 @@ servicialo/
 ├── lib/                  # Datos del protocolo
 ├── packages/
 │   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
-└── PROTOCOL.md           # Especificación completa
+├── schema/               # JSON Schemas para validación
+├── PROTOCOL.md           # Especificación completa
+└── README.md
 ```
 
 |  | Versión | Estado |

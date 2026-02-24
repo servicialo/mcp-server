@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/service-order.schema.json",
+  "title": "Servicialo Service Order",
+  "description": "A bilateral commercial agreement that groups one or more Services under a defined scope, pricing, and payment schedule. Servicialo protocol v0.3.",
+  "type": "object",
+  "required": ["id", "organization_id", "client_id", "payer_id", "scope", "term", "pricing", "payment_schedule", "lifecycle"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier.",
+      "examples": ["so_abc123"]
+    },
+    "organization_id": {
+      "type": "string",
+      "description": "Issuing organization."
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Beneficiary of the services."
+    },
+    "payer_id": {
+      "type": "string",
+      "description": "Who pays. May differ from client (insurance, employer, guardian)."
+    },
+
+    "scope": {
+      "type": "object",
+      "description": "What services are authorized under this order.",
+      "required": ["description", "service_types"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Human-readable scope definition.",
+          "examples": ["12 sesiones de kinesiología deportiva"]
+        },
+        "service_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Authorized service types.",
+          "examples": [["physical_therapy_session"]]
+        },
+        "quantity_limit": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Maximum number of services. null = unlimited."
+        },
+        "hours_limit": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Maximum hours. null = not applicable."
+        },
+        "expiry_condition": {
+          "type": "string",
+          "description": "Human-readable completion condition.",
+          "examples": ["12 sessions", "90 days", "milestone 3 approved"]
+        }
+      }
+    },
+
+    "term": {
+      "type": "object",
+      "description": "Duration and renewal terms.",
+      "required": ["type", "starts_at"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["permanent", "annual", "monthly", "per_milestone", "per_event"],
+          "description": "Duration type."
+        },
+        "starts_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the order begins."
+        },
+        "ends_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When the order ends. null if permanent or open-ended."
+        },
+        "auto_renews": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the order auto-renews at term end."
+        },
+        "renewal_notice_days": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Days before end to notify about renewal. null if auto_renews is false."
+        }
+      }
+    },
+
+    "pricing": {
+      "type": "object",
+      "description": "How value is calculated.",
+      "required": ["model", "currency"],
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["fixed", "t&m", "rate_card", "mixed"],
+          "description": "Pricing model."
+        },
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "description": "ISO 4217 currency code.",
+          "examples": ["CLP", "USD", "MXN"]
+        },
+        "fixed_amount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total fixed amount. Required if model = fixed."
+        },
+        "rate_card": {
+          "type": "array",
+          "description": "Rate card by professional level. Required if model = t&m or rate_card.",
+          "items": {
+            "type": "object",
+            "required": ["level", "billable_rate"],
+            "properties": {
+              "level": {
+                "type": "string",
+                "description": "Professional level.",
+                "examples": ["junior", "senior", "partner"]
+              },
+              "billable_rate": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Rate charged to client per hour."
+              },
+              "cost_rate": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Internal cost per hour."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "payment_schedule": {
+      "type": "object",
+      "description": "When money moves.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["upfront", "milestone", "periodic", "on_delivery", "custom"],
+          "description": "Payment schedule type."
+        },
+        "installments": {
+          "type": "array",
+          "description": "Payment installments. Required if type = milestone or custom.",
+          "items": {
+            "type": "object",
+            "required": ["trigger"],
+            "properties": {
+              "trigger": {
+                "type": "string",
+                "description": "What triggers this payment.",
+                "examples": ["contract_signed", "milestone_1_approved", "2026-03-01"]
+              },
+              "amount": {
+                "type": ["number", "null"],
+                "minimum": 0,
+                "description": "Fixed amount. null if percentage is used."
+              },
+              "percentage": {
+                "type": ["number", "null"],
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Percentage of total. null if amount is used."
+              },
+              "due_days": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Days from trigger to payment due date."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ledger": {
+      "type": "object",
+      "description": "Computed from verified Services. Read-only — never manually entered. As atomic Services transition to 'verified', the system updates these fields automatically.",
+      "properties": {
+        "services_verified": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count of services in 'verified' state."
+        },
+        "hours_consumed": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total hours across verified services."
+        },
+        "amount_consumed": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Value consumed at pricing rates."
+        },
+        "amount_billed": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total invoiced to date."
+        },
+        "amount_collected": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total payments received."
+        },
+        "amount_remaining": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Authorized scope not yet consumed."
+        }
+      }
+    },
+
+    "lifecycle": {
+      "type": "object",
+      "description": "Service Order lifecycle.",
+      "required": ["current_state"],
+      "properties": {
+        "current_state": {
+          "type": "string",
+          "enum": ["draft", "proposed", "negotiating", "active", "paused", "completed", "cancelled"],
+          "description": "Current state. A quote IS a Service Order in pre-active state — there is no separate 'quote' object."
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "at", "by"],
+            "properties": {
+              "from": { "type": ["string", "null"] },
+              "to": { "type": "string" },
+              "at": { "type": "string", "format": "date-time" },
+              "by": { "type": "string" },
+              "method": { "type": "string", "enum": ["auto", "manual", "agent"] },
+              "metadata": { "type": "object" }
+            }
+          },
+          "description": "Full audit trail of state changes."
+        }
+      }
+    },
+
+    "service_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to atomic Service objects that belong to this order."
+    }
+  }
+}
