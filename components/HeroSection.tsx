@@ -11,8 +11,8 @@ export function HeroSection() {
         </span>
       </h1>
       <p className="text-[15px] md:text-lg text-text-muted leading-[1.7] max-w-[540px]">
-        Servicialo define el lenguaje universal para crear, entregar y verificar
-        servicios — para humanos y para agentes AI.
+        El protocolo abierto que coordina servicios profesionales
+        — para humanos y para agentes AI.
       </p>
       <div className="flex flex-wrap gap-3 md:gap-6 mt-6 md:mt-8 font-mono text-[11px] text-text-dim">
         <span>◆ Estándar abierto</span>
