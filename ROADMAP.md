@@ -6,16 +6,32 @@ This roadmap reflects the current direction of the **Servicialo open standard** 
 
 ---
 
+## Done — v0.1 → v0.3
+
+What's already shipped:
+
+- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
+- [x] **JSON Schemas** — `service.schema.json` and `service-order.schema.json` with lifecycle states, exception types, and evidence definitions (`schema/`).
+- [x] **MCP server** — `@servicialo/mcp-server` v0.5.3 published on npm. 20 tools across 6 agent phases (Discovery, Booking, Execution, Documentation, Billing, Support).
+- [x] **Test suite** — Vitest tests for the MCP server (`packages/mcp-server/src/__tests__/`).
+- [x] **Website** — servicialo.com live with full protocol narrative (Next.js 14, Tailwind v3).
+- [x] **Agent examples** — two complete multi-turn conversations: kinesiology session and home repair (`examples/`).
+- [x] **Governance** — CONTRIBUTING.md with RFC process, SECURITY.md, CODE_OF_CONDUCT.md, CHANGELOG.md, issue/PR templates, CI/CD auto-publish to npm.
+- [x] **Evidence verticals** — 4 defined: Health, Home, Legal, Education.
+- [x] **Modular architecture** — Core (stable), Finance (design), Disputes (design).
+
+---
+
 ## Short Term — Solidify the Foundation
 
 _Target: Protocol v0.4_
 
-- [ ] **Finalize JSON Schemas** — complete validation coverage for all 9 lifecycle states and 6 exception flows.
-- [ ] **Conformance test suite** — portable tests any implementation can run to verify protocol compliance.
+- [ ] **Conformance test suite** — portable tests any implementation can run to verify protocol compliance (separate from MCP server unit tests).
 - [ ] **Expand evidence verticals** — add at least 2 new verticals beyond Health, Home, Legal, and Education (community-proposed).
 - [ ] **MCP server hardening** — improve error handling, input validation, and edge-case coverage.
 - [ ] **OpenAPI specification** — publish a formal API description for the HTTP endpoints consumed by the MCP server.
 - [ ] **Multilingual documentation** — English translation of the core specification (PROTOCOL.md and README).
+- [ ] **Página /protocolo en el sitio** — ruta dedicada con la especificación técnica formal, schema interactivo, y diagrama de estados.
 
 ## Mid Term — Grow the Ecosystem
 
@@ -35,8 +51,16 @@ _Target: Protocol v1.0_
 - [ ] **Protocol v1.0** — declare the Core module (8 dimensions, 9 states, 7 principles) as stable with backwards-compatibility guarantees.
 - [ ] **Formal governance body** — transition from single-maintainer to a multi-stakeholder steering committee.
 - [ ] **Certification program** — optional conformance certification for platforms implementing Servicialo.
-- [ ] **Industry adoption** — at least 3 independent implementations beyond the [Coordinalo](https://coordinalo.com) reference implementation.
-- [ ] **Accessibility and localization** — specification available in Spanish, English, and Portuguese; tooling supports i18n service metadata.
+- [ ] **Industry adoption** — at least 3 independent implementations beyond [Coordinalo](https://coordinalo.com).
+- [ ] **Localization** — specification available in Spanish, English, and Portuguese; tooling supports i18n service metadata.
+
+---
+
+## Repo Housekeeping
+
+- [x] Add `mcp-publisher`, `mcp-publisher.exe`, `.mcpregistry_*` tokens to `.gitignore`.
+- [x] Remove `PLAN.md` (outdated — superseded by this roadmap and PROTOCOL.md).
+- [x] Remove `plan_motor_entrega.docx` from root.
 
 ---
 

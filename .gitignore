@@ -38,4 +38,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# mcp registry tokens
+.mcpregistry_*
+
+# mcp publisher binaries
+mcp-publisher
+mcp-publisher.exe
