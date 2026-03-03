@@ -152,12 +152,12 @@ export const EVIDENCE_BY_VERTICAL = [
     icon: "\u{1F3E5}",
     color: "blue" as const,
     required: [
-      { type: "check_in", label: "Registro de entrada", desc: "Timestamp GPS del proveedor al llegar", auto: true },
-      { type: "check_out", label: "Registro de salida", desc: "Timestamp GPS del proveedor al salir", auto: true },
+      { type: "check_in", label: "Registro de entrada", desc: "Marca temporal GPS del proveedor al llegar", auto: true },
+      { type: "check_out", label: "Registro de salida", desc: "Marca temporal GPS del proveedor al salir", auto: true },
       { type: "clinical_record", label: "Ficha clínica firmada", desc: "Registro clínico firmado por profesional y paciente", auto: false },
-      { type: "treatment_plan", label: "Adherencia al plan", desc: "Checklist del plan de tratamiento ejecutado", auto: false },
+      { type: "treatment_plan", label: "Adherencia al plan", desc: "Lista de verificación del plan de tratamiento ejecutado", auto: false },
     ],
-    resolution_rule: "Si check-in/out existen y ficha clínica está firmada por ambas partes, servicio entregado. Si falta ficha o firma, escalar.",
+    resolution_rule: "Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes, servicio entregado. Si falta ficha o firma, escalar.",
   },
   {
     vertical: "hogar",
@@ -165,12 +165,12 @@ export const EVIDENCE_BY_VERTICAL = [
     icon: "\u{1F3E0}",
     color: "green" as const,
     required: [
-      { type: "photo_before", label: "Foto antes", desc: "Foto del estado inicial con timestamp y GPS", auto: false },
-      { type: "photo_after", label: "Foto después", desc: "Foto del resultado final con timestamp y GPS", auto: false },
+      { type: "photo_before", label: "Foto antes", desc: "Foto del estado inicial con marca temporal y GPS", auto: false },
+      { type: "photo_after", label: "Foto después", desc: "Foto del resultado final con marca temporal y GPS", auto: false },
       { type: "checklist", label: "Lista de verificación", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
       { type: "client_signature", label: "Firma del cliente", desc: "Firma digital del cliente confirmando recepción", auto: false },
     ],
-    resolution_rule: "Si fotos antes/después existen con metadata válida y lista de verificación completa, servicio entregado. Si falta firma del cliente, escalar.",
+    resolution_rule: "Si fotos antes/después existen con metadatos válidos y lista de verificación completa, servicio entregado. Si falta firma del cliente, escalar.",
   },
   {
     vertical: "legal",
@@ -233,7 +233,7 @@ export const MODULES = [
     includes: [
       "Ciclo de vida (9 estados universales)",
       "8 dimensiones del servicio",
-      "Órdenes de servicio (acuerdo comercial + ledger computado)",
+      "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
       "Protocolo MCP para agentes AI (20 herramientas)",
@@ -270,7 +270,7 @@ export const MODULES = [
 ] as const;
 
 export const CONTRATO_FIELDS = [
-  { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "check_in + check_out + ficha_clinica_firmada" },
+  { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "registro_entrada + registro_salida + ficha_clinica_firmada" },
   { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Entregado", example: "48 horas" },
   { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "0% si >24h, 50% si 2-24h, 100% si <2h" },
   { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "Cliente: cobra 100%. Proveedor: reasignación + penalidad" },

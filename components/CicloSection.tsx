@@ -7,7 +7,7 @@ import { LIFECYCLE_STATES } from "@/lib/data";
 const EXCEPTIONS = [
   {
     title: "Inasistencia del cliente",
-    transition: "Confirmado → Cancelado (no_show)",
+    transition: "Confirmado → Cancelado (inasistencia)",
     desc: "Cobra penalidad según política, libera horario del proveedor para reasignación. Incrementa contador de inasistencias del cliente.",
     borderColor: "border-l-rose-500",
   },

@@ -43,7 +43,7 @@ const examples = [
   {
     vertical: "Proyectos",
     icon: "\u{1F3D7}\u{FE0F}",
-    title: "Due diligence en 3 fases",
+    title: "Auditoría previa en 3 fases",
     order: "Alcance definido por hitos",
     pricing: "Monto fijo por fase",
     schedule: "Pago por hito aprobado",
