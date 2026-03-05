@@ -164,10 +164,14 @@ export function CicloSection() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {EXCEPTIONS.map((ex) => (
+          {EXCEPTIONS.map((ex, i) => (
             <div
               key={ex.title}
-              className={`bg-surface rounded-xl py-4 px-5 border border-border-light border-l-[3px] transition-shadow duration-200 hover:shadow-sm ${ex.borderColor}`}
+              className={`bg-surface rounded-xl py-4 px-5 border border-border-light border-l-[3px] transition-shadow duration-200 hover:shadow-sm ${ex.borderColor}${
+                i === EXCEPTIONS.length - 1 && EXCEPTIONS.length % 2 !== 0
+                  ? " md:col-span-2"
+                  : ""
+              }`}
             >
               <div className="font-mono text-[13px] font-semibold text-text mb-1">
                 {ex.title}
