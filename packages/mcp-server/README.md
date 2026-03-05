@@ -2,7 +2,7 @@
 
 MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
 
-**Protocol version:** 0.3 · **Package version:** 0.5.3
+**Protocol version:** 0.6 · **Package version:** 0.6.0
 
 > **Status:** Early-stage protocol with a live reference implementation in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. We're onboarding pilot implementations — [get in touch](https://servicialo.com) if you're building for professional services.
 
@@ -72,7 +72,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 |---|---|
 | `registry.search` | Search organizations by vertical and location |
 | `registry.get_organization` | Get public details of an organization |
-| `scheduling.check_availability` | Check available slots without authentication |
+| `scheduling.check_availability` | Check available slots without authentication. If the service has `resource_id` in its location, also verifies physical resource availability (3-variable scheduler: provider ∧ client ∧ resource) |
 | `services.list` | List the public service catalog |
 
 ## Phase 2 — Entender (2 tools)
@@ -87,7 +87,7 @@ A well-designed agent follows this order. Each phase has its tools. The standard
 | Tool | Description |
 |---|---|
 | `clients.get_or_create` | Find a client by email/phone or create if new. Single call to resolve client identity before booking |
-| `scheduling.book` | Book a new session → state "Solicitado". Requires contract.get first |
+| `scheduling.book` | Book a new session → state "Solicitado". Accepts optional `resource_id` to reserve a physical resource (3-variable scheduler). Requires contract.get first |
 | `scheduling.confirm` | Confirm a booked session → state "Confirmado" |
 
 ## Phase 4 — Ciclo de Vida (4 tools)
@@ -166,7 +166,18 @@ lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { typ
 
 ## Changelog
 
-### Package 0.5.0 (current)
+### Package 0.6.0 (current)
+
+Protocol v0.6.0 — Resource as first-class dimension (3.5b).
+
+| Change | Detail |
+|---|---|
+| `scheduling.check_availability` | Now accepts optional `resource_id` — verifies physical resource availability alongside provider (3-variable scheduler: provider ∧ client ∧ resource) |
+| `scheduling.book` | Now accepts optional `resource_id` — reserves physical resource alongside session |
+| New types | `ResourceSchema`, `ResourceAvailabilitySchema`, `ServiceLocationSchema` with `resource_id` |
+| New exception flow | 5.7 Resource Conflict — when a resource is double-booked or unavailable |
+
+### Package 0.5.0
 
 Consolidated from 38 tools to 20. Tools are now organized by lifecycle phase instead of database entity.
 
@@ -186,7 +197,11 @@ Consolidated from 38 tools to 20. Tools are now organized by lifecycle phase ins
 | `providers.get_commission` | Removed (not part of service lifecycle) |
 | `payroll.*` (5 tools) | Removed (not part of service lifecycle) |
 
-### Protocol 0.3 (current)
+### Protocol 0.6 (current)
+
+Resource as a first-class sub-dimension of Location (3.5b). `resource_id` optional in Location. New exception flow: Resource Conflict (5.7). Scheduler becomes 3-variable: provider ∧ client ∧ resource.
+
+### Protocol 0.3
 
 Lifecycle state order changed. Verified moved from position 6 to position 8 (final). Verification is the closure of the cycle — the client needs the full picture (documentation + charge) before confirming.
 

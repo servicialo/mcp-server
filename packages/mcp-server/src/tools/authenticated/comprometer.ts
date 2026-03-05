@@ -26,20 +26,22 @@ export const comprometerTools = {
 
   'scheduling.book': {
     description:
-      '[Fase 3 — Comprometer] Agenda una nueva sesión para un cliente con un proveedor. Crea la sesión en estado "Solicitado". Requiere haber llamado contract.get antes para conocer las reglas del servicio.',
+      '[Fase 3 — Comprometer] Agenda una nueva sesión para un cliente con un proveedor. Crea la sesión en estado "Solicitado". Si el servicio tiene location.resource_id, el recurso físico se reserva junto con la sesión (scheduler de 3 variables: profesional ∧ cliente ∧ recurso). Requiere haber llamado contract.get antes para conocer las reglas del servicio.',
     schema: z.object({
       service_id: z.string().describe('ID del servicio'),
       provider_id: z.string().describe('ID del proveedor'),
       client_id: z.string().describe('ID del cliente'),
       starts_at: z.string().describe('Fecha y hora de inicio (ISO datetime)'),
+      resource_id: z.string().optional().describe('ID del recurso físico a reservar (opcional, requerido si el servicio tiene location.resource_id)'),
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
-    handler: async (client: CoordinaloClient, args: { service_id: string; provider_id: string; client_id: string; starts_at: string; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: CoordinaloClient, args: { service_id: string; provider_id: string; client_id: string; starts_at: string; resource_id?: string; actor: z.infer<typeof ActorSchema> }) => {
       return client.post('/coordinalo/sessions', {
         serviceId: args.service_id,
         providerId: args.provider_id,
         clientId: args.client_id,
         startTime: args.starts_at,
+        resourceId: args.resource_id,
         actor: args.actor,
       });
     },

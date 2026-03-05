@@ -54,7 +54,7 @@ Every professional service — from a physiotherapy session to a tax audit — i
 | **2** | **Who delivers** | The service provider, with credentials | Certified physiotherapist, licensed electrician |
 | **3** | **Who receives** | The client — with payer explicitly separated | Patient (insurer pays), employee (company pays) |
 | **4** | **When** | Agreed time window | 2026-02-10 from 10:00 to 10:45 |
-| **5** | **Where** | Physical or virtual location | Clinic, home visit, video call |
+| **5** | **Where** | Physical or virtual location, with optional `resource_id` linking to a physical Resource (3.5b: room, box, chair, equipment) | Clinic room 3, home visit, video call |
 | **6** | **Lifecycle** | Current position in the 9 lifecycle states | Collected → next: Verified |
 | **7** | **Evidence** | How delivery is proven | GPS + duration + client signature |
 | **8** | **Billing** | Financial settlement, independent from lifecycle | $35 USD · collected · prepaid package |
@@ -98,6 +98,7 @@ Exceptions are not edge cases. They occur in **15–30% of appointments**. A wel
 | **Cancellation** | Any pre-delivery → Cancelled | Agreed cancellation policy applied |
 | **Quality dispute** | Completed → Disputed | Billing frozen, evidence requested |
 | **Rescheduling** | Scheduled/Confirmed → Rescheduling → Scheduled | Same provider kept if possible |
+| **Resource conflict** | Scheduled → Rescheduling → Scheduled | Resource double-booked or unavailable — reassign resource or reschedule |
 | **Partial delivery** | In Progress → Partial | Delivered portion documented, invoice adjusted |
 
 ---
@@ -284,7 +285,7 @@ Everything needed to model a professional service from start to finish.
 
 For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
 
-Includes: lifecycle (9 states) · 8 dimensions · service orders · exception flows · proof of delivery · MCP protocol (20 tools)
+Includes: lifecycle (9 states) · 8 dimensions · resource management · service orders · exception flows · proof of delivery · MCP protocol (20 tools)
 
 ### Servicialo/Finance — `in design`
 
@@ -305,7 +306,7 @@ For platforms with enough volume or where the amount per service makes disputes 
 JSON Schemas for automated validation: [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.3 ──────────────────
+# ── SERVICIALO v0.6 ──────────────────
 # The 8 dimensions of a service
 
 service:
@@ -335,6 +336,7 @@ service:
     type: in_person | virtual | home_visit
     address: string
     room: string
+    resource_id: string               # Optional — reference to Resource (3.5b)
     coordinates:
       lat: number
       lng: number
@@ -392,8 +394,8 @@ servicialo/
 
 |  | Version | Status |
 |---|---------|--------|
-| Protocol | 0.3 | Stable |
-| @servicialo/mcp-server | 0.5.3 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.6 | Stable |
+| @servicialo/mcp-server | 0.6.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 

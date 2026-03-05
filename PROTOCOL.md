@@ -136,6 +136,64 @@ Physical or virtual location.
 | `location.address` | string | Physical address | "Av. Providencia 1234, Santiago" |
 | `location.room` | string | Specific room/box | `"Box 3"` |
 | `location.coordinates` | object | lat/lng | `{lat: -33.42, lng: -70.61}` |
+| `location.resource_id` | string | Reference to a Resource entity (see 3.5b) | `res_box3` |
+
+**Design decision:** `location.room` remains as a human-readable label for simple cases where resource management is unnecessary. When a service requires scheduling a physical resource with its own availability and constraints, `location.resource_id` references a full Resource entity (Section 3.5b). Both fields can coexist — `room` for display, `resource_id` for scheduling logic.
+
+### 3.5b Resource (What Physical Space or Equipment)
+
+A Resource is a physical entity — a room, a dental chair, a gym court, a therapy box — that a service may require for delivery. It is optional: virtual sessions, home visits, and services delivered at the client's location have no Resource. But when a Resource exists, it is a first-class entity with its own identity, availability calendar, and constraints.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `resource.id` | string | Unique identifier | `res_box3` |
+| `resource.organization_id` | string | Owning organization | `org_mamapro` |
+| `resource.name` | string | Human-readable name | `"Box 3"` |
+| `resource.type` | string | Category | `"room"`, `"box"`, `"chair"`, `"equipment"` |
+| `resource.capacity` | integer | Max simultaneous sessions | `1` |
+| `resource.buffer_minutes` | integer | Reset time between uses | `15` |
+| `resource.equipment` | string[] | Available equipment | `["camilla", "TENS", "ultrasonido"]` |
+| `resource.location` | string | Physical location description | `"2nd floor, east wing"` |
+| `resource.is_active` | boolean | Whether bookable | `true` |
+| `resource.rules` | object | Business logic constraints | `{max_hours_per_day: 8}` |
+
+#### Why Resource is a separate dimension — not a field on Location
+
+A Resource has its own calendar of availability, independent from the provider and the client. It can be blocked for reasons unrelated to any session — maintenance, deep cleaning, institutional reservation, equipment calibration. Treating it as a text field on Location — as most scheduling systems do — collapses two distinct concepts and generates conflicts that only surface in production: the provider is available, the client is available, but the room is under maintenance. By the time a team discovers this conflict in a text-field model, they've already shipped a broken scheduler and are patching it with ad-hoc rules.
+
+A correct implementation models Resource as an entity that participates in availability intersection alongside provider and client. When scheduling a session, the system must verify three-way availability: provider free AND client free AND resource free.
+
+#### The buffer problem
+
+The buffer is not provider time and not client time — it is resource time. A physical therapist can see the next patient immediately. The therapy box needs 15 minutes of sanitization. If the buffer lives on the provider's schedule, the model is wrong — and the error compounds when the same pattern appears in dentistry (instrument sterilization), group fitness (room cleaning), or coworking (turnover reset).
+
+`buffer_minutes` is a first-class field on Resource — not buried inside `rules` — because the scheduler needs it for arithmetic. When computing available slots, the effective occupation of a resource is `session_duration + buffer_minutes`. This is a mathematical operation, not a business rule. Fields that the scheduler needs for arithmetic belong in the schema; fields that encode business logic belong in `rules`.
+
+#### Capacity and group sessions
+
+When `capacity > 1`, the Resource can host multiple simultaneous sessions as long as the total number of clients does not exceed `capacity`. The scheduler must verify:
+
+```
+current_clients + new_clients ≤ resource.capacity
+```
+
+This is not a special case — it is the general behavior. `capacity = 1` is simply the individual session case. A yoga studio with `capacity = 20` and a dental chair with `capacity = 1` use the exact same scheduling logic; only the number differs.
+
+#### Resource Availability
+
+A Resource has its own recurring availability schedule, independent from provider schedules. Each availability block defines when the resource is bookable.
+
+| Field | Type | Description | Example |
+|-------|------|-------------|---------|
+| `availability.resource_id` | string | Parent resource | `res_box3` |
+| `availability.day_of_week` | integer | 0 = Sunday, 6 = Saturday | `1` |
+| `availability.start_time` | string | Start time (HH:mm) | `"08:00"` |
+| `availability.end_time` | string | End time (HH:mm) | `"18:00"` |
+| `availability.is_available` | boolean | Available or blocked | `true` |
+| `availability.timezone` | string | IANA timezone | `"America/Santiago"` |
+| `availability.block_order` | integer | Block sequence within a day | `1` |
+
+**Design decision:** Resource availability is modeled as recurring weekly blocks, the same pattern used for provider availability. This allows the scheduler to apply the same intersection algorithm across all three entities (provider, client preference, resource) without special-casing any of them. `block_order` enables multiple availability blocks per day (e.g., a room available 08:00–12:00 and 14:00–18:00, closed for lunch). The combination of `resource_id + day_of_week + block_order` is unique — each block within a day is an independent availability window.
 
 ### 3.6 Lifecycle (States)
 
@@ -194,6 +252,10 @@ Solicitado → Agendado → Confirmado → En Curso → Completado → Documenta
 | 7 | **invoiced** | Facturado | Tax document issued | Tax document emitted |
 | 8 | **collected** | Cobrado | Payment received and confirmed | Payment received and confirmed |
 | 9 | **verified** | Verificado | Client confirms OK or silence window expires | Client responds OK, or auto-verified after window |
+
+### Resource commitment in Scheduled state
+
+When a session has an assigned Resource, the **Scheduled** state implies that three entities are simultaneously committed: the provider, the client(s), and the physical resource. This is a stronger commitment than a two-party appointment — releasing any one of the three affects the other two. A provider cancellation frees the resource for reallocation. A resource becoming unavailable (maintenance, emergency) forces rescheduling even if provider and client are still available. Implementations must treat the three-way commitment as atomic: a session is only validly Scheduled when all three entities have confirmed availability for the time slot.
 
 ### Why 9 states?
 
@@ -332,6 +394,21 @@ In Progress → Partial
 - Documents what was delivered
 - Adjusts invoice proportionally
 - Schedules continuation if needed
+
+### 5.7 Resource Conflict
+
+**Trigger:** The assigned resource becomes unavailable after the session was confirmed — due to maintenance, emergency, equipment failure, or a scheduling error.
+
+```
+Confirmed → Resource Reassigning → Confirmed (new resource) | Rescheduling (no alternative)
+```
+
+- System searches for an alternative resource that satisfies the same requirements (capacity, equipment) within the same time slot
+- **If alternative found:** session is reassigned transparently. The provider is always notified. The client is notified only if the change is material (different location, different room characteristics)
+- **If no alternative found:** the exception escalates to a Rescheduling flow (Section 5.5). The session needs a new time slot where all three entities — provider, client, and resource — are available
+- The original resource conflict is recorded in `lifecycle.exceptions` with type `resource_conflict`
+
+**Design decision:** Resource Conflict is a distinct exception from Provider No-Show (5.2) because the resolution logic is fundamentally different. A provider replacement changes the *who*; a resource replacement changes the *where*. The client's decision criteria are different — most clients care deeply about which professional treats them and less about which room it happens in. This asymmetry means the notification rules and the escalation thresholds must be modeled separately.
 
 ---
 
@@ -516,6 +593,7 @@ service:
     type: enum                    # in_person | virtual | home_visit
     address: string
     room: string
+    resource_id: string           # Reference to a Resource entity (optional)
     coordinates:
       lat: number
       lng: number
@@ -622,6 +700,7 @@ transition:
 
 exception:
   type: enum                    # no_show | cancellation | dispute | reschedule | partial
+                                # | resource_conflict
   at: datetime
   initiated_by: string
   resolution: string
@@ -631,6 +710,27 @@ evidence:
   type: enum                    # gps | signature | photo | document | duration
   captured_at: datetime
   data: object                  # type-specific payload
+
+resource:
+  id: string*                   # Unique identifier
+  organization_id: string*      # Owning organization
+  name: string*                 # Human-readable name, e.g. "Box 3"
+  type: string                  # Category: "room", "box", "chair", "equipment". Default: "room"
+  capacity: integer             # Max simultaneous sessions. Default: 1
+  buffer_minutes: integer       # Reset/cleaning time between uses, in minutes. Default: 0
+  equipment: string[]           # Available equipment or features
+  location: string              # Physical location description (floor, wing, address)
+  is_active: boolean            # Whether the resource is currently bookable. Default: true
+  rules: object                 # Extensible business logic constraints
+
+resource_availability:
+  resource_id: string*          # Parent resource
+  day_of_week: integer*         # 0 = Sunday, 6 = Saturday
+  start_time: string*           # "HH:mm" format
+  end_time: string*             # "HH:mm" format
+  is_available: boolean         # Default: true. False = explicitly blocked
+  timezone: string              # IANA timezone. Default: "America/Santiago"
+  block_order: integer          # Block sequence within a day. Unique per resource_id + day_of_week
 ```
 
 ---
@@ -652,6 +752,7 @@ The protocol defines that agents are first-class citizens, but not all states ar
 | Any state → Cancelled | — | ✅ Always requires human or explicit client action |
 | Any state → Disputed | — | ✅ Client must initiate |
 | Disputed → Resolved | — | ✅ Admin must resolve |
+| Confirmed → Resource Reassigning | ✅ If alternative resource available | ⚠️ If no alternative — escalates to Rescheduling |
 | Service Order: draft → proposed | — | ✅ Human sends proposal |
 | Service Order: proposed → active | — | ✅ Client acceptance required |
 | Service Order: active → paused | — | ✅ Human decision |

@@ -20,7 +20,7 @@ import { cerrarTools } from './tools/authenticated/cerrar.js';
 
 // --- Detect mode ---
 const mode = detectMode();
-const BASE_URL = process.env.SERVICIALO_BASE_URL || 'https://coordinalo.com';
+const BASE_URL = process.env.SERVICIALO_BASE_URL || 'http://localhost:3000';
 
 if (mode === 'authenticated') {
   console.error(`Servicialo MCP — modo autenticado [org: ${process.env.SERVICIALO_ORG_ID}]`);
@@ -38,7 +38,7 @@ const apiClient = new CoordinaloClient({
 // --- Init MCP server ---
 const server = new McpServer({
   name: 'servicialo',
-  version: '0.5.3',
+  version: '0.6.0',
 });
 
 // --- Tool type ---

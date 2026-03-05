@@ -54,7 +54,7 @@ Todo servicio profesional — desde una sesión de kinesiología hasta una audit
 | **2** | **Quién entrega** | El proveedor del servicio, con credenciales | Kinesiólogo certificado, electricista SEC |
 | **3** | **Quién recibe** | El cliente — con pagador separado explícitamente | Paciente (paga FONASA), empleado (paga empresa) |
 | **4** | **Cuándo** | Ventana temporal acordada | 2026-02-10 de 10:00 a 10:45 |
-| **5** | **Dónde** | Ubicación física o virtual | Clínica, domicilio, videollamada |
+| **5** | **Dónde** | Ubicación física o virtual, con `resource_id` opcional que referencia un Recurso físico (3.5b: sala, box, sillón, equipamiento) | Sala 3 de clínica, domicilio, videollamada |
 | **6** | **Ciclo** | Posición actual en los 9 estados del ciclo de vida | Cobrado → próximo: Verificado |
 | **7** | **Evidencia** | Cómo se prueba que el servicio ocurrió | GPS + duración + firma del cliente |
 | **8** | **Cobro** | Liquidación financiera, independiente del ciclo | $35.000 CLP · cobrado · paquete prepago |
@@ -98,6 +98,7 @@ Las excepciones no son casos excepcionales. Ocurren en el **15–30% de las cita
 | **Cancelación** | Cualquier pre-entrega → Cancelado | Se aplica la política de cancelación acordada |
 | **Disputa de calidad** | Completado → Disputado | Se congela el cobro, se solicita evidencia |
 | **Reagendamiento** | Agendado/Confirmado → Reagendando → Agendado | Se mantiene el proveedor si es posible |
+| **Conflicto de recurso** | Agendado → Reagendando → Agendado | Recurso con doble reserva o no disponible — se reasigna recurso o se reagenda |
 | **Entrega parcial** | En Curso → Parcial | Se documenta lo entregado, se ajusta la factura |
 
 ---
@@ -284,7 +285,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: ciclo de vida (9 estados) · 8 dimensiones · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (20 herramientas)
+Incluye: ciclo de vida (9 estados) · 8 dimensiones · gestión de recursos · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (20 herramientas)
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -305,7 +306,7 @@ Para plataformas con volumen suficiente o donde el monto por servicio hace que l
 JSON Schemas para validación automática: [`schema/service.schema.json`](./schema/service.schema.json) y [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.3 ──────────────────
+# ── SERVICIALO v0.6 ──────────────────
 # Las 8 dimensiones de un servicio
 
 servicio:
@@ -335,6 +336,7 @@ servicio:
     tipo: presencial | virtual | domicilio
     dirección: texto
     sala: texto
+    recurso_id: texto                 # Opcional — referencia a Recurso (3.5b)
     coordenadas:
       lat: número
       lng: número
@@ -392,8 +394,8 @@ servicialo/
 
 |  | Versión | Estado |
 |---|---------|--------|
-| Protocol | 0.3 | Estable |
-| @servicialo/mcp-server | 0.5.3 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.6 | Estable |
+| @servicialo/mcp-server | 0.6.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 
