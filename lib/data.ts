@@ -79,13 +79,12 @@ export const ANATOMY = [
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados son universales." },
-  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella." },
-  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa explícitamente al cliente del pagador." },
-  { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan." },
-  { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo." },
-  { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano." },
-  { title: "El acuerdo es separado de la entrega", body: "Una Orden de Servicio define lo que se acordó. Los servicios atómicos definen lo que se entregó. Son dos objetos distintos con dos ciclos de vida distintos. La Orden de Servicio es dueña de la relación comercial. El servicio atómico es dueño de la prueba de entrega. El libro mayor en la Orden es el puente computado entre ambos." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
+  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes AI." },
+  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
+  { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
+  { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, tanto un humano como un agente AI pueden descubrirlo y coordinarlo." },
+  { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
