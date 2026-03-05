@@ -37,7 +37,7 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={h}># ── SERVICIALO v0.3 ──────────────────</span></Line>
+      <Line><span className={h}># ── SERVICIALO v0.6.0 ────────────────</span></Line>
       <Line><span className={h}># Las 8 dimensiones de un servicio</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={a}>servicio:</span></Line>
@@ -66,10 +66,19 @@ function SchemaBlock() {
       <Line>  <span className={a}>ubicación:</span></Line>
       <Line>    <span className={k}>tipo:</span> <span className={t}>presencial | virtual | domicilio</span></Line>
       <Line>    <span className={k}>dirección:</span> <span className={t}>texto</span></Line>
-      <Line>    <span className={k}>sala:</span> <span className={t}>texto</span></Line>
       <Line>    <span className={a}>coordenadas:</span></Line>
       <Line>      <span className={k}>lat:</span> <span className={t}>número</span></Line>
       <Line>      <span className={k}>lng:</span> <span className={t}>número</span></Line>
+      <Line>    <span className={k}>recurso_id:</span> <span className={t}>texto</span>          <span className={c}># Opcional — referencia a entidad Resource</span></Line>
+      <Line>&nbsp;</Line>
+      <Line>  <span className={a}>recurso:</span>                           <span className={c}># Opcional — cuando requiere espacio físico</span></Line>
+      <Line>    <span className={k}>id:</span> <span className={t}>texto</span></Line>
+      <Line>    <span className={k}>nombre:</span> <span className={t}>texto</span>              <span className={c}># &quot;Box 3&quot;, &quot;Sala A&quot;, &quot;Sillón 2&quot;</span></Line>
+      <Line>    <span className={k}>tipo:</span> <span className={t}>texto</span>                <span className={c}># box | sala | sillón | equipamiento</span></Line>
+      <Line>    <span className={k}>capacidad:</span> <span className={t}>entero</span>           <span className={c}># Default: 1</span></Line>
+      <Line>    <span className={k}>buffer_minutos:</span> <span className={t}>entero</span>      <span className={c}># Reset entre usos. Default: 0</span></Line>
+      <Line>    <span className={k}>equipamiento:</span> <span className={t}>texto[]</span></Line>
+      <Line>    <span className={k}>activo:</span> <span className={t}>booleano</span></Line>
       <Line>&nbsp;</Line>
       <Line>  <span className={a}>ciclo_de_vida:</span></Line>
       <Line>    <span className={k}>estado_actual:</span> <span className={t}>enum[9]</span>    <span className={c}># Los 9 estados universales</span></Line>
@@ -134,7 +143,7 @@ export function EstandarSection() {
       {/* Schema block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Protocolo de Entrega de Servicios v0.3
+          Protocolo de Entrega de Servicios v0.6.0
         </div>
         <SchemaBlock />
       </div>

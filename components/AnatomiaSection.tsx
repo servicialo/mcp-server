@@ -48,6 +48,17 @@ export function AnatomiaSection() {
           </div>
         ))}
       </div>
+
+      <div className="mt-5 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
+        <div className="text-sm text-text-body leading-[1.8]">
+          Cuando el servicio requiere un espacio físico específico — un box
+          clínico, una sala de clases, un sillón dental — ese recurso es una
+          entidad de primera clase con disponibilidad propia, capacidad máxima
+          y tiempo de reset entre usos. No es un campo de texto en la ubicación:
+          es un participante más del servicio que el scheduler debe verificar
+          junto con el profesional y el cliente.
+        </div>
+      </div>
     </section>
   );
 }

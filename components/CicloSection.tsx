@@ -41,6 +41,12 @@ const EXCEPTIONS = [
     desc: "Documenta lo entregado, ajusta cobro proporcionalmente, agenda continuación si es necesario.",
     borderColor: "border-l-green",
   },
+  {
+    title: "Conflicto de recurso",
+    transition: "Confirmado → Reasignando recurso → Confirmado (nuevo recurso) / Reagendando (sin alternativa)",
+    desc: "El recurso asignado queda no disponible después de confirmada la sesión — por mantenimiento, emergencia o falla de equipamiento. Si existe un recurso alternativo compatible, la sesión se reasigna sin afectar al cliente. Si no hay alternativa, escala a reagendamiento. Reemplazar un recurso cambia el dónde — distinto a reemplazar un proveedor, que cambia el quién.",
+    borderColor: "border-l-sky-500",
+  },
 ];
 
 export function CicloSection() {

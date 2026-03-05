@@ -72,7 +72,7 @@ export const ANATOMY = [
   { field: "Quién entrega", desc: "El proveedor del servicio", example: "Kinesiólogo certificado / Electricista SEC / Abogado tributario" },
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
-  { field: "Dónde", desc: "Ubicación física o virtual", example: "Clínica / Domicilio / Videollamada" },
+  { field: "Dónde", desc: "Ubicación física o virtual, incluyendo el recurso físico cuando aplica", example: "Clínica / Box 3 / Domicilio / Videollamada" },
   { field: "Ciclo", desc: "Posición actual en los 9 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
@@ -89,7 +89,7 @@ export const PRINCIPLES = [
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.3
+# SERVICIALO v0.6.0
 # Las 8 dimensiones de un servicio profesional
 # ─────────────────────────────────────────────
 
@@ -119,10 +119,19 @@ servicio:
   ubicación:
     tipo: presencial | virtual | domicilio
     dirección: texto
-    sala: texto
     coordenadas:
       lat: número
       lng: número
+    recurso_id: texto            # Opcional — referencia a entidad Resource
+
+  recurso:                       # Opcional — cuando el servicio requiere espacio físico
+    id: texto
+    nombre: texto                # "Box 3", "Sala A", "Sillón 2"
+    tipo: texto                  # box | sala | sillón | equipamiento
+    capacidad: entero            # máximo de clientes simultáneos. Default: 1
+    buffer_minutos: entero       # tiempo de reset entre usos. Default: 0
+    equipamiento: texto[]
+    activo: booleano
 
   ciclo_de_vida:
     estado_actual: enum[9]       # Los 9 estados universales
