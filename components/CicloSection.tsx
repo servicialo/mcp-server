@@ -7,38 +7,38 @@ import { LIFECYCLE_STATES } from "@/lib/data";
 const EXCEPTIONS = [
   {
     title: "Inasistencia",
-    transition: "Confirmado → Cancelado (cliente) / Reasignación → Agendado (proveedor)",
-    desc: "Si falta el cliente: cobra penalidad según política, libera horario, incrementa contador de inasistencias. Si falta el proveedor: reasigna automáticamente, notifica al cliente del cambio, proveedor original marcado.",
+    transition: "Confirmado → Cancelado / Reasignado",
+    desc: "Cliente o proveedor no se presenta. Aplica penalidad o reasignación automática según quién falte. Libera horario y recursos para reasignación.",
     borderColor: "border-l-rose-500",
   },
   {
     title: "Cancelación",
-    transition: "Cualquier estado pre-entrega → Cancelado",
-    desc: "Aplica política de cancelación según tiempo restante antes del servicio.",
+    transition: "Pre-entrega → Cancelado",
+    desc: "Aplica política de cancelación según tiempo restante antes del servicio. Libera horario del proveedor y recurso asignado.",
     borderColor: "border-l-gray-400",
   },
   {
     title: "Disputa de calidad",
     transition: "Completado → Disputado",
-    desc: "Cobro congelado. Se solicita evidencia adicional de ambas partes. Resuelve a: Cobrado → Verificado (proveedor gana) o Cancelado (cliente gana, balance restaurado).",
+    desc: "Cobro congelado. Se solicita evidencia de ambas partes y resuelve a favor del proveedor o del cliente con ajuste de balance.",
     borderColor: "border-l-purple",
   },
   {
     title: "Reagendamiento",
-    transition: "Agendado/Confirmado → Reagendando → Agendado",
-    desc: "Busca nuevo horario compatible para ambas partes, mantiene el mismo proveedor.",
+    transition: "Agendado → Reagendando → Agendado",
+    desc: "Busca nuevo horario compatible para ambas partes. Mantiene el mismo proveedor y recurso asignado.",
     borderColor: "border-l-cyan-500",
   },
   {
     title: "Servicio parcial",
     transition: "En Curso → Parcial",
-    desc: "Documenta lo entregado, ajusta cobro proporcionalmente, agenda continuación si es necesario.",
+    desc: "Documenta lo entregado, ajusta cobro proporcionalmente. Agenda continuación si el servicio lo requiere.",
     borderColor: "border-l-green",
   },
   {
     title: "Conflicto de recurso",
-    transition: "Confirmado → Reasignando recurso → Confirmado (nuevo recurso) / Reagendando (sin alternativa)",
-    desc: "El recurso asignado queda no disponible después de confirmada la sesión — por mantenimiento, emergencia o falla de equipamiento. Si existe un recurso alternativo compatible, la sesión se reasigna sin afectar al cliente. Si no hay alternativa, escala a reagendamiento. Reemplazar un recurso cambia el dónde — distinto a reemplazar un proveedor, que cambia el quién.",
+    transition: "Confirmado → Reasignando recurso → Confirmado / Reagendando",
+    desc: "El recurso asignado queda no disponible tras confirmar la sesión. Reasigna a recurso alternativo o escala a reagendamiento.",
     borderColor: "border-l-sky-500",
   },
 ];
