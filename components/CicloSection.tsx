@@ -6,16 +6,10 @@ import { LIFECYCLE_STATES } from "@/lib/data";
 
 const EXCEPTIONS = [
   {
-    title: "Inasistencia del cliente",
-    transition: "Confirmado → Cancelado (inasistencia)",
-    desc: "Cobra penalidad según política, libera horario del proveedor para reasignación. Incrementa contador de inasistencias del cliente.",
+    title: "Inasistencia",
+    transition: "Confirmado → Cancelado (cliente) / Reasignación → Agendado (proveedor)",
+    desc: "Si falta el cliente: cobra penalidad según política, libera horario, incrementa contador de inasistencias. Si falta el proveedor: reasigna automáticamente, notifica al cliente del cambio, proveedor original marcado.",
     borderColor: "border-l-rose-500",
-  },
-  {
-    title: "Inasistencia del proveedor",
-    transition: "Confirmado → Reasignación → Agendado",
-    desc: "Reasigna proveedor automáticamente, notifica al cliente del cambio. Proveedor original marcado.",
-    borderColor: "border-l-amber-500",
   },
   {
     title: "Cancelación",
@@ -164,14 +158,10 @@ export function CicloSection() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {EXCEPTIONS.map((ex, i) => (
+          {EXCEPTIONS.map((ex) => (
             <div
               key={ex.title}
-              className={`bg-surface rounded-xl py-4 px-5 border border-border-light border-l-[3px] transition-shadow duration-200 hover:shadow-sm ${ex.borderColor}${
-                i === EXCEPTIONS.length - 1 && EXCEPTIONS.length % 2 !== 0
-                  ? " md:col-span-2"
-                  : ""
-              }`}
+              className={`bg-surface rounded-xl py-4 px-5 border border-border-light border-l-[3px] transition-shadow duration-200 hover:shadow-sm ${ex.borderColor}`}
             >
               <div className="font-mono text-[13px] font-semibold text-text mb-1">
                 {ex.title}
