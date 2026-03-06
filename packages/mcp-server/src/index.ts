@@ -119,3 +119,15 @@ main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });
+
+// --- Smithery sandbox (for registry scanning) ---
+export function createSandboxServer() {
+  const sandbox = new McpServer({ name: 'servicialo', version: '0.6.0' });
+  const allTools = { ...publicTools, ...authenticatedTools };
+  for (const [name, tool] of Object.entries(allTools)) {
+    sandbox.tool(name, tool.description, tool.schema.shape, async () => ({
+      content: [{ type: 'text' as const, text: '{}' }],
+    }));
+  }
+  return sandbox;
+}

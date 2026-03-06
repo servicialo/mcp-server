@@ -1,0 +1,1070 @@
+{
+  "payload": {
+    "type": "hosted",
+    "stateful": false,
+    "hasAuthAdapter": false,
+    "serverCard": {
+      "serverInfo": {
+        "name": "servicialo",
+        "version": "0.6.0"
+      },
+      "tools": [
+        {
+          "name": "registry.search",
+          "description": "Busca organizaciones Servicialo-compatible por vertical, ubicación u otros criterios",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "vertical": {
+                "type": "string",
+                "description": "Vertical del servicio (ej: kinesiologia, psicologia, dental)"
+              },
+              "location": {
+                "type": "string",
+                "description": "Ciudad o comuna para filtrar"
+              },
+              "country": {
+                "type": "string",
+                "default": "cl",
+                "description": "País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl"
+              },
+              "limit": {
+                "type": "number",
+                "default": 10,
+                "description": "Cantidad máxima de resultados"
+              }
+            },
+            "required": [
+              "vertical"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "registry.get_organization",
+          "description": "Obtiene el detalle público de una organización: servicios, profesionales y configuración de booking",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "org_slug": {
+                "type": "string",
+                "description": "Slug de la organización (ej: clinica-dental-sur)"
+              },
+              "country": {
+                "type": "string",
+                "default": "cl",
+                "description": "País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl"
+              }
+            },
+            "required": [
+              "org_slug"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "scheduling.check_availability",
+          "description": "Consulta horarios disponibles de una organización sin autenticación. Verifica disponibilidad de profesional y, si el servicio tiene resource_id en su location, también verifica disponibilidad del recurso físico (sala, box, sillón). Scheduler de 3 variables: profesional ∧ cliente ∧ recurso.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "org_slug": {
+                "type": "string",
+                "description": "Slug de la organización"
+              },
+              "service_id": {
+                "type": "string",
+                "description": "ID del servicio (opcional)"
+              },
+              "provider_id": {
+                "type": "string",
+                "description": "ID del proveedor (opcional)"
+              },
+              "resource_id": {
+                "type": "string",
+                "description": "ID del recurso físico (opcional, filtra slots donde el recurso esté disponible)"
+              },
+              "date_from": {
+                "type": "string",
+                "description": "Fecha inicio (ISO date, ej: 2025-03-01)"
+              },
+              "date_to": {
+                "type": "string",
+                "description": "Fecha fin (ISO date, ej: 2025-03-07)"
+              }
+            },
+            "required": [
+              "org_slug",
+              "date_from",
+              "date_to"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "services.list",
+          "description": "Lista el catálogo público de servicios de una organización",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "org_slug": {
+                "type": "string",
+                "description": "Slug de la organización"
+              }
+            },
+            "required": [
+              "org_slug"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "service.get",
+          "description": "[Fase 2 — Entender] Obtiene las 8 dimensiones de un servicio: qué se entrega, quién lo entrega, quién lo recibe (con pagador separado), cuándo, dónde, ciclo de vida, evidencia requerida y cobro. Llama esto para entender completamente un servicio antes de comprometerse.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "service_id": {
+                "type": "string",
+                "description": "ID del servicio"
+              }
+            },
+            "required": [
+              "service_id"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "contract.get",
+          "description": "[Fase 2 — Entender] Obtiene el contrato de servicio pre-acordado. Define las reglas bajo las que opera el servicio: evidencia requerida, políticas de cancelación, inasistencia y arbitraje. DEBE llamarse antes de cualquier acción en Fase 3+.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "service_id": {
+                "type": "string",
+                "description": "ID del servicio"
+              },
+              "org_id": {
+                "type": "string",
+                "description": "ID de la organización"
+              }
+            },
+            "required": [
+              "service_id",
+              "org_id"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "clients.get_or_create",
+          "description": "[Fase 3 — Comprometer] Busca un cliente por email o teléfono. Si existe, retorna sus datos y resumen de historial. Si no existe, lo crea con los datos proporcionados. Una sola llamada para resolver la identidad del cliente antes de agendar.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "Email del cliente (buscará primero por email)"
+              },
+              "phone": {
+                "type": "string",
+                "description": "Teléfono del cliente (buscará si no se provee email)"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nombre — requerido solo si el cliente no existe"
+              },
+              "last_name": {
+                "type": "string",
+                "description": "Apellido — requerido solo si el cliente no existe"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién realiza la acción"
+              }
+            },
+            "required": [
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "scheduling.book",
+          "description": "[Fase 3 — Comprometer] Agenda una nueva sesión para un cliente con un proveedor. Crea la sesión en estado \"Solicitado\". Si el servicio tiene location.resource_id, el recurso físico se reserva junto con la sesión (scheduler de 3 variables: profesional ∧ cliente ∧ recurso). Requiere haber llamado contract.get antes para conocer las reglas del servicio.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "service_id": {
+                "type": "string",
+                "description": "ID del servicio"
+              },
+              "provider_id": {
+                "type": "string",
+                "description": "ID del proveedor"
+              },
+              "client_id": {
+                "type": "string",
+                "description": "ID del cliente"
+              },
+              "starts_at": {
+                "type": "string",
+                "description": "Fecha y hora de inicio (ISO datetime)"
+              },
+              "resource_id": {
+                "type": "string",
+                "description": "ID del recurso físico a reservar (opcional, requerido si el servicio tiene location.resource_id)"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién realiza la acción"
+              }
+            },
+            "required": [
+              "service_id",
+              "provider_id",
+              "client_id",
+              "starts_at",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "scheduling.confirm",
+          "description": "[Fase 3 — Comprometer] Confirma una sesión agendada, moviéndola a estado \"Confirmado\". Ambas partes (proveedor y cliente) deben confirmar antes de que el servicio pueda iniciar.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión a confirmar"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién confirma (client, provider, organization o agent)"
+              }
+            },
+            "required": [
+              "session_id",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "lifecycle.get_state",
+          "description": "[Fase 4 — Ciclo de vida] Obtiene el estado actual de una sesión en el ciclo de vida Servicialo, incluyendo las transiciones disponibles desde el estado actual y el historial de transiciones pasadas.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              }
+            },
+            "required": [
+              "session_id"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "lifecycle.transition",
+          "description": "[Fase 4 — Ciclo de vida] Ejecuta una transición de estado en el ciclo de vida de una sesión. Transiciones válidas: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→documented, documented→charged, charged→verified, any→cancelled. Cada transición puede requerir evidencia según el contrato del servicio.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              },
+              "to_state": {
+                "type": "string",
+                "enum": [
+                  "scheduled",
+                  "confirmed",
+                  "in_progress",
+                  "delivered",
+                  "documented",
+                  "charged",
+                  "verified",
+                  "cancelled"
+                ],
+                "description": "Estado destino de la transición"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién ejecuta la transición"
+              },
+              "reason": {
+                "type": "string",
+                "description": "Motivo de la transición (requerido para cancelled)"
+              },
+              "evidence": {
+                "type": "object",
+                "additionalProperties": {},
+                "description": "Evidencia requerida por el contrato para esta transición"
+              }
+            },
+            "required": [
+              "session_id",
+              "to_state",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "scheduling.reschedule",
+          "description": "[Fase 4 — Ciclo de vida] Reagenda una sesión existente a una nueva fecha/hora. Flujo de excepción: la sesión vuelve a estado \"Scheduled\" con nuevo horario. La política de reagendamiento del contrato puede aplicar cargos.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión a reagendar"
+              },
+              "new_datetime": {
+                "type": "string",
+                "description": "Nueva fecha y hora (ISO datetime)"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién realiza la acción"
+              }
+            },
+            "required": [
+              "session_id",
+              "new_datetime",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "scheduling.cancel",
+          "description": "[Fase 4 — Ciclo de vida] Cancela una sesión existente. Flujo de excepción: aplica la política de cancelación definida en el contrato (reembolso total fuera de ventana de penalidad, parcial/nulo dentro). Llama contract.get primero para conocer la política.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión a cancelar"
+              },
+              "reason": {
+                "type": "string",
+                "description": "Motivo de la cancelación"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién realiza la acción"
+              }
+            },
+            "required": [
+              "session_id",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "delivery.checkin",
+          "description": "[Fase 5 — Verificar entrega] Registra el check-in del proveedor o cliente, moviendo la sesión a \"En Curso\". Captura timestamp y ubicación GPS como evidencia de inicio de servicio.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién hace check-in (provider o client)"
+              },
+              "location": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number",
+                    "description": "Latitud"
+                  },
+                  "lng": {
+                    "type": "number",
+                    "description": "Longitud"
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ],
+                "additionalProperties": false,
+                "description": "Ubicación GPS al momento del check-in"
+              },
+              "timestamp": {
+                "type": "string",
+                "description": "ISO datetime del check-in (default: ahora)"
+              }
+            },
+            "required": [
+              "session_id",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "delivery.checkout",
+          "description": "[Fase 5 — Verificar entrega] Registra el check-out al finalizar el servicio, moviendo la sesión a \"Entregado\". Captura timestamp y ubicación GPS. La duración real se calcula automáticamente.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién hace check-out (provider o client)"
+              },
+              "location": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number",
+                    "description": "Latitud"
+                  },
+                  "lng": {
+                    "type": "number",
+                    "description": "Longitud"
+                  }
+                },
+                "required": [
+                  "lat",
+                  "lng"
+                ],
+                "additionalProperties": false,
+                "description": "Ubicación GPS al momento del check-out"
+              },
+              "timestamp": {
+                "type": "string",
+                "description": "ISO datetime del check-out (default: ahora)"
+              }
+            },
+            "required": [
+              "session_id",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "delivery.record_evidence",
+          "description": "[Fase 5 — Verificar entrega] Registra evidencia de entrega del servicio según los requisitos del contrato. Tipos: GPS, firma, foto, documento, duración, notas. Consultar contract.get para conocer la evidencia requerida por vertical.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              },
+              "evidence_type": {
+                "type": "string",
+                "enum": [
+                  "gps",
+                  "signature",
+                  "photo",
+                  "document",
+                  "duration",
+                  "notes"
+                ],
+                "description": "Tipo de evidencia"
+              },
+              "data": {
+                "type": "object",
+                "additionalProperties": {},
+                "description": "Payload de la evidencia (estructura varía por tipo)"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién registra la evidencia"
+              }
+            },
+            "required": [
+              "session_id",
+              "evidence_type",
+              "data",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "documentation.create",
+          "description": "[Fase 6 — Cerrar] Genera el registro/documentación del servicio entregado (nota clínica, reporte de inspección, acta de clase, etc.). Mueve la sesión a \"Documentado\".",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "session_id": {
+                "type": "string",
+                "description": "ID de la sesión"
+              },
+              "content": {
+                "type": "string",
+                "description": "Contenido del registro/documentación"
+              },
+              "template_id": {
+                "type": "string",
+                "description": "ID de plantilla de documentación (si aplica)"
+              },
+              "actor": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "client",
+                      "provider",
+                      "organization",
+                      "agent"
+                    ]
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "on_behalf_of": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "id"
+                ],
+                "additionalProperties": false,
+                "description": "Quién genera la documentación (típicamente el proveedor)"
+              }
+            },
+            "required": [
+              "session_id",
+              "content",
+              "actor"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "payments.create_sale",
+          "description": "[Fase 6 — Cerrar] Crea una venta (cargo) asociada a un servicio documentado. Mueve la sesión a \"Cobrado\". Debe llamarse después de documentation.create.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "client_id": {
+                "type": "string",
+                "description": "ID del cliente"
+              },
+              "service_id": {
+                "type": "string",
+                "description": "ID del servicio"
+              },
+              "provider_id": {
+                "type": "string",
+                "description": "ID del proveedor"
+              },
+              "quantity": {
+                "type": "number",
+                "default": 1,
+                "description": "Cantidad de sesiones"
+              },
+              "unit_price": {
+                "type": "number",
+                "description": "Precio unitario"
+              }
+            },
+            "required": [
+              "client_id",
+              "service_id",
+              "provider_id",
+              "unit_price"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "payments.record_payment",
+          "description": "[Fase 6 — Cerrar] Registra un pago recibido contra una venta existente. El pago es independiente del ciclo de vida — billing.status transiciona de charged → invoiced → paid.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "venta_id": {
+                "type": "string",
+                "description": "ID de la venta"
+              },
+              "amount": {
+                "type": "number",
+                "description": "Monto cobrado"
+              },
+              "method": {
+                "type": "string",
+                "enum": [
+                  "efectivo",
+                  "transferencia",
+                  "mercadopago",
+                  "tarjeta"
+                ],
+                "description": "Método de pago"
+              },
+              "reference": {
+                "type": "string",
+                "description": "Referencia o número de transacción"
+              }
+            },
+            "required": [
+              "venta_id",
+              "amount",
+              "method"
+            ],
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        },
+        {
+          "name": "payments.get_status",
+          "description": "[Fase 6 — Cerrar] Consulta el estado de pago de una venta específica o el estado de cuenta de un cliente. Provee sale_id para una venta o client_id para el estado de cuenta completo.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "sale_id": {
+                "type": "string",
+                "description": "ID de la venta (para consultar una venta específica)"
+              },
+              "client_id": {
+                "type": "string",
+                "description": "ID del cliente (para consultar estado de cuenta)"
+              }
+            },
+            "additionalProperties": false,
+            "$schema": "http://json-schema.org/draft-07/schema#"
+          },
+          "execution": {
+            "taskSupport": "forbidden"
+          }
+        }
+      ],
+      "resources": [],
+      "prompts": []
+    },
+    "source": {
+      "commit": "c8e5d62ae5e242a0b99885b0208e87e63caa40d6",
+      "branch": "main"
+    }
+  },
+  "artifacts": {
+    "module": "module.js",
+    "sourcemap": "module.js.map"
+  }
+}
