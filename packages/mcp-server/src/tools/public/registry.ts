@@ -17,7 +17,7 @@ export const registryTools = {
         country: args.country ?? 'cl',
         limit: args.limit,
       });
-      return { ...result as Record<string, unknown>, _deprecated: true };
+      return result;
     },
   },
 
@@ -31,7 +31,7 @@ export const registryTools = {
       const result = await client.pub.get(`/api/servicialo/${args.org_slug}/services`, {
         country: args.country ?? 'cl',
       });
-      return { ...result as Record<string, unknown>, _deprecated: true };
+      return result;
     },
   },
 };
