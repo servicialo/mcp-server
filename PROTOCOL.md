@@ -1,5 +1,7 @@
 # Servicialo Protocol Specification
 
+**The orchestration layer for the AI-agent service economy**
+
 **Version:** 0.3
 **Status:** Stable
 **License:** MIT
@@ -10,24 +12,25 @@
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [Core Entities](#2-core-entities)
-3. [The 8 Dimensions of a Service](#3-the-8-dimensions-of-a-service)
-4. [The 9 Universal States](#4-the-9-universal-states)
-5. [Exception Flows](#5-exception-flows)
-6. [Service Order](#6-service-order)
-7. [The Principles](#7-the-principles)
-8. [Schema](#8-schema)
-9. [Agent Decision Model](#9-agent-decision-model)
-10. [MCP Server](#10-mcp-server)
-11. [Telemetry Extension](#11-telemetry-extension)
-12. [Implementations](#12-implementations)
-13. [Contributing](#13-contributing)
+2. [Protocol Primitives](#2-protocol-primitives)
+3. [Core Entities](#3-core-entities)
+4. [The 8 Dimensions of a Service](#4-the-8-dimensions-of-a-service)
+5. [The 9 Universal States](#5-the-9-universal-states)
+6. [Exception Flows](#6-exception-flows)
+7. [Service Order](#7-service-order)
+8. [The Principles](#8-the-principles)
+9. [Schema](#9-schema)
+10. [Agent Decision Model](#10-agent-decision-model)
+11. [MCP Server](#11-mcp-server)
+12. [Network Intelligence](#12-network-intelligence)
+13. [Implementations](#13-implementations)
+14. [Contributing](#14-contributing)
 
 ---
 
 ## 1. Overview
 
-Servicialo is an open standard for modeling the complete lifecycle of professional service delivery — from request to verified completion.
+Servicialo is an open protocol that defines the orchestration layer for professional service delivery in the AI-agent economy. It creates the common language so that scheduling, identity, resource allocation, and financial settlement flow across platforms without silos.
 
 Unlike scheduling APIs that model "when", payment APIs that model "how much", or healthcare APIs that model "what clinical data", Servicialo models the entire value delivery chain: who provides, who receives, who pays, when, where, what evidence proves delivery occurred, and what documentation results.
 
@@ -36,11 +39,11 @@ The protocol is designed for two audiences simultaneously:
 - **Humans** designing, delivering, and managing professional services
 - **AI agents** that need to discover, coordinate, verify, and settle services programmatically
 
-### Why a new standard?
+### Why a new protocol?
 
-Professional services represent a $6T+ global market with no universal protocol. Every platform builds its own data model for appointments, payments, and verification. The result: services are siloed, non-interoperable, and invisible to AI agents.
+Professional services represent a $6T+ global market with no universal protocol. Every platform builds its own data model for appointments, payments, and verification. The result: services are siloed, non-interoperable, and invisible to AI agents. Collective intelligence about service delivery — demand patterns, pricing benchmarks, operational efficiency — never forms because data is trapped in proprietary systems.
 
-Servicialo defines the minimum viable schema for any AI agent to interact with any professional service — regardless of the platform that manages it.
+Servicialo defines the minimum viable schema for any AI agent to interact with any professional service — regardless of the platform that manages it. The protocol is neutral infrastructure: no single implementation owns it.
 
 ### What Servicialo is NOT
 
@@ -48,14 +51,36 @@ Servicialo defines the minimum viable schema for any AI agent to interact with a
 - Not a payments protocol (though it includes payment states)
 - Not a healthcare standard (though it works for healthcare)
 - Not a platform (platforms implement it)
+- Not owned by any single company (Coordinalo is the reference implementation, not the owner)
 
 ---
 
-## 2. Core Entities
+## 2. Protocol Primitives
 
+The protocol defines four coordination primitives that together cover the complete value chain of professional service delivery:
+
+### 2.1 Schedule Coordination
+
+Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 9 lifecycle states, and 7 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
+
+### 2.2 Identity Verification
+
+Provider credentials, trust scores computed from delivery history, and explicit separation of client from payer. The protocol models the fact that in most professional services, the person who receives the service is not the person who pays for it.
+
+### 2.3 Financial Settlement
+
+Billing, invoicing, collection, and revenue sharing between provider, organization, and infrastructure. The Service Order ledger provides a computed, real-time view of consumption vs. commitment. Dispute resolution defines algorithmic arbitration for ~80% of cases.
+
+### 2.4 Demand Signals
+
+Aggregate, anonymous operational telemetry across network nodes. Each implementation that contributes data receives benchmarks segmented by vertical, region, and scale. The model is contribute-to-access: collective intelligence is a protocol commons, not an asset of any single implementation.
+
+---
+
+## 3. Core Entities
 The protocol is built around two objects and their relationship.
 
-**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 3](#3-the-8-dimensions-of-a-service). A Service can exist standalone or within a Service Order.
+**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 4](#4-the-8-dimensions-of-a-service). A Service can exist standalone or within a Service Order.
 
 **Service Order** is the commercial agreement that groups one or more Services under a defined scope, an agreed price, and a payment schedule. It is optional — not every Service belongs to an Order.
 
@@ -75,7 +100,7 @@ Organization
 
 ---
 
-## 3. The 8 Dimensions of a Service
+## 4. The 8 Dimensions of a Service
 
 Every professional service — from a physical therapy session to a legal consultation — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
@@ -197,7 +222,7 @@ A Resource has its own recurring availability schedule, independent from provide
 
 ### 3.6 Lifecycle (States)
 
-Current position in the 9-state lifecycle. See [Section 4](#4-the-9-universal-states).
+Current position in the 9-state lifecycle. See [Section 5](#5-the-9-universal-states).
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -233,7 +258,7 @@ Financial settlement for the service. Billing has its own status independent fro
 
 ---
 
-## 4. The 9 Universal States
+## 5. The 9 Universal States
 
 Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
@@ -297,7 +322,7 @@ Payment flow is tracked in `billing.status`, independently from the lifecycle. I
 
 ### State transitions
 
-States are strictly ordered. The 9 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 5](#5-exception-flows).
+States are strictly ordered. The 9 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 6](#6-exception-flows).
 
 Each transition records:
 
@@ -317,9 +342,9 @@ Implementations that calculate provider compensation must read only sessions in 
 
 ---
 
-## 5. Exception Flows
+## 6. Exception Flows
 
-A robust standard doesn't just define the happy path. It defines what happens when things go wrong. These are first-class flows, not edge cases.
+A robust protocol doesn't just define the happy path. It defines what happens when things go wrong. These are first-class flows, not edge cases.
 
 ### 5.1 Client No-Show
 
@@ -405,14 +430,14 @@ Confirmed → Resource Reassigning → Confirmed (new resource) | Rescheduling (
 
 - System searches for an alternative resource that satisfies the same requirements (capacity, equipment) within the same time slot
 - **If alternative found:** session is reassigned transparently. The provider is always notified. The client is notified only if the change is material (different location, different room characteristics)
-- **If no alternative found:** the exception escalates to a Rescheduling flow (Section 5.5). The session needs a new time slot where all three entities — provider, client, and resource — are available
+- **If no alternative found:** the exception escalates to a Rescheduling flow (Section 6.5). The session needs a new time slot where all three entities — provider, client, and resource — are available
 - The original resource conflict is recorded in `lifecycle.exceptions` with type `resource_conflict`
 
 **Design decision:** Resource Conflict is a distinct exception from Provider No-Show (5.2) because the resolution logic is fundamentally different. A provider replacement changes the *who*; a resource replacement changes the *where*. The client's decision criteria are different — most clients care deeply about which professional treats them and less about which room it happens in. This asymmetry means the notification rules and the escalation thresholds must be modeled separately.
 
 ---
 
-## 6. Service Order
+## 7. Service Order
 
 ### Concept
 
@@ -518,7 +543,7 @@ service_order:
 
 ---
 
-## 7. The Principles
+## 8. The Principles
 
 ### Principle 1: Every service has a lifecycle
 
@@ -530,7 +555,7 @@ If you can't prove the service occurred, it didn't occur. Servicialo defines wha
 
 ### Principle 3: The payer is not always the client
 
-In healthcare, the insurer pays. In corporate, the employer pays. In education, the guardian pays. The standard explicitly separates beneficiary, requester, and payer as independent entities.
+In healthcare, the insurer pays. In corporate, the employer pays. In education, the guardian pays. The protocol explicitly separates beneficiary, requester, and payer as independent entities.
 
 ### Principle 4: Exceptions are the rule
 
@@ -542,7 +567,7 @@ It has a name, price, duration, requirements, and expected outcome. Defined this
 
 ### Principle 6: AI agents are first-class citizens
 
-The standard is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
+The protocol is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
 
 ### Principle 7: The agreement is separate from the delivery
 
@@ -550,9 +575,15 @@ A Service Order defines *what was agreed*. Atomic Services define *what was deli
 
 Servicialo keeps them separate by design. The Service Order owns the commercial relationship. The atomic Service owns the proof of delivery. The ledger on the Service Order is the computed bridge between the two.
 
+### Principle 8: Collective intelligence is a protocol commons
+
+Every node that implements the protocol contributes operational data to the network. The aggregate intelligence — demand patterns, pricing benchmarks, operational efficiency metrics — improves all nodes. The parallel is Waze: each driver contributes GPS data, and everyone navigates better as a result.
+
+This intelligence is a commons of the protocol, not an asset of any single implementation. Governance rules (see [GOVERNANCE.md](./GOVERNANCE.md)) ensure that data contributed to the network cannot be captured, resold, or monopolized by any participant. The contribute-to-access model ensures symmetric benefit: you get benchmarks proportional to what you contribute.
+
 ---
 
-## 8. Schema
+## 9. Schema
 
 The canonical schema in YAML. Implementations may use JSON, protobuf, or any serialization format that preserves the structure.
 
@@ -735,7 +766,7 @@ resource_availability:
 
 ---
 
-## 9. Agent Decision Model
+## 10. Agent Decision Model
 
 The protocol defines that agents are first-class citizens, but not all states are equal from an autonomy perspective. Some transitions are deterministic and safe for an agent to execute alone. Others involve ambiguity, real money, or irreversible consequences that require human confirmation. This section establishes that boundary.
 
@@ -765,7 +796,7 @@ The protocol defines that agents are first-class citizens, but not all states ar
 
 ---
 
-## 10. MCP Server
+## 11. MCP Server
 
 Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
 
@@ -819,21 +850,39 @@ Additional tools include: `scheduling.book`, `scheduling.reschedule`, `schedulin
 
 ---
 
-## 11. Telemetry Extension
+## 12. Network Intelligence
 
 > **Status:** Design phase. Not yet implemented.
 
-The goal is to enable anonymous, aggregate benchmarks across organizations that implement the protocol. Organizations contribute monthly snapshots of operational metrics and receive in return benchmarks segmented by vertical, region, and size.
+### The network effect
 
-The model is contribute-to-access — you contribute data, you access benchmarks. Everything is anonymous and aggregated. Individual client, provider, or session information is never shared. The minimum segment size is 5 organizations to prevent re-identification.
+Every node that implements Servicialo generates operational data: scheduling patterns, no-show rates, pricing distributions, demand signals by vertical and geography. In isolation, this data has limited value. Aggregated across the network, it becomes collective intelligence that improves every participant.
 
-The extension will be activated when the ecosystem reaches 10+ organizations with consistent data.
+The parallel is Waze: each driver contributes real-time GPS data. No single driver's contribution is valuable alone. But the aggregate — traffic patterns, optimal routes, incident detection — benefits every driver proportionally. The network gets smarter as it grows.
+
+### Contribute-to-access model
+
+Organizations contribute monthly snapshots of anonymous, aggregate operational metrics. In return, they receive benchmarks segmented by vertical, region, and scale. The model is symmetric: you access intelligence proportional to what you contribute.
+
+- Everything is anonymous and aggregated
+- Individual client, provider, or session data is never shared
+- Minimum segment size is 5 organizations to prevent re-identification
+- The extension activates when the ecosystem reaches 10+ organizations with consistent data
+
+### Data governance
+
+The data contributed to the network is governed by the protocol, not by any single implementation. See [GOVERNANCE.md](./GOVERNANCE.md) for the full data governance framework. Key principles:
+
+- Network data is a protocol commons — no implementation can capture, resell, or monopolize it
+- Implementations retain full sovereignty over their operational data
+- Only aggregate, anonymous metrics flow to the protocol layer
+- Governance decisions about data policy follow the protocol's RFC process
 
 > Full specification: [telemetry-extension.md](./telemetry-extension.md) *(forthcoming)*
 
 ---
 
-## 12. Implementations
+## 13. Implementations
 
 Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 9 states in their data model and can connect to the MCP server.
 
@@ -847,20 +896,20 @@ Any platform can implement the Servicialo specification. Compatible implementati
 
 To be listed as a compatible implementation, a platform must:
 
-1. Model services using the 8 dimensions (Section 3)
-2. Implement the 9 lifecycle states (Section 4)
-3. Handle at least 3 exception flows (Section 5)
+1. Model services using the 8 dimensions (Section 4)
+2. Implement the 9 lifecycle states (Section 5)
+3. Handle at least 3 exception flows (Section 6)
 4. Expose an API that the MCP server can connect to
-5. (Optional) Model Service Orders using the schema in Section 6
-6. (Optional) Support the Telemetry Extension (Section 11)
+5. (Optional) Model Service Orders using the schema in Section 7
+6. (Optional) Contribute to Network Intelligence (Section 12)
 
 Submit an implementation for listing via [GitHub Issues](https://github.com/servicialo/mcp-server/issues).
 
 ---
 
-## 13. Contributing
+## 14. Contributing
 
-Servicialo is an open standard. Contributions are welcome:
+Servicialo is an open protocol. Contributions are welcome:
 
 - **Protocol design:** Open an issue to propose changes to dimensions, states, or principles
 - **Implementations:** Build a compatible platform and submit for listing

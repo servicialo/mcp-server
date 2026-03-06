@@ -2,17 +2,14 @@
 
 # Servicialo
 
-**The open standard for services**
+**The orchestration layer for the AI-agent service economy**
 
-Anyone can create a service.<br>
-**Any agent can coordinate it.**
+An open protocol for scheduling, identity, delivery verification,<br>
+and financial settlement of professional services.
 
-Servicialo defines the universal language for creating, delivering, and verifying<br>
-professional services — for humans and AI agents alike.
+`Open protocol` `Machine-readable` `Agent-native` `MIT license`
 
-`Open standard` `Machine-readable` `Designed for humans`
-
-[Website](https://servicialo.com) ・ [Specification](./PROTOCOL.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
+[Website](https://servicialo.com) ・ [Specification](./PROTOCOL.md) ・ [Governance](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
 **[Leer en Español](./README.es.md)**
 
@@ -22,9 +19,24 @@ professional services — for humans and AI agents alike.
 
 ## The problem
 
-Without a standard protocol, every service platform speaks its own language. An AI agent that wants to schedule a medical appointment, verify a home repair, or settle a legal consultation needs a different integration for each one.
+Without a standard protocol, every service platform speaks its own language. An AI agent that wants to schedule a medical appointment, verify a home repair, or settle a legal consultation needs a different integration for each one. Data stays siloed, interoperability requires custom integrations, and collective intelligence about service delivery never forms.
 
-**Servicialo is the common language.** If a platform implements it, any agent can operate that business — with no additional integration. The difference between an agent that informs and an agent that operates.
+**Servicialo is the common protocol.** It defines the minimum viable schema so that any AI agent can coordinate any professional service on any compatible platform — with no additional integration.
+
+---
+
+## Protocol primitives
+
+Servicialo defines four coordination primitives. Together they cover the complete value chain of professional service delivery:
+
+| Primitive | What it solves | Protocol surface |
+|-----------|---------------|------------------|
+| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 9 lifecycle states, 7 exception flows, 3-variable scheduler |
+| **Identity verification** | Provider credentials, trust scores, client-payer separation | Provider credentials, trust_score, payer_id separation |
+| **Financial settlement** | Billing, invoicing, collection, and revenue sharing with dispute resolution | billing dimension, Service Order ledger, payment_schedule |
+| **Demand signals** | Aggregate, anonymous operational telemetry across network nodes | Telemetry Extension (contribute-to-access model) |
+
+Each primitive is specified independently. Implementations adopt what they need.
 
 ---
 
@@ -32,7 +44,7 @@ Without a standard protocol, every service platform speaks its own language. An 
 
 > *A service is a promise of transformation delivered at a specific time and place.*
 
-Unlike a product, a service cannot be stored, resold, or returned. It is consumed the moment it is delivered. That makes it fundamentally different — and that is why it needs its own standard.
+Unlike a product, a service cannot be stored, resold, or returned. It is consumed the moment it is delivered. That makes it fundamentally different — and that is why it needs its own protocol.
 
 A service originates from three sources:
 
@@ -59,7 +71,7 @@ Every professional service — from a physiotherapy session to a tax audit — i
 | **7** | **Evidence** | How delivery is proven | GPS + duration + client signature |
 | **8** | **Billing** | Financial settlement, independent from lifecycle | $35 USD · collected · prepaid package |
 
-> **The payer is not always the client.** In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The standard explicitly separates client from payer — because in practice they are rarely the same person.
+> **The payer is not always the client.** In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer — because in practice they are rarely the same person.
 
 ---
 
@@ -251,7 +263,7 @@ A well-designed agent follows this order:
 | 5 | **Verify** | Proof of delivery | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Close** | Documentation and billing | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 
-The standard guarantees that any agent can complete the full cycle with any compatible implementation.
+The protocol guarantees that any agent can complete the full cycle with any compatible implementation.
 
 ### Full examples
 
@@ -261,23 +273,24 @@ The standard guarantees that any agent can complete the full cycle with any comp
 
 ---
 
-## The 7 principles
+## The 8 principles
 
 | # | Principle | |
 |:-:|-----------|---|
 | 1 | **Every service has a lifecycle** | Whether it's a massage or an audit. The 9 states are universal. |
 | 2 | **Delivery must be verifiable** | If you can't prove the service happened, it didn't happen. Servicialo defines what constitutes valid evidence so humans and AI agents can trust it. |
-| 3 | **The payer is not always the client** | In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The standard explicitly separates client from payer. |
+| 3 | **The payer is not always the client** | In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer. |
 | 4 | **Exceptions are the rule** | No-shows, cancellations, rescheduling, disputes. A well-designed service defines what happens when things don't go as planned. |
 | 5 | **A service is a product** | It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover and coordinate it. |
-| 6 | **AI agents are first-class citizens** | The standard is designed so an AI agent can request, verify, and close a service with the same confidence as a human. |
+| 6 | **AI agents are first-class citizens** | The protocol is designed so an AI agent can request, verify, and close a service with the same confidence as a human. |
 | 7 | **The agreement is separate from delivery** | The Service Order defines what was agreed. The atomic service defines what was delivered. Two distinct objects with two distinct lifecycles. |
+| 8 | **Collective intelligence is a protocol commons** | Every node that implements the protocol contributes operational data. The aggregate intelligence improves all nodes — like Waze, where each driver contributes and everyone navigates better. No single implementation owns the network data. |
 
 ---
 
 ## Layered architecture
 
-Adopt only what you need. Core covers the complete cycle. Modules add capabilities for more complex operations.
+Adopt only what you need. Core covers the complete service lifecycle. Extensions add capabilities for specialized operations.
 
 ### Servicialo Core — `stable`
 
@@ -381,7 +394,7 @@ Any platform can implement Servicialo. To be listed it must model the 8 dimensio
 
 ```
 servicialo/
-├── app/                  # servicialo.com — standard website (Next.js)
+├── app/                  # servicialo.com — protocol website (Next.js)
 ├── components/           # Website components
 ├── examples/             # Agent-server conversations
 ├── lib/                  # Protocol data
@@ -389,6 +402,7 @@ servicialo/
 │   └── mcp-server/       # @servicialo/mcp-server — MCP server (npm)
 ├── schema/               # JSON Schemas for validation
 ├── PROTOCOL.md           # Full specification
+├── GOVERNANCE.md         # Network governance and data policy
 └── README.md
 ```
 
@@ -401,4 +415,4 @@ servicialo/
 
 ## License
 
-MIT — Servicialo is an open standard. Anyone can implement it.
+MIT — Servicialo is an open protocol. Anyone can implement it.

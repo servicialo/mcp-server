@@ -5,11 +5,11 @@
 ### Launch post
 
 ```
-Primer MCP server para servicios profesionales en LATAM.
+Servicialo: the orchestration layer for the AI-agent service economy.
 
-Tu agente AI puede agendar, verificar entrega y cobrar — en cualquier plataforma que implemente el protocolo.
+Open protocol for scheduling, identity, delivery verification, and financial settlement of professional services.
 
-20 herramientas. 6 fases del ciclo de vida. Un comando:
+Any agent. Any platform. One protocol.
 
 npx -y @servicialo/mcp-server
 
@@ -19,19 +19,34 @@ github.com/servicialo/mcp-server
 ### Thread (optional follow-up)
 
 ```
-1/ El problema: cada plataforma de servicios habla su propio idioma. Un agente necesita una integración custom para cada una.
+1/ The problem: every service platform speaks its own language. An AI agent needs a custom integration for each one. Data stays siloed. Collective intelligence never forms.
 
-2/ Servicialo es el idioma común. Si una plataforma lo implementa, cualquier agente puede operar ese negocio sin integración adicional.
+2/ Servicialo is the common protocol. If a platform implements it, any agent can coordinate that business — no additional integration.
 
-3/ Dos modos:
-→ Descubrimiento: buscar organizaciones, ver disponibilidad (sin auth)
-→ Autenticado: agendar, verificar entrega, cobrar, cerrar (con API key)
+3/ Four protocol primitives:
+→ Schedule coordination (multi-party availability)
+→ Identity verification (credentials, trust scores)
+→ Financial settlement (billing, disputes, revenue sharing)
+→ Demand signals (anonymous network telemetry)
 
-4/ 6 fases del ciclo de vida:
-Descubrir → Entender → Comprometer → Gestionar → Verificar → Cerrar
+4/ The network effect: every node contributes, every node benefits. Like Waze — each driver contributes GPS data, everyone navigates better. Collective intelligence is a protocol commons, not any company's asset.
 
-5/ Primera implementación validada con clínicas de salud en Chile. El protocolo soporta cualquier servicio profesional.
+5/ MIT licensed. Neutral infrastructure. Reference implementation live in healthcare (Chile). The protocol works for any professional service vertical.
 
-Spec completa: servicialo.com
-Código: github.com/servicialo/mcp-server
+Spec: servicialo.com
+Code: github.com/servicialo/mcp-server
+```
+
+### Spanish version
+
+```
+Servicialo: la capa de orquestación para la economía de servicios en la era de agentes AI.
+
+Protocolo abierto para coordinación de agenda, identidad, verificación de entrega y liquidación financiera.
+
+Cualquier agente. Cualquier plataforma. Un protocolo.
+
+npx -y @servicialo/mcp-server
+
+github.com/servicialo/mcp-server
 ```

@@ -2,17 +2,14 @@
 
 # Servicialo
 
-**El estándar abierto para servicios**
+**La capa de orquestación para la economía de servicios en la era de agentes AI**
 
-Cualquier persona puede crear un servicio.<br>
-**Cualquier agente puede coordinarlo.**
+Un protocolo abierto para coordinación de agenda, identidad, verificación<br>
+de entrega y liquidación financiera de servicios profesionales.
 
-Servicialo define el lenguaje universal para crear, entregar y verificar<br>
-servicios profesionales — para humanos y para agentes AI.
+`Protocolo abierto` `Legible por máquinas` `Agent-native` `Licencia MIT`
 
-`Estándar abierto` `Legible por máquinas` `Diseñado para humanos`
-
-[Sitio web](https://servicialo.com) ・ [Especificación](./PROTOCOL.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
+[Sitio web](https://servicialo.com) ・ [Especificación](./PROTOCOL.md) ・ [Gobernanza](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
 **[Read in English](./README.md)**
 
@@ -22,9 +19,24 @@ servicios profesionales — para humanos y para agentes AI.
 
 ## El problema
 
-Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma. Un agente AI que quiere agendar una cita médica, verificar una reparación a domicilio o cobrar una consulta legal necesita una integración distinta para cada una.
+Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma. Un agente AI que quiere agendar una cita médica, verificar una reparación a domicilio o cobrar una consulta legal necesita una integración distinta para cada una. Los datos quedan en silos, la interoperabilidad requiere integraciones custom, y la inteligencia colectiva sobre entrega de servicios nunca se forma.
 
-**Servicialo es el idioma común.** Si una plataforma lo implementa, cualquier agente puede operar ese negocio — sin integración adicional. La diferencia entre un agente que informa y un agente que opera.
+**Servicialo es el protocolo común.** Define el esquema mínimo viable para que cualquier agente AI coordine cualquier servicio profesional en cualquier plataforma compatible — sin integración adicional.
+
+---
+
+## Primitivas del protocolo
+
+Servicialo define cuatro primitivas de coordinación. Juntas cubren la cadena de valor completa de la entrega de servicios profesionales:
+
+| Primitiva | Qué resuelve | Superficie del protocolo |
+|-----------|-------------|--------------------------|
+| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | 9 estados del ciclo de vida, 7 flujos de excepción, scheduler de 3 variables |
+| **Verificación de identidad** | Credenciales del proveedor, puntaje de confianza, separación cliente-pagador | Credenciales del proveedor, trust_score, separación payer_id |
+| **Liquidación financiera** | Facturación, cobranza, liquidación y revenue sharing con resolución de disputas | Dimensión de cobro, ledger de Orden de Servicio, payment_schedule |
+| **Señales de demanda** | Telemetría operacional anónima y agregada entre nodos de la red | Extensión de Telemetría (modelo contribuir-para-acceder) |
+
+Cada primitiva se especifica de forma independiente. Las implementaciones adoptan lo que necesitan.
 
 ---
 
@@ -32,7 +44,7 @@ Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma.
 
 > *Un servicio es una promesa de transformación entregada en un momento y lugar específico.*
 
-A diferencia de un producto, un servicio no se puede almacenar, revender ni devolver. Se consume en el momento en que se entrega. Eso lo hace fundamentalmente diferente — y es por eso que necesita su propio estándar.
+A diferencia de un producto, un servicio no se puede almacenar, revender ni devolver. Se consume en el momento en que se entrega. Eso lo hace fundamentalmente diferente — y es por eso que necesita su propio protocolo.
 
 Un servicio nace de tres fuentes:
 
@@ -59,7 +71,7 @@ Todo servicio profesional — desde una sesión de kinesiología hasta una audit
 | **7** | **Evidencia** | Cómo se prueba que el servicio ocurrió | GPS + duración + firma del cliente |
 | **8** | **Cobro** | Liquidación financiera, independiente del ciclo | $35.000 CLP · cobrado · paquete prepago |
 
-> **El pagador no siempre es el cliente.** En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa explícitamente al cliente del pagador — porque en la vida real casi nunca son la misma persona.
+> **El pagador no siempre es el cliente.** En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador — porque en la vida real casi nunca son la misma persona.
 
 ---
 
@@ -251,7 +263,7 @@ Un agente bien diseñado sigue este orden:
 | 5 | **Verificar** | Evidencia de que ocurrió | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 
-El estándar garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
+El protocolo garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
 ### Ejemplos completos
 
@@ -261,23 +273,24 @@ El estándar garantiza que cualquier agente pueda completar el ciclo completo co
 
 ---
 
-## Los 7 principios
+## Los 8 principios
 
 | # | Principio | |
 |:-:|-----------|---|
 | 1 | **Todo servicio tiene un ciclo** | No importa si es un masaje o una auditoría. Los 9 estados son universales. |
-| 2 | **La entrega debe ser verificable** | Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
-| 3 | **El pagador no siempre es el cliente** | En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa explícitamente al cliente del pagador. |
+| 2 | **La entrega debe ser verificable** | Si no puedes probar que el servicio ocurrió, no ocurrió. El protocolo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
+| 3 | **El pagador no siempre es el cliente** | En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador. |
 | 4 | **Las excepciones son la regla** | Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. |
 | 5 | **Un servicio es un producto** | Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo. |
-| 6 | **Los agentes AI son ciudadanos de primera clase** | El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano. |
+| 6 | **Los agentes AI son ciudadanos de primera clase** | El protocolo está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano. |
 | 7 | **El acuerdo es separado de la entrega** | La Orden de Servicio define lo acordado. El servicio atómico define lo entregado. Son dos objetos distintos con dos ciclos de vida distintos. |
+| 8 | **La inteligencia colectiva es un bien común del protocolo** | Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos los nodos — como Waze, donde cada conductor contribuye y todos navegan mejor. Ninguna implementación es dueña de los datos de la red. |
 
 ---
 
 ## Arquitectura por capas
 
-Adopta solo lo que necesitas. Core cubre el ciclo completo. Los módulos agregan capacidades para operaciones más complejas.
+Adopta solo lo que necesitas. Core cubre el ciclo completo de entrega. Las extensiones agregan capacidades para operaciones especializadas.
 
 ### Servicialo Core — `estable`
 
@@ -381,7 +394,7 @@ Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar
 
 ```
 servicialo/
-├── app/                  # servicialo.com — sitio del estándar (Next.js)
+├── app/                  # servicialo.com — sitio del protocolo (Next.js)
 ├── components/           # Componentes del sitio
 ├── examples/             # Conversaciones agente-servidor
 ├── lib/                  # Datos del protocolo
@@ -389,6 +402,7 @@ servicialo/
 │   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
 ├── schema/               # JSON Schemas para validación
 ├── PROTOCOL.md           # Especificación completa
+├── GOVERNANCE.md         # Gobernanza de red y política de datos
 └── README.md
 ```
 
@@ -401,4 +415,4 @@ servicialo/
 
 ## Licencia
 
-MIT — Servicialo es un estándar abierto. Cualquiera puede implementarlo.
+MIT — Servicialo es un protocolo abierto. Cualquiera puede implementarlo.

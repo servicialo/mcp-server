@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-Servicialo is an open standard for professional service delivery. Our community spans Latin America and beyond, and we welcome participation in both Spanish and English.
+Servicialo is an open protocol for professional service delivery. Our community spans Latin America and beyond, and we welcome participation in both Spanish and English.
 
 We as members, contributors, and leaders pledge to make participation in our
 community a harassment-free experience for everyone, regardless of age, body

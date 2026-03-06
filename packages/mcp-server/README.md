@@ -1,10 +1,10 @@
 # @servicialo/mcp-server
 
-MCP server for the [Servicialo](https://servicialo.com) protocol. Connects AI agents to professional services via any Servicialo-compatible platform.
+MCP server for the [Servicialo](https://servicialo.com) open protocol — the orchestration layer for the AI-agent service economy. Connects AI agents to professional services via any Servicialo-compatible platform.
 
 **Protocol version:** 0.6 · **Package version:** 0.6.0
 
-> **Status:** Early-stage protocol with a live reference implementation in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. We're onboarding pilot implementations — [get in touch](https://servicialo.com) if you're building for professional services.
+> **Status:** Early-stage protocol with a live reference implementation ([Coordinalo](https://coordinalo.com)) in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. Any platform can implement the protocol as a sovereign node — [get in touch](https://servicialo.com) if you're building for professional services.
 
 20 tools organized by the 6 lifecycle phases of a service — not by database table.
 
@@ -64,7 +64,7 @@ Omit the `env` block entirely for discovery-only mode.
 6. CERRAR       → documentation.create, payments.create_sale, record_payment, get_status
 ```
 
-A well-designed agent follows this order. Each phase has its tools. The standard guarantees any agent can complete the full cycle with any compatible implementation.
+A well-designed agent follows this order. Each phase has its tools. The protocol guarantees any agent can complete the full cycle with any compatible implementation.
 
 ## Phase 1 — Descubrimiento (4 public tools)
 

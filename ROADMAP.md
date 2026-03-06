@@ -1,8 +1,8 @@
 # Roadmap
 
-This roadmap reflects the current direction of the **Servicialo open standard** and its reference tooling. Priorities may shift based on community feedback and RFC outcomes.
+This roadmap reflects the current direction of the **Servicialo open protocol** and its reference tooling. Priorities may shift based on community feedback and RFC outcomes.
 
-> Servicialo is a community-driven standard. If you want to influence the roadmap, open a [feature request](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md) or submit an [RFC](./CONTRIBUTING.md).
+> Servicialo is a community-driven protocol. If you want to influence the roadmap, open a [feature request](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md) or submit an [RFC](./CONTRIBUTING.md).
 
 ---
 
@@ -10,7 +10,7 @@ This roadmap reflects the current direction of the **Servicialo open standard** 
 
 What's already shipped:
 
-- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
+- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 8 principles ([PROTOCOL.md](./PROTOCOL.md)).
 - [x] **JSON Schemas** — `service.schema.json` and `service-order.schema.json` with lifecycle states, exception types, and evidence definitions (`schema/`).
 - [x] **MCP server** — `@servicialo/mcp-server` v0.5.3 published on npm. 20 tools across 6 agent phases (Discovery, Booking, Execution, Documentation, Billing, Support).
 - [x] **Test suite** — Vitest tests for the MCP server (`packages/mcp-server/src/__tests__/`).
@@ -18,7 +18,8 @@ What's already shipped:
 - [x] **Agent examples** — two complete multi-turn conversations: kinesiology session and home repair (`examples/`).
 - [x] **Governance** — CONTRIBUTING.md with RFC process, SECURITY.md, CODE_OF_CONDUCT.md, CHANGELOG.md, issue/PR templates, CI/CD auto-publish to npm.
 - [x] **Evidence verticals** — 4 defined: Health, Home, Legal, Education.
-- [x] **Modular architecture** — Core (stable), Finance (design), Disputes (design).
+- [x] **Layered architecture** — Core (stable), Finance (design), Disputes (design).
+- [x] **Governance** — GOVERNANCE.md with network narrative, data governance principles, and protocol neutrality framework.
 
 ---
 
@@ -37,8 +38,9 @@ _Target: Protocol v0.4_
 
 _Target: Protocol v0.5 – v0.8_
 
-- [ ] **Finance module** — move billing and payment lifecycle from "design" to "stable" status with full schema support.
-- [ ] **Dispute resolution module** — formalize the 3-phase dispute model into a stable, implementable specification.
+- [ ] **Finance extension** — move billing and payment lifecycle from "design" to "stable" status with full schema support.
+- [ ] **Dispute resolution extension** — formalize the 3-phase dispute model into a stable, implementable specification.
+- [ ] **Network Intelligence** — activate contribute-to-access telemetry when ecosystem reaches 10+ nodes.
 - [ ] **Multi-implementation interoperability** — define and test cross-platform compatibility between independent Servicialo implementations.
 - [ ] **Agent SDK / client libraries** — reference libraries (TypeScript, Python) for building Servicialo-aware AI agents.
 - [ ] **Webhook / event specification** — standardize real-time notifications for state transitions.
@@ -48,8 +50,8 @@ _Target: Protocol v0.5 – v0.8_
 
 _Target: Protocol v1.0_
 
-- [ ] **Protocol v1.0** — declare the Core module (8 dimensions, 9 states, 7 principles) as stable with backwards-compatibility guarantees.
-- [ ] **Formal governance body** — transition from single-maintainer to a multi-stakeholder steering committee.
+- [ ] **Protocol v1.0** — declare Core (8 dimensions, 9 states, 8 principles) as stable with backwards-compatibility guarantees.
+- [ ] **Formal governance body** — transition from single-maintainer to a multi-stakeholder steering committee (see [GOVERNANCE.md](./GOVERNANCE.md)).
 - [ ] **Certification program** — optional conformance certification for platforms implementing Servicialo.
 - [ ] **Industry adoption** — at least 3 independent implementations beyond [Coordinalo](https://coordinalo.com).
 - [ ] **Localization** — specification available in Spanish, English, and Portuguese; tooling supports i18n service metadata.
