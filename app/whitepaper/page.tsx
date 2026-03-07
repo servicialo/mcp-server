@@ -4,54 +4,54 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Whitepaper — Servicialo",
   description:
-    "El estándar abierto para servicios profesionales. Define tu servicio una vez. Sé descubierto en todas partes.",
+    "Protocolo abierto para la definición, descubrimiento y coordinación de servicios profesionales.",
   openGraph: {
     title: "Whitepaper — Servicialo",
     description:
-      "El estándar abierto para servicios profesionales. Define tu servicio una vez. Sé descubierto en todas partes.",
+      "Protocolo abierto para la definición, descubrimiento y coordinación de servicios profesionales.",
   },
 };
 
 const secciones = [
   {
     num: "01",
-    titulo: "El Problema",
+    titulo: "El problema",
     desc: "Por qué los servicios profesionales siguen siendo invisibles para la tecnología.",
   },
   {
     num: "02",
-    titulo: "La Idea",
-    desc: "Un estándar abierto que hace legible cualquier servicio — para humanos y para máquinas.",
+    titulo: "Anatomía del servicio",
+    desc: "Las 8 dimensiones que definen cualquier servicio profesional de forma estructurada.",
   },
   {
     num: "03",
-    titulo: "Cómo Funciona",
-    desc: "La arquitectura del protocolo: definición, descubrimiento y coordinación.",
+    titulo: "Servicio y Orden de Servicio",
+    desc: "Las dos entidades centrales del protocolo y su relación contractual.",
   },
   {
     num: "04",
-    titulo: "Tu Identidad Profesional",
-    desc: "Cómo el estándar protege y representa al profesional que hay detrás del servicio.",
+    titulo: "Ciclo de vida",
+    desc: "9 estados universales que modelan desde la solicitud hasta la verificación.",
   },
   {
     num: "05",
-    titulo: "Los Agentes y Tú",
-    desc: "Cómo los agentes AI coordinan servicios sin reemplazar a las personas.",
+    titulo: "Excepciones y disputas",
+    desc: "Flujos de cancelación, reprogramación, y el mecanismo de resolución 80/20.",
   },
   {
     num: "06",
-    titulo: "El Estándar en la Práctica",
-    desc: "Casos reales: desde una sesión de kinesiología hasta una reparación del hogar.",
+    titulo: "Evidencia y cumplimiento",
+    desc: "Evidencia por vertical, cumplimiento regulatorio y trazabilidad de agentes AI.",
   },
   {
     num: "07",
-    titulo: "Exige el Estándar",
-    desc: "Por qué adoptar el estándar es un acto de soberanía profesional.",
+    titulo: "Servidor MCP",
+    desc: "20 herramientas organizadas en 6 fases para operar el protocolo desde agentes AI.",
   },
   {
     num: "08",
-    titulo: "Visión",
-    desc: "Hacia un ecosistema abierto donde cualquier servicio puede ser encontrado y coordinado.",
+    titulo: "Especificación técnica v0.6.0",
+    desc: "JSON Schema, endpoints REST y estructura completa de implementación.",
   },
 ];
 
@@ -84,11 +84,11 @@ export default function WhitepaperPage() {
           Whitepaper fundacional
         </div>
         <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
-          El estándar abierto para servicios profesionales
+          Protocolo abierto para servicios profesionales
         </h1>
         <p className="text-[15px] md:text-lg text-text-muted leading-[1.7] max-w-[540px] mb-6">
-          Define tu servicio una vez.{" "}
-          <span className="text-accent">Sé descubierto en todas partes.</span>
+          Definición, descubrimiento y coordinación —{" "}
+          <span className="text-accent">un estándar para agentes y humanos.</span>
         </p>
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] text-text-dim mb-8">
@@ -151,9 +151,9 @@ export default function WhitepaperPage() {
       {/* CTA final */}
       <section className="mt-14 md:mt-20 border-t border-border pt-8">
         <p className="text-sm text-text-muted leading-relaxed mb-5">
-          Este whitepaper describe la visión fundacional de servicialo — el
-          estándar abierto que hace visible y coordinable cualquier servicio
-          profesional.
+          Este whitepaper especifica el protocolo Servicialo v0.6.0 — definición
+          de servicios, ciclo de vida, resolución de disputas, y la interfaz MCP
+          para agentes AI.
         </p>
         <a
           href="/docs/servicialo-whitepaper.pdf"
