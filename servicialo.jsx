@@ -84,15 +84,14 @@ const SERVICE_ORIGINS = [
 ];
 
 const LIFECYCLE_STATES = [
-  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde. El sistema busca providers compatibles.", color: C.accent },
-  { id: "matched", label: "Asignado", icon: "2", desc: "Se selecciona el mejor provider según disponibilidad, ubicación, especialidad, rating y precio. El provider acepta.", color: C.accent },
-  { id: "scheduled", label: "Agendado", icon: "3", desc: "Se bloquea el slot en los calendarios de ambas partes. Confirmaciones automáticas enviadas.", color: C.accent },
-  { id: "confirmed", label: "Confirmado", icon: "4", desc: "Ambas partes reconfirmaron. Recordatorios programados. Pre-requisitos verificados (documentos, pagos previos, etc).", color: C.accent },
-  { id: "in_progress", label: "En Curso", icon: "5", desc: "Check-in del provider verificado. Cronómetro activo. El servicio está siendo entregado.", color: C.accent },
-  { id: "completed", label: "Completado", icon: "6", desc: "El servicio terminó. Evidencia capturada: duración real, notas, firma del cliente, fotos si aplica.", color: C.accent },
-  { id: "documented", label: "Documentado", icon: "7", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta de reunión — según la vertical.", color: C.accent },
-  { id: "billed", label: "Facturado", icon: "8", desc: "Cobro emitido al pagador: cliente directo, aseguradora, empresa, o plataforma. Documento tributario generado.", color: C.accent },
-  { id: "closed", label: "Cerrado", icon: "9", desc: "Ciclo completo. Rating bidireccional registrado. Datos disponibles para análisis y para agentes AI.", color: C.green },
+  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde.", color: C.accent },
+  { id: "scheduled", label: "Agendado", icon: "2", desc: "Fecha, hora y proveedor asignados. Se bloquea el horario en los calendarios de ambas partes.", color: C.accent },
+  { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes confirmaron el compromiso. Recordatorios programados. Prerrequisitos verificados.", color: C.accent },
+  { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado.", color: C.accent },
+  { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica.", color: C.accent },
+  { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical.", color: C.accent },
+  { id: "collected", label: "Cobrado", icon: "7", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido.", color: C.accent },
+  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo.", color: C.green },
 ];
 
 const ANATOMY = [
@@ -107,7 +106,7 @@ const ANATOMY = [
 ];
 
 const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Todo servicio se solicita, se agenda, se ejecuta, se documenta, se cobra y se cierra. Estos 9 estados son universales." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Todo servicio se solicita, se agenda, se ejecuta, se documenta, se cobra y se verifica. Estos 8 estados son universales." },
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida de entrega para que humanos y agentes AI puedan confiar en ella." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa estos tres roles: beneficiario, solicitante y pagador." },
   { title: "Las excepciones son la regla", body: "No-shows, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. Servicialo estandariza estos flujos." },
@@ -599,7 +598,7 @@ export default function Servicialo() {
         <Section id="ciclo">
           <SectionTitle
             tag="04 — Ciclo de vida"
-            title="9 estados universales"
+            title="8 estados universales"
             subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
           />
           <LifecycleInteractive />
@@ -611,11 +610,11 @@ export default function Servicialo() {
             padding: "20px 24px",
           }}>
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: C.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-              ¿Por qué 9 estados?
+              ¿Por qué 8 estados?
             </div>
             <div style={{ fontSize: 14, color: C.textBody, lineHeight: 1.8 }}>
               Menos estados pierden información crítica — por ejemplo, sin separar "Completado" de "Documentado", no sabes si el registro fue generado.
-              Más estados agregan fricción innecesaria. 9 es el mínimo viable para que un agente AI pueda verificar con certeza que un servicio fue solicitado, entregado, documentado y cobrado.
+              Más estados agregan fricción innecesaria. 8 es el mínimo viable para que un agente AI pueda verificar con certeza que un servicio fue solicitado, entregado, documentado, cobrado y verificado.
             </div>
           </div>
         </Section>
@@ -676,7 +675,7 @@ export default function Servicialo() {
             marginBottom: 16,
           }}>
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: C.accent, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16 }}>
-              Schema del servicio (v0.1)
+              Schema del servicio (v0.6)
             </div>
             <pre style={{
               fontFamily: "'IBM Plex Mono', monospace",
@@ -686,47 +685,52 @@ export default function Servicialo() {
               margin: 0,
               overflow: "auto",
             }}>
-{`service:
-  id: string                  # Identificador único
-  type: string                # Categoría del servicio
-  vertical: string            # salud | legal | hogar | educación | ...
-  
-  provider:
-    id: string
-    credentials: string[]     # Certificaciones requeridas
-    trust_score: number       # 0-100 calculado por historial
-    
-  client:
-    id: string
-    payer_id: string          # Puede diferir del client
-    
-  scheduling:
-    requested_at: datetime
-    scheduled_for: datetime
-    duration_expected: minutes
-    location: physical | virtual
-    
-  lifecycle:
-    current_state: enum[9]    # Los 9 estados universales
-    transitions: transition[]  # Historial de cambios
-    exceptions: exception[]    # No-shows, disputas, etc
-    
-  delivery_proof:
-    checkin: datetime
-    checkout: datetime
-    duration_actual: minutes
-    evidence: evidence[]      # GPS, firma, fotos, docs
-    
-  documentation:
-    record_type: string       # Ficha clínica, minuta, reporte
-    generated_at: datetime
-    signed_by: string[]
-    
-  billing:
-    amount: money
-    payer: reference
-    status: pending | billed | paid | disputed
-    tax_document: reference`}
+{`orden_de_servicio:
+  id: string
+  alcance: string             # Qué se acuerda entregar
+  precio: number              # Precio total acordado
+  esquema_pagos: string       # prepago | por_sesión | mensual
+  currency: string            # ISO 4217
+
+  servicios[]:                # Cada servicio atómico — 8 dimensiones
+    service:
+      id: string
+      orden_de_servicio_id: string
+      type: string            # Categoría del servicio
+      vertical: string        # salud | legal | hogar | ...
+
+      provider:
+        id: string
+        credentials: string[]
+        trust_score: number   # 0-100
+
+      client:
+        id: string
+        payer_id: string      # Puede diferir del client
+
+      scheduling:
+        requested_at: datetime
+        scheduled_for: datetime
+        duration_expected: minutes
+
+      lifecycle:
+        current_state: enum[8]  # Los 8 estados universales
+        transitions: transition[]
+        exceptions: exception[]
+
+      delivery_proof:
+        checkin: datetime
+        checkout: datetime
+        duration_actual: minutes
+        evidence: evidence[]  # GPS, firma, fotos, docs
+
+      billing:
+        orden_de_servicio_id: string
+        amount: money
+        payer: reference
+        status: pending | collected | paid | disputed
+
+# Ledger computado desde servicios verificados — nunca editable`}
             </pre>
           </div>
 
@@ -777,7 +781,7 @@ export default function Servicialo() {
               servicialo<span style={{ color: C.accent }}>.com</span>
             </div>
             <div style={{ fontSize: 12, color: C.textDim, marginTop: 4 }}>
-              El estándar abierto para servicios — v0.1
+              El estándar abierto para servicios — v0.6
             </div>
           </div>
           <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: C.textDim }}>

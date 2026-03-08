@@ -56,15 +56,14 @@ export const SERVICE_ORIGINS = [
 ] as const;
 
 export const LIFECYCLE_STATES = [
-  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde. El sistema busca proveedores compatibles." },
-  { id: "scheduled", label: "Agendado", icon: "2", desc: "Se asigna hora, proveedor y ubicación. Se bloquea el horario en los calendarios de ambas partes." },
-  { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes reconocen el compromiso. Recordatorios programados. Prerrequisitos verificados." },
-  { id: "in_progress", label: "En Curso", icon: "4", desc: "Registro de entrada detectado. El servicio está siendo entregado." },
-  { id: "completed", label: "Completado", icon: "5", desc: "El proveedor marca la entrega como completa. Evidencia capturada: duración real, notas, fotos si aplica." },
-  { id: "documented", label: "Documentado", icon: "6", desc: "Registro formal generado: ficha clínica, reporte de trabajo, minuta — según la vertical." },
-  { id: "invoiced", label: "Facturado", icon: "7", desc: "Documento tributario emitido. Boleta o factura generada según corresponda." },
-  { id: "collected", label: "Cobrado", icon: "8", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
-  { id: "verified", label: "Verificado", icon: "9", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
+  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde." },
+  { id: "scheduled", label: "Agendado", icon: "2", desc: "Fecha, hora y proveedor asignados. Se bloquea el horario en los calendarios de ambas partes." },
+  { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes confirmaron el compromiso. Recordatorios programados. Prerrequisitos verificados." },
+  { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado." },
+  { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica." },
+  { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical." },
+  { id: "collected", label: "Cobrado", icon: "7", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
+  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
 ] as const;
 
 export const ANATOMY = [
@@ -73,13 +72,13 @@ export const ANATOMY = [
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual, incluyendo el recurso físico cuando aplica", example: "Clínica / Box 3 / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición actual en los 9 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
+  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 8 estados del ciclo de vida son universales para cualquier servicio." },
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes AI." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
@@ -88,70 +87,68 @@ export const PRINCIPLES = [
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.6.0
-# Las 8 dimensiones de un servicio profesional
+# SERVICIALO v0.6
+# Dos entidades: Orden + Servicios atómicos
 # ─────────────────────────────────────────────
 
-servicio:
+orden_de_servicio:
   id: texto                      # Identificador único
-  orden_de_servicio_id: texto    # Opcional — referencia a Orden padre
-  tipo: texto                    # Categoría del servicio
-  vertical: texto                # salud | legal | hogar | educación | ...
-  nombre: texto                  # Nombre legible
-  duración_minutos: entero       # Duración esperada
+  alcance: texto                 # Qué se acuerda entregar
+  precio: número                 # Precio total acordado
+  esquema_pagos: texto           # prepago | por_sesión | mensual
+  currency: texto                # ISO 4217
 
-  proveedor:
-    id: texto
-    credenciales: texto[]        # Certificaciones requeridas
-    puntaje_confianza: número    # 0-100 calculado por historial
-    organización_id: texto       # Organización padre
+  servicios[]:                   # Cada servicio atómico — 8 dimensiones
 
-  cliente:
-    id: texto
-    pagador_id: texto            # Puede diferir del cliente
+    servicio:
+      id: texto
+      orden_de_servicio_id: texto  # Referencia a la Orden padre
+      tipo: texto                # Categoría del servicio
+      vertical: texto            # salud | legal | hogar | educación | ...
+      nombre: texto              # Nombre legible
+      duración_minutos: entero
 
-  agenda:
-    solicitado_en: fecha_hora
-    agendado_para: fecha_hora
-    duración_esperada: minutos
+      proveedor:
+        id: texto
+        credenciales: texto[]    # Certificaciones requeridas
+        puntaje_confianza: número  # 0-100 calculado por historial
+        organización_id: texto
 
-  ubicación:
-    tipo: presencial | virtual | domicilio
-    dirección: texto
-    coordenadas:
-      lat: número
-      lng: número
-    recurso_id: texto            # Opcional — referencia a entidad Resource
+      cliente:
+        id: texto
+        pagador_id: texto        # Puede diferir del cliente
 
-  recurso:                       # Opcional — cuando el servicio requiere espacio físico
-    id: texto
-    nombre: texto                # "Box 3", "Sala A", "Sillón 2"
-    tipo: texto                  # box | sala | sillón | equipamiento
-    capacidad: entero            # máximo de clientes simultáneos. Default: 1
-    buffer_minutos: entero       # tiempo de reset entre usos. Default: 0
-    equipamiento: texto[]
-    activo: booleano
+      agenda:
+        solicitado_en: fecha_hora
+        agendado_para: fecha_hora
+        duración_esperada: minutos
 
-  ciclo_de_vida:
-    estado_actual: enum[9]       # Los 9 estados universales
-    transiciones: transición[]   # Historial de cambios
-    excepciones: excepción[]     # Inasistencias, disputas, etc
+      ubicación:
+        tipo: presencial | virtual | domicilio
+        dirección: texto
+        recurso_id: texto        # Opcional — referencia a recurso físico
 
-  prueba_de_entrega:
-    entrada: fecha_hora
-    salida: fecha_hora
-    duración_real: minutos
-    evidencia: evidencia[]       # GPS, firma, fotos, documentos
+      ciclo_de_vida:
+        estado_actual: enum[8]   # Los 8 estados universales
+        transiciones: transición[]
+        excepciones: excepción[]
 
-  cobro:                         # Informativo si pertenece a una Orden
-    monto:
-      valor: número
-      moneda: texto              # ISO 4217
-    pagador: referencia          # Puede diferir del cliente
-    estado: pendiente | cobrado | facturado | pagado | disputado
-    cobrado_en: fecha_hora       # 1:1 con estado Cobrado del ciclo
-    pago_id: referencia          # Pago vinculado (puede ser paquete prepago)
-    documento_tributario: ref    # Boleta/factura si se emitió`;
+      prueba_de_entrega:
+        entrada: fecha_hora
+        salida: fecha_hora
+        duración_real: minutos
+        evidencia: evidencia[]   # GPS, firma, fotos, documentos
+
+      cobro:
+        orden_de_servicio_id: texto  # Referencia a la Orden padre
+        monto:
+          valor: número
+          moneda: texto          # ISO 4217
+        pagador: referencia
+        estado: pendiente | cobrado | pagado | disputado
+        cobrado_en: fecha_hora
+
+# Ledger computado desde servicios verificados — nunca editable`;
 
 export const EVIDENCE_BY_VERTICAL = [
   {
@@ -239,7 +236,7 @@ export const MODULES = [
     desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega, cobro y órdenes de servicio.",
     audience: "Cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza de oficinas con múltiples cuentas, equipos y personal con alta rotación.",
     includes: [
-      "Ciclo de vida (9 estados universales)",
+      "Ciclo de vida (8 estados universales)",
       "8 dimensiones del servicio",
       "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
