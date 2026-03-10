@@ -1,32 +1,124 @@
 # @servicialo/mcp-server
 
-MCP server for the [Servicialo](https://servicialo.com) open protocol — the orchestration layer for the AI-agent service economy. Connects AI agents to professional services via any Servicialo-compatible platform.
+> **[English version](./README.en.md)**
 
-**Protocol version:** 0.6 · **Package version:** 0.6.0
+**La capa de protocolo que falta para agentes de IA que coordinan servicios profesionales.**
 
-> **Status:** Early-stage protocol with a live reference implementation ([Coordinalo](https://coordinalo.com)) in healthcare (Chile). The protocol spec is stable. The MCP server implements discovery + scheduling + basic lifecycle. Advanced tools (delivery evidence, payments, documentation) are specified but not yet fully wired to backend endpoints. Any platform can implement the protocol as a sovereign node — [get in touch](https://servicialo.com) if you're building for professional services.
+No existe una forma estándar para que un agente de IA reserve, verifique y liquide un servicio profesional. Servicialo es un protocolo abierto que resuelve esto — y este MCP server es su implementación de referencia. Piensa en HTTP para coordinación de servicios: cualquier agente, cualquier plataforma, un solo protocolo.
 
-20 tools organized by the 6 lifecycle phases of a service — not by database table.
+## El Problema
 
-## Two Modes of Operation
+Los agentes de IA pueden navegar la web, escribir código y mantener conversaciones. Pero pídele a uno que reserve una sesión de kinesiología, verifique que ocurrió, y procese el pago — y se desmorona.
 
-### Discovery Mode (no configuration)
+Hoy, cada plataforma es un silo. No hay estándar para:
+
+- **Descubrimiento** — qué prestador, en qué organización, ofrece lo que necesito?
+- **Identidad** — en nombre de quién actúa este agente, y qué está autorizado a hacer?
+- **Ciclo de vida** — en qué estado está este servicio? Quién confirmó? Quién asistió?
+- **Prueba de entrega** — ocurrió realmente la sesión? Por cuánto tiempo? Dónde?
+- **Liquidación** — cuánto, a quién, bajo qué términos contractuales?
+
+Sin un protocolo compartido, cada integración es artesanal. Cada conexión agente-plataforma es un API custom. Esto no escala.
+
+## Qué es Servicialo
+
+Servicialo es un **protocolo abierto**, no una plataforma. Define cómo los servicios profesionales se mueven a través de su ciclo de vida — desde el descubrimiento hasta el pago — de una forma que cualquier agente de IA o plataforma puede implementar.
+
+La relación es como HTTP con Apache, o SMTP con Gmail: Servicialo define las reglas, las implementaciones les dan vida.
+
+El protocolo modela cada servicio a través de **8 dimensiones ortogonales** (identidad, prestador, cliente, agenda, ubicación, ciclo de vida, prueba de entrega, facturación) y define **8 estados de ciclo de vida** universales entre verticales — salud, legal, educación, servicios domiciliarios:
+
+```
+Solicitado → Agendado → Confirmado → En Curso → Entregado → Documentado → Cobrado → Verificado
+```
+
+Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica específica del vertical vive *dentro* de cada estado, pero la máquina de estados es invariante.
+
+## Qué Hace Este MCP Server
+
+Este paquete expone el protocolo Servicialo como 20 herramientas MCP organizadas por las **6 fases** del ciclo de vida de un servicio. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+
+### Fase 1 — Descubrimiento (4 herramientas públicas, sin autenticación)
+
+| Herramienta | Descripción |
+|---|---|
+| `registry.search` | Buscar organizaciones por vertical, ubicación, país |
+| `registry.get_organization` | Obtener detalles públicos: servicios, prestadores, configuración de reservas |
+| `scheduling.check_availability` | Consultar disponibilidad (3 variables: prestador ∧ cliente ∧ recurso) |
+| `services.list` | Listar el catálogo público de servicios de una organización |
+
+### Fase 2 — Entender (2 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `service.get` | Obtener las 8 dimensiones de un servicio | `service:read` |
+| `contract.get` | Obtener términos del contrato: evidencia requerida, política de cancelación, ventana de disputa | `service:read` `order:read` |
+
+### Fase 3 — Comprometer (3 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `clients.get_or_create` | Resolver identidad del cliente por email/teléfono — buscar o crear en una sola llamada | `patient:write` |
+| `scheduling.book` | Reservar sesión → estado `solicitado`. `resource_id` opcional para recursos físicos | `schedule:write` |
+| `scheduling.confirm` | Confirmar sesión reservada → estado `confirmado` | `schedule:write` |
+
+### Fase 4 — Ciclo de Vida (4 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `lifecycle.get_state` | Obtener estado actual, transiciones disponibles e historial | `service:read` |
+| `lifecycle.transition` | Ejecutar transición de estado con evidencia | `service:write` |
+| `scheduling.reschedule` | Reagendar a nueva fecha/hora (política contractual puede aplicar) | `schedule:write` |
+| `scheduling.cancel` | Cancelar sesión (se aplica política de cancelación del contrato) | `schedule:write` |
+
+### Fase 5 — Verificar Entrega (3 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `delivery.checkin` | Check-in con GPS + timestamp → estado `en_curso` | `evidence:write` |
+| `delivery.checkout` | Check-out con GPS + timestamp → estado `entregado` (duración auto-calculada) | `evidence:write` |
+| `delivery.record_evidence` | Registrar evidencia: `gps`, `firma`, `foto`, `documento`, `duración`, `notas` | `evidence:write` |
+
+### Fase 6 — Cerrar (4 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `documentation.create` | Generar registro del servicio (nota clínica, informe de inspección, etc.) → estado `documentado` | `document:write` |
+| `payments.create_sale` | Crear cargo por servicio documentado → estado `cobrado` | `payment:write` |
+| `payments.record_payment` | Registrar pago recibido contra una venta | `payment:write` |
+| `payments.get_status` | Obtener estado de pago de una venta o saldo de cuenta del cliente | `payment:read` |
+
+## Instalación y Quickstart
+
+### Opción 1: Modo descubrimiento (zero config)
 
 ```bash
 npx -y @servicialo/mcp-server
 ```
 
-No credentials needed. 4 public tools for discovering organizations, services, and availability.
+Sin API key. Sin org ID. 4 herramientas públicas disponibles de inmediato. Pruébalo:
 
-### Authenticated Mode
-
-```bash
-SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
+```json
+{
+  "tool": "registry.search",
+  "arguments": {
+    "vertical": "kinesiologia",
+    "location": "santiago"
+  }
+}
 ```
 
-Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 20 tools across the full service lifecycle.
+### Opción 2: Modo completo (autenticado)
 
-### Claude Desktop Configuration
+```bash
+SERVICIALO_API_KEY=tu_key SERVICIALO_ORG_ID=tu_org npx -y @servicialo/mcp-server
+```
+
+Las 20 herramientas habilitadas.
+
+### Claude Desktop / Cursor / cualquier cliente MCP
+
+Agregar a tu configuración MCP:
 
 ```json
 {
@@ -35,198 +127,221 @@ Requires `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID`. Enables all 20 tools acro
       "command": "npx",
       "args": ["-y", "@servicialo/mcp-server"],
       "env": {
-        "SERVICIALO_API_KEY": "your_api_key",
-        "SERVICIALO_ORG_ID": "your_org_id"
+        "SERVICIALO_API_KEY": "tu_api_key",
+        "SERVICIALO_ORG_ID": "tu_org_id"
       }
     }
   }
 }
 ```
 
-Omit the `env` block entirely for discovery-only mode.
+Omitir el bloque `env` para modo solo-descubrimiento.
 
-## Environment Variables
+### Variables de Entorno
 
-| Variable | Required | Description |
+| Variable | Requerida | Default | Descripción |
+|---|---|---|---|
+| `SERVICIALO_API_KEY` | No | — | Bearer token. Habilita modo autenticado |
+| `SERVICIALO_ORG_ID` | No | — | Slug de organización. Habilita modo autenticado |
+| `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | Endpoint del API de la plataforma compatible con Servicialo |
+
+`SERVICIALO_API_KEY` y `SERVICIALO_ORG_ID` deben configurarse juntas. Si solo una está presente, el servidor cae a modo descubrimiento con un warning.
+
+## Modelo de Agencia Delegada
+
+El protocolo trata a los agentes de IA como actores de primera clase — pero nunca confía en ellos implícitamente. Cada acción de agente requiere un **ServiceMandate**: una delegación explícita de capacidad de un humano principal a un agente.
+
+### Cómo funciona
+
+1. Un humano (profesional, paciente u organización) emite un mandato a un agente
+2. El mandato especifica **para quién** actúa el agente, **qué** puede hacer (scopes), y **por cuánto tiempo**
+3. En cada tool call, el MCP server valida el mandato contra 8 checks antes de ejecutar
+4. Cada acción produce una entrada de auditoría — éxito o fallo
+
+### Ejemplo de mandato
+
+```json
+{
+  "mandate_id": "550e8400-e29b-41d4-a716-446655440000",
+  "principal_id": "dra_barbara",
+  "principal_type": "professional",
+  "agent_id": "agent_booking_bot",
+  "agent_name": "Asistente de Agendamiento",
+  "acting_for": "professional",
+  "context": "org:clinica-kinesia",
+  "scopes": ["schedule:read", "schedule:write", "patient:write"],
+  "constraints": {
+    "max_actions_per_day": 50,
+    "allowed_hours": {
+      "start": "08:00",
+      "end": "20:00",
+      "timezone": "America/Santiago"
+    },
+    "require_confirmation_above": {
+      "amount": 100000,
+      "currency": "CLP"
+    }
+  },
+  "issued_at": "2026-03-01T00:00:00Z",
+  "expires_at": "2026-06-01T00:00:00Z",
+  "status": "active"
+}
+```
+
+### Uso de mandatos en tool calls
+
+Cuando `actor.type` es `"agent"`, incluir el `mandate_id`:
+
+```json
+{
+  "tool": "scheduling.book",
+  "arguments": {
+    "service_id": "srv_123",
+    "provider_id": "prov_111",
+    "client_id": "cli_789",
+    "starts_at": "2026-03-03T10:00:00",
+    "actor": {
+      "type": "agent",
+      "id": "agent_booking_bot",
+      "mandate_id": "550e8400-e29b-41d4-a716-446655440000"
+    }
+  }
+}
+```
+
+### Los 8 checks de validación
+
+Cada tool call de un agente se valida contra:
+
+| # | Check | Qué previene |
 |---|---|---|
-| `SERVICIALO_API_KEY` | No | Bearer token — enables authenticated mode |
-| `SERVICIALO_ORG_ID` | No | Organization slug — enables authenticated mode |
-| `SERVICIALO_BASE_URL` | No | API base URL of the Servicialo-compatible platform |
+| 1 | **Estado** — mandato debe ser `active` | Uso de mandatos revocados o expirados |
+| 2 | **Validez temporal** — `issued_at ≤ now < expires_at` | Ataques basados en tiempo |
+| 3 | **Identidad del agente** — `mandate.agent_id === agente solicitante` | Suplantación de agente |
+| 4 | **Cobertura de scopes** — scopes del mandato cubren los requisitos de la herramienta | Escalación de privilegios |
+| 5 | **Contexto** — contexto del mandato coincide con la solicitud | Acceso cross-org a datos |
+| 6 | **Conflicto de interés** — agente no puede actuar para ambas partes | Violaciones de doble agencia |
+| 7 | **Restricciones** — horarios permitidos, límites diarios, umbrales financieros | Agentes sobre-autónomos |
+| 8 | **Auditoría** — cada acción registrada con inputs sanitizados | No repudio |
 
-## Agent Flow (6 Lifecycle Phases)
+Actores no-agente (`client`, `provider`, `organization`) no pasan por validación de mandato.
 
-```
-1. DESCUBRIR    → registry.*, check_availability, services.list
-2. ENTENDER     → service.get, contract.get
-3. COMPROMETER  → clients.get_or_create, scheduling.book, scheduling.confirm
-4. GESTIONAR    → lifecycle.get_state, lifecycle.transition, reschedule, cancel
-5. VERIFICAR    → delivery.checkin, delivery.checkout, delivery.record_evidence
-6. CERRAR       → documentation.create, payments.create_sale, record_payment, get_status
-```
+## Descubrimiento de Prestadores
 
-A well-designed agent follows this order. Each phase has its tools. The protocol guarantees any agent can complete the full cycle with any compatible implementation.
+Los agentes pueden buscar en el registro y hacer matching de prestadores con las necesidades de un paciente usando consultas estructuradas.
 
-## Phase 1 — Descubrimiento (4 public tools)
+### Buscar en el registro
 
-| Tool | Description |
-|---|---|
-| `registry.search` | Search organizations by vertical and location |
-| `registry.get_organization` | Get public details of an organization |
-| `scheduling.check_availability` | Check available slots without authentication. If the service has `resource_id` in its location, also verifies physical resource availability (3-variable scheduler: provider ∧ client ∧ resource) |
-| `services.list` | List the public service catalog |
-
-## Phase 2 — Entender (2 tools)
-
-| Tool | Description |
-|---|---|
-| `service.get` | Get the 8 dimensions of a service: what, who delivers, who receives (with separate payer), when, where, lifecycle, evidence, billing |
-| `contract.get` | Get the pre-agreed service contract: required evidence, cancellation policy, no-show policy, dispute terms |
-
-## Phase 3 — Comprometer (3 tools)
-
-| Tool | Description |
-|---|---|
-| `clients.get_or_create` | Find a client by email/phone or create if new. Single call to resolve client identity before booking |
-| `scheduling.book` | Book a new session → state "Solicitado". Accepts optional `resource_id` to reserve a physical resource (3-variable scheduler). Requires contract.get first |
-| `scheduling.confirm` | Confirm a booked session → state "Confirmado" |
-
-## Phase 4 — Ciclo de Vida (4 tools)
-
-| Tool | Description |
-|---|---|
-| `lifecycle.get_state` | Get current lifecycle state, available transitions, and transition history |
-| `lifecycle.transition` | Execute a state transition with evidence. Valid: requested→scheduled, scheduled→confirmed, confirmed→in_progress, in_progress→delivered, delivered→documented, documented→charged, charged→verified, any→cancelled |
-| `scheduling.reschedule` | Exception flow: reschedule to new datetime. Contract rescheduling policy may apply |
-| `scheduling.cancel` | Exception flow: cancel with contract cancellation policy applied |
-
-## Phase 5 — Verificar Entrega (3 tools)
-
-| Tool | Description |
-|---|---|
-| `delivery.checkin` | Provider/client check-in with GPS + timestamp → state "En Curso" |
-| `delivery.checkout` | Check-out with GPS + timestamp → state "Entregado". Duration auto-calculated |
-| `delivery.record_evidence` | Record delivery evidence per vertical: GPS, signature, photo, document, duration, notes |
-
-## Phase 6 — Cerrar (4 tools)
-
-| Tool | Description |
-|---|---|
-| `documentation.create` | Generate service record (clinical note, inspection report, class minutes, etc.) → state "Documentado" |
-| `payments.create_sale` | Create a sale/charge for the documented service → state "Cobrado" |
-| `payments.record_payment` | Record payment received. Payment is independent from lifecycle — billing.status transitions from charged → invoiced → paid |
-| `payments.get_status` | Get payment status for a sale or client account balance |
-
-## End-to-End Example
-
-```
-registry.search({ vertical: "kinesiologia", location: "santiago" })
-  → find org "clinica-kinesia"
-
-registry.get_organization({ org_slug: "clinica-kinesia" })
-  → list services, providers
-
-scheduling.check_availability({ org_slug: "clinica-kinesia", date_from: "2026-03-01", date_to: "2026-03-07" })
-  → available slots
-
-service.get({ service_id: "srv_123" })
-  → 8 dimensions: duration 45min, location presencial, billing, etc.
-
-contract.get({ service_id: "srv_123", org_id: "org_456" })
-  → evidence: check_in + check_out + clinical_record
-  → cancellation: 0% if >24h, 50% if 2-24h, 100% if <2h
-  → dispute window: 48 hours
-
-clients.get_or_create({ email: "paciente@mail.com", name: "Maria", last_name: "Lopez", actor: { type: "agent", id: "agent_1" } })
-  → client_id: "cli_789"
-
-scheduling.book({ service_id: "srv_123", provider_id: "prov_111", client_id: "cli_789", starts_at: "2026-03-03T10:00:00", actor: { type: "agent", id: "agent_1" } })
-  → session_id: "ses_001", state: "requested"
-
-scheduling.confirm({ session_id: "ses_001", actor: { type: "client", id: "cli_789" } })
-  → state: "confirmed"
-
-delivery.checkin({ session_id: "ses_001", actor: { type: "provider", id: "prov_111" }, location: { lat: -33.45, lng: -70.66 } })
-  → state: "in_progress"
-
-delivery.checkout({ session_id: "ses_001", actor: { type: "provider", id: "prov_111" }, location: { lat: -33.45, lng: -70.66 } })
-  → state: "delivered", duration: 42min
-
-delivery.record_evidence({ session_id: "ses_001", evidence_type: "document", data: { type: "clinical_record", signed_by: ["prov_111", "cli_789"] }, actor: { type: "provider", id: "prov_111" } })
-  → evidence recorded
-
-documentation.create({ session_id: "ses_001", content: "Sesion de rehabilitacion...", actor: { type: "provider", id: "prov_111" } })
-  → state: "documented"
-
-payments.create_sale({ client_id: "cli_789", service_id: "srv_123", provider_id: "prov_111", unit_price: 35000 })
-  → sale_id: "sale_001", state: "charged"
-
-lifecycle.transition({ session_id: "ses_001", to_state: "verified", actor: { type: "client", id: "cli_789" } })
-  → state: "verified"
+```json
+{
+  "tool": "registry.search",
+  "arguments": {
+    "vertical": "kinesiologia",
+    "location": "santiago",
+    "country": "cl"
+  }
+}
 ```
 
-## Changelog
+Retorna organizaciones que coinciden con sus servicios y prestadores.
 
-### Package 0.6.0 (current)
+### Consultar disponibilidad
 
-Protocol v0.6.0 — Resource as first-class dimension (3.5b).
-
-| Change | Detail |
-|---|---|
-| `scheduling.check_availability` | Now accepts optional `resource_id` — verifies physical resource availability alongside provider (3-variable scheduler: provider ∧ client ∧ resource) |
-| `scheduling.book` | Now accepts optional `resource_id` — reserves physical resource alongside session |
-| New types | `ResourceSchema`, `ResourceAvailabilitySchema`, `ServiceLocationSchema` with `resource_id` |
-| New exception flow | 5.7 Resource Conflict — when a resource is double-booked or unavailable |
-
-### Package 0.5.0
-
-Consolidated from 38 tools to 20. Tools are now organized by lifecycle phase instead of database entity.
-
-| Removed Tool | Replacement |
-|---|---|
-| `scheduling.list_sessions` | `lifecycle.get_state` |
-| `clients.list` | `clients.get_or_create` |
-| `clients.get` | `clients.get_or_create` |
-| `clients.create` | `clients.get_or_create` |
-| `clients.history` | `lifecycle.get_state` |
-| `payments.list_sales` | `payments.get_status` |
-| `payments.client_balance` | `payments.get_status` |
-| `notifications.send_session_reminder` | `lifecycle.transition` |
-| `notifications.send_payment_reminder` | `lifecycle.transition` |
-| `providers.list` | Removed (not part of service lifecycle) |
-| `providers.get` | Removed (not part of service lifecycle) |
-| `providers.get_commission` | Removed (not part of service lifecycle) |
-| `payroll.*` (5 tools) | Removed (not part of service lifecycle) |
-
-### Protocol 0.6 (current)
-
-Resource as a first-class sub-dimension of Location (3.5b). `resource_id` optional in Location. New exception flow: Resource Conflict (5.7). Scheduler becomes 3-variable: provider ∧ client ∧ resource.
-
-### Protocol 0.3
-
-Lifecycle state order changed. Verified moved from position 6 to position 8 (final). Verification is the closure of the cycle — the client needs the full picture (documentation + charge) before confirming.
-
-| Previous State | Current State | Notes |
-|---|---|---|
-| Completed | Delivered | Renamed — provider marks delivery, not completion |
-| Documented | Documented | Unchanged — comes after Delivered |
-| Invoiced | — | Removed from lifecycle — tracked in billing.status |
-| Collected | — | Removed from lifecycle — tracked in billing.status |
-| — | Charged | New — charge applied 1:1 with delivered + documented session |
-| Verified (pos 6) | Verified (pos 8) | Moved to final — client confirms or auto-verified after silence window |
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Build
-npm run build
-
-# Watch mode
-npm run dev
+```json
+{
+  "tool": "scheduling.check_availability",
+  "arguments": {
+    "org_slug": "clinica-kinesia",
+    "service_id": "srv_rehab_pelvica",
+    "provider_id": "prov_111",
+    "date_from": "2026-03-10",
+    "date_to": "2026-03-14"
+  }
+}
 ```
 
-## License
+El scheduler de 3 variables verifica disponibilidad de prestador, cliente y recurso físico simultáneamente.
 
-Servicialo Protocol is open infrastructure. Licensed under Apache 2.0 — any implementation, commercial or otherwise, is welcome. See [LICENSE](./LICENSE) for details.
+### Ejemplo de punta a punta
+
+```
+1. registry.search({ vertical: "kinesiologia", location: "santiago" })
+   → encuentra org "clinica-kinesia"
+
+2. services.list({ org_slug: "clinica-kinesia" })
+   → lista servicios disponibles
+
+3. scheduling.check_availability({ org_slug: "clinica-kinesia", date_from: "2026-03-10", date_to: "2026-03-14" })
+   → retorna slots disponibles
+
+4. contract.get({ service_id: "srv_123", org_id: "org_456" })
+   → cancelación: 0% si >24h, 50% si 2-24h, 100% si <2h
+   → evidencia requerida: check_in + check_out + registro_clinico
+
+5. clients.get_or_create({ email: "maria@mail.com", name: "Maria", last_name: "Lopez" })
+   → client_id: "cli_789"
+
+6. scheduling.book({ service_id: "srv_123", provider_id: "prov_111", client_id: "cli_789", starts_at: "2026-03-12T10:00:00" })
+   → session_id: "ses_001", estado: "solicitado"
+
+7. scheduling.confirm({ session_id: "ses_001" })
+   → estado: "confirmado"
+
+8. delivery.checkin({ session_id: "ses_001", location: { lat: -33.45, lng: -70.66 } })
+   → estado: "en_curso"
+
+9. delivery.checkout({ session_id: "ses_001", location: { lat: -33.45, lng: -70.66 } })
+   → estado: "entregado", duración: 42min
+
+10. documentation.create({ session_id: "ses_001", content: "Sesión de rehabilitación de piso pélvico..." })
+    → estado: "documentado"
+
+11. payments.create_sale({ client_id: "cli_789", service_id: "srv_123", unit_price: 35000 })
+    → sale_id: "sale_001", estado: "cobrado"
+
+12. lifecycle.transition({ session_id: "ses_001", to_state: "verified" })
+    → estado: "verificado" ✓
+```
+
+## Especificación del Protocolo
+
+La especificación completa del protocolo Servicialo está disponible en:
+
+- **Repositorio:** [github.com/servicialo/protocol](https://github.com/servicialo/protocol)
+- **Sitio web:** [servicialo.com](https://servicialo.com)
+- **Versión estable actual:** 0.7
+- **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
+
+La spec cubre las 8 dimensiones del servicio, 8 estados de ciclo de vida, 5 flujos de excepción (inasistencia, cancelación, disputa, reagendamiento, entrega parcial), la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), y el Modelo de Agencia Delegada.
+
+## Implementación de Referencia
+
+**Digitalo** es la primera implementación en producción del protocolo Servicialo, operando en salud en Chile. Implementa el ciclo de vida completo — desde descubrimiento de prestadores hasta liquidación de pagos — y sirve como terreno de validación para la evolución del protocolo.
+
+Este MCP server se conecta a cualquier backend compatible con Servicialo a través de `SERVICIALO_BASE_URL`. Digitalo es uno de esos backends. El protocolo está diseñado para que cualquier CRM, HIS, o plataforma lo implemente como un nodo soberano.
+
+## Contribuir al Protocolo
+
+Servicialo sigue versionado semántico para la especificación del protocolo:
+
+- **Patch** (0.7.x) — clarificaciones, correcciones de typos, adiciones no-breaking
+- **Minor** (0.x.0) — nuevos campos opcionales, nuevas definiciones de herramientas, nuevos flujos de excepción
+- **Major** (x.0.0) — cambios breaking a schemas, máquina de estados, o semántica core
+
+### Cómo proponer cambios
+
+1. Abrir un issue describiendo el problema y la solución propuesta
+2. Para cambios significativos, escribir un RFC en `spec/` con el número de sección que afecta
+3. Los cambios al protocolo requieren al menos una implementación de referencia antes de merge
+4. Los cambios a schemas deben incluir JSON Schema actualizado y tipos Zod en el MCP server
+
+### Áreas buscando input activamente
+
+- Requisitos de evidencia específicos por vertical (más allá de salud)
+- Soporte multi-idioma para nombres de estados del ciclo de vida
+- Federación inter-nodo (cómo dos implementaciones Servicialo interoperan)
+- Patrones de Agent SDK para Python y TypeScript
+
+## Licencia
+
+Apache-2.0 — cualquier implementación, comercial o no, es bienvenida. Ver [LICENSE](./LICENSE).
