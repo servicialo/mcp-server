@@ -44,3 +44,4 @@ next-env.d.ts
 # mcp publisher binaries
 mcp-publisher
 mcp-publisher.exe
+packages/mcp-server/key.pem
