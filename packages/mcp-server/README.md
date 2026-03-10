@@ -229,4 +229,4 @@ npm run dev
 
 ## License
 
-MIT
+Servicialo Protocol is open infrastructure. Licensed under Apache 2.0 — any implementation, commercial or otherwise, is welcome. See [LICENSE](./LICENSE) for details.
