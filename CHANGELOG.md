@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 The **protocol** follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The **MCP server** (`@servicialo/mcp-server`) is versioned independently.
 
+## [Protocol v0.7] - 2026-03-10
+
+### Added
+- **Visibility field** (`public` | `unlisted` | `private`) on Service and Service Order — controls discoverability in the network.
+
+### Changed
+- License changed from MIT to Apache-2.0.
+
 ## [Protocol v0.3] - 2025-02-23
 
 ### Added
@@ -43,6 +51,7 @@ The **MCP server** (`@servicialo/mcp-server`) is versioned independently.
 - CONTRIBUTING.md with RFC process for standard changes.
 - Dual license structure (Apache-2.0 for code/spec, CC-BY-4.0 for docs).
 
+[Protocol v0.7]: https://github.com/servicialo/mcp-server/compare/v0.3...v0.7
 [Protocol v0.3]: https://github.com/servicialo/mcp-server/compare/v0.2...v0.3
 [Protocol v0.2]: https://github.com/servicialo/mcp-server/compare/v0.1...v0.2
 [Protocol v0.1]: https://github.com/servicialo/mcp-server/releases/tag/v0.1

@@ -2,95 +2,145 @@
 
 **The orchestration layer for the AI-agent service economy**
 
-**Version:** 0.3
-**Status:** Stable
-**License:** MIT
-**Reference Implementation:** [Coordinalo](https://coordinalo.com)
+| | |
+|---|---|
+| **Version** | 0.8 |
+| **Date** | 2026-03-10 |
+| **Status** | Draft |
+| **License** | Apache-2.0 |
+| **Canonical URL** | `https://servicialo.com/spec/v0.8` |
+| **Schemas** | `https://servicialo.com/schema/` |
+
+---
+
+## Conformance
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
 ---
 
 ## Table of Contents
 
-1. [Overview](#1-overview)
-2. [Protocol Primitives](#2-protocol-primitives)
-3. [Core Entities](#3-core-entities)
-4. [The 8 Dimensions of a Service](#4-the-8-dimensions-of-a-service)
-5. [The 9 Universal States](#5-the-9-universal-states)
-6. [Exception Flows](#6-exception-flows)
-7. [Service Order](#7-service-order)
-8. [The Principles](#8-the-principles)
-9. [Schema](#9-schema)
-10. [Agent Decision Model](#10-agent-decision-model)
-11. [MCP Server](#11-mcp-server)
-12. [Network Intelligence](#12-network-intelligence)
-13. [Implementations](#13-implementations)
-14. [Contributing](#14-contributing)
+1.  [Overview](#1-overview)
+2.  [Glossary](#2-glossary)
+3.  [Protocol Primitives](#3-protocol-primitives)
+4.  [Core Entities](#4-core-entities)
+5.  [The 8 Dimensions of a Service](#5-the-8-dimensions-of-a-service)
+6.  [The 9 Universal States](#6-the-9-universal-states)
+7.  [Exception Flows](#7-exception-flows)
+8.  [Service Order](#8-service-order)
+9.  [Principles](#9-principles)
+10. [Delegated Agency Model](#10-delegated-agency-model)
+11. [Agent Decision Model](#11-agent-decision-model)
+12. [Provider Profile & Discoverable Attributes](#12-provider-profile--discoverable-attributes)
+13. [MCP Tool Interface](#13-mcp-tool-interface)
+14. [Network Intelligence](#14-network-intelligence)
+15. [Extensibility](#15-extensibility)
+16. [Implementations](#16-implementations)
+17. [Contributing & Versioning](#17-contributing--versioning)
+
+**Appendices**
+
+- [A. Glossary (extended)](#appendix-a-glossary)
+- [B. Changelog v0.6 → v0.7 → v0.8](#appendix-b-changelog)
+- [C. Scope Reference](#appendix-c-scope-reference)
+- [D. Attribute Key Reference](#appendix-d-attribute-key-reference)
 
 ---
 
 ## 1. Overview
 
-Servicialo is an open protocol that defines the orchestration layer for professional service delivery in the AI-agent economy. It creates the common language so that scheduling, identity, resource allocation, and financial settlement flow across platforms without silos.
+Servicialo is an open protocol that defines the orchestration layer for professional service delivery in the AI-agent service economy. It provides the common language so that scheduling, identity, resource allocation, and financial settlement flow across platforms without silos.
 
-Unlike scheduling APIs that model "when", payment APIs that model "how much", or healthcare APIs that model "what clinical data", Servicialo models the entire value delivery chain: who provides, who receives, who pays, when, where, what evidence proves delivery occurred, and what documentation results.
+The protocol models the entire value delivery chain: who provides, who receives, who pays, when, where, what evidence proves delivery occurred, and what documentation results. It is designed for two audiences simultaneously:
 
-The protocol is designed for two audiences simultaneously:
+- **Humans** who design, deliver, and manage professional services.
+- **AI agents** that discover, coordinate, verify, and settle services programmatically.
 
-- **Humans** designing, delivering, and managing professional services
-- **AI agents** that need to discover, coordinate, verify, and settle services programmatically
+### 1.1 Motivation
 
-### Why a new protocol?
-
-Professional services represent a $6T+ global market with no universal protocol. Every platform builds its own data model for appointments, payments, and verification. The result: services are siloed, non-interoperable, and invisible to AI agents. Collective intelligence about service delivery — demand patterns, pricing benchmarks, operational efficiency — never forms because data is trapped in proprietary systems.
+Professional services represent a multi-trillion-dollar global market with no universal protocol. Every platform builds its own data model for appointments, payments, and verification. The result: services are siloed, non-interoperable, and invisible to AI agents. Collective intelligence about service delivery never forms because data is trapped in proprietary systems.
 
 Servicialo defines the minimum viable schema for any AI agent to interact with any professional service — regardless of the platform that manages it. The protocol is neutral infrastructure: no single implementation owns it.
 
-### What Servicialo is NOT
+### 1.2 Scope and Non-Goals
 
-- Not a scheduling API (though it includes scheduling)
-- Not a payments protocol (though it includes payment states)
-- Not a healthcare standard (though it works for healthcare)
-- Not a platform (platforms implement it)
-- Not owned by any single company (Coordinalo is the reference implementation, not the owner)
+Servicialo **is**:
+
+- A protocol that defines data contracts for professional service orchestration.
+- Stack-agnostic — it prescribes structures, not implementations.
+- Designed for cross-platform interoperability.
+
+Servicialo **is not**:
+
+- A scheduling API (though it includes scheduling semantics).
+- A payments protocol (though it includes payment states).
+- A healthcare standard (though it works for healthcare).
+- A platform (platforms implement it).
+- Owned by any single company.
 
 ---
 
-## 2. Protocol Primitives
+## 2. Glossary
 
-The protocol defines four coordination primitives that together cover the complete value chain of professional service delivery:
+Terms used throughout this specification. See [Appendix A](#appendix-a-glossary) for the extended glossary.
 
-### 2.1 Schedule Coordination
+| Term | Definition |
+|------|------------|
+| **Service** | The atomic unit of professional service delivery, modeled across 8 dimensions. |
+| **Service Order** | A bilateral commercial agreement that groups one or more Services under a defined scope, pricing model, and payment schedule. |
+| **ServiceMandate** | An explicit delegation of capability from a human principal to an AI agent. |
+| **Provider** | The professional or entity that delivers a service. |
+| **Client** | The beneficiary who receives a service. |
+| **Payer** | The entity that pays for a service. MAY differ from the client. |
+| **Resource** | A physical entity (room, chair, equipment) required for service delivery. |
+| **Principal** | The human or organization that issues a ServiceMandate. |
+| **Agent** | An AI system that acts on behalf of a principal under a ServiceMandate. |
+| **Scope (mandate)** | A `resource:action` capability pair granted within a ServiceMandate. |
+| **Visibility** | Discovery level of a protocol object: `public`, `unlisted`, or `private`. |
+| **ProviderAttribute** | A typed, origin-tracked descriptor of a provider's identity, capability, or operational profile. |
+| **Transition** | A recorded state change in a lifecycle, including actor, method, and timestamp. |
+| **Evidence** | A proof-of-delivery artifact (GPS, signature, photo, document, duration). |
+
+---
+
+## 3. Protocol Primitives
+
+The protocol defines four coordination primitives that together cover the complete value chain of professional service delivery.
+
+### 3.1 Schedule Coordination
 
 Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 9 lifecycle states, and 7 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
 
-### 2.2 Identity Verification
+### 3.2 Identity Verification
 
 Provider credentials, trust scores computed from delivery history, and explicit separation of client from payer. The protocol models the fact that in most professional services, the person who receives the service is not the person who pays for it.
 
-### 2.3 Financial Settlement
+### 3.3 Financial Settlement
 
-Billing, invoicing, collection, and revenue sharing between provider, organization, and infrastructure. The Service Order ledger provides a computed, real-time view of consumption vs. commitment. Dispute resolution defines algorithmic arbitration for ~80% of cases.
+Billing, invoicing, collection, and revenue sharing between provider, organization, and infrastructure. The Service Order ledger provides a computed, real-time view of consumption vs. commitment. Dispute resolution defines algorithmic arbitration for the majority of cases.
 
-### 2.4 Demand Signals
+### 3.4 Demand Signals
 
 Aggregate, anonymous operational telemetry across network nodes. Each implementation that contributes data receives benchmarks segmented by vertical, region, and scale. The model is contribute-to-access: collective intelligence is a protocol commons, not an asset of any single implementation.
 
 ---
 
-## 3. Core Entities
+## 4. Core Entities
+
 The protocol is built around two objects and their relationship.
 
-**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 4](#4-the-8-dimensions-of-a-service). A Service can exist standalone or within a Service Order.
+**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 5](#5-the-8-dimensions-of-a-service). A Service MAY exist standalone or within a Service Order.
 
-**Service Order** is the commercial agreement that groups one or more Services under a defined scope, an agreed price, and a payment schedule. It is optional — not every Service belongs to an Order.
+**Service Order** is the commercial agreement that groups one or more Services under a defined scope, an agreed price, and a payment schedule. It is OPTIONAL — not every Service belongs to an Order.
 
 The key relationship: when a Service belongs to a Service Order, its `billing` dimension is **informative** (it records the economic value of the individual service unit) but **not transactional** (it does not generate an invoice). Invoicing is the exclusive responsibility of the Service Order, which triggers it according to its own payment schedule.
 
-A Service without a Service Order is a valid, complete object. The Order is an optional upper layer, not a requirement.
+A Service without a Service Order is a valid, complete object.
 
 ```
 Organization
-└── Service Order (optional)
+└── Service Order (OPTIONAL)
     ├── scope: what services, how many, what type
     ├── pricing: how value is calculated
     ├── payment_schedule: when money moves
@@ -100,303 +150,275 @@ Organization
 
 ---
 
-## 4. The 8 Dimensions of a Service
+## 5. The 8 Dimensions of a Service
 
-Every professional service — from a physical therapy session to a legal consultation — can be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
+Every professional service — from a physical therapy session to a legal consultation — MUST be described across 8 dimensions. These are the minimum fields required for an AI agent to fully understand and coordinate a service.
 
 > When a Service belongs to a Service Order, the `billing` dimension is informative — it records the economic value of the individual service unit. The Service Order determines when and how invoicing occurs.
 
-### 3.1 Identity (What)
+### 5.1 Identity (What)
 
 The activity or outcome being delivered.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `id` | string | Unique identifier | `svc_abc123` |
-| `type` | string | Service category | `physical_therapy_session` |
-| `vertical` | enum | Industry vertical | `health`, `legal`, `home`, `education` |
-| `name` | string | Human-readable name | "Kinesiology Session - 45min" |
-| `duration_minutes` | integer | Expected duration | `45` |
-| `requirements` | string[] | Prerequisites | `["medical_referral", "intake_form"]` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | REQUIRED | Unique identifier. |
+| `service_order_id` | string | OPTIONAL | Reference to a parent Service Order. |
+| `type` | string | REQUIRED | Service category (e.g., `physical_therapy_session`, `legal_consultation`). |
+| `vertical` | string | REQUIRED | Industry vertical (e.g., `health`, `legal`, `home`, `education`). |
+| `name` | string | REQUIRED | Human-readable service name. |
+| `duration_minutes` | integer | REQUIRED | Expected duration in minutes. MUST be ≥ 1. |
+| `requirements` | string[] | OPTIONAL | Prerequisites for this service. |
+| `visibility` | enum | OPTIONAL | `public` \| `unlisted` \| `private`. Default: `public`. See §5.1.1. |
 
-### 3.2 Provider (Who Delivers)
+#### 5.1.1 Visibility Semantics
+
+| Value | Discovery | Access |
+|-------|-----------|--------|
+| `public` | Indexed in catalogs and search results. | Any agent or human can read the service definition. |
+| `unlisted` | Not indexed. Accessible only by direct ID. | Any agent or human with the ID can read it. |
+| `private` | Not indexed. Not accessible without authorization. | Only authorized parties (mandate context match). |
+
+Visibility controls **discoverability**, not **authorization**. Even for `public` services, performing any action beyond reading the catalog REQUIRES a valid ServiceMandate (§10).
+
+### 5.2 Provider (Who Delivers)
 
 The professional or entity delivering the service.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `provider.id` | string | Provider identifier | `prov_xyz789` |
-| `provider.credentials` | string[] | Required certifications | `["kinesiologist_cl", "colegio_medico"]` |
-| `provider.trust_score` | number | 0-100, calculated from history | `92` |
-| `provider.organization_id` | string | Parent organization | `org_mamapro` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `provider.id` | string | REQUIRED | Provider identifier. |
+| `provider.credentials` | string[] | OPTIONAL | Required certifications. |
+| `provider.trust_score` | number | OPTIONAL | 0–100, calculated from history. |
+| `provider.organization_id` | string | REQUIRED | Parent organization. |
+| `provider.profile_id` | string | OPTIONAL | Reference to a ProviderProfile (§12). |
 
-### 3.3 Client (Who Receives)
+### 5.3 Client (Who Receives)
 
-The beneficiary of the service.
+The beneficiary of the service. The payer is explicitly separated from the client.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `client.id` | string | Client identifier | `cli_def456` |
-| `client.payer_id` | string | May differ from client | `payer_fonasa` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `client.id` | string | REQUIRED | Client (beneficiary) identifier. |
+| `client.payer_id` | string | OPTIONAL | Who pays. MAY differ from client — insurance, employer, guardian. |
 
-**Design decision:** The payer is explicitly separated from the client. In healthcare, insurance pays. In corporate training, the employer pays. In education, the parent pays. Most scheduling APIs ignore this distinction.
-
-### 3.4 Schedule (When)
+### 5.4 Schedule (When)
 
 The temporal window for the service.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `schedule.requested_at` | datetime | When the request was made | `2026-02-10T08:00:00Z` |
-| `schedule.scheduled_for` | datetime | Agreed start time | `2026-02-10T10:00:00Z` |
-| `schedule.duration_expected` | integer | Expected minutes | `45` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `schedule.requested_at` | datetime | REQUIRED | When the request was made. ISO 8601. |
+| `schedule.scheduled_for` | datetime | OPTIONAL | Agreed start time. Set when the service transitions to `scheduled`. |
+| `schedule.duration_expected` | integer | OPTIONAL | Expected duration in minutes. |
 
-### 3.5 Location (Where)
+### 5.5 Location (Where)
 
 Physical or virtual location.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `location.type` | enum | `in_person`, `virtual`, `home_visit` | `in_person` |
-| `location.address` | string | Physical address | "Av. Providencia 1234, Santiago" |
-| `location.room` | string | Specific room/box | `"Box 3"` |
-| `location.coordinates` | object | lat/lng | `{lat: -33.42, lng: -70.61}` |
-| `location.resource_id` | string | Reference to a Resource entity (see 3.5b) | `res_box3` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `location.type` | enum | OPTIONAL | `in_person` \| `virtual` \| `home_visit`. |
+| `location.address` | string | OPTIONAL | Physical address. |
+| `location.room` | string | OPTIONAL | Human-readable room label. |
+| `location.resource_id` | string | OPTIONAL | Reference to a Resource entity (§5.5.1). |
+| `location.coordinates` | object | OPTIONAL | `{ lat: number, lng: number }`. |
 
-**Design decision:** `location.room` remains as a human-readable label for simple cases where resource management is unnecessary. When a service requires scheduling a physical resource with its own availability and constraints, `location.resource_id` references a full Resource entity (Section 3.5b). Both fields can coexist — `room` for display, `resource_id` for scheduling logic.
+#### 5.5.1 Resource (Physical Space or Equipment)
 
-### 3.5b Resource (What Physical Space or Equipment)
+A Resource is a physical entity — a room, a dental chair, a gym court, a therapy box — that a service MAY require for delivery. It is OPTIONAL: virtual sessions, home visits, and services delivered at the client's location have no Resource. When a Resource exists, it is a first-class entity with its own identity, availability calendar, and constraints.
 
-A Resource is a physical entity — a room, a dental chair, a gym court, a therapy box — that a service may require for delivery. It is optional: virtual sessions, home visits, and services delivered at the client's location have no Resource. But when a Resource exists, it is a first-class entity with its own identity, availability calendar, and constraints.
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `resource.id` | string | REQUIRED | Unique identifier. |
+| `resource.organization_id` | string | REQUIRED | Owning organization. |
+| `resource.name` | string | REQUIRED | Human-readable name. |
+| `resource.type` | string | OPTIONAL | Category: `room`, `box`, `chair`, `equipment`. Default: `room`. |
+| `resource.capacity` | integer | OPTIONAL | Max simultaneous sessions. Default: 1. |
+| `resource.buffer_minutes` | integer | OPTIONAL | Reset time between uses, in minutes. Default: 0. |
+| `resource.equipment` | string[] | OPTIONAL | Available equipment or features. |
+| `resource.location` | string | OPTIONAL | Physical location description. |
+| `resource.is_active` | boolean | OPTIONAL | Whether bookable. Default: `true`. |
+| `resource.rules` | object | OPTIONAL | Extensible business logic constraints. |
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `resource.id` | string | Unique identifier | `res_box3` |
-| `resource.organization_id` | string | Owning organization | `org_mamapro` |
-| `resource.name` | string | Human-readable name | `"Box 3"` |
-| `resource.type` | string | Category | `"room"`, `"box"`, `"chair"`, `"equipment"` |
-| `resource.capacity` | integer | Max simultaneous sessions | `1` |
-| `resource.buffer_minutes` | integer | Reset time between uses | `15` |
-| `resource.equipment` | string[] | Available equipment | `["camilla", "TENS", "ultrasonido"]` |
-| `resource.location` | string | Physical location description | `"2nd floor, east wing"` |
-| `resource.is_active` | boolean | Whether bookable | `true` |
-| `resource.rules` | object | Business logic constraints | `{max_hours_per_day: 8}` |
+**Buffer semantics:** `buffer_minutes` is resource time, not provider time. When computing available slots, the effective occupation of a resource is `session_duration + buffer_minutes`. This is arithmetic, not a business rule, and therefore belongs in the schema rather than in `rules`.
 
-#### Why Resource is a separate dimension — not a field on Location
+**Capacity semantics:** When `capacity > 1`, the Resource can host multiple simultaneous sessions. The scheduler MUST verify: `current_clients + new_clients ≤ resource.capacity`. A yoga studio with `capacity = 20` and a dental chair with `capacity = 1` use the same logic.
 
-A Resource has its own calendar of availability, independent from the provider and the client. It can be blocked for reasons unrelated to any session — maintenance, deep cleaning, institutional reservation, equipment calibration. Treating it as a text field on Location — as most scheduling systems do — collapses two distinct concepts and generates conflicts that only surface in production: the provider is available, the client is available, but the room is under maintenance. By the time a team discovers this conflict in a text-field model, they've already shipped a broken scheduler and are patching it with ad-hoc rules.
+#### 5.5.2 Resource Availability
 
-A correct implementation models Resource as an entity that participates in availability intersection alongside provider and client. When scheduling a session, the system must verify three-way availability: provider free AND client free AND resource free.
+A Resource has its own recurring availability schedule, independent from provider schedules.
 
-#### The buffer problem
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `availability.resource_id` | string | REQUIRED | Parent resource. |
+| `availability.day_of_week` | integer | REQUIRED | 0 = Sunday, 6 = Saturday. |
+| `availability.start_time` | string | REQUIRED | Start time (HH:mm). |
+| `availability.end_time` | string | REQUIRED | End time (HH:mm). |
+| `availability.is_available` | boolean | OPTIONAL | Default: `true`. `false` = explicitly blocked. |
+| `availability.timezone` | string | OPTIONAL | IANA timezone identifier. |
+| `availability.block_order` | integer | OPTIONAL | Block sequence within a day. |
 
-The buffer is not provider time and not client time — it is resource time. A physical therapist can see the next patient immediately. The therapy box needs 15 minutes of sanitization. If the buffer lives on the provider's schedule, the model is wrong — and the error compounds when the same pattern appears in dentistry (instrument sterilization), group fitness (room cleaning), or coworking (turnover reset).
+The combination of `resource_id + day_of_week + block_order` MUST be unique.
 
-`buffer_minutes` is a first-class field on Resource — not buried inside `rules` — because the scheduler needs it for arithmetic. When computing available slots, the effective occupation of a resource is `session_duration + buffer_minutes`. This is a mathematical operation, not a business rule. Fields that the scheduler needs for arithmetic belong in the schema; fields that encode business logic belong in `rules`.
+### 5.6 Lifecycle (States)
 
-#### Capacity and group sessions
+Current position in the 9-state lifecycle. See [Section 6](#6-the-9-universal-states).
 
-When `capacity > 1`, the Resource can host multiple simultaneous sessions as long as the total number of clients does not exceed `capacity`. The scheduler must verify:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `lifecycle.current_state` | enum | REQUIRED | One of the 9 universal states or exception states. |
+| `lifecycle.transitions` | transition[] | OPTIONAL | State change history (audit trail). |
+| `lifecycle.exceptions` | exception[] | OPTIONAL | No-shows, disputes, resource conflicts. |
 
-```
-current_clients + new_clients ≤ resource.capacity
-```
-
-This is not a special case — it is the general behavior. `capacity = 1` is simply the individual session case. A yoga studio with `capacity = 20` and a dental chair with `capacity = 1` use the exact same scheduling logic; only the number differs.
-
-#### Resource Availability
-
-A Resource has its own recurring availability schedule, independent from provider schedules. Each availability block defines when the resource is bookable.
-
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `availability.resource_id` | string | Parent resource | `res_box3` |
-| `availability.day_of_week` | integer | 0 = Sunday, 6 = Saturday | `1` |
-| `availability.start_time` | string | Start time (HH:mm) | `"08:00"` |
-| `availability.end_time` | string | End time (HH:mm) | `"18:00"` |
-| `availability.is_available` | boolean | Available or blocked | `true` |
-| `availability.timezone` | string | IANA timezone | `"America/Santiago"` |
-| `availability.block_order` | integer | Block sequence within a day | `1` |
-
-**Design decision:** Resource availability is modeled as recurring weekly blocks, the same pattern used for provider availability. This allows the scheduler to apply the same intersection algorithm across all three entities (provider, client preference, resource) without special-casing any of them. `block_order` enables multiple availability blocks per day (e.g., a room available 08:00–12:00 and 14:00–18:00, closed for lunch). The combination of `resource_id + day_of_week + block_order` is unique — each block within a day is an independent availability window.
-
-### 3.6 Lifecycle (States)
-
-Current position in the 9-state lifecycle. See [Section 5](#5-the-9-universal-states).
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `lifecycle.current_state` | enum[9] | Current state |
-| `lifecycle.transitions` | transition[] | State change history |
-| `lifecycle.exceptions` | exception[] | No-shows, disputes, etc. |
-
-### 3.7 Proof of Delivery (Evidence)
+### 5.7 Proof of Delivery (Evidence)
 
 How the service proves it occurred.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `proof.checkin` | datetime | Provider/client arrived | `2026-02-10T09:58:00Z` |
-| `proof.checkout` | datetime | Session ended | `2026-02-10T10:43:00Z` |
-| `proof.duration_actual` | integer | Actual minutes | `45` |
-| `proof.evidence` | evidence[] | GPS, signatures, photos | `[{type: "gps", ...}]` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `proof.checkin` | datetime | OPTIONAL | When the provider or client checked in. |
+| `proof.checkout` | datetime | OPTIONAL | When the session ended. |
+| `proof.duration_actual` | integer | OPTIONAL | Actual minutes. Auto-calculated from checkin/checkout. |
+| `proof.evidence` | evidence[] | OPTIONAL | Evidence items: GPS, signatures, photos, documents. |
 
-### 3.8 Billing (Payment)
+### 5.8 Billing (Payment)
 
-Financial settlement for the service. Billing has its own status independent from the lifecycle state — a service can be Collected in the lifecycle while its billing is still `invoiced` (e.g., waiting for insurance reimbursement).
+Financial settlement for the service. Billing has its own status independent from the lifecycle state.
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `billing.amount` | money | Service price | `{value: 35000, currency: "CLP"}` |
-| `billing.payer` | reference | Who pays (may differ from client) | `payer_fonasa` |
-| `billing.status` | enum | `pending` \| `charged` \| `invoiced` \| `paid` \| `disputed` | `charged` |
-| `billing.charged_at` | datetime | When charge was applied to account | `2026-02-10T11:05:00Z` |
-| `billing.payment_id` | reference | Linked payment (may be a prepaid package) | `pkg_001` |
-| `billing.tax_document` | reference | Invoice/receipt if issued | `inv_001234` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `billing.amount` | object | REQUIRED | `{ value: number, currency: string }`. Currency MUST be ISO 4217. |
+| `billing.payer` | string | OPTIONAL | Who pays. MAY differ from client. |
+| `billing.status` | enum | OPTIONAL | `pending` \| `charged` \| `invoiced` \| `paid` \| `disputed`. |
+| `billing.charged_at` | datetime | OPTIONAL | When the charge was applied. |
+| `billing.payment_id` | string | OPTIONAL | Linked payment — MAY reference a prepaid package. |
+| `billing.tax_document` | string | OPTIONAL | Reference to invoice or receipt if issued. |
 
-**Design decision:** `charged` and `paid` are explicitly separated. **Charged** means the amount was debited from the client's balance or added to their debt — it always happens 1:1 with a Completed session. **Paid** means cash was received, and may have occurred upstream (when the client purchased a prepaid package) or downstream (insurance reimbursement). Most professional service platforms in Latin America operate on prepaid packages — conflating charge and payment loses critical information about cash flow.
+**`charged` vs. `paid`:** `charged` means the amount was debited from the client's balance or added to their debt — it always happens 1:1 with a completed session. `paid` means cash was received, and MAY have occurred upstream (prepaid package) or downstream (insurance reimbursement).
 
 ---
 
-## 5. The 9 Universal States
+## 6. The 9 Universal States
 
-Every service — from a physical therapy session to a legal consultation — passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
+Every service passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
 
 ```
-Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
+Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
 ```
 
-| # | Key (enum) | Nombre | Description | Trigger |
-|---|------------|--------|-------------|---------|
-| 1 | **requested** | Solicitado | Client or agent defines what they need | Client submits request |
-| 2 | **scheduled** | Agendado | Time, provider, and location assigned | System matches availability |
-| 3 | **confirmed** | Confirmado | Both parties acknowledge | Provider + client confirm |
-| 4 | **in_progress** | En Curso | Service is being delivered | Check-in detected |
-| 5 | **completed** | Completado | Provider marks delivery complete | Provider confirms (1-tap WhatsApp or app) |
-| 6 | **documented** | Documentado | Record/evidence generated | Clinical note, report, or evidence filed |
-| 7 | **invoiced** | Facturado | Tax document issued | Tax document emitted |
-| 8 | **collected** | Cobrado | Payment received and confirmed | Payment received and confirmed |
-| 9 | **verified** | Verificado | Client confirms OK or silence window expires | Client responds OK, or auto-verified after window |
+| # | Key (enum) | Description | Trigger |
+|---|------------|-------------|---------|
+| 1 | `requested` | Client or agent defines what they need. | Client submits request. |
+| 2 | `scheduled` | Time, provider, and location assigned. | System matches availability. |
+| 3 | `confirmed` | Both parties acknowledge. | Provider + client confirm. |
+| 4 | `in_progress` | Service is being delivered. | Check-in detected. |
+| 5 | `completed` | Provider marks delivery complete. | Provider confirms. |
+| 6 | `documented` | Record/evidence generated. | Clinical note, report, or evidence filed. |
+| 7 | `invoiced` | Tax document issued. | Tax document emitted. |
+| 8 | `collected` | Payment received and confirmed. | Payment received and confirmed. |
+| 9 | `verified` | Client confirms OK or silence window expires. | Client responds OK, or auto-verified after window. |
 
-### Resource commitment in Scheduled state
+### 6.1 State Transition Rules
 
-When a session has an assigned Resource, the **Scheduled** state implies that three entities are simultaneously committed: the provider, the client(s), and the physical resource. This is a stronger commitment than a two-party appointment — releasing any one of the three affects the other two. A provider cancellation frees the resource for reallocation. A resource becoming unavailable (maintenance, emergency) forces rescheduling even if provider and client are still available. Implementations must treat the three-way commitment as atomic: a session is only validly Scheduled when all three entities have confirmed availability for the time slot.
+States MUST be strictly ordered. The 9 universal states MUST NOT be skipped (e.g., a service MUST NOT jump from `scheduled` directly to `documented`). Implementations MAY add intermediate states between the universal states; these intermediate states MUST follow the same forward-only rule. Exception flows (§7) MAY redirect a service out of the happy path at any point.
 
-### Why 9 states?
-
-Fewer states lose critical information — without separating Completed from Documented, you can't distinguish "the provider says it happened" from "the evidence is on record". Without separating Invoiced from Collected, you can't know if the payment was actually received. Without separating Collected from Verified, you can't know if the client accepted the outcome.
-
-More states add friction. 9 is the minimum viable set for an AI agent to verify the full service chain with certainty.
-
-### Why Verified comes last
-
-Verification is the closure of the cycle, not a step in the middle. In practice:
-
-1. The provider delivers the service (Completado)
-2. The provider documents (writes the clinical note, files the report) (Documentado)
-3. The tax document is issued (Facturado)
-4. Payment is collected (Cobrado)
-5. The client verifies — or the verification window expires and it auto-closes (Verificado)
-
-The client cannot meaningfully verify until the service has been documented, invoiced, and collected. They need the complete picture — the clinical note, the invoice, the payment confirmation — before they can confirm or dispute. Verification that comes before documentation is premature: the client would be confirming something that hasn't been formally recorded yet.
-
-### Intermediate states
-
-Implementations may add states between the universal nine to match their operational reality. For example, an assignment step between Requested and Scheduled, or a quality review step between Documented and Invoiced. The 9 universal states are the minimum — not the maximum.
-
-### Revenue recognition
-
-What triggers the transition from Completed to the financial cycle (Documented → Invoiced → Collected) depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
-
-| Method | When revenue is recognized | Example |
-|--------|---------------------------|---------|
-| Per delivery | Each completed session | Individual therapy session |
-| Percentage of completion | Proportional to treatment progress | Orthodontics: each session = X% |
-| Milestones | At defined checkpoints | Consulting: interim deliverable, final deliverable |
-
-The protocol does not prescribe which method to use. Each implementation resolves this based on its vertical.
-
-### Why there is no "Paid" state in the lifecycle
-
-Payment flow is tracked in `billing.status`, independently from the lifecycle. In Latin American professional services, the dominant model is prepaid packages — the client pays before the sessions occur. **Collected** means the payment for the session was received or accounted for. **Paid** (in `billing.status`) may have occurred days or weeks earlier when the client purchased the package. For post-paid models (insurance, corporate invoicing), `billing.status` transitions from `pending → invoiced → paid` after the lifecycle closes. The lifecycle captures the milestone; `billing.status` captures the flow.
-
-### State transitions
-
-States are strictly ordered. The 9 universal states cannot be skipped (e.g., jump from Scheduled to Documented). Intermediate states added by implementations fit between the universal states and follow the same forward-only rule. Exception flows can redirect a service out of the happy path at any point. See [Section 6](#6-exception-flows).
-
-Each transition records:
+Each transition MUST record:
 
 ```yaml
 transition:
-  from: "collected"
-  to: "verified"
-  at: "2026-02-10T11:00:00Z"
-  by: "client_def456"       # who triggered (client, provider, system, or agent)
-  method: "auto"             # auto | manual | agent
-  metadata: {}               # context-specific data
+  from: string       # Previous state. null for the initial state.
+  to: string         # New state.
+  at: datetime       # ISO 8601 timestamp.
+  by: string         # Who triggered: client ID, provider ID, "system", or agent ID.
+  method: enum       # "auto" | "manual" | "agent".
+  metadata: object   # Context-specific data.
 ```
 
-### Payroll rule
+When `method` is `agent`, the `metadata` object MUST include `mandate_id` (§10).
 
-Implementations that calculate provider compensation must read only sessions in **Collected** (Cobrado) state. Sessions that have not yet reached Collected are not yet settled facts and must not count toward payroll. This eliminates the common failure mode where providers register sessions retroactively at month-end to inflate their compensation.
+### 6.2 Resource Commitment in Scheduled State
+
+When a session has an assigned Resource, the `scheduled` state implies that three entities are simultaneously committed: the provider, the client(s), and the physical resource. Implementations MUST treat this three-way commitment as atomic: a session is only validly `scheduled` when all three entities have confirmed availability for the time slot.
+
+### 6.3 Verification as Closure
+
+Verification is the closure of the cycle, not a step in the middle. The client cannot meaningfully verify until the service has been documented, invoiced, and collected. Verification that comes before documentation is premature.
+
+### 6.4 Revenue Recognition
+
+What triggers the transition from `completed` to the financial cycle depends on the **revenue recognition method**, which is an attribute of the service or package — not of the session:
+
+| Method | When Revenue Is Recognized |
+|--------|----------------------------|
+| Per delivery | Each completed session. |
+| Percentage of completion | Proportional to treatment progress. |
+| Milestones | At defined checkpoints. |
+
+The protocol does not prescribe which method to use. Each implementation resolves this based on its vertical.
+
+### 6.5 Payroll Rule
+
+Implementations that calculate provider compensation MUST read only sessions in `collected` state. Sessions that have not yet reached `collected` are not yet settled facts and MUST NOT count toward payroll.
+
+### 6.6 Billing Status Independence
+
+There is no `paid` state in the lifecycle because payment flow is tracked in `billing.status`, independently from the lifecycle. The lifecycle captures the milestone; `billing.status` captures the flow.
 
 ---
 
-## 6. Exception Flows
+## 7. Exception Flows
 
-A robust protocol doesn't just define the happy path. It defines what happens when things go wrong. These are first-class flows, not edge cases.
+Exception flows are first-class flows, not edge cases. They happen in 15–30% of all service appointments.
 
-### 5.1 Client No-Show
+### 7.1 Client No-Show
 
-**Trigger:** Client doesn't arrive within the grace period.
+**Trigger:** Client does not arrive within the grace period.
 
 ```
 Confirmed → Cancelled (no_show)
 ```
 
-- Charges penalty per organization policy
-- Frees provider's time slot for reallocation
-- Increments client's no-show counter (strike system)
-- Provider is compensated per policy
+- The implementation SHOULD charge a penalty per organization policy.
+- The provider's time slot SHOULD be freed for reallocation.
+- The client's no-show counter SHOULD be incremented.
 
-### 5.2 Provider No-Show
+### 7.2 Provider No-Show
 
-**Trigger:** Provider doesn't arrive or cancels last-minute.
+**Trigger:** Provider does not arrive or cancels last-minute.
 
 ```
 Confirmed → Reassigning → Scheduled (new provider)
 ```
 
-- System automatically finds replacement provider
-- Client notified of change
-- Original provider flagged
+- The system SHOULD automatically find a replacement provider.
+- The client MUST be notified of the change.
+- The original provider SHOULD be flagged.
 
-### 5.3 Cancellation
+### 7.3 Cancellation
 
-**Trigger:** Either party cancels before the service.
+**Trigger:** Either party cancels before delivery.
 
 ```
 Any pre-delivery state → Cancelled
 ```
 
-- Cancellation policy applied based on time remaining
-- Full refund if outside penalty window
-- Partial/no refund within penalty window
+- Cancellation policy MUST be applied based on time remaining.
+- Full refund if outside penalty window; partial/no refund within penalty window.
 
-### 5.4 Quality Dispute
+### 7.4 Quality Dispute
 
-**Trigger:** Client disputes the quality of a completed service within the dispute window.
+**Trigger:** Client disputes quality of a completed service within the dispute window.
 
 ```
 Completed → Disputed
 ```
 
-- Charge frozen — `billing.status` remains `pending` until resolution
-- Additional evidence requested from both parties
-- Admin or arbitration resolves
-- Resolves to: Collected → Verified (provider wins) or Cancelled (client wins, balance restored)
+- The charge MUST be frozen — `billing.status` remains `pending` until resolution.
+- Additional evidence SHOULD be requested from both parties.
+- Resolution: `Collected → Verified` (provider prevails) or `Cancelled` (client prevails, balance restored).
 
-### 5.5 Rescheduling
+### 7.5 Rescheduling
 
 **Trigger:** Either party needs to change the time.
 
@@ -404,11 +426,10 @@ Completed → Disputed
 Scheduled/Confirmed → Rescheduling → Scheduled (new time)
 ```
 
-- Finds compatible time for both parties
-- Maintains same provider when possible
-- Rescheduling policy may apply
+- The system SHOULD find a compatible time for both parties.
+- The same provider SHOULD be maintained when possible.
 
-### 5.6 Partial Delivery
+### 7.6 Partial Delivery
 
 **Trigger:** Service cannot be completed in full.
 
@@ -416,47 +437,94 @@ Scheduled/Confirmed → Rescheduling → Scheduled (new time)
 In Progress → Partial
 ```
 
-- Documents what was delivered
-- Adjusts invoice proportionally
-- Schedules continuation if needed
+- What was delivered MUST be documented.
+- The invoice SHOULD be adjusted proportionally.
 
-### 5.7 Resource Conflict
+### 7.7 Resource Conflict
 
-**Trigger:** The assigned resource becomes unavailable after the session was confirmed — due to maintenance, emergency, equipment failure, or a scheduling error.
+**Trigger:** The assigned resource becomes unavailable after the session was confirmed.
 
 ```
 Confirmed → Resource Reassigning → Confirmed (new resource) | Rescheduling (no alternative)
 ```
 
-- System searches for an alternative resource that satisfies the same requirements (capacity, equipment) within the same time slot
-- **If alternative found:** session is reassigned transparently. The provider is always notified. The client is notified only if the change is material (different location, different room characteristics)
-- **If no alternative found:** the exception escalates to a Rescheduling flow (Section 6.5). The session needs a new time slot where all three entities — provider, client, and resource — are available
-- The original resource conflict is recorded in `lifecycle.exceptions` with type `resource_conflict`
-
-**Design decision:** Resource Conflict is a distinct exception from Provider No-Show (5.2) because the resolution logic is fundamentally different. A provider replacement changes the *who*; a resource replacement changes the *where*. The client's decision criteria are different — most clients care deeply about which professional treats them and less about which room it happens in. This asymmetry means the notification rules and the escalation thresholds must be modeled separately.
+- The system MUST search for an alternative resource that satisfies the same requirements within the same time slot.
+- **If alternative found:** the session is reassigned. The provider MUST be notified. The client SHOULD be notified only if the change is material (different location, different room characteristics).
+- **If no alternative found:** the exception escalates to a Rescheduling flow (§7.5).
+- The conflict MUST be recorded in `lifecycle.exceptions` with type `resource_conflict`.
 
 ---
 
-## 7. Service Order
+## 8. Service Order
 
-### Concept
+### 8.1 Concept
 
 A Service Order is a bilateral agreement to deliver a set of services under defined commercial terms. Three axes define it completely:
 
-- **Scope** — what services are authorized, how many, of what type
-- **Pricing** — how delivery is valued (fixed, time & materials, rate card, mixed)
-- **Payment schedule** — when money moves (upfront, by milestones, periodic, on delivery, custom)
+- **Scope** — what services are authorized, how many, of what type.
+- **Pricing** — how delivery is valued (fixed, time & materials, rate card, mixed).
+- **Payment schedule** — when money moves (upfront, by milestones, periodic, on delivery, custom).
 
-A Service Order can be episodic (10 post-surgery sessions), milestone-based (due diligence in 3 phases), time-and-materials-bounded (40 hours of consulting), or permanent (monthly retainer with no end date). The duration type is an attribute of the Order, not a separate entity.
+### 8.2 Service Order Schema
 
-Examples across verticals that the protocol supports with the same object:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | REQUIRED | Unique identifier. |
+| `organization_id` | string | REQUIRED | Issuing organization. |
+| `client_id` | string | REQUIRED | Beneficiary. |
+| `payer_id` | string | REQUIRED | Who pays. MAY differ from client. |
+| `visibility` | enum | OPTIONAL | `public` \| `unlisted` \| `private`. Default: `private`. |
 
-- ISAPRE issues authorization for 12 kinesiology sessions → Service Order, payer = ISAPRE, term.type = per_event (medical authorization)
-- Company contracts 40 hours of consulting → Service Order, pricing.model = t&m, term.type = project
-- Patient purchases unlimited monthly package → Service Order, term.type = monthly, term.auto_renews = true
-- Client contracts due diligence paid in 3 milestones → Service Order, payment_schedule.type = milestone
+#### 8.2.1 Scope
 
-### Lifecycle
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `scope.description` | string | REQUIRED | Human-readable scope definition. |
+| `scope.service_types` | string[] | REQUIRED | Authorized service types. Minimum 1. |
+| `scope.quantity_limit` | integer \| null | OPTIONAL | Maximum services. `null` = unlimited. |
+| `scope.hours_limit` | number \| null | OPTIONAL | Maximum hours. `null` = not applicable. |
+| `scope.expiry_condition` | string | OPTIONAL | Human-readable completion condition. |
+
+#### 8.2.2 Term
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `term.type` | enum | REQUIRED | `permanent` \| `annual` \| `monthly` \| `per_milestone` \| `per_event`. |
+| `term.starts_at` | datetime | REQUIRED | When the order begins. |
+| `term.ends_at` | datetime \| null | OPTIONAL | When the order ends. `null` if permanent. |
+| `term.auto_renews` | boolean | OPTIONAL | Default: `false`. |
+| `term.renewal_notice_days` | integer \| null | OPTIONAL | Days before end to notify. |
+
+#### 8.2.3 Pricing
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `pricing.model` | enum | REQUIRED | `fixed` \| `t&m` \| `rate_card` \| `mixed`. |
+| `pricing.currency` | string | REQUIRED | ISO 4217 currency code. |
+| `pricing.fixed_amount` | number | Conditional | REQUIRED if `model = fixed`. |
+| `pricing.rate_card` | array | Conditional | REQUIRED if `model = t&m` or `rate_card`. Each entry: `{ level, billable_rate, cost_rate }`. |
+
+#### 8.2.4 Payment Schedule
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `payment_schedule.type` | enum | REQUIRED | `upfront` \| `milestone` \| `periodic` \| `on_delivery` \| `custom`. |
+| `payment_schedule.installments` | array | Conditional | REQUIRED if type = `milestone` or `custom`. Each entry: `{ trigger, amount, percentage, due_days }`. |
+
+#### 8.2.5 Ledger (Read-Only)
+
+The ledger is entirely computed — it is NEVER manually entered. As atomic Services transition to `verified` state, the system automatically updates these fields.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ledger.services_verified` | integer | Count of services in `verified` state. |
+| `ledger.hours_consumed` | number | Total hours across verified services. |
+| `ledger.amount_consumed` | number | Value consumed at pricing rates. |
+| `ledger.amount_billed` | number | Total invoiced to date. |
+| `ledger.amount_collected` | number | Total payments received. |
+| `ledger.amount_remaining` | number | Authorized scope not yet consumed. |
+
+### 8.3 Service Order Lifecycle
 
 ```
 draft → proposed → negotiating → active → paused → completed
@@ -465,497 +533,948 @@ draft → proposed → negotiating → active → paused → completed
 
 | State | Description |
 |-------|-------------|
-| `draft` | Created but not sent to the client. Equivalent to a draft quote. |
-| `proposed` | Sent to the client, awaiting acceptance. Equivalent to a commercial proposal. |
+| `draft` | Created but not sent. Equivalent to a draft quote. |
+| `proposed` | Sent to the client, awaiting acceptance. |
 | `negotiating` | Active negotiation of terms. |
 | `active` | Accepted and in execution. Verified Services feed the ledger. |
-| `paused` | Temporarily suspended (e.g., client hospitalized, budget frozen). |
+| `paused` | Temporarily suspended. |
 | `completed` | Scope fulfilled or term expired per defined condition. |
-| `cancelled` | Terminated before completion by either party. |
+| `cancelled` | Terminated before completion. |
 
-**Design decision:** The `draft` and `proposed` states turn the Service Order into the central object for Estimalo (quoting). A quote IS a Service Order in pre-active state. There is no separate "quote" object.
-
-### Schema
-
-```yaml
-service_order:
-  # Required fields (marked with *)
-  id: string*                       # Unique identifier, e.g. "so_abc123"
-  organization_id: string*          # Issuing organization
-  client_id: string*                # Beneficiary
-  payer_id: string*                 # Who pays (may differ from client)
-
-  # Scope — what is authorized
-  scope:
-    description: string*            # Human-readable scope definition
-    service_types: string[]*        # Authorized service types, e.g. ["physical_therapy_session"]
-    quantity_limit: integer         # Max services. null = unlimited
-    hours_limit: number             # Max hours. null = not applicable
-    expiry_condition: string        # Human-readable completion condition
-                                    # e.g. "12 sessions" | "90 days" | "milestone 3 approved"
-
-  # Term — duration and renewal
-  term:
-    type: enum*                     # permanent | annual | monthly | per_milestone | per_event
-    starts_at: datetime*
-    ends_at: datetime               # null if permanent or open-ended
-    auto_renews: boolean            # default: false
-    renewal_notice_days: integer    # days before end to notify. null if auto_renews = false
-
-  # Pricing — how value is calculated
-  pricing:
-    model: enum*                    # fixed | t&m | rate_card | mixed
-    currency: string*               # ISO 4217, e.g. "CLP"
-    fixed_amount: number            # required if model = fixed
-    rate_card:                      # required if model = t&m or rate_card
-      - level: string               # e.g. "junior" | "senior" | "partner"
-        billable_rate: number       # what is charged to client per hour
-        cost_rate: number           # internal cost per hour
-
-  # Payment schedule — when money moves
-  payment_schedule:
-    type: enum*                     # upfront | milestone | periodic | on_delivery | custom
-    installments:                   # required if type = milestone or custom
-      - trigger: string             # e.g. "contract_signed" | "milestone_1_approved" | "2026-03-01"
-        amount: number              # fixed amount. null if percentage is used
-        percentage: number          # % of total. null if amount is used
-        due_days: integer           # days from trigger to payment due date
-
-  # Ledger — computed from verified Services, never manually entered
-  ledger:                           # read-only, calculated by the system
-    services_verified: integer      # count of verified atomic services
-    hours_consumed: number          # total hours across verified services
-    amount_consumed: number         # value consumed at pricing rates
-    amount_billed: number           # total invoiced to date
-    amount_collected: number        # total payments received
-    amount_remaining: number        # authorized scope not yet consumed
-
-  # Lifecycle
-  lifecycle:
-    current_state: enum*            # draft | proposed | negotiating | active | paused | completed | cancelled
-    transitions: transition[]       # full audit trail of state changes
-
-  # Services that belong to this order
-  service_ids: string[]             # references to atomic Service objects
-```
-
-> **Design decision:** The `ledger` is entirely computed — it is never manually entered. As atomic Services transition to `verified` state, the system automatically updates `services_verified`, `hours_consumed`, and `amount_consumed`. This means the Service Order always reflects the real state of delivery without any reconciliation step. The admin's month-end close becomes a review of exceptions, not a reconstruction from scratch.
+A quote IS a Service Order in pre-active state. There is no separate "quote" object.
 
 ---
 
-## 8. The Principles
+## 9. Principles
 
-### Principle 1: Every service has a lifecycle
+### Principle 1: Every Service Has a Lifecycle
 
-Whether it's a massage or an audit, the 9 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
+The 9 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
 
-### Principle 2: Delivery must be verifiable
+### Principle 2: Delivery MUST Be Verifiable
 
-If you can't prove the service occurred, it didn't occur. Servicialo defines what constitutes valid evidence so that both humans and AI agents can trust it. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation.
+If you cannot prove the service occurred, it did not occur. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation.
 
-### Principle 3: The payer is not always the client
+### Principle 3: The Payer Is Not Always the Client
 
-In healthcare, the insurer pays. In corporate, the employer pays. In education, the guardian pays. The protocol explicitly separates beneficiary, requester, and payer as independent entities.
+The protocol explicitly separates beneficiary, requester, and payer as independent entities.
 
-### Principle 4: Exceptions are the rule
+### Principle 4: Exceptions Are the Rule
 
-No-shows, cancellations, reschedulings, disputes — these aren't edge cases. They happen in 15-30% of all service appointments. A well-designed service defines what happens when things don't go according to plan.
+No-shows, cancellations, reschedulings, disputes happen in 15–30% of all service appointments. A well-designed service defines what happens when things go wrong.
 
-### Principle 5: A service is a product
+### Principle 5: A Service Is a Product
 
-It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover it and coordinate it. Services that aren't productized are invisible to agents.
+It has a name, price, duration, requirements, and expected outcome. Services that are not productized are invisible to agents.
 
-### Principle 6: AI agents are first-class citizens
+### Principle 6: AI Agents Are First-Class Citizens
 
 The protocol is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
 
-### Principle 7: The agreement is separate from the delivery
+### Principle 7: The Agreement Is Separate from the Delivery
 
-A Service Order defines *what was agreed*. Atomic Services define *what was delivered*. These are two different objects with two different lifecycles. Conflating them — as most scheduling and billing systems do — creates a fundamental data integrity problem: you can't know whether a dispute is about the terms of the agreement or the quality of the delivery.
+A Service Order defines *what was agreed*. Atomic Services define *what was delivered*. These are two different objects with two different lifecycles. The ledger on the Service Order is the computed bridge between the two.
 
-Servicialo keeps them separate by design. The Service Order owns the commercial relationship. The atomic Service owns the proof of delivery. The ledger on the Service Order is the computed bridge between the two.
+### Principle 8: Collective Intelligence Is a Protocol Commons
 
-### Principle 8: Collective intelligence is a protocol commons
-
-Every node that implements the protocol contributes operational data to the network. The aggregate intelligence — demand patterns, pricing benchmarks, operational efficiency metrics — improves all nodes. The parallel is Waze: each driver contributes GPS data, and everyone navigates better as a result.
-
-This intelligence is a commons of the protocol, not an asset of any single implementation. Governance rules (see [GOVERNANCE.md](./GOVERNANCE.md)) ensure that data contributed to the network cannot be captured, resold, or monopolized by any participant. The contribute-to-access model ensures symmetric benefit: you get benchmarks proportional to what you contribute.
+Every node that implements the protocol contributes operational data to the network. The aggregate intelligence improves all nodes. This intelligence is a commons of the protocol, not an asset of any single implementation.
 
 ---
 
-## 9. Schema
+## 10. Delegated Agency Model
 
-The canonical schema in YAML. Implementations may use JSON, protobuf, or any serialization format that preserves the structure.
+### 10.1 Motivation
 
-**Machine-readable JSON Schemas:** [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json) — use these to validate your implementation programmatically.
+When an AI agent enters a professional service relationship — scheduling appointments, reading records, processing payments — the trust does not transfer automatically. It MUST be explicitly delegated, bounded, and auditable.
 
-### Service
+The Delegated Agency Model solves a fundamental problem: how does a protocol that treats AI agents as first-class citizens (Principle 6) ensure that those agents never exceed the authority granted to them?
 
-```yaml
-service:
-  # 3.1 Identity
-  id: string*                     # Unique identifier
-  service_order_id: string        # optional — reference to parent Service Order
-  type: string*                   # Service category
-  vertical: string*               # health | legal | home | education | ...
-  name: string*                   # Human-readable name
-  duration_minutes: integer*      # Expected duration
+Existing approaches fail in two modes:
 
-  # 3.2 Provider
-  provider:
-    id: string*
-    credentials: string[]         # Required certifications
-    trust_score: number           # 0-100, calculated from history
-    organization_id: string*      # Parent organization
+1. **API keys as identity.** The agent authenticates as the organization, inheriting all permissions. There is no record of who authorized what, no scope limitation, and no way to revoke a specific delegation without rotating the entire key.
+2. **Role-based proxying.** The agent acts "as" a user via impersonation. The audit trail becomes unreliable — accountability collapses.
 
-  # 3.3 Client
-  client:
-    id: string*
-    payer_id: string              # May differ from client
+The Delegated Agency Model introduces a third path: **explicit mandates**. A human principal issues a ServiceMandate that grants an agent specific capabilities, within a defined context, for a bounded duration.
 
-  # 3.4 Schedule
-  schedule:
-    requested_at: datetime*
-    scheduled_for: datetime       # Set when scheduled
-    duration_expected: integer    # minutes
+### 10.2 Design Principles
 
-  # 3.5 Location
-  location:
-    type: enum                    # in_person | virtual | home_visit
-    address: string
-    room: string
-    resource_id: string           # Reference to a Resource entity (optional)
-    coordinates:
-      lat: number
-      lng: number
+1. **No self-issuance.** An agent MUST NOT create its own mandate. Authority always flows from a human principal.
+2. **Deny by default.** An agent with no valid mandate has zero capabilities beyond public discovery (Phase 1 tools). Scopes are additive.
+3. **Conflict-of-interest transparency.** The `acting_for` field declares whose interests the agent serves. An agent MUST NOT act for both the provider and the client within the same service interaction.
+4. **Audit immutability.** Every action taken under a mandate MUST produce an audit entry. The audit log is append-only and MUST NOT be retroactively modified.
+5. **Graceful degradation.** When a mandate expires or is revoked mid-operation, the agent MUST halt, preserve state, and surface the situation to the principal.
+6. **Stack agnosticism.** The mandate model defines contracts and validation rules. It does not prescribe storage, transport, or cryptographic mechanisms.
 
-  # 3.6 Lifecycle
-  lifecycle:
-    current_state: enum*          # The 9 universal states
-    transitions: transition[]     # State change history
-    exceptions: exception[]       # No-shows, disputes, etc.
+### 10.3 The ServiceMandate
 
-  # 3.7 Proof of Delivery
-  proof:
-    checkin: datetime
-    checkout: datetime
-    duration_actual: integer      # minutes
-    evidence: evidence[]          # GPS, signatures, photos, docs
+A ServiceMandate is a first-class protocol object that represents the explicit delegation of capability from a human principal to an agent.
 
-  # 3.8 Billing
-  billing:                        # informative when service belongs to a Service Order — invoicing is handled by the Order
-    amount:
-      value: number*
-      currency: string*           # ISO 4217
-    payer: reference              # May differ from client (insurance, employer, guardian)
-    status: enum                  # pending | charged | invoiced | paid | disputed
-    charged_at: datetime          # When charge was applied
-    payment_id: reference         # Linked payment — may be a prepaid package purchased earlier
-    tax_document: reference       # Invoice/receipt if issued
+#### 10.3.1 Formal Definition
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `mandate_id` | string (UUID v4) | REQUIRED | Unique identifier. |
+| `principal_id` | string | REQUIRED | The human or organization that issues the mandate. |
+| `principal_type` | enum | REQUIRED | `professional` \| `patient` \| `organization`. |
+| `agent_id` | string | REQUIRED | The agent that receives the delegation. |
+| `agent_name` | string | OPTIONAL | Human-readable label for the agent. |
+| `acting_for` | enum | REQUIRED | `professional` \| `patient` \| `organization`. |
+| `context` | string | REQUIRED | Scope boundary. Format: `{context_type}:{context_id}`. |
+| `scopes` | string[] | REQUIRED | List of granted capabilities (§10.3.2). Minimum 1. |
+| `constraints` | object | OPTIONAL | Additional restrictions (§10.3.3). |
+| `issued_at` | datetime | REQUIRED | When the mandate was created. ISO 8601. |
+| `expires_at` | datetime | REQUIRED | When the mandate ceases to be valid. MUST be after `issued_at`. |
+| `revoked_at` | datetime | OPTIONAL | When the principal explicitly revoked the mandate. |
+| `revocation_reason` | string | OPTIONAL | Human-readable reason for revocation. |
+| `status` | enum | REQUIRED | `active` \| `expired` \| `revoked` \| `suspended`. |
+| `metadata` | object | OPTIONAL | Implementation-specific data. The protocol does not interpret this field. |
+
+#### 10.3.2 Scopes
+
+Scopes follow the pattern `{resource}:{action}` and are additive (deny-by-default). An agent MAY only perform actions for which it holds an explicit scope in a valid, active mandate.
+
+See [Appendix C](#appendix-c-scope-reference) for the complete scope reference.
+
+**Scope hierarchy:** There is no implicit hierarchy. `patient:write` does NOT imply `patient:read`. Both MUST be explicitly granted if both are needed.
+
+**Custom scopes:** Implementations MAY define additional scopes prefixed with `x-` (e.g., `x-clinical:prescribe`). Custom scopes MUST follow the `{resource}:{action}` pattern.
+
+#### 10.3.3 Constraints
+
+OPTIONAL additional restrictions that narrow a mandate beyond its scopes. When present, constraints are enforced conjunctively (all constraints MUST be satisfied).
+
+| Constraint | Type | Description |
+|------------|------|-------------|
+| `max_actions_per_day` | integer | Maximum actions per calendar day. |
+| `allowed_hours` | object | Time window: `{ start: "HH:mm", end: "HH:mm", timezone: "IANA" }`. |
+| `ip_allowlist` | string[] | Network-level restriction. CIDR notation or IP addresses. |
+| `require_confirmation_above` | object | Financial threshold: `{ amount: number, currency: "ISO 4217" }`. |
+| `service_types` | string[] | Restrict to specific service types. |
+
+### 10.4 Mandate Lifecycle
+
+```
+                ┌──────────────────────────────────┐
+                │                                   │
+  Principal     │         ┌──────────┐              │
+  issues   ─────┤────────►│  active  │              │
+  mandate       │         └────┬─────┘              │
+                │              │                    │
+                │         ┌────┴──────────────┐     │
+                │         │                   │     │
+                │    time passes         principal  │
+                │    (expires_at)        revokes    │
+                │         │                   │     │
+                │         ▼                   ▼     │
+                │    ┌─────────┐       ┌─────────┐  │
+                │    │ expired │       │ revoked │  │
+                │    └─────────┘       └─────────┘  │
+                │                                   │
+                │    ┌───────────┐                   │
+                │    │ suspended │◄── org admin      │
+                │    └─────┬─────┘   or system       │
+                │          │                        │
+                │     reactivate                    │
+                │     or expire                     │
+                │          │                        │
+                │          ▼                        │
+                │    active / expired               │
+                └──────────────────────────────────┘
 ```
 
-### Service Order
+#### 10.4.1 Issuance
 
-```yaml
-service_order:
-  # Required fields (marked with *)
-  id: string*                       # Unique identifier, e.g. "so_abc123"
-  organization_id: string*          # Issuing organization
-  client_id: string*                # Beneficiary
-  payer_id: string*                 # Who pays (may differ from client)
+A mandate is created when a human principal explicitly delegates capability to an agent. Issuance rules:
 
-  # Scope — what is authorized
-  scope:
-    description: string*            # Human-readable scope definition
-    service_types: string[]*        # Authorized service types, e.g. ["physical_therapy_session"]
-    quantity_limit: integer         # Max services. null = unlimited
-    hours_limit: number             # Max hours. null = not applicable
-    expiry_condition: string        # Human-readable completion condition
-                                    # e.g. "12 sessions" | "90 days" | "milestone 3 approved"
+1. The `principal_id` MUST reference a verified entity in the system.
+2. The principal MUST have the authority to grant the requested scopes.
+3. The `acting_for` field MUST be consistent with the principal's role.
+4. `issued_at` MUST be set to the current timestamp. `expires_at` MUST be in the future.
+5. `status` MUST be set to `active`.
 
-  # Term — duration and renewal
-  term:
-    type: enum*                     # permanent | annual | monthly | per_milestone | per_event
-    starts_at: datetime*
-    ends_at: datetime               # null if permanent or open-ended
-    auto_renews: boolean            # default: false
-    renewal_notice_days: integer    # days before end to notify. null if auto_renews = false
+An agent MUST NOT issue a mandate for itself or for another agent.
 
-  # Pricing — how value is calculated
-  pricing:
-    model: enum*                    # fixed | t&m | rate_card | mixed
-    currency: string*               # ISO 4217, e.g. "CLP"
-    fixed_amount: number            # required if model = fixed
-    rate_card:                      # required if model = t&m or rate_card
-      - level: string               # e.g. "junior" | "senior" | "partner"
-        billable_rate: number       # what is charged to client per hour
-        cost_rate: number           # internal cost per hour
+#### 10.4.2 Validation on Use
 
-  # Payment schedule — when money moves
-  payment_schedule:
-    type: enum*                     # upfront | milestone | periodic | on_delivery | custom
-    installments:                   # required if type = milestone or custom
-      - trigger: string             # e.g. "contract_signed" | "milestone_1_approved" | "2026-03-01"
-        amount: number              # fixed amount. null if percentage is used
-        percentage: number          # % of total. null if amount is used
-        due_days: integer           # days from trigger to payment due date
+Every time an agent presents a mandate to perform an action, the implementation MUST validate:
 
-  # Ledger — computed from verified Services, never manually entered
-  ledger:                           # read-only, calculated by the system
-    services_verified: integer      # count of verified atomic services
-    hours_consumed: number          # total hours across verified services
-    amount_consumed: number         # value consumed at pricing rates
-    amount_billed: number           # total invoiced to date
-    amount_collected: number        # total payments received
-    amount_remaining: number        # authorized scope not yet consumed
+1. **Existence:** The `mandate_id` references a known mandate.
+2. **Status:** `status` is `active`.
+3. **Temporal validity:** `issued_at ≤ now < expires_at` and `revoked_at` is null.
+4. **Agent identity:** The requesting `agent_id` matches the mandate's `agent_id`.
+5. **Scope coverage:** The requested action falls within the mandate's `scopes`.
+6. **Context match:** The action's context matches the mandate's `context`.
+7. **Conflict-of-interest check:** The `acting_for` does not conflict with the other party (§10.5, Rule 4).
+8. **Constraints satisfaction:** All applicable constraints are met.
 
-  # Lifecycle
-  lifecycle:
-    current_state: enum*            # draft | proposed | negotiating | active | paused | completed | cancelled
-    transitions: transition[]       # full audit trail of state changes
+If any check fails, the action MUST be rejected. The rejection MUST be logged in the audit trail.
 
-  # Services that belong to this order
-  service_ids: string[]             # references to atomic Service objects
-```
+#### 10.4.3 Expiration
 
-### Supporting Types
+When the current time exceeds `expires_at`, the mandate transitions to `expired`. Implementations SHOULD check temporal validity on every use rather than relying on background expiration jobs.
 
-```yaml
-transition:
-  from: string
-  to: string
-  at: datetime
-  by: string                    # who triggered
-  method: enum                  # auto | manual | agent
-  metadata: object
+Multi-step operations MUST re-validate the mandate at each step.
 
-exception:
-  type: enum                    # no_show | cancellation | dispute | reschedule | partial
-                                # | resource_conflict
-  at: datetime
-  initiated_by: string
-  resolution: string
-  resolved_at: datetime
+#### 10.4.4 Revocation
 
-evidence:
-  type: enum                    # gps | signature | photo | document | duration
-  captured_at: datetime
-  data: object                  # type-specific payload
+A principal MAY revoke a mandate at any time. Revocation takes effect immediately.
 
-resource:
-  id: string*                   # Unique identifier
-  organization_id: string*      # Owning organization
-  name: string*                 # Human-readable name, e.g. "Box 3"
-  type: string                  # Category: "room", "box", "chair", "equipment". Default: "room"
-  capacity: integer             # Max simultaneous sessions. Default: 1
-  buffer_minutes: integer       # Reset/cleaning time between uses, in minutes. Default: 0
-  equipment: string[]           # Available equipment or features
-  location: string              # Physical location description (floor, wing, address)
-  is_active: boolean            # Whether the resource is currently bookable. Default: true
-  rules: object                 # Extensible business logic constraints
+- All pending (non-completed) actions MUST be halted.
+- The agent MUST be notified (mechanism is implementation-specific).
+- Actions already completed are not rolled back.
+- The agent MUST surface the revocation to the user.
 
-resource_availability:
-  resource_id: string*          # Parent resource
-  day_of_week: integer*         # 0 = Sunday, 6 = Saturday
-  start_time: string*           # "HH:mm" format
-  end_time: string*             # "HH:mm" format
-  is_available: boolean         # Default: true. False = explicitly blocked
-  timezone: string              # IANA timezone. Default: "America/Santiago"
-  block_order: integer          # Block sequence within a day. Unique per resource_id + day_of_week
-```
+#### 10.4.5 Suspension
+
+An organizational administrator or system process MAY temporarily suspend a mandate. Suspension is reversible.
+
+- While suspended, the mandate fails validation (same as revoked) but can be reactivated.
+- If `expires_at` passes during suspension, the mandate transitions to `expired` and MUST NOT be reactivated.
+
+### 10.5 Normative Validation Rules
+
+Any implementation claiming Servicialo v0.8 compliance MUST enforce these rules:
+
+| Rule | Statement |
+|------|-----------|
+| **1. No self-issuance** | `principal_id` MUST reference a human entity. `agent_id` MUST NOT equal `principal_id`. |
+| **2. Scope minimality** | Implementations SHOULD warn when a mandate is issued with scopes exceeding the agent's known tool requirements. |
+| **3. Temporal boundedness** | Every mandate MUST have a finite `expires_at`. The protocol RECOMMENDS ≤ 90 days with renewal. |
+| **4. Conflict-of-interest isolation** | Within a single service interaction, an agent MUST NOT hold active mandates with conflicting `acting_for` values. |
+| **5. Context confinement** | A mandate with `context: "org:A"` MUST NOT be used for actions on entities belonging to `org:B`. |
+| **6. Revocation immediacy** | Revocation takes effect immediately. Implementations MUST NOT cache mandate validity beyond a single atomic operation. |
+| **7. Audit completeness** | Every action and every rejection under a mandate MUST produce an audit entry. |
+| **8. Graceful degradation on mandate loss** | On mandate expiration or revocation during a multi-step operation, the agent MUST: (a) halt, (b) preserve in-progress state, (c) surface the loss to the human. It MUST NOT retry or escalate permissions. |
+
+### 10.6 Audit Model
+
+#### 10.6.1 Audit Entry Structure
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `audit_id` | string (UUID v4) | REQUIRED | Unique identifier. |
+| `mandate_id` | string | REQUIRED | Reference to the ServiceMandate. |
+| `agent_id` | string | REQUIRED | The agent that performed the action. |
+| `principal_id` | string | REQUIRED | The human principal who authorized the mandate. |
+| `acting_for` | enum | REQUIRED | Inherited from the mandate. |
+| `action` | string | REQUIRED | The action performed (e.g., `scheduling.book`). |
+| `action_input` | object | OPTIONAL | Sanitized input parameters. Sensitive fields MUST be redacted. |
+| `action_result` | enum | REQUIRED | `success` \| `failure` \| `rejected` \| `halted`. |
+| `failure_reason` | string | OPTIONAL | Reason if `action_result` is `failure` or `rejected`. |
+| `resource_id` | string | OPTIONAL | The primary resource affected. |
+| `context` | string | REQUIRED | Inherited from the mandate. |
+| `timestamp` | datetime | REQUIRED | When the action was performed. ISO 8601. |
+| `ip_address` | string | OPTIONAL | Source IP. Implementation-specific. |
+| `request_id` | string | OPTIONAL | Correlation ID for distributed tracing. |
+
+#### 10.6.2 Audit Requirements
+
+1. **Append-only.** Audit entries MUST NOT be modified or deleted.
+2. **Complete attribution.** Every mutating action performed by an agent MUST produce an audit entry.
+3. **Queryable by mandate.** Implementations MUST support querying all audit entries for a given `mandate_id`.
+4. **Queryable by principal.** Implementations MUST support querying all audit entries across all mandates for a given `principal_id`.
+5. **Retention.** The protocol does not define a minimum retention period. Implementations SHOULD follow applicable regulations.
+
+#### 10.6.3 Integration with Lifecycle Transitions
+
+When `transition.method` is `agent`:
+
+- `transition.by` MUST contain the `agent_id`.
+- `transition.metadata` MUST include `mandate_id`.
+- A corresponding audit entry MUST exist in the mandate audit trail.
+
+This creates a dual audit path: the service lifecycle records *what happened*; the mandate audit trail records *who authorized it*.
+
+### 10.7 Security Considerations
+
+| Threat | Mitigation |
+|--------|------------|
+| **Mandate theft** | Validation MUST verify `agent_id`, not just `mandate_id`. Implementations SHOULD bind mandates to agent authentication tokens. |
+| **Scope escalation** | Scope validation is REQUIRED at the protocol level. No implicit hierarchy. |
+| **Principal impersonation** | Mandate issuance MUST occur through an authenticated channel. Agents MUST NOT call the issuance endpoint. |
+| **Audit tampering** | Append-only storage is a protocol REQUIREMENT. Implementations SHOULD consider write-once storage or hash chains. |
+| **Revocation race conditions** | Re-validation at each step of multi-step operations. Atomic operations that begin before revocation MAY complete. |
+| **Cross-context leakage** | Context confinement (Rule 5) is enforced at every action. |
+
+### 10.8 Service Order Mandate Requirements
+
+- **Creating a Service Order** (`order:write`): Requires a mandate from the organization.
+- **Proposing a Service Order** (`order:write`): Requires human confirmation regardless of mandate.
+- **Activating a Service Order** (`order:write`): Requires client acceptance — the organization's agent MUST NOT accept on behalf of the client.
+- **Ledger updates**: Automatic, triggered by service verification.
 
 ---
 
-## 10. Agent Decision Model
+## 11. Agent Decision Model
 
-The protocol defines that agents are first-class citizens, but not all states are equal from an autonomy perspective. Some transitions are deterministic and safe for an agent to execute alone. Others involve ambiguity, real money, or irreversible consequences that require human confirmation. This section establishes that boundary.
+Not all states are equal from an autonomy perspective. Some transitions are deterministic and safe for an agent to execute alone. Others involve ambiguity, real money, or irreversible consequences that require human confirmation.
 
-| Transition | Agent can act autonomously | Requires human confirmation |
+The v0.8 update adds one requirement: **every agent action — whether autonomous or requiring human confirmation — MUST be performed under a valid ServiceMandate (§10).**
+
+| Dimension | Determined by |
+|-----------|--------------|
+| **Can the agent act?** | ServiceMandate (scopes, context, constraints). |
+| **Can the agent act autonomously?** | Agent Decision Model (autonomy matrix below). |
+| **Is the action recorded?** | Audit Model (always yes for agent actions). |
+
+### 11.1 Autonomy Matrix
+
+| Transition | Agent Autonomous | Requires Human Confirmation |
 |---|---|---|
-| Requested → Scheduled | ✅ System matches availability | — |
-| Scheduled → Confirmed | ✅ If both parties have confirmed via registered channel | ⚠️ If confirmation is ambiguous or missing |
-| Confirmed → In Progress | ✅ On check-in detection | — |
-| In Progress → Completed | — | ✅ Provider must mark |
-| Completed → Documented | ✅ If evidence auto-captured (GPS, duration) | ⚠️ If evidence requires human filing (clinical notes) |
-| Documented → Invoiced | ✅ If billing rules are fully defined in Service Order | ⚠️ If pricing requires manual calculation |
-| Invoiced → Collected | ✅ On payment confirmation from payment system | — |
-| Collected → Verified | ✅ On client confirmation or after silence window expires | — |
-| Any state → Cancelled | — | ✅ Always requires human or explicit client action |
-| Any state → Disputed | — | ✅ Client must initiate |
-| Disputed → Resolved | — | ✅ Admin must resolve |
-| Confirmed → Resource Reassigning | ✅ If alternative resource available | ⚠️ If no alternative — escalates to Rescheduling |
-| Service Order: draft → proposed | — | ✅ Human sends proposal |
-| Service Order: proposed → active | — | ✅ Client acceptance required |
-| Service Order: active → paused | — | ✅ Human decision |
-| Service Order: ledger update | ✅ Automatic on service verified | — |
-| Service Order: payment trigger | ✅ If trigger condition is deterministic (date, count) | ⚠️ If trigger requires judgment (milestone approval) |
+| `requested` → `scheduled` | YES — system matches availability. | — |
+| `scheduled` → `confirmed` | YES — if both parties confirmed via registered channel. | If confirmation is ambiguous or missing. |
+| `confirmed` → `in_progress` | YES — on check-in detection. | — |
+| `in_progress` → `completed` | — | YES — provider MUST mark. |
+| `completed` → `documented` | YES — if evidence is auto-captured. | If evidence requires human filing. |
+| `documented` → `invoiced` | YES — if billing rules are fully defined. | If pricing requires manual calculation. |
+| `invoiced` → `collected` | YES — on payment confirmation from payment system. | — |
+| `collected` → `verified` | YES — on client confirmation or after silence window. | — |
+| Any → `cancelled` | — | YES — always requires human or explicit client action. |
+| Any → `disputed` | — | YES — client MUST initiate. |
+| `disputed` → Resolved | — | YES — admin MUST resolve. |
+| `confirmed` → Resource Reassigning | YES — if alternative resource available. | If no alternative — escalates. |
+| Service Order: `draft` → `proposed` | — | YES — human sends proposal. |
+| Service Order: `proposed` → `active` | — | YES — client acceptance required. |
+| Service Order: `active` → `paused` | — | YES — human decision. |
+| Service Order: ledger update | YES — automatic on service verified. | — |
+| Service Order: payment trigger | YES — if trigger condition is deterministic. | If trigger requires judgment. |
 
-**The ambiguity rule:** When a transition falls in the ⚠️ category, the agent must pause and surface the ambiguity to a human before proceeding. The agent should never resolve ambiguity by assumption. It should present the available information and the decision required, then wait.
+### 11.2 The Ambiguity Rule
 
-**The irreversibility rule:** Any transition that moves money, generates a legal document, or closes a Service Order is irreversible by default. Agents must treat these as requiring explicit human confirmation regardless of how deterministic the trigger appears.
+When a transition falls in the "requires human confirmation" category, the agent MUST pause and surface the ambiguity to a human before proceeding. The agent MUST NOT resolve ambiguity by assumption.
+
+### 11.3 The Irreversibility Rule
+
+Any transition that moves money, generates a legal document, or closes a Service Order is irreversible by default. Agents MUST treat these as requiring explicit human confirmation regardless of how deterministic the trigger appears.
 
 ---
 
-## 11. MCP Server
+## 12. Provider Profile & Discoverable Attributes
 
-Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
+### 12.1 Motivation
 
-### Discovery Mode (No credentials — 4 public tools)
+Professional service marketplaces face a structural information asymmetry: the client knows what they need, but does not know who is best equipped to provide it. AI agents can bridge this gap — but only if provider attributes are structured, machine-readable, and trustworthy.
 
-```bash
-npx -y @servicialo/mcp-server
-```
+Provider attributes belong in the protocol — not in each implementation — for the same reason that service lifecycle states do: interoperability. When a patient's agent queries providers across multiple clinics, the attributes MUST be comparable.
 
-| Tool | Description |
-|------|-------------|
-| `registry.search` | Search organizations by vertical and location |
-| `registry.get_organization` | Public details of an organization |
-| `scheduling.check_availability` | Check available time slots |
-| `services.list` | Public service catalog |
+### 12.2 ProviderAttribute
 
-### Authenticated Mode (29 total tools)
+A `ProviderAttribute` is the atomic unit of provider description.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `attribute_id` | string (UUID v4) | REQUIRED | Unique identifier. |
+| `provider_id` | string | REQUIRED | The professional this attribute describes. |
+| `category` | enum | REQUIRED | `identity` \| `capability` \| `availability` \| `geography` \| `economic` \| `trust`. |
+| `key` | string | REQUIRED | Attribute key within category. See [Appendix D](#appendix-d-attribute-key-reference). |
+| `value` | string \| number \| boolean \| string[] \| object | REQUIRED | Attribute value. Type depends on key definition. |
+| `origin` | enum | REQUIRED | `declared` \| `verified` \| `inferred`. |
+| `confidence` | number (0.0–1.0) | Conditional | REQUIRED for `inferred` attributes. |
+| `evidence_count` | integer | OPTIONAL | Number of data points supporting an inference. |
+| `verified_by` | string | OPTIONAL | Entity that confirmed a `verified` attribute. |
+| `verified_at` | datetime | OPTIONAL | When verification occurred. |
+| `visibility` | enum | REQUIRED | `public` \| `unlisted` \| `private`. |
+| `valid_from` | datetime | OPTIONAL | When this attribute became valid. |
+| `valid_until` | datetime | OPTIONAL | When this attribute expires. `null` = indefinite. |
+| `version` | integer | REQUIRED | Monotonically increasing version number. |
+| `updated_at` | datetime | REQUIRED | Last modification timestamp. |
+
+#### 12.2.1 Origin Semantics
+
+| Origin | Definition | Weight in Matching |
+|--------|------------|-------------------|
+| `declared` | The professional stated this attribute. | Base weight (1.0x). |
+| `verified` | A trusted authority confirmed this attribute. | High weight (1.5x). |
+| `inferred` | Derived from operational data. | Highest weight (2.0x × confidence). |
+
+Inferred attributes carry the highest weight because they reflect what a professional actually does, not what they claim to do.
+
+#### 12.2.2 Versioning
+
+Attributes are versioned, not overwritten. When an attribute changes:
+
+- The `version` field MUST increment.
+- The previous version SHOULD be preserved in the attribute history.
+- `updated_at` MUST reflect the latest version.
+
+### 12.3 ProviderProfile
+
+A ProviderProfile aggregates all attributes for a provider within an organizational context.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `profile_id` | string (UUID v4) | REQUIRED | Unique identifier. |
+| `provider_id` | string | REQUIRED | Reference to provider entity. |
+| `organization_id` | string | REQUIRED | Context for this profile variant. |
+| `display_name` | string | REQUIRED | Human-readable name. |
+| `slug` | string | REQUIRED | URL-safe identifier. |
+| `attributes` | ProviderAttribute[] | REQUIRED | Array of typed attributes. |
+| `created_at` | datetime | REQUIRED | When the profile was created. |
+| `updated_at` | datetime | REQUIRED | Last modification. |
+| `version` | integer | REQUIRED | Profile-level version. |
+
+A provider who works at multiple organizations MAY have different attribute sets per context.
+
+### 12.4 Base Taxonomy
+
+The base taxonomy defines the minimum attribute set that every Servicialo implementation MUST support. See [Appendix D](#appendix-d-attribute-key-reference) for the complete key reference with types and descriptions.
+
+The six categories are:
+
+| Category | Purpose |
+|----------|---------|
+| `identity` | Stable, foundational attributes about the professional. |
+| `capability` | What the professional can treat/deliver and how. |
+| `availability` | How and when the provider can be reached. |
+| `geography` | Where the provider operates. |
+| `economic` | Pricing, insurance, and payment attributes. |
+| `trust` | System-generated operational metrics. Always `origin: "inferred"`. |
+
+**Domain extensions:** Implementations MAY define domain-specific attributes using the `x-{domain}:` prefix (e.g., `x-health:clinical_approach`). Domain extensions MUST follow the ProviderAttribute structure.
+
+### 12.5 Real-Time vs. Static Attributes
+
+| Type | Update Pattern | Examples |
+|------|---------------|----------|
+| **Static** | Changed by human action. | `profession`, `license_number`, `conditions_treated`. |
+| **Real-time** | Updated automatically from operational data. | `avg_wait_days`, `next_available`, `cancellation_rate`. |
+
+#### 12.5.1 Staleness Thresholds
+
+| Attribute | Maximum Staleness |
+|-----------|-------------------|
+| `next_available` | 5 minutes |
+| `avg_wait_days` | 24 hours |
+| `cancellation_rate` | 24 hours |
+| `rating_avg` | 1 hour |
+| `services_completed` | 24 hours |
+
+If an attribute exceeds its staleness threshold, implementations SHOULD either refresh it on demand or exclude it from matching with a staleness flag.
+
+### 12.6 Semantic Matching
+
+#### 12.6.1 Query Model
+
+An agent MAY query the provider directory using structured criteria:
 
 ```json
 {
-  "mcpServers": {
-    "servicialo": {
-      "command": "npx",
-      "args": ["-y", "@servicialo/mcp-server"],
-      "env": {
-        "SERVICIALO_API_KEY": "your_api_key",
-        "SERVICIALO_ORG_ID": "your_org_id"
+  "query": {
+    "conditions": ["urinary_incontinence", "pelvic_pain"],
+    "population": "postpartum",
+    "modality": "in_person",
+    "geography": {
+      "city": "Santiago",
+      "max_distance_km": 10
+    },
+    "insurance": "fonasa",
+    "max_wait_days": 7,
+    "language": "es"
+  },
+  "patient_context": {
+    "age": 34,
+    "sex": "female",
+    "weeks_postpartum": 8
+  }
+}
+```
+
+#### 12.6.2 Scoring Model
+
+The matching engine produces a **compatibility score** for each provider:
+
+```
+score = Σ (match_weight × origin_weight × attribute_score)
+```
+
+Where:
+
+| Factor | Values |
+|--------|--------|
+| `match_weight` | conditions (3.0), population (2.5), geography (2.0), availability (1.5), economic (1.0), trust (1.0). |
+| `origin_weight` | declared (1.0), verified (1.5), inferred (2.0 × confidence). |
+| `attribute_score` | Binary (0/1) for exact matches, continuous (0.0–1.0) for fuzzy/distance-based matches. |
+
+#### 12.6.3 Result Structure
+
+```json
+{
+  "results": [
+    {
+      "provider_id": "provider_abc",
+      "display_name": "Dr. Example",
+      "organization_id": "org_xyz",
+      "compatibility_score": 0.92,
+      "match_breakdown": {
+        "conditions": { "score": 1.0, "origin": "inferred", "confidence": 0.95 },
+        "population": { "score": 1.0, "origin": "inferred", "confidence": 0.88 },
+        "geography": { "score": 0.85, "origin": "declared", "distance_km": 3.2 },
+        "availability": { "score": 0.9, "origin": "inferred", "next_available": "2026-03-12" },
+        "insurance": { "score": 1.0, "origin": "declared" },
+        "trust": { "score": 0.88, "rating": 4.8, "services_completed": 1247 }
       }
+    }
+  ],
+  "query_metadata": {
+    "total_matches": 12,
+    "returned": 10,
+    "staleness_warnings": []
+  }
+}
+```
+
+#### 12.6.4 Privacy-Aware Matching
+
+| Requester | Attributes Visible | Mandate Required? |
+|-----------|-------------------|-------------------|
+| Public search (no auth) | `visibility: "public"` only. | No. |
+| Agent with `discovery:read` | `public` + `unlisted`. | Yes. |
+| Agent with `patient:read` + `discovery:read` | `public` + `unlisted` + `private` (within mandate context). | Yes. |
+
+### 12.7 JSON-LD Serialization
+
+Provider profiles SHOULD be serializable as JSON-LD for search engine indexation. The protocol defines a minimal JSON-LD context that maps provider attributes to Schema.org types:
+
+| Provider Attribute | Schema.org Property |
+|-------------------|---------------------|
+| `identity.profession` | `@type` |
+| `identity.primary_specialty` | `medicalSpecialty` (health vertical) |
+| `identity.bio` | `description` |
+| `geography.city` | `areaServed` |
+| `geography.address` | `address` |
+| `geography.coordinates` | `geo` |
+| `economic.price_range` | `priceRange` |
+| `trust.rating_avg` | `aggregateRating.ratingValue` |
+| `trust.rating_count` | `aggregateRating.reviewCount` |
+
+Attributes without a Schema.org equivalent SHOULD be placed under the `servicialo:` namespace.
+
+---
+
+## 13. MCP Tool Interface
+
+Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
+
+### 13.1 Discovery Mode (No Credentials)
+
+Four public tools are available without authentication. These tools do not require a ServiceMandate.
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `registry.search` | Search organizations by vertical and location. | None. |
+| `registry.get_organization` | Public details of an organization. | None. |
+| `scheduling.check_availability` | Check available time slots. | None. |
+| `services.list` | Public service catalog. | None. |
+
+### 13.2 Authenticated Mode
+
+All authenticated tools require API credentials. Tools that mutate state require a valid ServiceMandate when `actor.type` is `agent`.
+
+#### 13.2.1 Phase 2 — Understanding
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `service.get` | Full details of a service. | `service:read`. |
+| `contract.get` | Get contractual terms. | `service:read` or `order:read`. |
+
+#### 13.2.2 Phase 3 — Commitment
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `clients.get_or_create` | Find or register a client. | `patient:write`. |
+| `scheduling.book` | Book a service appointment. | `schedule:write`. |
+| `scheduling.confirm` | Confirm a booking. | `schedule:write`. |
+
+#### 13.2.3 Phase 4 — Lifecycle
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `lifecycle.get_state` | Current lifecycle state. | `service:read`. |
+| `lifecycle.transition` | Advance lifecycle state. | `service:write`. |
+| `scheduling.reschedule` | Reschedule an appointment. | `schedule:write`. |
+| `scheduling.cancel` | Cancel an appointment. | `schedule:write`. |
+
+#### 13.2.4 Phase 5 — Delivery Verification
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `delivery.checkin` | Record check-in. | `evidence:write`. |
+| `delivery.checkout` | Record check-out. | `evidence:write`. |
+| `delivery.record_evidence` | Submit proof-of-delivery. | `evidence:write`. |
+
+#### 13.2.5 Phase 6 — Closing
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `documentation.create` | Create documentation. | `document:write`. |
+| `payments.create_sale` | Create a sale/invoice. | `payment:write`. |
+| `payments.record_payment` | Record a payment. | `payment:write`. |
+| `payments.get_status` | Get payment status. | `payment:read`. |
+
+#### 13.2.6 Service Order Tools
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `service_orders.list` | List Service Orders. | `order:read`. |
+| `service_orders.get` | Get full Service Order details. | `order:read`. |
+| `service_orders.create` | Create a Service Order (draft). | `order:write`. |
+| `service_orders.propose` | Transition draft → proposed. | `order:write`. |
+| `service_orders.activate` | Transition proposed → active. | `order:write`. |
+| `service_orders.get_ledger` | Real-time ledger. | `order:read`. |
+
+#### 13.2.7 Mandate Management Tools
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `mandates.list` | List mandates issued by this principal. | `mandate:read`. |
+| `mandates.get` | Get mandate details. | `mandate:read`. |
+| `mandates.suspend` | Suspend a mandate. | `mandate:admin`. |
+
+### 13.3 Actor Parameter
+
+All authenticated tools accept an `actor` parameter:
+
+```json
+{
+  "actor": {
+    "type": "agent",
+    "id": "agent_scheduler_01",
+    "mandate_id": "mdt_01JAXYZ...",
+    "on_behalf_of": {
+      "type": "professional",
+      "id": "provider_abc"
     }
   }
 }
 ```
 
-Additional tools include: `scheduling.book`, `scheduling.reschedule`, `scheduling.cancel`, `clients.list`, `clients.get`, `clients.create`, `payments.create_sale`, `payments.record_payment`, `notifications.send_session_reminder`, plus 10 more for payments, providers, and payroll.
+When `actor.type` is `agent`, the `mandate_id` field is REQUIRED. The MCP server MUST validate the mandate (§10.4.2) before executing the tool and MUST produce an audit entry (§10.6) regardless of success or failure.
 
-| Tool | Description |
-|------|-------------|
-| `service_orders.list` | List Service Orders for an organization |
-| `service_orders.get` | Get full details of a Service Order including ledger |
-| `service_orders.create` | Create a Service Order in draft state |
-| `service_orders.propose` | Transition a Service Order from draft to proposed |
-| `service_orders.activate` | Transition a Service Order to active (on client acceptance) |
-| `service_orders.get_ledger` | Get real-time ledger of a Service Order |
+When `actor.type` is `client`, `provider`, or `organization`, the actor operates under direct authentication and mandate validation is not performed.
 
-**Planned tools (Telemetry Extension):** `telemetry.contribute`, `telemetry.benchmark`
+### 13.4 Package
 
-### Package
-
-- **npm:** [@servicialo/mcp-server](https://www.npmjs.com/package/@servicialo/mcp-server)
-- **GitHub:** [servicialo/mcp-server](https://github.com/servicialo/mcp-server)
+- **npm:** `@servicialo/mcp-server`
+- **Canonical:** `https://github.com/servicialo/mcp-server`
 
 ---
 
-## 12. Network Intelligence
+## 14. Network Intelligence
 
 > **Status:** Design phase. Not yet implemented.
 
-### The network effect
+### 14.1 The Network Effect
 
-Every node that implements Servicialo generates operational data: scheduling patterns, no-show rates, pricing distributions, demand signals by vertical and geography. In isolation, this data has limited value. Aggregated across the network, it becomes collective intelligence that improves every participant.
+Every node that implements Servicialo generates operational data: scheduling patterns, no-show rates, pricing distributions, demand signals by vertical and geography. Aggregated across the network, this data becomes collective intelligence.
 
-The parallel is Waze: each driver contributes real-time GPS data. No single driver's contribution is valuable alone. But the aggregate — traffic patterns, optimal routes, incident detection — benefits every driver proportionally. The network gets smarter as it grows.
+### 14.2 Contribute-to-Access Model
 
-### Contribute-to-access model
+Organizations contribute monthly snapshots of anonymous, aggregate operational metrics. In return, they receive benchmarks segmented by vertical, region, and scale.
 
-Organizations contribute monthly snapshots of anonymous, aggregate operational metrics. In return, they receive benchmarks segmented by vertical, region, and scale. The model is symmetric: you access intelligence proportional to what you contribute.
+- Everything is anonymous and aggregated.
+- Individual client, provider, or session data is NEVER shared.
+- Minimum segment size is 5 organizations to prevent re-identification.
 
-- Everything is anonymous and aggregated
-- Individual client, provider, or session data is never shared
-- Minimum segment size is 5 organizations to prevent re-identification
-- The extension activates when the ecosystem reaches 10+ organizations with consistent data
+### 14.3 Data Governance
 
-### Data governance
+The data contributed to the network is governed by the protocol, not by any single implementation.
 
-The data contributed to the network is governed by the protocol, not by any single implementation. See [GOVERNANCE.md](./GOVERNANCE.md) for the full data governance framework. Key principles:
-
-- Network data is a protocol commons — no implementation can capture, resell, or monopolize it
-- Implementations retain full sovereignty over their operational data
-- Only aggregate, anonymous metrics flow to the protocol layer
-- Governance decisions about data policy follow the protocol's RFC process
-
-> Full specification: [telemetry-extension.md](./telemetry-extension.md) *(forthcoming)*
+- Network data is a protocol commons — no implementation can capture, resell, or monopolize it.
+- Implementations retain full sovereignty over their operational data.
+- Only aggregate, anonymous metrics flow to the protocol layer.
 
 ---
 
-## 13. Implementations
+## 15. Extensibility
 
-Any platform can implement the Servicialo specification. Compatible implementations expose the 8 dimensions and 9 states in their data model and can connect to the MCP server.
+### 15.1 Extending the Service Dimensions
+
+Implementations MAY add fields to any dimension. Additional fields MUST NOT conflict with protocol-defined field names. The protocol RECOMMENDS namespacing extensions with `x-{domain}:` prefix.
+
+### 15.2 Intermediate States
+
+Implementations MAY add states between the 9 universal states. Intermediate states MUST follow the same forward-only rule. Intermediate states MUST NOT replace or skip any of the 9 universal states.
+
+### 15.3 Custom Scopes
+
+Implementations MAY define additional scopes prefixed with `x-` (e.g., `x-clinical:prescribe`). Custom scopes MUST follow the `{resource}:{action}` pattern.
+
+### 15.4 Domain-Specific Attributes
+
+Implementations MAY define domain-specific attribute categories for the Provider Profile using the `x-{domain}:` prefix. Domain extensions MUST follow the `ProviderAttribute` structure (§12.2).
+
+### 15.5 Backward Compatibility
+
+When extending the protocol:
+
+- REQUIRED fields in the protocol MUST NOT be removed.
+- New REQUIRED fields MUST NOT be added to existing objects without a major version increment.
+- OPTIONAL fields MAY be added in minor version increments.
+- Implementations MUST ignore unrecognized fields rather than rejecting them.
+
+---
+
+## 16. Implementations
+
+Any platform can implement the Servicialo specification. To be listed as a compatible implementation, a platform MUST:
+
+1. Model services using the 8 dimensions (§5).
+2. Implement the 9 lifecycle states (§6).
+3. Handle at least 3 exception flows (§7).
+4. Expose an API that an MCP server can connect to.
+5. (OPTIONAL) Model Service Orders using the schema in §8.
+6. (OPTIONAL) Implement the Delegated Agency Model (§10).
+7. (OPTIONAL) Implement Provider Profiles (§12).
+8. (OPTIONAL) Contribute to Network Intelligence (§14).
 
 ### Reference Implementation
 
-| Platform | Vertical | Status | URL |
-|----------|----------|--------|-----|
-| Coordinalo | Healthcare | ✅ Live | [coordinalo.com](https://coordinalo.com) |
-
-### Implementing the Protocol
-
-To be listed as a compatible implementation, a platform must:
-
-1. Model services using the 8 dimensions (Section 4)
-2. Implement the 9 lifecycle states (Section 5)
-3. Handle at least 3 exception flows (Section 6)
-4. Expose an API that the MCP server can connect to
-5. (Optional) Model Service Orders using the schema in Section 7
-6. (Optional) Contribute to Network Intelligence (Section 12)
-
-Submit an implementation for listing via [GitHub Issues](https://github.com/servicialo/mcp-server/issues).
+| Platform | Vertical | Status |
+|----------|----------|--------|
+| Coordinalo | Healthcare | Live |
 
 ---
 
-## 14. Contributing
+## 17. Contributing & Versioning
+
+### 17.1 Contributing
 
 Servicialo is an open protocol. Contributions are welcome:
 
-- **Protocol design:** Open an issue to propose changes to dimensions, states, or principles
-- **Implementations:** Build a compatible platform and submit for listing
-- **Telemetry Extension:** Feedback on the data model, privacy design, and incentive structure
-- **Translations:** The protocol spec is in English; the reference implementation serves Latin American markets
+- **Protocol design:** Open an issue to propose changes to dimensions, states, or principles.
+- **Implementations:** Build a compatible platform and submit for listing.
+- **Translations:** The protocol spec is in English; implementations serve global markets.
 
-### Versioning
+### 17.2 Versioning
 
 The protocol follows semantic versioning:
-- **Patch (0.3.x):** Clarifications, typo fixes, examples
-- **Minor (0.x.0):** New optional fields, new exception flows, extensions
-- **Major (x.0.0):** Breaking changes to required fields or state model
 
-The protocol version is independent from the MCP server package version (`@servicialo/mcp-server`). Both are tracked separately.
+- **Patch (0.8.x):** Clarifications, typo fixes, examples.
+- **Minor (0.x.0):** New OPTIONAL fields, new exception flows, extensions.
+- **Major (x.0.0):** Breaking changes to REQUIRED fields or state model.
 
-### Changelog
+The protocol version is independent from the MCP server package version.
 
-#### 0.3 (2026-02-23)
+---
 
-- **Status:** Draft → Stable. The core protocol (8 dimensions, 9 states, 6 exception flows, 7 principles) is considered stable for implementation.
-- **JSON Schema:** Published `schema/service.schema.json` and `schema/service-order.schema.json` for machine-readable validation.
-- **Agent conversation example:** Added `examples/kinesiology-session.md` with a complete lifecycle walkthrough.
-- **Version alignment:** All references across site, README, and spec now consistently say v0.3.
+## Appendix A: Glossary
 
-#### 0.2 (2026-02-22)
+| Term | Definition |
+|------|------------|
+| **Agent** | An AI system that acts on behalf of a human principal within the Servicialo protocol. Agents operate under ServiceMandates and produce audit entries for every action. |
+| **Autonomy matrix** | The decision table (§11.1) that defines which lifecycle transitions an agent MAY perform autonomously and which REQUIRE human confirmation. |
+| **Billing status** | An independent status track (`pending` → `charged` → `invoiced` → `paid` → `disputed`) that runs parallel to the lifecycle states. |
+| **Buffer minutes** | The reset/cleaning time a Resource requires between uses. Expressed in minutes. Scheduler arithmetic, not a business rule. |
+| **Capacity** | The maximum number of simultaneous sessions a Resource can host. |
+| **Client** | The beneficiary who receives a service. Explicitly separated from the payer. |
+| **Constraint** | An OPTIONAL restriction on a ServiceMandate (time window, daily limit, financial threshold, service type filter). Enforced conjunctively. |
+| **Context** | The organizational or personal boundary of a ServiceMandate. Format: `{type}:{id}` (e.g., `org:clinic_a`, `personal:maria`). |
+| **Evidence** | A proof-of-delivery artifact. Types: `gps`, `signature`, `photo`, `document`, `duration`, `notes`. |
+| **Exception flow** | A defined protocol path for handling deviations from the happy path: no-shows, cancellations, disputes, rescheduling, partial delivery, resource conflicts. |
+| **Ledger** | The read-only, system-computed summary on a Service Order that tracks consumption vs. commitment. |
+| **Mandate** | See ServiceMandate. |
+| **MCP** | Model Context Protocol. The interface through which AI agents interact with Servicialo tools. |
+| **Origin** | The provenance of a ProviderAttribute: `declared` (self-reported), `verified` (third-party confirmed), or `inferred` (derived from operational data). |
+| **Payer** | The entity that pays for a service. MAY differ from the client (insurance, employer, guardian). |
+| **Principal** | The human or organization that issues a ServiceMandate. Authority always originates from a human. |
+| **Provider** | The professional or entity that delivers a service. |
+| **ProviderAttribute** | A typed, origin-tracked descriptor of a provider's identity, capability, or operational profile. |
+| **ProviderProfile** | An aggregation of ProviderAttributes for a provider within a specific organizational context. |
+| **Resource** | A physical entity (room, chair, equipment) required for service delivery. Has its own availability calendar. |
+| **Scope (mandate)** | A `resource:action` capability pair granted within a ServiceMandate. Additive, deny-by-default. |
+| **Scope (order)** | The set of services authorized under a Service Order (types, quantity limits, hour limits). |
+| **Service** | The atomic unit of professional service delivery, modeled across 8 dimensions. |
+| **Service Order** | A bilateral commercial agreement grouping one or more Services under scope, pricing, and payment terms. |
+| **ServiceMandate** | A first-class protocol object representing the explicit delegation of capability from a human principal to an AI agent. |
+| **Transition** | A recorded state change in a lifecycle. Includes: `from`, `to`, `at`, `by`, `method`, and `metadata`. |
+| **Trust score** | A 0–100 numeric score calculated from a provider's delivery history. |
+| **Vertical** | Industry classification: `health`, `legal`, `home`, `education`, etc. |
+| **Visibility** | Discovery level: `public` (indexed), `unlisted` (direct ID only), `private` (authorized parties only). |
 
-- **Core Entities:** Introduced Service and Service Order as the two central protocol objects.
-- **Service Order:** Full lifecycle (draft → proposed → negotiating → active → paused → completed | cancelled), schema with scope/pricing/payment_schedule/ledger.
-- **Agent Decision Model:** Explicit autonomy boundaries for AI agents acting on services and orders.
-- **Principle 7:** "The agreement is separate from the delivery."
-- **Schema:** Annotated with required/optional fields, added `service_order_id` to Service.
-- **MCP Server:** 29 tools (added 6 `service_orders.*` tools).
-- **Telemetry Extension:** Collapsed to design-phase summary with link to forthcoming full spec.
+---
 
-#### 0.1 (2026-02-01)
+## Appendix B: Changelog
 
-- Initial public draft with 8 dimensions, 9 states, 6 exception flows, 6 principles.
-- Billing section with independent `billing.status`.
-- Telemetry Extension (planned).
-- MCP server reference.
+### v0.8 (2026-03-10)
+
+- **Delegated Agency Model (§10).** Introduced `ServiceMandate` as a first-class protocol object for explicit delegation of capability from human principals to AI agents. Includes 8 normative validation rules, mandate lifecycle (issuance, validation, expiration, revocation, suspension), audit model, and security considerations.
+- **Provider Profile & Discoverable Attributes (§12).** Introduced `ProviderProfile` and `ProviderAttribute` with origin-tracked taxonomy across 6 categories (identity, capability, availability, geography, economic, trust). Includes semantic matching model with weighted scoring, JSON-LD serialization for search engine indexation, and real-time vs. static attribute synchronization.
+- **Agent Decision Model updated (§11).** Integrated with Delegated Agency Model — every agent action now REQUIRES a valid ServiceMandate.
+- **MCP server extended.** Added 3 mandate management tools (`mandates.list`, `mandates.get`, `mandates.suspend`). All authenticated tools now accept `mandate_id` in the `actor` parameter.
+- **Provider dimension extended.** Added `profile_id` field to link providers to their ProviderProfile.
+- **New scopes.** Added `evidence:write`, `document:read`, `document:write`, `mandate:read`, `mandate:admin`, `discovery:read`, `profile:write`.
+- **Service Mandate JSON Schema.** Published `schema/service-mandate.schema.json`.
+
+### v0.7 (2026-03-04)
+
+- **Visibility.** Added `visibility` field (`public` | `unlisted` | `private`) to Service and Service Order. Controls discoverability — `public` services are indexed in catalogs, `unlisted` are accessible by direct ID, `private` are restricted to authorized parties.
+- **License.** MIT → Apache-2.0.
+
+### v0.6 (2026-03-01)
+
+- **Two-entity architecture.** Refactored protocol to center on two core objects: Service (atomic delivery unit) and Service Order (commercial agreement).
+- **8 lifecycle states.** Reduced from previous state model to 8 universal states plus exception states.
+- **Resource entity.** Introduced Resource as a first-class entity with its own availability calendar, capacity, and buffer semantics.
+- **Exception flow: Resource Conflict.** Added as the 7th exception flow.
+- **Principle 8.** Added "Collective Intelligence Is a Protocol Commons."
+
+---
+
+## Appendix C: Scope Reference
+
+Protocol-defined scopes. All scopes follow the `{resource}:{action}` pattern.
+
+| Scope | Description | Typical Mandate |
+|-------|-------------|-----------------|
+| `schedule:read` | View availability and scheduled services. | Scheduling agent. |
+| `schedule:write` | Book, reschedule, cancel services. | Scheduling agent. |
+| `patient:read` | Read patient/client records. | Clinical agent. |
+| `patient:write` | Create or update patient/client records. | Intake agent. |
+| `service:read` | View service details and lifecycle state. | Any operational agent. |
+| `service:write` | Transition service lifecycle states. | Lifecycle agent. |
+| `payment:read` | View billing status and payment history. | Reconciliation agent. |
+| `payment:write` | Create invoices and record payments. | Billing agent. |
+| `document:read` | Read clinical notes and documentation. | Documentation agent. |
+| `document:write` | Create or update documentation. | Documentation agent. |
+| `evidence:write` | Submit proof-of-delivery evidence. | Delivery verification agent. |
+| `order:read` | View Service Order details and ledger. | Account management agent. |
+| `order:write` | Create, propose, or modify Service Orders. | Sales agent. |
+| `discovery:read` | Query unlisted provider attributes. | Discovery agent. |
+| `profile:write` | Update provider profile attributes. | Profile management agent. |
+| `mandate:read` | View mandates issued by this principal. | Administrative agent. |
+| `mandate:admin` | Suspend mandates (not issue — only principals issue). | Organizational admin agent. |
+
+### Tool-to-Scope Mapping
+
+| Tool | Required Scopes |
+|------|-----------------|
+| `registry.search` | None (public). |
+| `registry.get_organization` | None (public). |
+| `scheduling.check_availability` | None (public). |
+| `services.list` | None (public). |
+| `service.get` | `service:read`. |
+| `contract.get` | `service:read` or `order:read`. |
+| `clients.get_or_create` | `patient:write`. |
+| `scheduling.book` | `schedule:write`. |
+| `scheduling.confirm` | `schedule:write`. |
+| `lifecycle.get_state` | `service:read`. |
+| `lifecycle.transition` | `service:write`. |
+| `scheduling.reschedule` | `schedule:write`. |
+| `scheduling.cancel` | `schedule:write`. |
+| `delivery.checkin` | `evidence:write`. |
+| `delivery.checkout` | `evidence:write`. |
+| `delivery.record_evidence` | `evidence:write`. |
+| `documentation.create` | `document:write`. |
+| `payments.create_sale` | `payment:write`. |
+| `payments.record_payment` | `payment:write`. |
+| `payments.get_status` | `payment:read`. |
+| `service_orders.list` | `order:read`. |
+| `service_orders.get` | `order:read`. |
+| `service_orders.create` | `order:write`. |
+| `service_orders.propose` | `order:write`. |
+| `service_orders.activate` | `order:write`. |
+| `service_orders.get_ledger` | `order:read`. |
+| `mandates.list` | `mandate:read`. |
+| `mandates.get` | `mandate:read`. |
+| `mandates.suspend` | `mandate:admin`. |
+
+---
+
+## Appendix D: Attribute Key Reference
+
+Protocol-defined attribute keys per category. Implementations MUST support these keys. Additional keys MAY be defined using the `x-{domain}:` prefix.
+
+### D.1 Identity (`identity`)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `profession` | string | Primary profession. |
+| `primary_specialty` | string | Main area of practice. |
+| `subspecialties` | string[] | Additional areas of expertise. |
+| `title` | string | Academic or professional title. |
+| `training_institution` | string | Where the professional studied. |
+| `license_number` | string | Professional license/registration number. |
+| `license_jurisdiction` | string | Where the license is valid (ISO 3166-1). |
+| `years_experience` | integer | Years in practice. |
+| `languages` | string[] | Languages spoken (ISO 639-1). |
+| `bio` | string | Free-text biography for human display. |
+| `photo_url` | string (URL) | Profile photo URL. |
+
+### D.2 Capability (`capability`)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `conditions_treated` | string[] | Conditions/diagnoses the provider handles. |
+| `techniques` | string[] | Methods and techniques applied. |
+| `populations_served` | string[] | Patient demographics served. |
+| `age_range` | object | Age range served: `{ min: integer, max: integer }`. |
+| `contraindications` | string[] | Conditions the provider does NOT treat. |
+| `typical_session_count` | object | Typical treatment duration: `{ min: integer, max: integer }`. |
+| `outcome_metrics` | string[] | Outcomes the provider tracks. |
+
+### D.3 Availability (`availability`)
+
+| Key | Type | Typical Origin | Description |
+|-----|------|----------------|-------------|
+| `modalities` | string[] | declared | Delivery modes: `in_person`, `virtual`, `home_visit`. |
+| `typical_hours` | object | inferred | Usual schedule blocks from booking history. |
+| `avg_wait_days` | number | inferred | Average days from request to first available slot. |
+| `next_available` | datetime | inferred (real-time) | Next open slot — synced from scheduling system. |
+| `accepts_new_patients` | boolean | declared | Whether currently accepting new patients/clients. |
+| `max_daily_sessions` | integer | declared | Self-imposed daily session limit. |
+
+### D.4 Geography (`geography`)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `country` | string | Country (ISO 3166-1). |
+| `region` | string | Administrative region. |
+| `city` | string | City. |
+| `district` | string | Sub-city division (borough, district). |
+| `address` | string | Primary practice address. |
+| `coordinates` | object | `{ lat: number, lng: number }`. |
+| `service_radius_km` | number | For home visits: maximum distance served. |
+| `remote_policy` | string | Virtual care scope: `same_region`, `national`, `international`. |
+
+### D.5 Economic (`economic`)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `price_range` | object | `{ min: number, max: number, currency: string }`. |
+| `insurance_accepted` | string[] | Accepted insurance types. |
+| `payment_methods` | string[] | Accepted payment methods. |
+| `cancellation_policy` | string | Human-readable cancellation policy. |
+| `cancellation_window_hours` | integer | Machine-readable cancellation window in hours. |
+| `offers_packages` | boolean | Whether multi-session packages are available. |
+
+### D.6 Trust (`trust`)
+
+All trust attributes have `origin: "inferred"` and `visibility: "public"`.
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `rating_avg` | number (1.0–5.0) | Average client rating. |
+| `rating_count` | integer | Number of ratings. |
+| `cancellation_rate` | number (0.0–1.0) | Provider-initiated cancellation rate. |
+| `no_show_rate` | number (0.0–1.0) | Client no-show rate. |
+| `response_time_hours` | number | Average time to respond to booking requests. |
+| `platform_tenure_months` | integer | Months active on the platform. |
+| `services_completed` | integer | Total completed services. |
+| `repeat_client_rate` | number (0.0–1.0) | Percentage of clients who return. |
+
+---
+
+## Machine-Readable Schemas
+
+- [`schema/service.schema.json`](./schema/service.schema.json)
+- [`schema/service-order.schema.json`](./schema/service-order.schema.json)
+- [`schema/service-mandate.schema.json`](./schema/service-mandate.schema.json)
 
 ---
 
 ## License
 
-MIT — Use it, implement it, extend it. Attribution appreciated but not required.
+Apache-2.0 — Use it, implement it, extend it.
 
 ---
 

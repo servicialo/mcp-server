@@ -6,7 +6,7 @@ This roadmap reflects the current direction of the **Servicialo open protocol** 
 
 ---
 
-## Done — v0.1 → v0.3
+## Done — v0.1 → v0.7
 
 What's already shipped:
 
