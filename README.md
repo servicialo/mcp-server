@@ -2,236 +2,236 @@
 
 # Servicialo
 
-**The orchestration layer for the AI-agent service economy**
+**La capa de orquestación para la economía de servicios en la era de agentes AI**
 
-An open protocol for scheduling, identity, delivery verification,<br>
-and financial settlement of professional services.
+Un protocolo abierto para coordinación de agenda, identidad, verificación<br>
+de entrega y liquidación financiera de servicios profesionales.
 
-`Open protocol` `Machine-readable` `Agent-native` `MIT license`
+`Protocolo abierto` `Legible por máquinas` `Agent-native` `Licencia MIT`
 
-[Website](https://servicialo.com) ・ [Specification](./PROTOCOL.md) ・ [Governance](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
+[Sitio web](https://servicialo.com) ・ [Especificación](./PROTOCOL.md) ・ [Gobernanza](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
-**[Leer en Español](./README.es.md)**
+**[Read in English](./README.en.md)**
 
 </div>
 
 ---
 
-## The problem
+## El problema
 
-Without a standard protocol, every service platform speaks its own language. An AI agent that wants to schedule a medical appointment, verify a home repair, or settle a legal consultation needs a different integration for each one. Data stays siloed, interoperability requires custom integrations, and collective intelligence about service delivery never forms.
+Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma. Un agente AI que quiere agendar una cita médica, verificar una reparación a domicilio o cobrar una consulta legal necesita una integración distinta para cada una. Los datos quedan en silos, la interoperabilidad requiere integraciones custom, y la inteligencia colectiva sobre entrega de servicios nunca se forma.
 
-**Servicialo is the common protocol.** It defines the minimum viable schema so that any AI agent can coordinate any professional service on any compatible platform — with no additional integration.
-
----
-
-## Protocol primitives
-
-Servicialo defines four coordination primitives. Together they cover the complete value chain of professional service delivery:
-
-| Primitive | What it solves | Protocol surface |
-|-----------|---------------|------------------|
-| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 9 lifecycle states, 7 exception flows, 3-variable scheduler |
-| **Identity verification** | Provider credentials, trust scores, client-payer separation | Provider credentials, trust_score, payer_id separation |
-| **Financial settlement** | Billing, invoicing, collection, and revenue sharing with dispute resolution | billing dimension, Service Order ledger, payment_schedule |
-| **Demand signals** | Aggregate, anonymous operational telemetry across network nodes | Telemetry Extension (contribute-to-access model) |
-
-Each primitive is specified independently. Implementations adopt what they need.
+**Servicialo es el protocolo común.** Define el esquema mínimo viable para que cualquier agente AI coordine cualquier servicio profesional en cualquier plataforma compatible — sin integración adicional.
 
 ---
 
-## What is a service
+## Primitivas del protocolo
 
-> *A service is a promise of transformation delivered at a specific time and place.*
+Servicialo define cuatro primitivas de coordinación. Juntas cubren la cadena de valor completa de la entrega de servicios profesionales:
 
-Unlike a product, a service cannot be stored, resold, or returned. It is consumed the moment it is delivered. That makes it fundamentally different — and that is why it needs its own protocol.
+| Primitiva | Qué resuelve | Superficie del protocolo |
+|-----------|-------------|--------------------------|
+| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | 9 estados del ciclo de vida, 7 flujos de excepción, scheduler de 3 variables |
+| **Verificación de identidad** | Credenciales del proveedor, puntaje de confianza, separación cliente-pagador | Credenciales del proveedor, trust_score, separación payer_id |
+| **Liquidación financiera** | Facturación, cobranza, liquidación y revenue sharing con resolución de disputas | Dimensión de cobro, ledger de Orden de Servicio, payment_schedule |
+| **Señales de demanda** | Telemetría operacional anónima y agregada entre nodos de la red | Extensión de Telemetría (modelo contribuir-para-acceder) |
 
-A service originates from three sources:
-
-| Origin | Key question | Example |
-|--------|-------------|---------|
-| **From an asset** | *What do you have that others need?* | An empty apartment → temporary lodging |
-| **From an advantage** | *What do you know that others don't?* | Physiotherapy certification → sports rehabilitation |
-| **From your time** | *What can you do that others won't or can't?* | Available hours → professional cleaning |
-
----
-
-## The 8 dimensions
-
-Every professional service — from a physiotherapy session to a tax audit — is modeled with the same 8 dimensions:
-
-| | Dimension | What it captures | Example |
-|:---:|-----------|-----------------|---------|
-| **1** | **What** | The activity or outcome being delivered | Physiotherapy session, electrical repair |
-| **2** | **Who delivers** | The service provider, with credentials | Certified physiotherapist, licensed electrician |
-| **3** | **Who receives** | The client — with payer explicitly separated | Patient (insurer pays), employee (company pays) |
-| **4** | **When** | Agreed time window | 2026-02-10 from 10:00 to 10:45 |
-| **5** | **Where** | Physical or virtual location, with optional `resource_id` linking to a physical Resource (3.5b: room, box, chair, equipment) | Clinic room 3, home visit, video call |
-| **6** | **Lifecycle** | Current position in the 9 lifecycle states | Collected → next: Verified |
-| **7** | **Evidence** | How delivery is proven | GPS + duration + client signature |
-| **8** | **Billing** | Financial settlement, independent from lifecycle | $35 USD · collected · prepaid package |
-
-> **The payer is not always the client.** In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer — because in practice they are rarely the same person.
+Cada primitiva se especifica de forma independiente. Las implementaciones adoptan lo que necesitan.
 
 ---
 
-## The 9 universal states
+## Qué es un servicio
 
-Whether it's a massage or an audit, every service transitions through the same lifecycle:
+> *Un servicio es una promesa de transformación entregada en un momento y lugar específico.*
+
+A diferencia de un producto, un servicio no se puede almacenar, revender ni devolver. Se consume en el momento en que se entrega. Eso lo hace fundamentalmente diferente — y es por eso que necesita su propio protocolo.
+
+Un servicio nace de tres fuentes:
+
+| Origen | Pregunta clave | Ejemplo |
+|--------|---------------|---------|
+| **Desde un activo** | *Qué tienes que otros necesitan?* | Un departamento vacío → hospedaje temporal |
+| **Desde una ventaja** | *Qué sabes que otros no?* | Certificación en kinesiología → rehabilitación deportiva |
+| **Desde tu tiempo** | *Qué puedes hacer que otros no quieren o no pueden?* | Horas disponibles → limpieza profesional |
+
+---
+
+## Las 8 dimensiones
+
+Todo servicio profesional — desde una sesión de kinesiología hasta una auditoría tributaria — se modela con las mismas 8 dimensiones:
+
+| | Dimensión | Qué captura | Ejemplo |
+|:---:|-----------|-------------|---------|
+| **1** | **Qué** | La actividad o resultado que se entrega | Sesión de kinesiología, reparación eléctrica |
+| **2** | **Quién entrega** | El proveedor del servicio, con credenciales | Kinesiólogo certificado, electricista SEC |
+| **3** | **Quién recibe** | El cliente — con pagador separado explícitamente | Paciente (paga FONASA), empleado (paga empresa) |
+| **4** | **Cuándo** | Ventana temporal acordada | 2026-02-10 de 10:00 a 10:45 |
+| **5** | **Dónde** | Ubicación física o virtual, con `resource_id` opcional que referencia un Recurso físico (3.5b: sala, box, sillón, equipamiento) | Sala 3 de clínica, domicilio, videollamada |
+| **6** | **Ciclo** | Posición actual en los 9 estados del ciclo de vida | Cobrado → próximo: Verificado |
+| **7** | **Evidencia** | Cómo se prueba que el servicio ocurrió | GPS + duración + firma del cliente |
+| **8** | **Cobro** | Liquidación financiera, independiente del ciclo | $35.000 CLP · cobrado · paquete prepago |
+
+> **El pagador no siempre es el cliente.** En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador — porque en la vida real casi nunca son la misma persona.
+
+---
+
+## Los 9 estados universales
+
+No importa si es un masaje o una auditoría. Todo servicio transiciona por el mismo ciclo de vida:
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
+Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
 ```
 
-| # | State | What happens |
-|:-:|-------|-------------|
-| 1 | **Requested** | The client or their agent defines what they need, when, and where |
-| 2 | **Scheduled** | Time, provider, and location are assigned. Calendar is blocked |
-| 3 | **Confirmed** | Both parties acknowledge the commitment |
-| 4 | **In Progress** | Check-in detected. The service is being delivered |
-| 5 | **Completed** | The provider marks delivery as complete |
-| 6 | **Documented** | Formal record generated: clinical notes, work report, minutes |
-| 7 | **Invoiced** | Tax document issued |
-| 8 | **Collected** | Payment received and confirmed |
-| 9 | **Verified** | The client confirms — cycle closed |
+| # | Estado | Qué ocurre |
+|:-:|--------|-----------|
+| 1 | **Solicitado** | El cliente o su agente define qué necesita, cuándo y dónde |
+| 2 | **Agendado** | Se asigna hora, proveedor y ubicación. Se bloquea el horario |
+| 3 | **Confirmado** | Ambas partes reconocen el compromiso |
+| 4 | **En Curso** | Registro de entrada detectado. El servicio está siendo entregado |
+| 5 | **Completado** | El proveedor marca la entrega como completa |
+| 6 | **Documentado** | Registro formal generado: ficha clínica, reporte, minuta |
+| 7 | **Facturado** | Documento tributario emitido |
+| 8 | **Cobrado** | Pago recibido y confirmado |
+| 9 | **Verificado** | El cliente confirma — cierre del ciclo |
 
-> **Verified is the closure.** The client cannot verify until they have the complete picture: documented evidence, issued invoice, and applied charge. Premature verification forces the client to confirm something that has no formal record yet.
+> **Verificado es el cierre.** El cliente no puede verificar hasta tener el cuadro completo: la evidencia documentada, la factura emitida y el cobro aplicado. Verificación prematura obliga al cliente a confirmar algo que aún no tiene registro formal.
 
 ---
 
-## Exceptions are the rule
+## Las excepciones son la regla
 
-Exceptions are not edge cases. They occur in **15–30% of appointments**. A well-designed service defines what happens when things don't go as planned:
+Las excepciones no son casos excepcionales. Ocurren en el **15–30% de las citas**. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan:
 
-| Exception | Transition | What happens |
-|-----------|-----------|-------------|
-| **Client no-show** | Confirmed → Cancelled | Penalty applied, provider's time freed |
-| **Provider no-show** | Confirmed → Reassigning → Scheduled | Automatic replacement search |
-| **Cancellation** | Any pre-delivery → Cancelled | Agreed cancellation policy applied |
-| **Quality dispute** | Completed → Disputed | Billing frozen, evidence requested |
-| **Rescheduling** | Scheduled/Confirmed → Rescheduling → Scheduled | Same provider kept if possible |
-| **Resource conflict** | Scheduled → Rescheduling → Scheduled | Resource double-booked or unavailable — reassign resource or reschedule |
-| **Partial delivery** | In Progress → Partial | Delivered portion documented, invoice adjusted |
-
----
-
-## Service and Service Order
-
-The protocol is built on two objects and their relationship:
-
-```
-Organization
-└── Service Order                ← commercial agreement (optional)
-    ├── scope                     what services, how many, what type
-    ├── pricing                   how value is calculated
-    ├── payment schedule          when money moves
-    └── Services                 ← atomic delivery units
-        └── 8 dimensions each
-```
-
-> **The Service** is the atomic unit of delivery — what actually happened. **The Service Order** is the commercial agreement that groups services under a scope, pricing model, and payment schedule.
-
-When a Service belongs to an Order, its billing dimension is **informational** — it records the economic value, but does not generate an invoice. Invoicing is the exclusive responsibility of the Order.
-
-The same structure works across any vertical:
-
-| Vertical | Example | Scope | Payments |
-|----------|---------|-------|----------|
-| **Healthcare** | Physiotherapy plan | 12 sessions | Per session |
-| **Consulting** | Hourly contract | 40 hours of legal advisory | Monthly based on usage |
-| **Projects** | Due diligence in 3 phases | Defined milestones | Per approved milestone |
+| Excepción | Transición | Qué pasa |
+|-----------|-----------|----------|
+| **Inasistencia del cliente** | Confirmado → Cancelado | Se aplica penalidad, se libera tiempo del proveedor |
+| **Inasistencia del proveedor** | Confirmado → Reasignando → Agendado | Se busca reemplazo automáticamente |
+| **Cancelación** | Cualquier pre-entrega → Cancelado | Se aplica la política de cancelación acordada |
+| **Disputa de calidad** | Completado → Disputado | Se congela el cobro, se solicita evidencia |
+| **Reagendamiento** | Agendado/Confirmado → Reagendando → Agendado | Se mantiene el proveedor si es posible |
+| **Conflicto de recurso** | Agendado → Reagendando → Agendado | Recurso con doble reserva o no disponible — se reasigna recurso o se reagenda |
+| **Entrega parcial** | En Curso → Parcial | Se documenta lo entregado, se ajusta la factura |
 
 ---
 
-## Evidence by vertical
+## Servicio y Orden de Servicio
 
-Each vertical defines what constitutes proof that the service occurred — with no ambiguity, so an algorithm can resolve 80% of disputes without human intervention:
+El protocolo se construye sobre dos objetos y su relación:
+
+```
+Organización
+└── Orden de Servicio            ← acuerdo comercial (opcional)
+    ├── alcance                   qué servicios, cuántos, de qué tipo
+    ├── precio                    cómo se calcula el valor
+    ├── esquema de pagos          cuándo se mueve el dinero
+    └── Servicios                 ← unidades atómicas de entrega
+        └── 8 dimensiones cada uno
+```
+
+> **El Servicio** es la unidad atómica de entrega — lo que realmente ocurrió. **La Orden de Servicio** es el acuerdo comercial que agrupa servicios bajo un alcance, un precio y un esquema de pagos.
+
+Cuando un Servicio pertenece a una Orden, su dimensión de cobro es **informativa** — registra el valor económico, pero no genera factura. La facturación es responsabilidad exclusiva de la Orden.
+
+La misma estructura funciona para cualquier vertical:
+
+| Vertical | Ejemplo | Alcance | Pagos |
+|----------|---------|---------|-------|
+| **Salud** | Plan de kinesiología | 12 sesiones | Por sesión |
+| **Consultoría** | Contrato por horas | 40 horas de asesoría legal | Mensual según consumo |
+| **Proyectos** | Auditoría previa en 3 fases | Hitos definidos | Por hito aprobado |
+
+---
+
+## Evidencia por vertical
+
+Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin ambigüedad — para que un algoritmo pueda resolver el 80% de las disputas sin intervención humana:
 
 <details>
-<summary><b>Healthcare</b> — 4 evidence types</summary>
+<summary><b>Salud</b> — 4 tipos de evidencia</summary>
 
-| Evidence | Description | Capture |
-|----------|-------------|:-------:|
-| Check-in record | GPS timestamp when provider arrives | auto |
-| Check-out record | GPS timestamp when provider leaves | auto |
-| Signed clinical notes | Clinical record signed by provider and patient | manual |
-| Treatment plan adherence | Checklist of treatment plan items completed | manual |
+| Evidencia | Descripción | Captura |
+|-----------|-------------|:-------:|
+| Registro de entrada | Marca temporal GPS del proveedor al llegar | auto |
+| Registro de salida | Marca temporal GPS del proveedor al salir | auto |
+| Ficha clínica firmada | Registro clínico firmado por profesional y paciente | manual |
+| Adherencia al plan | Lista de verificación del plan de tratamiento ejecutado | manual |
 
-**Resolution rule:** If check-in/out records exist and clinical notes are signed by both parties → service delivered. If notes or signature missing → escalate.
+**Regla de resolución:** Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes → servicio entregado. Si falta ficha o firma → escalar.
 
 </details>
 
 <details>
-<summary><b>Home</b> — 4 evidence types</summary>
+<summary><b>Hogar</b> — 4 tipos de evidencia</summary>
 
-| Evidence | Description | Capture |
-|----------|-------------|:-------:|
-| Before photo | Photo of initial state with timestamp and GPS | manual |
-| After photo | Photo of final result with timestamp and GPS | manual |
-| Task checklist | Agreed tasks marked as completed | manual |
-| Client signature | Digital signature confirming reception | manual |
+| Evidencia | Descripción | Captura |
+|-----------|-------------|:-------:|
+| Foto antes | Foto del estado inicial con marca temporal y GPS | manual |
+| Foto después | Foto del resultado final con marca temporal y GPS | manual |
+| Lista de verificación | Tareas acordadas marcadas como completadas | manual |
+| Firma del cliente | Firma digital del cliente confirmando recepción | manual |
 
-**Resolution rule:** If before/after photos exist with valid metadata and checklist is complete → service delivered. If client signature missing → escalate.
-
-</details>
-
-<details>
-<summary><b>Legal</b> — 3 evidence types</summary>
-
-| Evidence | Description | Capture |
-|----------|-------------|:-------:|
-| Meeting minutes | Record of what was discussed and agreed | manual |
-| Document delivery | Confirmation of generated documents delivered | manual |
-| Time log | Billable hours with activity descriptions | manual |
-
-**Resolution rule:** If minutes exist and logged hours are within agreed range → service delivered. If hours exceed agreement without justification → escalate.
+**Regla de resolución:** Si fotos antes/después existen con metadatos válidos y lista completa → servicio entregado. Si falta firma del cliente → escalar.
 
 </details>
 
 <details>
-<summary><b>Education</b> — 3 evidence types</summary>
+<summary><b>Legal</b> — 3 tipos de evidencia</summary>
 
-| Evidence | Description | Capture |
-|----------|-------------|:-------:|
-| Attendance record | Confirmation of student and teacher presence | auto |
-| Material delivery | Materials or assignments delivered to student | manual |
-| Evaluation | Session evaluation or feedback | manual |
+| Evidencia | Descripción | Captura |
+|-----------|-------------|:-------:|
+| Minuta de reunión | Registro de lo discutido y acordado | manual |
+| Entrega de documentos | Confirmación de entrega de documentos generados | manual |
+| Registro de horas | Horas facturables con descripción de actividades | manual |
 
-**Resolution rule:** If attendance recorded and material delivered → service delivered. If evaluation missing and contract requires it → escalate.
+**Regla de resolución:** Si minuta existe y horas registradas dentro del rango acordado → servicio entregado. Si horas exceden lo acordado sin justificación → escalar.
+
+</details>
+
+<details>
+<summary><b>Educación</b> — 3 tipos de evidencia</summary>
+
+| Evidencia | Descripción | Captura |
+|-----------|-------------|:-------:|
+| Registro de asistencia | Confirmación de presencia del alumno y profesor | auto |
+| Entrega de material | Material o tareas entregadas al alumno | manual |
+| Evaluación | Evaluación o retroalimentación de la sesión | manual |
+
+**Regla de resolución:** Si asistencia registrada y material entregado → servicio entregado. Si falta evaluación y contrato la requiere → escalar.
 
 </details>
 
 ---
 
-## Dispute resolution
+## Resolución de disputas
 
-When there is disagreement, the mechanism does not depend on goodwill, does not require a centralized judge, and an AI agent can execute it with the same confidence as a human:
+Cuando hay desacuerdo, el mecanismo no depende de buena voluntad, no requiere un juez centralizado, y un agente AI puede ejecutarlo con la misma confianza que un humano:
 
-**1. Opening** — Either party opens a dispute within the defined window. Billing is frozen automatically.
+**1. Apertura** — Cualquier parte abre disputa dentro del plazo definido. Se congela el cobro automáticamente.
 
-**2. Evidence review** — Additional evidence is requested from both parties. The system compares recorded evidence against the contract.
+**2. Revisión de evidencia** — Se solicita evidencia adicional de ambas partes. El sistema compara evidencia registrada contra el contrato.
 
-**3. Resolution** — If provider wins: Collected → Verified. If client wins: Cancelled with balance restored.
+**3. Resolución** — Si proveedor gana: Cobrado → Verificado. Si cliente gana: Cancelado con balance restaurado.
 
-> **80/20.** 80% of disputes are resolved automatically by comparing evidence against contract. No human intervention, no discretion, no delay. The remaining 20% escalate to peer arbitrators from the same professional vertical who vote within 48 hours.
+> **80/20.** El 80% de las disputas se resuelven automáticamente comparando evidencia contra contrato. Sin intervención humana, sin discrecionalidad, sin demora. El 20% restante escala a árbitros del mismo vertical profesional que votan en 48 horas.
 
 ---
 
-## MCP Server
+## Servidor MCP
 
-Servicialo exposes its tools as an MCP server, enabling AI agents to discover and coordinate professional services natively.
+Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes AI descubran y coordinen servicios profesionales de forma nativa.
 
-### Quickstart
+### Inicio rápido
 
 ```bash
 npx -y @servicialo/mcp-server
 ```
 
-With that, your agent can already search organizations, check availability, and list services — no credentials required.
+Con eso, tu agente ya puede buscar organizaciones, consultar disponibilidad y listar servicios — sin credenciales.
 
-### Authenticated mode
+### Modo autenticado
 
-For the full cycle — schedule, verify delivery, collect payment:
+Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 ```json
 {
@@ -240,180 +240,184 @@ For the full cycle — schedule, verify delivery, collect payment:
       "command": "npx",
       "args": ["-y", "@servicialo/mcp-server"],
       "env": {
-        "SERVICIALO_API_KEY": "your_api_key",
-        "SERVICIALO_ORG_ID": "your_org_id"
+        "SERVICIALO_API_KEY": "tu_api_key",
+        "SERVICIALO_ORG_ID": "tu_org_id"
       }
     }
   }
 }
 ```
 
-Credentials are obtained by each organization from their Servicialo-compatible platform.
+Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### The 6 agent phases — 20 tools
+### Las 6 fases del agente — 20 herramientas
 
-A well-designed agent follows this order:
+Un agente bien diseñado sigue este orden:
 
-| # | Phase | What it solves | Tools |
-|:-:|-------|---------------|-------|
-| 1 | **Discover** | What's available | `registry.search` · `registry.get_organization` · `scheduling.check_availability` · `services.list` |
-| 2 | **Understand** | Service dimensions and rules | `service.get` · `contract.get` |
-| 3 | **Commit** | Client identity and booking | `clients.get_or_create` · `scheduling.book` · `scheduling.confirm` |
-| 4 | **Manage** | State and transitions | `lifecycle.get_state` · `lifecycle.transition` · `scheduling.reschedule` · `scheduling.cancel` |
-| 5 | **Verify** | Proof of delivery | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
-| 6 | **Close** | Documentation and billing | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
+| # | Fase | Qué resuelve | Herramientas |
+|:-:|------|-------------|--------------|
+| 1 | **Descubrir** | Qué hay disponible | `registry.search` · `registry.get_organization` · `scheduling.check_availability` · `services.list` |
+| 2 | **Entender** | Dimensiones y reglas del servicio | `service.get` · `contract.get` |
+| 3 | **Comprometer** | Identidad del cliente y reserva | `clients.get_or_create` · `scheduling.book` · `scheduling.confirm` |
+| 4 | **Gestionar** | Estado y transiciones | `lifecycle.get_state` · `lifecycle.transition` · `scheduling.reschedule` · `scheduling.cancel` |
+| 5 | **Verificar** | Evidencia de que ocurrió | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
+| 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 
-The protocol guarantees that any agent can complete the full cycle with any compatible implementation.
+El protocolo garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
-### Full examples
+### Ejemplos completos
 
-**[Physiotherapy session](./examples/kinesiology-session.md)** — Healthcare vertical. GPS check-in, signed clinical notes, bank transfer payment.
+**[Sesión de kinesiología](./examples/kinesiology-session.md)** — Vertical salud. Registro de entrada con GPS, ficha clínica firmada, pago por transferencia.
 
-**[Electrical repair](./examples/home-repair.md)** — Home vertical. Home visit, before/after photos, task checklist, client signature, cash payment.
+**[Reparación eléctrica](./examples/home-repair.md)** — Vertical hogar. Visita a domicilio, fotos antes/después, lista de verificación, firma del cliente, pago en efectivo.
 
 ---
 
-## The 8 principles
+## Los 8 principios
 
-| # | Principle | |
+| # | Principio | |
 |:-:|-----------|---|
-| 1 | **Every service has a lifecycle** | Whether it's a massage or an audit. The 9 states are universal. |
-| 2 | **Delivery must be verifiable** | If you can't prove the service happened, it didn't happen. Servicialo defines what constitutes valid evidence so humans and AI agents can trust it. |
-| 3 | **The payer is not always the client** | In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer. |
-| 4 | **Exceptions are the rule** | No-shows, cancellations, rescheduling, disputes. A well-designed service defines what happens when things don't go as planned. |
-| 5 | **A service is a product** | It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover and coordinate it. |
-| 6 | **AI agents are first-class citizens** | The protocol is designed so an AI agent can request, verify, and close a service with the same confidence as a human. |
-| 7 | **The agreement is separate from delivery** | The Service Order defines what was agreed. The atomic service defines what was delivered. Two distinct objects with two distinct lifecycles. |
-| 8 | **Collective intelligence is a protocol commons** | Every node that implements the protocol contributes operational data. The aggregate intelligence improves all nodes — like Waze, where each driver contributes and everyone navigates better. No single implementation owns the network data. |
+| 1 | **Todo servicio tiene un ciclo** | No importa si es un masaje o una auditoría. Los 9 estados son universales. |
+| 2 | **La entrega debe ser verificable** | Si no puedes probar que el servicio ocurrió, no ocurrió. El protocolo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
+| 3 | **El pagador no siempre es el cliente** | En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador. |
+| 4 | **Las excepciones son la regla** | Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. |
+| 5 | **Un servicio es un producto** | Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo. |
+| 6 | **Los agentes AI son ciudadanos de primera clase** | El protocolo está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano. |
+| 7 | **El acuerdo es separado de la entrega** | La Orden de Servicio define lo acordado. El servicio atómico define lo entregado. Son dos objetos distintos con dos ciclos de vida distintos. |
+| 8 | **La inteligencia colectiva es un bien común del protocolo** | Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos los nodos — como Waze, donde cada conductor contribuye y todos navegan mejor. Ninguna implementación es dueña de los datos de la red. |
 
 ---
 
-## Layered architecture
+## Arquitectura por capas
 
-Adopt only what you need. Core covers the complete service lifecycle. Extensions add capabilities for specialized operations.
+Adopta solo lo que necesitas. Core cubre el ciclo completo de entrega. Las extensiones agregan capacidades para operaciones especializadas.
 
-### Servicialo Core — `stable`
+### Servicialo Core — `estable`
 
-Everything needed to model a professional service from start to finish.
+Todo lo necesario para modelar un servicio profesional de principio a fin.
 
-For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
+Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Includes: lifecycle (9 states) · 8 dimensions · resource management · service orders · exception flows · proof of delivery · MCP protocol (20 tools)
+Incluye: ciclo de vida (9 estados) · 8 dimensiones · gestión de recursos · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (20 herramientas)
 
-### Servicialo/Finance — `in design`
+### Servicialo/Finanzas — `en diseño`
 
-Payment distribution between provider, organization, and infrastructure — with clear settlement rules.
+Distribución de pagos entre profesional, organización e infraestructura — con reglas claras de liquidación.
 
-For platforms that intermediate payments between clients and providers, or that charge commissions.
+Para plataformas que intermedian pagos entre clientes y profesionales, o que cobran comisiones.
 
-### Servicialo/Disputes — `in design`
+### Servicialo/Disputas — `en diseño`
 
-Formal resolution with algorithmic arbitration (~80%) and peer arbitration from the same vertical (~20%).
+Resolución formal con arbitraje algorítmico (~80%) y por pares del mismo vertical (~20%).
 
-For platforms with enough volume or where the amount per service makes disputes economically relevant.
+Para plataformas con volumen suficiente o donde el monto por servicio hace que las disputas sean económicamente relevantes.
 
 ---
 
 ## Schema
 
-JSON Schemas for automated validation: [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json)
+JSON Schemas para validación automática: [`schema/service.schema.json`](./schema/service.schema.json) y [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.7 ──────────────────
-# The 8 dimensions of a service
+# ── SERVICIALO v0.6 ──────────────────
+# Las 8 dimensiones de un servicio
 
-service:
-  id: string
-  service_order_id: string              # Optional — reference to parent Order
-  type: string                          # Service category
-  vertical: string                      # health | legal | home | education | ...
-  name: string
-  duration_minutes: integer
-  visibility: public | unlisted | private  # Discovery level (default: public)
+servicio:
+  id: texto
+  orden_de_servicio_id: texto         # Opcional — referencia a Orden padre
+  tipo: texto                         # Categoría del servicio
+  vertical: texto                     # salud | legal | hogar | educación | ...
+  nombre: texto
+  duración_minutos: entero
 
-  provider:
-    id: string
-    credentials: string[]               # Required certifications
-    trust_score: number                  # 0-100, computed from history
-    organization_id: string
+  proveedor:
+    id: texto
+    credenciales: texto[]             # Certificaciones requeridas
+    puntaje_confianza: número         # 0-100 calculado por historial
+    organización_id: texto
 
-  client:
-    id: string
-    payer_id: string                    # May differ from client
+  cliente:
+    id: texto
+    pagador_id: texto                 # Puede diferir del cliente
 
-  schedule:
-    requested_at: datetime
-    scheduled_for: datetime
-    expected_duration: minutes
+  agenda:
+    solicitado_en: fecha_hora
+    agendado_para: fecha_hora
+    duración_esperada: minutos
 
-  location:
-    type: in_person | virtual | home_visit
-    address: string
-    room: string
-    resource_id: string               # Optional — reference to Resource (3.5b)
-    coordinates:
-      lat: number
-      lng: number
+  ubicación:
+    tipo: presencial | virtual | domicilio
+    dirección: texto
+    sala: texto
+    recurso_id: texto                 # Opcional — referencia a Recurso (3.5b)
+    coordenadas:
+      lat: número
+      lng: número
 
-  lifecycle:
-    current_state: enum[9]              # The 9 universal states
-    transitions: transition[]
-    exceptions: exception[]
+  ciclo_de_vida:
+    estado_actual: enum[9]            # Los 9 estados universales
+    transiciones: transición[]
+    excepciones: excepción[]
 
-  proof:
-    checkin: datetime
-    checkout: datetime
-    actual_duration: minutes
-    evidence: evidence[]                # GPS, signature, photos, documents
+  prueba_de_entrega:
+    entrada: fecha_hora
+    salida: fecha_hora
+    duración_real: minutos
+    evidencia: evidencia[]            # GPS, firma, fotos, documentos
 
-  billing:                              # Informational if part of an Order
-    amount:
-      value: number
-      currency: string                  # ISO 4217
-    payer: reference                    # May differ from client
-    status: pending | charged | invoiced | paid | disputed
-    charged_at: datetime
-    payment_id: reference
-    tax_document: reference
+  cobro:                              # Informativo si pertenece a una Orden
+    monto:
+      valor: número
+      moneda: texto                   # ISO 4217
+    pagador: referencia               # Puede diferir del cliente
+    estado: pendiente | cobrado | facturado | pagado | disputado
+    cobrado_en: fecha_hora
+    pago_id: referencia
+    documento_tributario: ref
 ```
 
 ---
 
-## Implementations
+## Implementaciones
 
-Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 9 states, handle at least 3 exception flows, and expose an API connectable to the MCP server.
+Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 9 estados, manejar al menos 3 flujos de excepción y exponer una API conectable al MCP server.
 
-| Platform | Vertical | Coverage | Status |
-|----------|----------|----------|:------:|
-| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensions · 9/9 states · 6/6 exceptions · 7/7 principles | Live |
+| Plataforma | Vertical | Cobertura | Estado |
+|------------|----------|-----------|:------:|
+| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 7/7 principios | Live |
 
-> Building for professional services? [Open an issue](https://github.com/servicialo/mcp-server/issues) to list your implementation.
+> Construyendo para servicios profesionales? [Abre un issue](https://github.com/servicialo/mcp-server/issues) para listar tu implementación.
+
+### Para implementadores
+
+Guía paso a paso para construir una plataforma compatible desde cero — 7 pasos, el primero toma 20 minutos.
+Empezar aquí: [`IMPLEMENTING.md`](./IMPLEMENTING.md) ([English](./IMPLEMENTING.en.md))
 
 ---
 
-## What's in this repository
+## Qué hay en este repositorio
 
 ```
 servicialo/
-├── app/                  # servicialo.com — protocol website (Next.js)
-├── components/           # Website components
-├── examples/             # Agent-server conversations
-├── lib/                  # Protocol data
+├── app/                  # servicialo.com — sitio del protocolo (Next.js)
+├── components/           # Componentes del sitio
+├── examples/             # Conversaciones agente-servidor
+├── lib/                  # Datos del protocolo
 ├── packages/
-│   └── mcp-server/       # @servicialo/mcp-server — MCP server (npm)
-├── schema/               # JSON Schemas for validation
-├── PROTOCOL.md           # Full specification
-├── GOVERNANCE.md         # Network governance and data policy
+│   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
+├── schema/               # JSON Schemas para validación
+├── PROTOCOL.md           # Especificación completa
+├── GOVERNANCE.md         # Gobernanza de red y política de datos
 └── README.md
 ```
 
-|  | Version | Status |
+|  | Versión | Estado |
 |---|---------|--------|
-| Protocol | 0.6 | Stable |
+| Protocol | 0.6 | Estable |
 | @servicialo/mcp-server | 0.6.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 
-## License
+## Licencia
 
-MIT — Servicialo is an open protocol. Anyone can implement it.
+MIT — Servicialo es un protocolo abierto. Cualquiera puede implementarlo.
