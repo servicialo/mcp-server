@@ -216,54 +216,70 @@ GET /services
 
 ---
 
-### Endpoint 2: `GET /availability` → herramienta MCP `scheduling.check_availability` (§13.1)
+### Endpoint 2: `GET /availability` → herramienta MCP `scheduling.check_availability` (§13.1.1)
 
 Retorna horarios disponibles. Sin autenticación.
 
 ```typescript
-// GET /availability?service_id=X&date_from=Y&date_to=Z
+// GET /availability?service_id=X&provider_id=Y&date_from=Z&date_to=W
 // Herramienta MCP: scheduling.check_availability (Fase 1 — Descubrir)
-// Spec: §13.1 — Modo Descubrimiento
+// Spec: §13.1.1 — Modos de Disponibilidad
+//
+// Modo A: disponibilidad solo por proveedor
+// No requiere infraestructura de Recurso (§5.5.1)
+// Suficiente para: consultas individuales, freelancers,
+//   cualquier proveedor sin recursos físicos compartidos
+//
+// Otros modos (B: solo recurso, C: proveedor + recurso) requieren
+// entidad Resource. Ver §13.1.1 para especificación completa.
 
 app.get("/availability", (req, res) => {
-  const { service_id, date_from, date_to } = req.query;
+  const { service_id, provider_id, date_from, date_to } = req.query;
   const service = SERVICES.find((s) => s.id === service_id);
   if (!service) return res.status(404).json({ error: "Servicio no encontrado" });
 
-  // En producción: intersectar calendario del proveedor, calendario del recurso,
-  // y reservas existentes (§6.2 — scheduler de 3 variables)
-  // Para este ejemplo mínimo, retornamos slots hardcodeados
+  // Modo A: verificar solo el calendario del proveedor.
+  // Sin resource_id → no se necesita infraestructura de Recurso.
+  // confidence_score = 0.9 (conflictos de recurso posibles pero desconocidos)
+  //
+  // En producción: consultar reservas existentes del proveedor
+  // y retornar slots donde no tiene servicios confirmados.
+  // Para este ejemplo mínimo, retornamos slots hardcodeados.
   res.json({
     service_id,
+    mode: "provider_only",
     provider: {
       id: service.provider.id,
       credentials: service.provider.credentials,
     },
     slots: [
-      { date: date_from, start: "10:00", end: "10:45" },
-      { date: date_from, start: "15:00", end: "15:45" },
+      { date: date_from, start: "10:00", end: "10:45", confidence_score: 0.9 },
+      { date: date_from, start: "15:00", end: "15:45", confidence_score: 0.9 },
     ],
+    conflict_resolution: { type: "none" },
   });
 });
 ```
 
 **Request:**
 ```http
-GET /availability?service_id=srv_kine_rehab&date_from=2026-03-20&date_to=2026-03-24
+GET /availability?service_id=srv_kine_rehab&provider_id=pro_andrea&date_from=2026-03-20&date_to=2026-03-24
 ```
 
 **Response:**
 ```json
 {
   "service_id": "srv_kine_rehab",
+  "mode": "provider_only",
   "provider": {
     "id": "pro_andrea",
     "credentials": ["kinesiologist_cl"]
   },
   "slots": [
-    { "date": "2026-03-20", "start": "10:00", "end": "10:45" },
-    { "date": "2026-03-20", "start": "15:00", "end": "15:45" }
-  ]
+    { "date": "2026-03-20", "start": "10:00", "end": "10:45", "confidence_score": 0.9 },
+    { "date": "2026-03-20", "start": "15:00", "end": "15:45", "confidence_score": 0.9 }
+  ],
+  "conflict_resolution": { "type": "none" }
 }
 ```
 
@@ -638,18 +654,24 @@ server.tool(
   }
 );
 
-// Herramienta 2: scheduling.check_availability (§13.1)
+// Herramienta 2: scheduling.check_availability (§13.1.1)
+// Modo A: disponibilidad solo por proveedor
+// No requiere infraestructura de Recurso
+// Suficiente para: consultas individuales, freelancers,
+//   cualquier proveedor sin recursos físicos compartidos
 server.tool(
   "scheduling.check_availability",
-  "Consultar horarios disponibles",
+  "Consultar horarios disponibles (Modo A: solo proveedor)",
   {
     service_id: z.string(),
+    provider_id: z.string().describe("ID del proveedor (Modo A)"),
     date_from: z.string(),
     date_to: z.string(),
+    duration_minutes: z.number().optional().describe("Duración solicitada en minutos"),
   },
-  async ({ service_id, date_from, date_to }) => {
+  async ({ service_id, provider_id, date_from, date_to }) => {
     const res = await fetch(
-      `${API}/availability?service_id=${service_id}&date_from=${date_from}&date_to=${date_to}`
+      `${API}/availability?service_id=${service_id}&provider_id=${provider_id}&date_from=${date_from}&date_to=${date_to}`
     );
     return { content: [{ type: "text", text: await res.text() }] };
   }
@@ -844,4 +866,4 @@ Todo esto es opcional para compliance pero existe en el spec completo:
 
 [SPEC GAP] El protocolo no define un contrato de API HTTP — solo firmas de herramientas MCP. Esto significa que dos implementaciones compatibles pueden tener APIs REST completamente diferentes. La capa del servidor MCP es lo que provee interoperabilidad, no la capa HTTP.
 
-[SPEC GAP] El protocolo no especifica cómo `scheduling.check_availability` debe computar slots cuando no existe una entidad Resource. Este ejemplo retorna slots hardcodeados. Una implementación real necesita intersectar calendarios de proveedores con reservas existentes.
+[RESUELTO v0.8] El protocolo ahora especifica tres modos de disponibilidad (§13.1.1): Modo A (solo proveedor), Modo B (solo recurso), Modo C (proveedor + recurso). Este ejemplo usa Modo A — no requiere infraestructura de Recurso. Una implementación real debe intersectar el calendario del proveedor con reservas existentes.

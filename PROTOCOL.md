@@ -1073,6 +1073,90 @@ Four public tools are available without authentication. These tools do not requi
 | `scheduling.check_availability` | Check available time slots. | None. |
 | `services.list` | Public service catalog. | None. |
 
+#### 13.1.1 `scheduling.check_availability` — Availability Modes
+
+The availability tool supports three modes, determined by the combination of input parameters. This allows implementations to start with provider-only scheduling and add Resource infrastructure incrementally.
+
+**Input parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `service_id` | string | REQUIRED | Service to check availability for. |
+| `provider_id` | string | CONDITIONAL | Provider identifier. Required for Mode A and Mode C. |
+| `resource_id` | string | CONDITIONAL | Resource identifier (§5.5.1). Required for Mode B and Mode C. |
+| `date_from` | string | REQUIRED | Start of date range (ISO 8601 date). |
+| `date_to` | string | REQUIRED | End of date range (ISO 8601 date). |
+| `duration_minutes` | integer | OPTIONAL | Requested slot duration. Defaults to the service's `duration_minutes`. |
+
+**Mode resolution:**
+
+| Mode | Condition | Logic |
+|------|-----------|-------|
+| **A — Provider only** | `provider_id` present, `resource_id` absent. | Return slots where provider has no confirmed services. No Resource infrastructure required. |
+| **B — Resource only** | `resource_id` present, `provider_id` absent. | Return slots where resource is unbooked, respecting `capacity` and `buffer_minutes`. |
+| **C — Provider + Resource** | Both `provider_id` and `resource_id` present. | Return intersection of provider availability and resource availability. |
+
+When neither `provider_id` nor `resource_id` is provided, implementations MUST return an error with code `missing_availability_target`.
+
+**Mode A** is the documented default for getting-started scenarios. It requires zero Resource infrastructure and is sufficient for solo practices, freelancers, and any provider without shared physical resources.
+
+**Response schema (all modes):**
+
+```json
+{
+  "service_id": "string",
+  "mode": "provider_only | resource_only | provider_and_resource",
+  "provider": {
+    "id": "string",
+    "credentials": ["string"]
+  },
+  "resource": {
+    "id": "string",
+    "name": "string"
+  },
+  "slots": [
+    {
+      "date": "string (ISO 8601 date)",
+      "start": "string (HH:mm)",
+      "end": "string (HH:mm)",
+      "confidence_score": "number (0.0–1.0)"
+    }
+  ],
+  "conflict_resolution": {
+    "type": "none | provider_available_resource_unavailable | resource_available_provider_unavailable",
+    "message": "string"
+  }
+}
+```
+
+- The `provider` object is present in modes A and C; absent in mode B.
+- The `resource` object is present in modes B and C; absent in mode A.
+- `conflict_resolution` is only populated in mode C when partial availability exists.
+
+**`confidence_score` semantics:**
+
+| Mode | Score | Rationale |
+|------|-------|-----------|
+| C — Provider + Resource | `1.0` | Both calendars verified; no unknown conflicts. |
+| A — Provider only | `0.9` | Provider verified; resource conflicts possible but unknown. |
+| B — Resource only | `0.8` | Resource verified; provider conflicts possible but unknown. |
+
+Implementations MAY adjust scores based on additional signals (e.g., historical no-show rates), but MUST NOT exceed the mode ceiling.
+
+**`conflict_resolution` field:**
+
+In mode C, when provider and resource availability do not fully overlap, the response SHOULD include a `conflict_resolution` object describing the mismatch:
+
+| `type` | Description | Recommended action |
+|--------|-------------|-------------------|
+| `none` | Full overlap; no conflicts. | Proceed normally. |
+| `provider_available_resource_unavailable` | Provider has slots but resource is booked. | Suggest alternative resources or dates. |
+| `resource_available_provider_unavailable` | Resource is free but provider is busy. | Suggest alternative providers or dates. |
+
+In modes A and B, `conflict_resolution.type` MUST be `none`.
+
+**Reference implementation (Coordinalo):** Implements all three modes. Mode A is the default for organizations that have not configured Resource entities. When an organization creates its first Resource, Coordinalo prompts to associate it with existing services but does not retroactively change the availability mode for existing bookings.
+
 ### 13.2 Authenticated Mode
 
 All authenticated tools require API credentials. Tools that mutate state require a valid ServiceMandate when `actor.type` is `agent`.
