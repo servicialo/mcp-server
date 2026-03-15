@@ -1,0 +1,17 @@
+{
+  "organizations": [
+    {
+      "slug": "mamapro",
+      "name": "Mamá Pro",
+      "description": "Atención kinesiológica integral a domicilio para madres y recién nacidos",
+      "vertical": "kinesiologia",
+      "location": "Santiago",
+      "country": "cl",
+      "discoverable": true,
+      "endpoints": {
+        "services": "https://coordinalo.com/api/servicialo/mamapro/services",
+        "availability": "https://coordinalo.com/api/servicialo/mamapro/availability"
+      }
+    }
+  ]
+}

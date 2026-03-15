@@ -21,6 +21,15 @@ export const registryTools = {
     },
   },
 
+  'registry.manifest': {
+    description: 'Obtiene el manifiesto del servidor Servicialo: versión del protocolo, nombre, descripción y endpoints disponibles',
+    schema: z.object({}),
+    handler: async (client: ServicialoAdapter) => {
+      const result = await client.pub.get('/api/servicialo/manifest');
+      return result;
+    },
+  },
+
   'registry.get_organization': {
     description: 'Obtiene el detalle público de una organización: servicios, profesionales y configuración de booking',
     schema: z.object({

@@ -292,6 +292,38 @@ These endpoints are PUBLIC. They MUST NOT require authentication.
 
 ---
 
+### 4.0 `registry.manifest`
+
+Server manifest — returns protocol version, server name, and available endpoints.
+
+| | |
+|---|---|
+| **Compliance** | REQUIRED |
+| **MCP Tool** | `registry.manifest` |
+| **Method** | `GET` |
+| **Path** | `/servicialo/v1/manifest` |
+
+**Success Response**
+
+| Status | Body |
+|---|---|
+| `200 OK` | Server manifest object. |
+
+```json
+{
+  "servicialo": "0.7",
+  "name": "Coordinalo",
+  "description": "Plataforma abierta para la gestión integral de servicios profesionales.",
+  "endpoints": {
+    "registry": "/api/servicialo/registry",
+    "services": "/api/servicialo/{orgSlug}/services",
+    "availability": "/api/servicialo/{orgSlug}/availability"
+  }
+}
+```
+
+---
+
 ### 4.1 `registry.search`
 
 Search organizations by vertical and location.
