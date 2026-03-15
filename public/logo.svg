@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8590C"/>
+      <stop offset="100%" stop-color="#C24B0A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon -->
+  <rect x="20" y="20" width="280" height="280" rx="60" fill="url(#g)"/>
+  <path d="M 193 91
+           C 193 91, 127 91, 114 91
+           C 92 91, 77 106, 77 125
+           C 77 144, 92 159, 114 159
+           L 208 159
+           C 230 159, 245 174, 245 193
+           C 245 212, 230 227, 208 227
+           L 130 227"
+        fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="152,207 130,227 152,247"
+            fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="340" y="210" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="140" font-weight="700" fill="#1a1a1a" letter-spacing="-3">
+    Servicialo
+  </text>
+
+  <!-- Tagline -->
+  <text x="344" y="260" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#666666" letter-spacing="0.5">
+    Open protocol for professional services
+  </text>
+</svg>

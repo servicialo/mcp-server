@@ -1,0 +1,119 @@
+registries:
+  - id: punkpeye-awesome-mcp
+    name: punkpeye/awesome-mcp-servers
+    url: https://github.com/punkpeye/awesome-mcp-servers
+    type: github_pr
+    status: submitted
+    pr_url: https://github.com/punkpeye/awesome-mcp-servers/pull/2277
+    last_checked: 2026-03-15
+    entry_format: markdown_list
+    section: Support & Service Management
+    submitted_version: 0.7.0
+    last_entry: >
+      - [servicialo/mcp-server](https://github.com/servicialo/mcp-server) 📇 ☁️ 🍎 🪟 🐧 - Open protocol for AI-agent
+      coordination of professional services. Scheduling, identity, delivery verification, and financial settlement. MCP
+      server + HTTP profile + Python SDK.
+    notes: >
+      PR #2277 opened 2026-02-22 by danioni. Labels: has-emoji, missing-glama, valid-name. The missing-glama label means
+      maintainer wants a Glama listing before merging. Asked maintainer if Glama is a hard requirement (2026-03-15).
+  - id: appcypher-awesome-mcp
+    name: appcypher/awesome-mcp-servers
+    url: https://github.com/appcypher/awesome-mcp-servers
+    type: github_pr
+    status: submitted
+    pr_url: https://github.com/appcypher/awesome-mcp-servers/pull/379
+    last_checked: 2026-03-15
+    entry_format: markdown_list
+    section: ""
+    submitted_version: 0.7.0
+    last_entry: >
+      - [Servicialo](https://github.com/servicialo/mcp-server) - Open protocol for professional service delivery. 23 MCP
+      tools, HTTP profile, OpenAPI 3.1, Python SDK.
+    notes: >
+      PR #379 opened 2026-02-22 by danioni. No reviewer activity for 3+ weeks. Updated comment posted 2026-03-15 with
+      v0.7.0 capabilities.
+  - id: wong2-mcpservers
+    name: wong2/awesome-mcp-servers (via mcpservers.org)
+    url: https://mcpservers.org
+    type: web_submit
+    submit_url: https://mcpservers.org/submit
+    status: manual_required
+    pr_url: ""
+    last_checked: 2026-03-15
+    entry_format: web_form
+    section: ""
+    submitted_version: ""
+    last_entry: ""
+    notes: >
+      wong2/awesome-mcp-servers no longer accepts PRs.
+
+      Submit via web form at https://mcpservers.org/submit
+
+      No login required. Free tier available (paid $39 for faster review).
+
+
+      FORM FIELDS:
+        Server Name: Servicialo
+        Short Description: Open protocol for AI-agent coordination of professional services. Scheduling, identity, delivery verification, and financial settlement.
+        Link: https://github.com/servicialo/mcp-server
+        Category: Other
+        Contact Email: <your email>
+  - id: mcp-official-registry
+    name: modelcontextprotocol/registry
+    url: https://github.com/modelcontextprotocol/registry
+    type: github_pr
+    status: submitted
+    pr_url: https://github.com/modelcontextprotocol/registry/pull/1063
+    last_checked: 2026-03-15
+    entry_format: json_seed
+    section: ""
+    submitted_version: 0.7.0
+    last_entry: ""
+    notes: >
+      Submitted via PR to data/seed.json (PR #1063, 2026-03-15). Official path is CLI publisher (mcp-publisher) but PR
+      approach is used by community. CLI requires GitHub OAuth authentication.
+  - id: glama-ai
+    name: Glama.ai MCP Directory
+    url: https://glama.ai/mcp/servers
+    type: web_submit
+    submit_url: https://glama.ai/mcp/servers
+    status: manual_required
+    pr_url: ""
+    last_checked: 2026-03-15
+    entry_format: web_form
+    section: ""
+    submitted_version: ""
+    last_entry: ""
+    notes: |
+      Not currently listed (checked 2026-03-15).
+      Requires web login + "Add Server" button at https://glama.ai/mcp/servers
+      HIGH PRIORITY: punkpeye PR #2277 has `missing-glama` label.
+      Getting listed here may unblock that PR.
+
+      STEPS:
+        1. Go to https://glama.ai/mcp/servers
+        2. Click "Add Server" button
+        3. Fill in the form (likely needs GitHub repo URL)
+        4. Submit for review
+  - id: apis-guru
+    name: APIs.guru / openapi-directory
+    url: https://github.com/APIs-guru/openapi-directory
+    type: web_submit
+    submit_url: https://apis.guru/add-api/
+    status: manual_required
+    pr_url: ""
+    last_checked: 2026-03-15
+    entry_format: web_form
+    section: ""
+    submitted_version: ""
+    last_entry: ""
+    notes: |
+      Do NOT submit PRs — they get overwritten by automated updates.
+      Submit via web form at https://apis.guru/add-api/
+
+      Requirements: API must be public, persistent, and useful.
+      The spec/openapi.yaml file in the repo is the source.
+
+      FORM FIELDS (expected):
+        API URL / Spec URL: https://raw.githubusercontent.com/servicialo/mcp-server/main/spec/openapi.yaml
+        (The form may auto-detect fields from the OpenAPI spec)

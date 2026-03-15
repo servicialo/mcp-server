@@ -1,0 +1,66 @@
+name: Registry Check
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday 9am UTC
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  check-registries:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install tsx
+        run: npm install -g tsx
+
+      - name: Check all registries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx tsx distribution/publish.ts check-all 2>&1 | tee /tmp/check-output.txt
+
+      - name: Parse results and create issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check for rejected PRs
+          if grep -q "PR closed without merge" /tmp/check-output.txt; then
+            REJECTED=$(grep "PR closed without merge" /tmp/check-output.txt | sed 's/✗ //' | sed 's/:.*//')
+            for REG in $REJECTED; do
+              EXISTING=$(gh issue list --search "Registry submission rejected: $REG" --state open --json number --jq length)
+              if [ "$EXISTING" = "0" ]; then
+                gh issue create \
+                  --title "Registry submission rejected: $REG" \
+                  --body "The PR for registry \`$REG\` was closed without merge. Review the rejection reason and consider resubmitting." \
+                  --label "distribution"
+              fi
+            done
+          fi
+
+          # Check for version mismatches
+          CURRENT_VERSION=$(node -p "require('./packages/mcp-server/package.json').version")
+          npx tsx distribution/publish.ts status 2>&1 | grep "✗" | while read -r line; do
+            REG=$(echo "$line" | awk '{print $1}')
+            EXISTING=$(gh issue list --search "Registry entry outdated: $REG" --state open --json number --jq length)
+            if [ "$EXISTING" = "0" ]; then
+              gh issue create \
+                --title "Registry entry outdated: $REG" \
+                --body "Registry \`$REG\` has an outdated entry. Current package version is \`$CURRENT_VERSION\`. Run \`npx tsx distribution/publish.ts update-entry $REG\` to see the diff." \
+                --label "distribution"
+            fi
+          done
+
+      - name: Log success for merged PRs
+        run: |
+          if grep -q "PR merged" /tmp/check-output.txt; then
+            echo "🎉 Registry PRs merged:"
+            grep "PR merged" /tmp/check-output.txt
+          fi
