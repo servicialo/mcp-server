@@ -7,6 +7,7 @@
  *   canonical /v1/* paths defined in HTTP_PROFILE.md.
  *
  *   Public endpoints:
+ *     /api/servicialo/manifest             → /v1/manifest
  *     /api/servicialo/registry             → /v1/registry
  *     /api/servicialo/{slug}/services      → /v1/organizations/{slug}/services
  *     /api/servicialo/{slug}/availability  → /v1/organizations/{slug}/availability
@@ -50,6 +51,11 @@ export class HttpAdapter implements ServicialoAdapter {
    * Translate a Coordinalo-internal path to a canonical HTTP_PROFILE.md path.
    */
   private translatePath(path: string): string {
+    // Public: /api/servicialo/manifest → /v1/manifest
+    if (path === '/api/servicialo/manifest') {
+      return '/v1/manifest';
+    }
+
     // Public: /api/servicialo/registry → /v1/registry
     if (path === '/api/servicialo/registry') {
       return '/v1/registry';

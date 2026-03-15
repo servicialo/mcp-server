@@ -26,7 +26,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+
+# database
+*.db
 
 # vercel
 .vercel
@@ -45,3 +49,5 @@ next-env.d.ts
 mcp-publisher
 mcp-publisher.exe
 packages/mcp-server/key.pem
+
+/lib/generated/prisma

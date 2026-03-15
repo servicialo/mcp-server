@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  vertical    String?
+  location    String?
+  country     String?
+
+  discoverable Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
