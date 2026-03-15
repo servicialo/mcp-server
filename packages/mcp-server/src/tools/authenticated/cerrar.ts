@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 import { ActorSchema } from '../schemas.js';
 
 export const cerrarTools = {
@@ -12,7 +12,7 @@ export const cerrarTools = {
       template_id: z.string().optional().describe('ID de plantilla de documentación (si aplica)'),
       actor: ActorSchema.describe('Quién genera la documentación (típicamente el proveedor)'),
     }),
-    handler: async (client: CoordinaloClient, args: { session_id: string; content: string; template_id?: string; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; content: string; template_id?: string; actor: z.infer<typeof ActorSchema> }) => {
       return client.post(`/coordinalo/sessions/${args.session_id}/documentation`, {
         content: args.content,
         templateId: args.template_id,
@@ -31,7 +31,7 @@ export const cerrarTools = {
       quantity: z.number().default(1).describe('Cantidad de sesiones'),
       unit_price: z.number().describe('Precio unitario'),
     }),
-    handler: async (client: CoordinaloClient, args: { client_id: string; service_id: string; provider_id: string; quantity?: number; unit_price: number }) => {
+    handler: async (client: ServicialoAdapter, args: { client_id: string; service_id: string; provider_id: string; quantity?: number; unit_price: number }) => {
       return client.post('/planificalo/sales', {
         clientId: args.client_id,
         serviceId: args.service_id,
@@ -51,7 +51,7 @@ export const cerrarTools = {
       method: z.enum(['efectivo', 'transferencia', 'mercadopago', 'tarjeta']).describe('Método de pago'),
       reference: z.string().optional().describe('Referencia o número de transacción'),
     }),
-    handler: async (client: CoordinaloClient, args: { venta_id: string; amount: number; method: string; reference?: string }) => {
+    handler: async (client: ServicialoAdapter, args: { venta_id: string; amount: number; method: string; reference?: string }) => {
       return client.post('/planificalo/payments', {
         ventaId: args.venta_id,
         amount: args.amount,
@@ -68,7 +68,7 @@ export const cerrarTools = {
       sale_id: z.string().optional().describe('ID de la venta (para consultar una venta específica)'),
       client_id: z.string().optional().describe('ID del cliente (para consultar estado de cuenta)'),
     }),
-    handler: async (client: CoordinaloClient, args: { sale_id?: string; client_id?: string }) => {
+    handler: async (client: ServicialoAdapter, args: { sale_id?: string; client_id?: string }) => {
       if (args.sale_id) {
         return client.get(`/planificalo/sales/${args.sale_id}`);
       }

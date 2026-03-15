@@ -1,5 +1,8 @@
 # @servicialo/mcp-server
 
+> **Canonical MCP Registry entry:** `com.servicialo/mcp-server`
+> The entry `io.github.danioni/servicialo` has been deprecated since March 2026.
+
 > **[Versión en español](./README.md)**
 
 **The missing protocol layer for AI agents that coordinate professional services.**
@@ -144,8 +147,50 @@ Omit the `env` block for discovery-only mode.
 | `SERVICIALO_API_KEY` | No | — | Bearer token. Enables authenticated mode |
 | `SERVICIALO_ORG_ID` | No | — | Organization slug. Enables authenticated mode |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | API endpoint of the Servicialo-compatible platform |
+| `SERVICIALO_ADAPTER` | No | `coordinalo` | Backend adapter: `coordinalo` or `http` |
 
 Both `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` must be set together. If only one is present, the server falls back to discovery mode with a warning.
+
+## Connecting to a custom implementation
+
+This MCP server supports any Servicialo-compatible backend through its pluggable adapter layer. Two adapters are included:
+
+- **`coordinalo`** (default) — connects to a Coordinalo/Digitalo backend with org-scoped routes under `/api/organizations/{orgId}`.
+- **`http`** — connects to any implementation that exposes the canonical `HTTP_PROFILE.md` endpoints under `/v1/*`.
+
+### 3 steps to connect your implementation
+
+**Step 1.** Implement the REST endpoints defined in [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md) in your platform.
+
+**Step 2.** Configure the MCP server to use the HTTP adapter:
+
+```bash
+SERVICIALO_ADAPTER=http \
+SERVICIALO_BASE_URL=https://your-platform.com \
+SERVICIALO_API_KEY=your_key \
+npx -y @servicialo/mcp-server
+```
+
+**Step 3.** Add to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "servicialo": {
+      "command": "npx",
+      "args": ["-y", "@servicialo/mcp-server"],
+      "env": {
+        "SERVICIALO_ADAPTER": "http",
+        "SERVICIALO_BASE_URL": "https://your-platform.com",
+        "SERVICIALO_API_KEY": "your_api_key",
+        "SERVICIALO_ORG_ID": "your_org_id"
+      }
+    }
+  }
+}
+```
+
+The HTTP adapter translates internal paths to canonical `/v1/*` endpoints and sends the organization context via the `X-Servicialo-Org` header. See `HTTP_PROFILE.md` for the full REST contract.
 
 ## Delegated Agency Model
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 
 export const registryTools = {
   'registry.search': {
@@ -10,7 +10,7 @@ export const registryTools = {
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl'),
       limit: z.number().default(10).describe('Cantidad máxima de resultados'),
     }),
-    handler: async (client: CoordinaloClient, args: { vertical: string; location?: string; country?: string; limit?: number }) => {
+    handler: async (client: ServicialoAdapter, args: { vertical: string; location?: string; country?: string; limit?: number }) => {
       const result = await client.pub.get('/api/servicialo/registry', {
         vertical: args.vertical,
         location: args.location,
@@ -27,7 +27,7 @@ export const registryTools = {
       org_slug: z.string().describe('Slug de la organización (ej: clinica-dental-sur)'),
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl'),
     }),
-    handler: async (client: CoordinaloClient, args: { org_slug: string; country?: string }) => {
+    handler: async (client: ServicialoAdapter, args: { org_slug: string; country?: string }) => {
       const result = await client.pub.get(`/api/servicialo/${args.org_slug}/services`, {
         country: args.country ?? 'cl',
       });

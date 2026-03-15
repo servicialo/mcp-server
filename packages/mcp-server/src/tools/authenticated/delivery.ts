@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 import { ActorSchema, LocationSchema } from '../schemas.js';
 
 export const deliveryTools = {
@@ -12,7 +12,7 @@ export const deliveryTools = {
       location: LocationSchema.optional().describe('Ubicación GPS al momento del check-in'),
       timestamp: z.string().optional().describe('ISO datetime del check-in (default: ahora)'),
     }),
-    handler: async (client: CoordinaloClient, args: { session_id: string; actor: z.infer<typeof ActorSchema>; location?: z.infer<typeof LocationSchema>; timestamp?: string }) => {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; actor: z.infer<typeof ActorSchema>; location?: z.infer<typeof LocationSchema>; timestamp?: string }) => {
       return client.post(`/coordinalo/sessions/${args.session_id}/checkin`, {
         actor: args.actor,
         location: args.location,
@@ -30,7 +30,7 @@ export const deliveryTools = {
       location: LocationSchema.optional().describe('Ubicación GPS al momento del check-out'),
       timestamp: z.string().optional().describe('ISO datetime del check-out (default: ahora)'),
     }),
-    handler: async (client: CoordinaloClient, args: { session_id: string; actor: z.infer<typeof ActorSchema>; location?: z.infer<typeof LocationSchema>; timestamp?: string }) => {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; actor: z.infer<typeof ActorSchema>; location?: z.infer<typeof LocationSchema>; timestamp?: string }) => {
       return client.post(`/coordinalo/sessions/${args.session_id}/checkout`, {
         actor: args.actor,
         location: args.location,
@@ -48,7 +48,7 @@ export const deliveryTools = {
       data: z.record(z.unknown()).describe('Payload de la evidencia (estructura varía por tipo)'),
       actor: ActorSchema.describe('Quién registra la evidencia'),
     }),
-    handler: async (client: CoordinaloClient, args: { session_id: string; evidence_type: string; data: Record<string, unknown>; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; evidence_type: string; data: Record<string, unknown>; actor: z.infer<typeof ActorSchema> }) => {
       return client.post(`/coordinalo/sessions/${args.session_id}/evidence`, {
         evidenceType: args.evidence_type,
         data: args.data,

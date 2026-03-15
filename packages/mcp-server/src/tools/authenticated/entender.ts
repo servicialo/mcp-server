@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 
 export const entenderTools = {
   'service.get': {
@@ -8,7 +8,7 @@ export const entenderTools = {
     schema: z.object({
       service_id: z.string().describe('ID del servicio'),
     }),
-    handler: async (client: CoordinaloClient, args: { service_id: string }) => {
+    handler: async (client: ServicialoAdapter, args: { service_id: string }) => {
       return client.get(`/coordinalo/services/${args.service_id}`);
     },
   },
@@ -20,7 +20,7 @@ export const entenderTools = {
       service_id: z.string().describe('ID del servicio'),
       org_id: z.string().describe('ID de la organización'),
     }),
-    handler: async (client: CoordinaloClient, args: { service_id: string; org_id: string }) => {
+    handler: async (client: ServicialoAdapter, args: { service_id: string; org_id: string }) => {
       return client.get(`/coordinalo/services/${args.service_id}/contract`, {
         orgId: args.org_id,
       });

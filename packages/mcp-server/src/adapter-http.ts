@@ -1,89 +1,124 @@
 /**
- * HTTP client for Coordinalo REST API.
+ * HttpAdapter — generic adapter for any Servicialo-compatible implementation
+ * that exposes the canonical HTTP_PROFILE.md REST endpoints.
  *
- * Supports two modes:
- * - Public: calls to /api/servicialo/* without Authorization header
- * - Authenticated: calls to /api/organizations/{orgSlug}/* with Bearer token
+ * Path translation:
+ *   Coordinalo internal paths (used by tool handlers) are translated to
+ *   canonical /v1/* paths defined in HTTP_PROFILE.md.
  *
- * Implements ServicialoAdapter — the pluggable backend interface used by
- * all MCP tool handlers. This is the default adapter (SERVICIALO_ADAPTER=coordinalo).
+ *   Public endpoints:
+ *     /api/servicialo/registry             → /v1/registry
+ *     /api/servicialo/{slug}/services      → /v1/organizations/{slug}/services
+ *     /api/servicialo/{slug}/availability  → /v1/organizations/{slug}/availability
+ *
+ *   Authenticated endpoints:
+ *     /coordinalo/*                        → /v1/*
+ *     /relacionalo/clients/upsert          → /v1/clients
+ *     /planificalo/*                       → /v1/*
+ *
+ * Unlike CoordinaloClient, this adapter does NOT prefix paths with
+ * /api/organizations/{orgId}. The org context is communicated via
+ * the X-Servicialo-Org header (or the implementation's own mechanism).
  */
 
 import type { ServicialoAdapter } from './adapter.js';
 
-export interface ClientConfig {
+export interface HttpAdapterConfig {
   baseUrl: string;
   apiKey?: string;
   orgId?: string;
 }
 
-export class CoordinaloClient implements ServicialoAdapter {
+export class HttpAdapter implements ServicialoAdapter {
   private baseUrl: string;
   private apiKey: string | undefined;
   private orgId: string | undefined;
 
-  constructor(config: ClientConfig) {
+  constructor(config: HttpAdapterConfig) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '');
     this.apiKey = config.apiKey;
     this.orgId = config.orgId;
   }
 
-  /** Whether the client has credentials for authenticated operations */
   get isAuthenticated(): boolean {
-    return !!this.apiKey && !!this.orgId;
+    return !!this.apiKey;
   }
 
-  // --- Private helpers ---
+  // --- Path translation ---
 
-  /** Base path for all org-scoped endpoints */
-  private orgPath(): string {
-    if (!this.orgId) {
-      throw new Error('No SERVICIALO_ORG_ID configured — cannot call org-scoped endpoints.');
+  /**
+   * Translate a Coordinalo-internal path to a canonical HTTP_PROFILE.md path.
+   */
+  private translatePath(path: string): string {
+    // Public: /api/servicialo/registry → /v1/registry
+    if (path === '/api/servicialo/registry') {
+      return '/v1/registry';
     }
-    return `/api/organizations/${this.orgId}`;
+
+    // Public: /api/servicialo/{slug}/* → /v1/organizations/{slug}/*
+    const pubMatch = path.match(/^\/api\/servicialo\/([^/]+)\/(.+)$/);
+    if (pubMatch) {
+      return `/v1/organizations/${pubMatch[1]}/${pubMatch[2]}`;
+    }
+
+    // Authenticated: /relacionalo/clients/upsert → /v1/clients
+    if (path === '/relacionalo/clients/upsert') {
+      return '/v1/clients';
+    }
+
+    // Authenticated: /coordinalo/* → /v1/*
+    if (path.startsWith('/coordinalo/')) {
+      return '/v1/' + path.slice('/coordinalo/'.length);
+    }
+
+    // Authenticated: /planificalo/* → /v1/*
+    if (path.startsWith('/planificalo/')) {
+      return '/v1/' + path.slice('/planificalo/'.length);
+    }
+
+    // Absolute /api/* paths: pass through
+    if (path.startsWith('/api/')) {
+      return path;
+    }
+
+    // Fallback: prefix with /v1
+    return '/v1' + path;
   }
+
+  // --- Headers ---
 
   private authHeaders(): Record<string, string> {
-    if (!this.apiKey) {
-      throw new Error('No SERVICIALO_API_KEY configured — cannot call authenticated endpoints.');
-    }
-    return {
-      'Authorization': `Bearer ${this.apiKey}`,
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
+    if (this.apiKey) {
+      headers['Authorization'] = `Bearer ${this.apiKey}`;
+    }
+    if (this.orgId) {
+      headers['X-Servicialo-Org'] = this.orgId;
+    }
+    return headers;
   }
 
   private publicHeaders(): Record<string, string> {
-    return {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-  }
-
-  /**
-   * Build full URL for authenticated (org-scoped) requests.
-   * If path starts with `/api/` it's used as-is (absolute).
-   * Otherwise it's appended to the org-scoped base path.
-   */
-  private buildUrl(path: string): string {
-    if (path.startsWith('/api/')) {
-      return `${this.baseUrl}${path}`;
+    if (this.orgId) {
+      headers['X-Servicialo-Org'] = this.orgId;
     }
-    return `${this.baseUrl}${this.orgPath()}${path}`;
+    return headers;
   }
 
-  /**
-   * Build full URL for public requests.
-   * Path must be absolute (e.g., /api/v1/public/registry).
-   */
-  private buildPublicUrl(path: string): string {
-    return `${this.baseUrl}${path}`;
+  private buildUrl(path: string): string {
+    return `${this.baseUrl}${this.translatePath(path)}`;
   }
 
-  // --- Public API (no auth required) ---
+  // --- Public API ---
 
   readonly pub = {
     get: async (path: string, params?: Record<string, string | number | undefined>): Promise<unknown> => {
-      const url = new URL(this.buildPublicUrl(path));
+      const url = new URL(this.buildUrl(path));
       if (params) {
         for (const [key, value] of Object.entries(params)) {
           if (value !== undefined) {
@@ -92,24 +127,10 @@ export class CoordinaloClient implements ServicialoAdapter {
         }
       }
 
-      let res = await fetch(url.toString(), {
+      const res = await fetch(url.toString(), {
         method: 'GET',
         headers: this.publicHeaders(),
       });
-
-      // If 401, retry with auth headers when API key is available
-      if (res.status === 401 && this.apiKey) {
-        res = await fetch(url.toString(), {
-          method: 'GET',
-          headers: this.authHeaders(),
-        });
-      }
-
-      if (res.status === 401) {
-        throw new Error(
-          `GET ${path} returned 401 Unauthorized. Configure SERVICIALO_API_KEY to access this endpoint.`,
-        );
-      }
 
       if (!res.ok) {
         const body = await res.text();

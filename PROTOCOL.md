@@ -23,6 +23,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 1.  [Overview](#1-overview)
 2.  [Glossary](#2-glossary)
+-   [Interoperability Channels](#interoperability-channels)
 3.  [Protocol Primitives](#3-protocol-primitives)
 4.  [Core Entities](#4-core-entities)
 5.  [The 8 Dimensions of a Service](#5-the-8-dimensions-of-a-service)
@@ -101,6 +102,12 @@ Terms used throughout this specification. See [Appendix A](#appendix-a-glossary)
 | **ProviderAttribute** | A typed, origin-tracked descriptor of a provider's identity, capability, or operational profile. |
 | **Transition** | A recorded state change in a lifecycle, including actor, method, and timestamp. |
 | **Evidence** | A proof-of-delivery artifact (GPS, signature, photo, document, duration). |
+
+---
+
+## Interoperability Channels
+
+The Servicialo protocol defines two parallel, equivalent interoperability channels: **MCP** (Model Context Protocol) and **HTTP REST**. MCP is the agent-to-platform channel — it enables AI agents to discover, book, and manage services through structured tool calls. HTTP is the platform-to-platform channel — it enables Servicialo-compatible implementations to interoperate via standard REST endpoints. Both channels expose the same protocol semantics, lifecycle states, and validation rules defined in this specification; neither is a subset of the other. The canonical HTTP contract is defined in [`HTTP_PROFILE.md`](./HTTP_PROFILE.md); the MCP tool interface is defined in [§13](#13-mcp-tool-interface).
 
 ---
 
@@ -1129,6 +1136,17 @@ All authenticated tools require API credentials. Tools that mutate state require
 | `mandates.list` | List mandates issued by this principal. | `mandate:read`. |
 | `mandates.get` | Get mandate details. | `mandate:read`. |
 | `mandates.suspend` | Suspend a mandate. | `mandate:admin`. |
+
+#### 13.2.8 Resource Management
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `resource.list` | List resources by organization. | `resource:read`. |
+| `resource.get` | Get resource details with availability slots. | `resource:read`. |
+| `resource.create` | Create a physical resource. | `resource:write`. |
+| `resource.update` | Partial update (patch semantics). | `resource:write`. |
+| `resource.delete` | Soft delete (set `is_active = false`). | `resource:write`. |
+| `resource.get_availability` | Available slots for a date range (no service_id required). | `resource:read`. |
 
 ### 13.3 Actor Parameter
 

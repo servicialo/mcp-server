@@ -7,6 +7,14 @@
     "source": "github"
   },
   "version": "0.7.0",
+  "deprecatedEntries": [
+    {
+      "name": "io.github.danioni/servicialo",
+      "version": "0.5.2",
+      "reason": "Migrated to com.servicialo/mcp-server. Use the canonical entry.",
+      "since": "2026-03"
+    }
+  ],
   "packages": [
     {
       "registryType": "npm",

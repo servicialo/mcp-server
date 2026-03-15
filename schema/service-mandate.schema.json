@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/service-mandate.schema.json",
+  "title": "Servicialo ServiceMandate",
+  "description": "Explicit delegation of capability from a human principal to an AI agent. Servicialo protocol v0.8.",
+  "type": "object",
+  "required": ["mandate_id", "principal_id", "principal_type", "agent_id", "acting_for", "context", "scopes", "issued_at", "expires_at", "status"],
+  "properties": {
+    "mandate_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this mandate (UUID v4)."
+    },
+    "principal_id": {
+      "type": "string",
+      "description": "The human or organization that issues the mandate. Must reference a valid entity."
+    },
+    "principal_type": {
+      "type": "string",
+      "enum": ["professional", "patient", "organization"],
+      "description": "The role of the issuing entity."
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "The agent that receives the delegation."
+    },
+    "agent_name": {
+      "type": "string",
+      "description": "Human-readable label for the agent."
+    },
+    "acting_for": {
+      "type": "string",
+      "enum": ["professional", "patient", "organization"],
+      "description": "Whose interests this agent serves under this mandate. An agent cannot act for conflicting parties in the same service interaction."
+    },
+    "context": {
+      "type": "string",
+      "pattern": "^[a-z_]+:.+$",
+      "description": "Scope boundary. Format: {context_type}:{context_id}. Examples: org:mamapro, personal:barbara, order:so_abc123.",
+      "examples": ["org:mamapro", "personal:maria", "order:so_abc123"]
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z_]+:[a-z_]+$",
+        "description": "Scope in resource:action format.",
+        "examples": ["schedule:read", "schedule:write", "patient:read", "payment:write"]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "List of granted capabilities. Additive — deny by default."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Optional additional restrictions that narrow the mandate beyond its scopes.",
+      "properties": {
+        "max_actions_per_day": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of actions per calendar day."
+        },
+        "allowed_hours": {
+          "type": "object",
+          "required": ["start", "end", "timezone"],
+          "properties": {
+            "start": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "description": "Start time (HH:mm)."
+            },
+            "end": {
+              "type": "string",
+              "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+              "description": "End time (HH:mm)."
+            },
+            "timezone": {
+              "type": "string",
+              "description": "IANA timezone identifier.",
+              "examples": ["America/Santiago", "America/Mexico_City"]
+            }
+          }
+        },
+        "ip_allowlist": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Network-level restriction. CIDR notation or IP addresses."
+        },
+        "require_confirmation_above": {
+          "type": "object",
+          "required": ["amount", "currency"],
+          "properties": {
+            "amount": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Financial threshold."
+            },
+            "currency": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "description": "ISO 4217 currency code."
+            }
+          },
+          "description": "Actions involving amounts above this require human confirmation."
+        },
+        "service_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Restrict mandate to specific service types."
+        }
+      }
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the mandate was created."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the mandate ceases to be valid. Must be after issued_at."
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the principal explicitly revoked the mandate."
+    },
+    "revocation_reason": {
+      "type": "string",
+      "description": "Human-readable reason for revocation."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "expired", "revoked", "suspended"],
+      "description": "Current mandate status."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific data. The protocol does not interpret this field."
+    }
+  }
+}

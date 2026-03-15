@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 import { ActorSchema } from '../schemas.js';
 
 export const comprometerTools = {
@@ -13,7 +13,7 @@ export const comprometerTools = {
       last_name: z.string().optional().describe('Apellido — requerido solo si el cliente no existe'),
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
-    handler: async (client: CoordinaloClient, args: { email?: string; phone?: string; name?: string; last_name?: string; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: ServicialoAdapter, args: { email?: string; phone?: string; name?: string; last_name?: string; actor: z.infer<typeof ActorSchema> }) => {
       return client.post('/relacionalo/clients/upsert', {
         email: args.email,
         phone: args.phone,
@@ -35,7 +35,7 @@ export const comprometerTools = {
       resource_id: z.string().optional().describe('ID del recurso físico a reservar (opcional, requerido si el servicio tiene location.resource_id)'),
       actor: ActorSchema.describe('Quién realiza la acción'),
     }),
-    handler: async (client: CoordinaloClient, args: { service_id: string; provider_id: string; client_id: string; starts_at: string; resource_id?: string; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: ServicialoAdapter, args: { service_id: string; provider_id: string; client_id: string; starts_at: string; resource_id?: string; actor: z.infer<typeof ActorSchema> }) => {
       return client.post('/coordinalo/sessions', {
         serviceId: args.service_id,
         providerId: args.provider_id,
@@ -54,7 +54,7 @@ export const comprometerTools = {
       session_id: z.string().describe('ID de la sesión a confirmar'),
       actor: ActorSchema.describe('Quién confirma (client, provider, organization o agent)'),
     }),
-    handler: async (client: CoordinaloClient, args: { session_id: string; actor: z.infer<typeof ActorSchema> }) => {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; actor: z.infer<typeof ActorSchema> }) => {
       return client.post(`/coordinalo/sessions/${args.session_id}/confirm`, {
         actor: args.actor,
       });

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 
 export const publicAvailabilityTools = {
   'scheduling.check_availability': {
@@ -12,7 +12,7 @@ export const publicAvailabilityTools = {
       date_from: z.string().describe('Fecha inicio (ISO date, ej: 2025-03-01)'),
       date_to: z.string().describe('Fecha fin (ISO date, ej: 2025-03-07)'),
     }),
-    handler: async (client: CoordinaloClient, args: { org_slug: string; service_id?: string; provider_id?: string; resource_id?: string; date_from: string; date_to: string }) => {
+    handler: async (client: ServicialoAdapter, args: { org_slug: string; service_id?: string; provider_id?: string; resource_id?: string; date_from: string; date_to: string }) => {
       return client.pub.get(`/api/servicialo/${args.org_slug}/availability`, {
         serviceId: args.service_id,
         providerId: args.provider_id,

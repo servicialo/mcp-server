@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CoordinaloClient } from '../../client.js';
+import type { ServicialoAdapter } from '../../adapter.js';
 
 export const publicServicesTools = {
   'services.list': {
@@ -7,7 +7,7 @@ export const publicServicesTools = {
     schema: z.object({
       org_slug: z.string().describe('Slug de la organización'),
     }),
-    handler: async (client: CoordinaloClient, args: { org_slug: string }) => {
+    handler: async (client: ServicialoAdapter, args: { org_slug: string }) => {
       return client.pub.get(`/api/servicialo/${args.org_slug}/services`);
     },
   },

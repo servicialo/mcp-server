@@ -37,6 +37,7 @@
   "engines": {
     "node": ">=18"
   },
+  "deprecated_registry_entry": "io.github.danioni/servicialo was deprecated in March 2026. Use com.servicialo/mcp-server.",
   "keywords": [
     "mcp",
     "model-context-protocol",
