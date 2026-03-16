@@ -274,6 +274,94 @@ export const MODULES = [
   },
 ] as const;
 
+export const GENESIS_SKILLS = [
+  {
+    num: "1",
+    label: "Agendar cita nueva",
+    desc: "Flujo completo de booking",
+    detail: "Manifest → disponibilidad (single-day, next-N, ventana) → confirmación → booking → resultado. Manejo automático de 402 (prepago requerido) → Habilidad 4.",
+    color: "text-[#7EC8E3]",
+    bg: "bg-[#7EC8E3]/10",
+  },
+  {
+    num: "2",
+    label: "Gestionar citas",
+    desc: "Buscar, cancelar o reagendar",
+    detail: "Buscar citas por email → mostrar lista → ver estado detallado, cancelar con evaluación de política, o reagendar con nueva disponibilidad.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+  },
+  {
+    num: "3",
+    label: "Descubrimiento multi-org",
+    desc: "Encontrar el proveedor correcto",
+    detail: "Registry search por vertical/ubicación → mostrar opciones → explorar catálogo de servicios → fluir a Habilidad 1.",
+    color: "text-[#98C379]",
+    bg: "bg-[#98C379]/10",
+  },
+  {
+    num: "4",
+    label: "Pago anticipado",
+    desc: "Checkout cuando el servicio requiere prepago",
+    detail: "Se activa automáticamente con 402 o manifest. Crea checkout → entrega link de pago (15 min expiry) → polling de estado → booking con paymentIntentId.",
+    color: "text-[#E5C07B]",
+    bg: "bg-[#E5C07B]/10",
+  },
+  {
+    num: "5",
+    label: "Seguimiento post-sesión",
+    desc: "Confirmar, verificar y cerrar",
+    detail: "Confirmar asistencia, ver progreso de orden/paquete (sesiones totales vs realizadas vs pendientes, monto consumido), confirmación bilateral de entrega.",
+    color: "text-[#C678DD]",
+    bg: "bg-[#C678DD]/10",
+  },
+] as const;
+
+export const REST_ENDPOINTS = {
+  discovery: {
+    label: "Discovery",
+    endpoints: [
+      { method: "GET", path: "/api/servicialo/manifest", desc: "Declaración de capacidades" },
+      { method: "GET", path: "/api/servicialo/registry", desc: "Registro público de orgs", params: "vertical, location" },
+      { method: "GET", path: "/api/servicialo/{org}/manifest", desc: "Manifest de org con servicios" },
+      { method: "GET", path: "/api/servicialo/{org}/services", desc: "Catálogo de servicios" },
+    ],
+  },
+  booking: {
+    label: "Booking & Availability",
+    endpoints: [
+      { method: "GET", path: "/api/servicialo/{org}/availability", desc: "Slots disponibles", params: "serviceId, date (single-day, next-N, ventana)" },
+      { method: "POST", path: "/api/servicialo/{org}/book", desc: "Booking atómico (Venta + Orden + Session)" },
+      { method: "POST", path: "/api/servicialo/{org}/checkout", desc: "Crear PaymentIntent para prepago" },
+      { method: "GET", path: "/api/servicialo/{org}/checkout/{id}", desc: "Estado del pago" },
+    ],
+  },
+  appointments: {
+    label: "Gestión de citas",
+    endpoints: [
+      { method: "GET", path: "/api/servicialo/{org}/bookings", desc: "Lookup de citas por email", params: "email, status (upcoming|past|all)" },
+    ],
+  },
+  lifecycle: {
+    label: "Ciclo de vida",
+    endpoints: [
+      { method: "GET", path: "/api/servicialo/{org}/sessions/{id}", desc: "Estado de sesión" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/confirm", desc: "Confirmar asistencia" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/start", desc: "Iniciar sesión" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/complete", desc: "Completar sesión" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/deliver", desc: "Registrar entrega" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/cancel", desc: "Cancelar" },
+      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/reschedule", desc: "Reagendar" },
+    ],
+  },
+  orders: {
+    label: "Órdenes",
+    endpoints: [
+      { method: "GET", path: "/api/servicialo/{org}/orders/{id}", desc: "Orden con ledger computado" },
+    ],
+  },
+} as const;
+
 export const CONTRATO_FIELDS = [
   { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "registro_entrada + registro_salida + ficha_clinica_firmada" },
   { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Entregado", example: "48 horas" },

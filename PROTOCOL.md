@@ -1259,6 +1259,63 @@ When `actor.type` is `client`, `provider`, or `organization`, the actor operates
 - **npm:** `@servicialo/mcp-server`
 - **Canonical:** `https://github.com/servicialo/mcp-server`
 
+### 13.5 Bookings Lookup
+
+Implementations SHOULD expose a public endpoint for querying existing appointments by client email. This enables AI agents to manage appointments without requiring a prior `session_id`.
+
+**HTTP binding:**
+
+```
+GET /api/servicialo/{orgSlug}/bookings?email={email}&status={status}
+```
+
+**Parameters:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `email` | string | REQUIRED | Client email address. |
+| `status` | string | OPTIONAL | Filter: `upcoming` (default), `past`, or `all`. |
+
+**Response schema:**
+
+```json
+{
+  "bookings": [
+    {
+      "session_id": "string",
+      "servicialo_state": "string (one of the 9 universal states)",
+      "service": { "name": "string", "vertical": "string" },
+      "provider": { "name": "string" },
+      "scheduled_for": "string (ISO 8601 datetime)",
+      "duration_minutes": "integer"
+    }
+  ]
+}
+```
+
+**Constraints:**
+
+- Results MUST be limited to a maximum of 10 entries per request.
+- The endpoint MUST NOT require authentication.
+- Implementations MAY add rate limiting to prevent enumeration attacks.
+- The `servicialo_state` field MUST use the canonical state names defined in §6.
+
+**Use cases:** An AI agent can query this endpoint to list a client's upcoming appointments, then use the returned `session_id` to cancel (`scheduling.cancel`), reschedule (`scheduling.reschedule`), or check detailed status (`lifecycle.get_state`).
+
+### 13.6 Reference Agent Skills (Genesis)
+
+A compliant implementation SHOULD support the following five agent skills, which together cover the complete client-facing service lifecycle. These skills are demonstrated by the reference implementation (Coordinalo) through its **Genesis** skill.
+
+| # | Skill | Description | Primary Tools / Endpoints |
+|---|-------|-------------|--------------------------|
+| 1 | **Schedule new appointment** | Full booking flow: manifest → availability (single-day, next-N, window) → confirmation → booking. Automatic 402 handling triggers Skill 4. | `services.list`, `scheduling.check_availability`, `scheduling.book` |
+| 2 | **Manage existing appointments** | Lookup by email → display list → user chooses: view detailed status, cancel (with cancellation policy evaluation), or reschedule (check availability → new date → confirm). | Bookings Lookup (§13.5), `lifecycle.get_state`, `scheduling.cancel`, `scheduling.reschedule` |
+| 3 | **Multi-org discovery** | When the user has no predefined org: registry search by vertical/location → display options → explore service catalog → flow into Skill 1. | `registry.search`, `registry.get_organization`, `services.list` |
+| 4 | **Prepayment checkout** | Activated automatically when the service requires prepayment (402 response or manifest flag). Creates checkout → delivers payment link (15 min expiry) → polls status → completes booking with `paymentIntentId`. | `POST /{org}/checkout`, `GET /{org}/checkout/{id}`, `scheduling.book` |
+| 5 | **Post-session follow-up** | Confirm attendance, view order/package progress (total sessions vs completed vs pending, amount consumed), bilateral delivery confirmation. | `lifecycle.get_state`, `delivery.checkin`, `delivery.checkout`, `service_orders.get_ledger` |
+
+**Design principle:** The value of implementing Servicialo is that an implementor gets a complete AI assistant covering the full service lifecycle — not just booking, but discovery, management, payment, and verification. These five skills represent the minimum viable agent experience.
+
 ---
 
 ## 14. Network Intelligence
@@ -1396,6 +1453,11 @@ The protocol version is independent from the MCP server package version.
 ---
 
 ## Appendix B: Changelog
+
+### v0.8.1 (2026-03-16)
+
+- **Bookings Lookup (§13.5).** New protocol-level endpoint for querying existing appointments by client email. Enables AI agents to manage appointments without requiring a prior `session_id`.
+- **Reference Agent Skills — Genesis (§13.6).** Documented the 5 reference agent skills that cover the complete client-facing service lifecycle: schedule, manage, discover, pay, and follow up.
 
 ### v0.8 (2026-03-10)
 

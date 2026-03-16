@@ -1,4 +1,5 @@
 import { SectionTitle } from "./SectionTitle";
+import { GENESIS_SKILLS, REST_ENDPOINTS } from "@/lib/data";
 
 const publicTools = [
   { tool: "registry.search", desc: "Buscar organizaciones por vertical y ubicación" },
@@ -24,57 +25,6 @@ const authenticatedTools = [
   { tool: "payments.create_sale", desc: "Crear venta/cargo" },
   { tool: "payments.record_payment", desc: "Registrar pago" },
   { tool: "payments.get_status", desc: "Estado de pago" },
-];
-
-const agentPhases = [
-  {
-    num: "1",
-    label: "Descubrimiento",
-    desc: "Qué hay disponible",
-    tools: "registry.* · check_availability · services.list",
-    color: "text-[#7EC8E3]",
-    bg: "bg-[#7EC8E3]/10",
-  },
-  {
-    num: "2",
-    label: "Entender",
-    desc: "Dimensiones y reglas del servicio",
-    tools: "service.get · contract.get",
-    color: "text-accent",
-    bg: "bg-accent/10",
-  },
-  {
-    num: "3",
-    label: "Comprometer",
-    desc: "Identidad del cliente y reserva",
-    tools: "clients.get_or_create · scheduling.book · confirm",
-    color: "text-[#98C379]",
-    bg: "bg-[#98C379]/10",
-  },
-  {
-    num: "4",
-    label: "Ciclo de vida",
-    desc: "Estado y transiciones",
-    tools: "lifecycle.get_state · transition · reschedule · cancel",
-    color: "text-[#E5C07B]",
-    bg: "bg-[#E5C07B]/10",
-  },
-  {
-    num: "5",
-    label: "Verificar entrega",
-    desc: "Evidencia de que ocurrió",
-    tools: "delivery.checkin · checkout · record_evidence",
-    color: "text-[#C678DD]",
-    bg: "bg-[#C678DD]/10",
-  },
-  {
-    num: "6",
-    label: "Cerrar",
-    desc: "Documentación y cobro",
-    tools: "documentation.create · payments.*",
-    color: "text-[#E06C75]",
-    bg: "bg-[#E06C75]/10",
-  },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -124,6 +74,18 @@ function ToolRow({ tool, desc }: { tool: string; desc: string }) {
   );
 }
 
+function MethodBadge({ method }: { method: string }) {
+  const color = method === "GET" ? "text-[#98C379] bg-[#98C379]/10" : "text-[#E5C07B] bg-[#E5C07B]/10";
+  return (
+    <span className={`font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded ${color} shrink-0`}>
+      {method}
+    </span>
+  );
+}
+
+const endpointGroups = Object.values(REST_ENDPOINTS);
+const totalEndpoints = endpointGroups.reduce((sum, g) => sum + g.endpoints.length, 0);
+
 export function ConectateSection() {
   return (
     <section id="mcp-server" className="mb-16">
@@ -136,46 +98,46 @@ export function ConectateSection() {
       {/* Intro block */}
       <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
         <div className="text-[13px] text-text-body leading-relaxed mb-3">
-          Diseñado para desarrolladores que construyen agentes AI sobre negocios de servicios
-          profesionales en LATAM. Si tu agente necesita agendar, verificar entrega o cobrar
-          un servicio — sin importar la plataforma — este es el protocolo.
+          Un implementador que adopta Servicialo obtiene un asistente AI completo gratis.
+          No solo booking — gestión completa del ciclo de vida del servicio: agendar, gestionar,
+          pagar y verificar. Todo desde el primer día.
         </div>
         <div className="text-[13px] text-text-dim leading-relaxed">
-          No es para usuarios finales de plataformas Servicialo-compatible — esas
-          plataformas gestionan la conexión internamente.
+          El skill <span className="text-text-body font-medium">Génesis</span> es la prueba:
+          5 habilidades que cubren el 100% de lo que un cliente necesita hacer con sus citas.
         </div>
       </div>
 
-      {/* Agent flow — 6 lifecycle phases */}
+      {/* Genesis Skills — 5 capabilities */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
-          Flujo del agente
+          Génesis — 5 habilidades
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-5">
-          Seis fases del ciclo de vida del servicio — 20 herramientas
+          Lo que un agente AI puede hacer con cualquier implementación compatible
         </div>
 
-        <div className="grid gap-2.5">
-          {agentPhases.map((phase) => (
-            <div key={phase.num} className="flex items-start gap-3">
+        <div className="grid gap-3">
+          {GENESIS_SKILLS.map((skill) => (
+            <div key={skill.num} className="flex items-start gap-3">
               <div
-                className={`shrink-0 w-6 h-6 rounded-full ${phase.bg} flex items-center justify-center`}
+                className={`shrink-0 w-6 h-6 rounded-full ${skill.bg} flex items-center justify-center`}
               >
-                <span className={`font-mono text-[11px] font-semibold ${phase.color}`}>
-                  {phase.num}
+                <span className={`font-mono text-[11px] font-semibold ${skill.color}`}>
+                  {skill.num}
                 </span>
               </div>
               <div className="min-w-0">
                 <div className="flex items-baseline gap-2">
-                  <span className={`font-mono text-[11px] font-semibold ${phase.color}`}>
-                    {phase.label}
+                  <span className={`font-mono text-[11px] font-semibold ${skill.color}`}>
+                    {skill.label}
                   </span>
                   <span className="font-mono text-[10px] text-white/35">
-                    {phase.desc}
+                    {skill.desc}
                   </span>
                 </div>
-                <div className="font-mono text-[10px] text-white/50 mt-0.5">
-                  {phase.tools}
+                <div className="font-mono text-[10px] text-white/50 mt-0.5 leading-relaxed">
+                  {skill.detail}
                 </div>
               </div>
             </div>
@@ -184,13 +146,45 @@ export function ConectateSection() {
 
         <div className="mt-5 pt-5 border-t border-white/10">
           <div className="text-[12px] text-white/40 leading-[1.7]">
-            Un agente bien diseñado sigue este orden:{" "}
+            Flujo completo:{" "}
             <span className="text-white/55">
-              Descubrir &rarr; Entender &rarr; Comprometer &rarr; Gestionar &rarr; Verificar &rarr; Cerrar.
+              Descubrir &rarr; Agendar &rarr; Gestionar &rarr; Pagar &rarr; Verificar.
             </span>{" "}
-            Cada fase tiene sus herramientas. El estándar garantiza que cualquier agente pueda
-            completar el ciclo completo con cualquier implementación compatible.
+            Cualquier agente puede completar el ciclo completo con cualquier implementación compatible.
           </div>
+        </div>
+      </div>
+
+      {/* REST API Endpoints — 17 endpoints */}
+      <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-3">
+        <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1">
+          API REST pública
+        </div>
+        <div className="font-mono text-[10px] text-white/40 mb-5">
+          {totalEndpoints} endpoints — 0 requieren autenticación
+        </div>
+
+        <div className="grid gap-4">
+          {endpointGroups.map((group) => (
+            <div key={group.label}>
+              <div className="font-mono text-[10px] text-white/50 uppercase tracking-wider mb-2">
+                {group.label}
+              </div>
+              <div className="grid gap-1.5">
+                {group.endpoints.map((ep) => (
+                  <div key={ep.path + ep.method} className="flex items-baseline gap-2">
+                    <MethodBadge method={ep.method} />
+                    <span className="font-mono text-[10px] md:text-[11px] text-white/60 shrink-0">
+                      {ep.path}
+                    </span>
+                    <span className="font-mono text-[10px] text-white/30 leading-relaxed hidden md:inline">
+                      {ep.desc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
