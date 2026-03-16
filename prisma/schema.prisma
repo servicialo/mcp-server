@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Organization ──
+
+model Organization {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  name          String
+  description   String    @default("")
+  vertical      String    @default("")
+  location      String    @default("")
+  country       String    @default("")
+  contactEmail  String    @default("")
+  discoverable  Boolean   @default(false)
+  claimedAt     DateTime?
+  verifiedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  services      Service[]
+  providers     Provider[]
+}
+
+// ── Provider ──
+
+model Provider {
+  id             String        @id @default(cuid())
+  name           String
+  email          String?
+  isActive       Boolean       @default(true)
+
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+
+  serviceProviders ServiceProvider[]
+  appointments     Appointment[]
+
+  createdAt      DateTime      @default(now())
+}
+
+// ── Service ──
+
+model Service {
+  id              String    @id @default(cuid())
+  name            String
+  description     String    @default("")
+  durationMinutes Int       @default(60)
+  priceAmount     Int?
+  priceCurrency   String?
+  isActive        Boolean   @default(true)
+
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+
+  serviceProviders ServiceProvider[]
+  appointments     Appointment[]
+
+  createdAt       DateTime  @default(now())
+}
+
+// ── Many-to-many: Service <-> Provider ──
+
+model ServiceProvider {
+  id         String   @id @default(cuid())
+  serviceId  String
+  providerId String
+
+  service    Service  @relation(fields: [serviceId], references: [id])
+  provider   Provider @relation(fields: [providerId], references: [id])
+
+  @@unique([serviceId, providerId])
+}
+
+// ── Appointment (booking) ──
+
+model Appointment {
+  id             String    @id @default(cuid())
+  start          DateTime
+  end            DateTime
+  status         String    @default("confirmed")
+  notes          String    @default("")
+  bookedByAgent  Boolean   @default(false)
+
+  requesterName  String
+  requesterEmail String
+
+  serviceId      String
+  service        Service   @relation(fields: [serviceId], references: [id])
+
+  providerId     String
+  provider       Provider  @relation(fields: [providerId], references: [id])
+
+  createdAt      DateTime  @default(now())
+
+  @@unique([providerId, start])
+}
