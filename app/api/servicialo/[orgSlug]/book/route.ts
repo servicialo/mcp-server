@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { servicialoJson, servicialoError, withRateLimit } from '@/lib/servicialo/response';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { validateSlot } from '@/lib/servicialo/slots';
 
 interface BookRequest {
   service_id: string;
@@ -87,6 +88,24 @@ export async function POST(
   });
   if (!sp || sp.provider.organizationId !== org.id) {
     return servicialoError(orgSlug, `Provider "${data.provider_id}" does not offer service "${data.service_id}"`, 400);
+  }
+
+  // Validate slot against provider availability and conflicts
+  const slotCheck = await validateSlot({
+    providerId: data.provider_id,
+    startUtc: new Date(data.start),
+    endUtc: new Date(data.end),
+    durationMinutes: service.durationMinutes,
+  });
+
+  if (!slotCheck.valid) {
+    const messages: Record<string, string> = {
+      NO_AVAILABILITY_CONFIGURED: 'Provider has no availability configured',
+      OUTSIDE_PROVIDER_HOURS: 'Requested slot is outside provider availability hours',
+      SLOT_CONFLICT: 'This slot was just booked. Please query availability again.',
+    };
+    const status = slotCheck.reason === 'SLOT_CONFLICT' ? 409 : 400;
+    return servicialoError(orgSlug, messages[slotCheck.reason!] ?? 'Invalid slot', status);
   }
 
   // Atomic booking inside a transaction

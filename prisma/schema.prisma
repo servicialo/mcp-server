@@ -41,6 +41,7 @@ model Provider {
 
   serviceProviders ServiceProvider[]
   appointments     Appointment[]
+  availability     ProviderAvailability[]
 
   createdAt      DateTime      @default(now())
 }
@@ -76,6 +77,20 @@ model ServiceProvider {
   provider   Provider @relation(fields: [providerId], references: [id])
 
   @@unique([serviceId, providerId])
+}
+
+// ── Provider Availability (weekly schedule) ──
+
+model ProviderAvailability {
+  id         String @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id])
+  dayOfWeek  Int    // ISO weekday: 1=Mon … 7=Sun
+  startTime  String // "HH:MM" in provider's timezone
+  endTime    String // "HH:MM" in provider's timezone
+  timezone   String @default("America/Santiago")
+
+  @@unique([providerId, dayOfWeek, startTime])
 }
 
 // ── Appointment (booking) ──
