@@ -71,7 +71,7 @@ export async function GET(
     effectiveDateTo = d.toISOString().slice(0, 10);
   }
 
-  const providerIds = service.serviceProviders.map(sp => sp.providerId);
+  const providerIds = service.serviceProviders.map((sp: { providerId: string }) => sp.providerId);
 
   // Query range: convert Santiago day boundaries to UTC
   const rangeStartUtc = zonedToUtc(`${dateFrom}T00:00:00`, TZ);
