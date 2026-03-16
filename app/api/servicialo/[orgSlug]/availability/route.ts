@@ -86,7 +86,7 @@ export async function GET(
   });
 
   const bookedSet = new Set(
-    existingAppointments.map(a => `${a.providerId}|${a.start.toISOString()}`),
+    existingAppointments.map((a: { providerId: string; start: Date }) => `${a.providerId}|${a.start.toISOString()}`),
   );
 
   // Generate slots day by day
