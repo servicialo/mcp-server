@@ -25,7 +25,17 @@ export async function GET() {
           book: 'POST /api/servicialo/{org}/book → proxied to implementation rest_url',
         },
       },
-      how_it_works: 'Organizations register their rest_url via /resolve/register. All /api/servicialo/{org}/* requests are proxied to the registered implementation. The resolver acts as DNS — it maps slugs to endpoints.',
+      capabilities: {
+        description: 'Each org in the resolver has probed capabilities. Use resolve.lookup to see them.',
+        levels: {
+          declared: 'Registered with rest_url, not yet probed',
+          catalog_ready: 'Has discoverable services (catalog verified)',
+          bookable: 'Has services + available slots (availability verified)',
+          proven: 'Has completed at least one booking through the resolver',
+        },
+        filtering: 'GET /api/servicialo/resolve/{country}?readiness=bookable → only booking-ready orgs',
+      },
+      how_it_works: 'Organizations register their rest_url via /resolve/register. The resolver probes their endpoints to verify capabilities (services, availability, booking). All /api/servicialo/{org}/* requests are proxied to the registered implementation. Responses include X-Servicialo-Readiness header.',
     },
     { headers: { 'X-Servicialo-Version': '1.0' } },
   );

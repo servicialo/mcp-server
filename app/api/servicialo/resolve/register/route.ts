@@ -3,6 +3,8 @@ import { withRateLimit } from '@/lib/servicialo/response';
 import { validateSlug, validateCountry, validateUrl } from '@/lib/servicialo/validation';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { buildResolutionRecord } from '@/lib/servicialo/resolution';
+import { probeCapabilities } from '@/lib/servicialo/capabilities';
 
 const VERSION = '1.0';
 
@@ -117,30 +119,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const resolution = {
-      org_slug: org.slug,
-      country: org.country,
-      addresses: {
-        path: `/${org.country}/${org.slug}`,
-        subdomain: `${org.slug}.${org.country}.servicialo.com`,
-      },
-      endpoint: {
-        mcp: org.mcpUrl || null,
-        rest: org.restUrl || null,
-        health: org.healthUrl || null,
-      },
-      identity: {
-        legal_name: org.name,
-        verticals: org.vertical ? org.vertical.split(', ') : [],
-      },
-      trust: {
-        score: org.trustScore,
-        level: org.trustLevel,
-        last_seen: null,
-        registered_at: org.registeredAt?.toISOString(),
-      },
-      status: 'active',
-    };
+    // Probe capabilities on registration (await to ensure it completes)
+    if (org.restUrl) {
+      await probeCapabilities(org.id, org.restUrl, org.slug);
+    }
+
+    // Re-read org to include fresh capabilities
+    const fresh = await prisma.organization.findUnique({ where: { id: org.id } });
+    const resolution = buildResolutionRecord(fresh ?? org);
 
     return versionedJson({ resolution, message: 'Organization registered in Servicialo resolver' }, 201);
   } catch (err) {

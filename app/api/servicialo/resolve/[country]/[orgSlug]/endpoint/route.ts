@@ -53,8 +53,19 @@ export async function PATCH(
     data: updateData,
   });
 
+  // Probe capabilities on heartbeat (await to ensure it completes on serverless)
+  if (heartbeat && updated.restUrl) {
+    const { probeCapabilities } = await import('@/lib/servicialo/capabilities');
+    await probeCapabilities(updated.id, updated.restUrl, orgSlug);
+  }
+
+  // Re-read org to include fresh capabilities in response
+  const fresh = heartbeat
+    ? await prisma.organization.findUnique({ where: { id: org.id } })
+    : updated;
+
   return servicialoJson(orgSlug, {
-    resolution: buildResolutionRecord(updated),
+    resolution: buildResolutionRecord(fresh ?? updated),
     message: heartbeat ? 'Heartbeat recorded' : 'Endpoint updated',
   });
 }

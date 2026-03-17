@@ -1,20 +1,19 @@
 /**
  * Proxy helper: resolves an org slug via the DNS resolver DB
  * and forwards the request to the implementation's rest_url.
+ * Adds readiness headers and opportunistic capability updates.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withRateLimit } from './response';
+import { deriveReadiness } from './capabilities';
+import { updateCapabilityFromProxy } from './capabilities';
 
 const SERVICIALO_VERSION = '1.0';
 
 /**
  * Resolve an org's rest_url from the resolver DB and proxy the request.
- *
- * @param orgSlug - The organization slug to resolve
- * @param path - The path to append after /api/servicialo/{orgSlug}/
- * @param request - The incoming NextRequest (method, headers, body, query forwarded)
  */
 export async function resolveAndProxy(
   orgSlug: string,
@@ -26,7 +25,18 @@ export async function resolveAndProxy(
 
   const org = await prisma.organization.findUnique({
     where: { slug: orgSlug },
-    select: { restUrl: true, discoverable: true },
+    select: {
+      id: true,
+      restUrl: true,
+      discoverable: true,
+      capServices: true,
+      capServicesCount: true,
+      capServicesAt: true,
+      capAvailability: true,
+      capAvailabilityAt: true,
+      capBooking: true,
+      capBookingAt: true,
+    },
   });
 
   if (!org) {
@@ -42,6 +52,8 @@ export async function resolveAndProxy(
       { status: 502, headers: { 'X-Servicialo-Version': SERVICIALO_VERSION } },
     );
   }
+
+  const readiness = deriveReadiness(org);
 
   // Build target URL: {restUrl}/api/servicialo/{orgSlug}/{path}
   const baseUrl = org.restUrl.replace(/\/$/, '');
@@ -69,14 +81,22 @@ export async function resolveAndProxy(
     const upstream = await fetch(targetUrl, fetchOptions);
     const body = await upstream.text();
 
+    // Fire-and-forget: update capability timestamps from proxy success
+    if (upstream.ok) {
+      updateCapabilityFromProxy(org.id, path, upstream.status).catch(() => {});
+    }
+
+    const responseHeaders: Record<string, string> = {
+      'Content-Type': upstream.headers.get('content-type') || 'application/json',
+      'X-Servicialo-Version': SERVICIALO_VERSION,
+      'X-Servicialo-Proxy': 'true',
+      'X-Servicialo-Upstream': baseUrl,
+      'X-Servicialo-Readiness': readiness,
+    };
+
     return new NextResponse(body, {
       status: upstream.status,
-      headers: {
-        'Content-Type': upstream.headers.get('content-type') || 'application/json',
-        'X-Servicialo-Version': SERVICIALO_VERSION,
-        'X-Servicialo-Proxy': 'true',
-        'X-Servicialo-Upstream': baseUrl,
-      },
+      headers: responseHeaders,
     });
   } catch (err) {
     return NextResponse.json(

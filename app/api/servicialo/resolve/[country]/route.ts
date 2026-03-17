@@ -2,6 +2,7 @@ import { type NextRequest } from 'next/server';
 import { withRateLimit, servicialoJson, servicialoError } from '@/lib/servicialo/response';
 import { validateCountry } from '@/lib/servicialo/validation';
 import { prisma } from '@/lib/prisma';
+import { deriveReadiness } from '@/lib/servicialo/capabilities';
 
 export async function GET(
   request: NextRequest,
@@ -19,6 +20,7 @@ export async function GET(
 
   const url = new URL(request.url);
   const vertical = url.searchParams.get('vertical');
+  const readinessFilter = url.searchParams.get('readiness');
   const limitParam = parseInt(url.searchParams.get('limit') ?? '20', 10);
   const limit = Math.min(Math.max(limitParam, 1), 100);
 
@@ -44,25 +46,45 @@ export async function GET(
         trustLevel: true,
         lastSeen: true,
         registeredAt: true,
+        capServices: true,
+        capServicesCount: true,
+        capServicesAt: true,
+        capAvailability: true,
+        capAvailabilityAt: true,
+        capBooking: true,
+        capBookingAt: true,
       },
     }),
     prisma.organization.count({ where }),
   ]);
 
-  const data = orgs.map((org) => ({
-    org_slug: org.slug,
-    name: org.name,
-    country: org.country,
-    verticals: org.vertical ? org.vertical.split(',').map((v) => v.trim()) : [],
-    endpoint: {
-      mcp: org.mcpUrl || null,
-      rest: org.restUrl || null,
-    },
-    trust: {
-      score: org.trustScore,
-      level: org.trustLevel,
-    },
-  }));
+  let data = orgs.map((org) => {
+    const readiness = deriveReadiness(org);
+    return {
+      org_slug: org.slug,
+      name: org.name,
+      country: org.country,
+      verticals: org.vertical ? org.vertical.split(',').map((v) => v.trim()) : [],
+      endpoint: {
+        mcp: org.mcpUrl || null,
+        rest: org.restUrl || null,
+      },
+      trust: {
+        score: org.trustScore,
+        level: org.trustLevel,
+      },
+      readiness,
+    };
+  });
+
+  // Filter by readiness if requested
+  if (readinessFilter) {
+    const validLevels = ['declared', 'catalog_ready', 'bookable', 'proven'];
+    if (validLevels.includes(readinessFilter)) {
+      const minIndex = validLevels.indexOf(readinessFilter);
+      data = data.filter((d) => validLevels.indexOf(d.readiness) >= minIndex);
+    }
+  }
 
   return servicialoJson(country, { total, limit, data });
 }
