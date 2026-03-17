@@ -2,7 +2,7 @@ import { type NextRequest } from 'next/server';
 import { withRateLimit, servicialoJson, servicialoError } from '@/lib/servicialo/response';
 import { validateUrl } from '@/lib/servicialo/validation';
 import { prisma } from '@/lib/prisma';
-import { buildResolutionRecord } from '../route';
+import { buildResolutionRecord } from '@/lib/servicialo/resolution';
 
 export async function PATCH(
   request: NextRequest,
