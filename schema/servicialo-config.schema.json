@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/servicialo-config.schema.json",
+  "title": "Servicialo Organization Configuration",
+  "description": "Registration record for a node in the Servicialo network. Declares identity, endpoints, and catalog. Equivalent to a DNS zone file.",
+  "type": "object",
+  "required": ["org_slug", "country", "endpoint", "identity"],
+  "properties": {
+    "org_slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$",
+      "description": "Globally unique portable identifier. e.g. clinica-dental-sur"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "ISO 3166-1 alpha-2 country code. e.g. cl, mx, ar"
+    },
+    "endpoint": {
+      "type": "object",
+      "description": "URLs where this organization's services are reachable. If the org migrates platforms, only this block changes.",
+      "anyOf": [
+        { "required": ["mcp"] },
+        { "required": ["rest"] }
+      ],
+      "properties": {
+        "mcp": {
+          "type": "string",
+          "format": "uri",
+          "description": "MCP server endpoint for AI agent interaction"
+        },
+        "rest": {
+          "type": "string",
+          "format": "uri",
+          "description": "REST API endpoint for HTTP interaction"
+        },
+        "health": {
+          "type": "string",
+          "format": "uri",
+          "description": "Health-check endpoint for uptime monitoring"
+        }
+      },
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "required": ["legal_name", "verticals"],
+      "properties": {
+        "legal_name": {
+          "type": "string",
+          "description": "Legal or trade name of the organization"
+        },
+        "tax_id": {
+          "type": "string",
+          "description": "Tax identifier per country (RUT, RFC, CUIT, EIN, etc.)"
+        },
+        "verticals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Service verticals offered: salud, hogar, legal, educacion, belleza, etc."
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "catalog_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the organization's public service catalog (Servicialo-compatible JSON)"
+    },
+    "telemetry": {
+      "type": "object",
+      "properties": {
+        "heartbeat_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether this node sends periodic heartbeats to the resolver"
+        },
+        "metrics_enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this node shares anonymized usage metrics"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

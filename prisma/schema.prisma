@@ -24,8 +24,21 @@ model Organization {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Resolver endpoints (portability: change these, keep the slug)
+  mcpUrl        String    @default("")
+  restUrl       String    @default("")
+  healthUrl     String    @default("")
+
+  // Trust (passive, accumulated)
+  trustScore    Int       @default(0)
+  trustLevel    String    @default("unverified")
+  lastSeen      DateTime?
+  registeredAt  DateTime?
+
   services      Service[]
   providers     Provider[]
+
+  @@index([country, slug])
 }
 
 // ── Provider ──

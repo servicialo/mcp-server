@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/resolution.schema.json",
+  "title": "Servicialo Resolution Record",
+  "description": "The response returned when resolving an org_slug. Like a DNS A-record, but for professional services.",
+  "type": "object",
+  "required": ["org_slug", "country", "addresses", "endpoint", "identity", "trust", "status"],
+  "properties": {
+    "org_slug": {
+      "type": "string",
+      "description": "The resolved organization slug"
+    },
+    "country": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "description": "ISO 3166-1 alpha-2 country code"
+    },
+    "addresses": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Current path-based address. e.g. /cl/clinica-dental-sur"
+        },
+        "subdomain": {
+          "type": ["string", "null"],
+          "description": "Future DNS-based address. e.g. clinica-dental-sur.cl.servicialo.com"
+        }
+      },
+      "additionalProperties": false
+    },
+    "endpoint": {
+      "type": "object",
+      "properties": {
+        "mcp": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "MCP server endpoint"
+        },
+        "rest": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "REST API endpoint"
+        },
+        "health": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "Health-check endpoint"
+        }
+      },
+      "additionalProperties": false
+    },
+    "identity": {
+      "type": "object",
+      "required": ["legal_name", "verticals"],
+      "properties": {
+        "legal_name": {
+          "type": "string"
+        },
+        "verticals": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "trust": {
+      "type": "object",
+      "required": ["score", "level", "registered_at"],
+      "properties": {
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Passive trust score. 0=new, 100=long consistent history."
+        },
+        "level": {
+          "type": "string",
+          "enum": ["unverified", "declared", "vouched", "verified"],
+          "description": "Trust tier derived from score: 0-10 unverified, 11-40 declared, 41-80 vouched, 81-100 verified"
+        },
+        "last_seen": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Last heartbeat or activity timestamp"
+        },
+        "registered_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the org registered with the resolver"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "description": "Active if last_seen within 7 days or recently registered. Inactive otherwise."
+    },
+    "catalog_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL to the organization's service catalog"
+    }
+  },
+  "additionalProperties": false
+}

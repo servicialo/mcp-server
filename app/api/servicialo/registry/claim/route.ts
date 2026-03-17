@@ -1,9 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { withRateLimit } from '@/lib/servicialo/response';
+import { validateSlug } from '@/lib/servicialo/validation';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
-
-const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
 
 interface ClaimRequest {
   slug: string;
@@ -21,21 +20,14 @@ function validateBody(body: unknown): { ok: true; data: ClaimRequest } | { ok: f
   }
   const b = body as Record<string, unknown>;
 
-  if (!b.slug || typeof b.slug !== 'string') return { ok: false, error: 'Missing or invalid field: slug' };
+  const slugError = validateSlug(b.slug);
+  if (slugError) return { ok: false, error: slugError };
   if (!b.name || typeof b.name !== 'string') return { ok: false, error: 'Missing or invalid field: name' };
-
-  const slug = b.slug as string;
-  if (slug.length < 3 || slug.length > 48) {
-    return { ok: false, error: 'slug must be between 3 and 48 characters' };
-  }
-  if (!SLUG_RE.test(slug)) {
-    return { ok: false, error: 'slug must be lowercase alphanumeric with hyphens only (no leading/trailing hyphens)' };
-  }
 
   return {
     ok: true,
     data: {
-      slug,
+      slug: b.slug as string,
       name: b.name as string,
       description: typeof b.description === 'string' ? b.description : undefined,
       vertical: typeof b.vertical === 'string' ? b.vertical : undefined,

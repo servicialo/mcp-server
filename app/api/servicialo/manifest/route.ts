@@ -7,6 +7,12 @@ export async function GET() {
       name: 'Coordinalo',
       registry: 'https://coordinalo.com/api/servicialo/registry',
       endpoints: {
+        resolver: {
+          lookup: 'GET /api/servicialo/resolve/{country}/{orgSlug}',
+          list: 'GET /api/servicialo/resolve/{country}?vertical={vertical}&limit={limit}',
+          register: 'POST /api/servicialo/resolve/register',
+          update_endpoint: 'PATCH /api/servicialo/resolve/{country}/{orgSlug}/endpoint',
+        },
         discovery: {
           manifest: 'GET /api/servicialo/manifest',
           registry: 'GET /api/servicialo/registry',

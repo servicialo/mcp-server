@@ -10,6 +10,7 @@ import type { z } from 'zod';
 import { registryTools } from './tools/public/registry.js';
 import { publicAvailabilityTools } from './tools/public/availability.js';
 import { publicServicesTools } from './tools/public/services.js';
+import { resolveTools } from './tools/public/resolve.js';
 
 // --- Authenticated tools (Phases 2–6) ---
 import { entenderTools } from './tools/authenticated/entender.js';
@@ -18,6 +19,7 @@ import { lifecycleTools } from './tools/authenticated/lifecycle.js';
 import { deliveryTools } from './tools/authenticated/delivery.js';
 import { cerrarTools } from './tools/authenticated/cerrar.js';
 import { resourceTools } from './tools/authenticated/resource.js';
+import { resolveAuthTools } from './tools/authenticated/resolve-auth.js';
 
 // --- Tool type ---
 type ToolDef = {
@@ -32,6 +34,7 @@ const publicTools: Record<string, ToolDef> = {
   ...registryTools as unknown as Record<string, ToolDef>,
   ...publicAvailabilityTools as unknown as Record<string, ToolDef>,
   ...publicServicesTools as unknown as Record<string, ToolDef>,
+  ...resolveTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Authenticated tools (only in authenticated mode) ---
@@ -42,6 +45,7 @@ const authenticatedTools: Record<string, ToolDef> = {
   ...deliveryTools as unknown as Record<string, ToolDef>,
   ...cerrarTools as unknown as Record<string, ToolDef>,
   ...resourceTools as unknown as Record<string, ToolDef>,
+  ...resolveAuthTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Connect via stdio ---
