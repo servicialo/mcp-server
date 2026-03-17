@@ -39,7 +39,15 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 ## Qué Hace Este MCP Server
 
-Este paquete expone el protocolo Servicialo como 20 herramientas MCP organizadas por las **6 fases** del ciclo de vida de un servicio. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+Este paquete expone el protocolo Servicialo como 23 herramientas MCP organizadas por **7 fases** del ciclo de vida de un servicio (incluyendo resolución DNS). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+
+### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
+
+| Herramienta | Descripción |
+|---|---|
+| `resolve.lookup` | Resolver un orgSlug a su endpoint MCP/REST y nivel de confianza (equivalente a DNS lookup) |
+| `resolve.search` | Buscar organizaciones registradas por país y vertical en el resolver global |
+| `trust.get_score` | Obtener puntaje de confianza de una organización (score 0-100, nivel, última actividad) |
 
 ### Fase 1 — Descubrimiento (4 herramientas públicas, sin autenticación)
 

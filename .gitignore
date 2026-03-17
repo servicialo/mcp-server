@@ -45,3 +45,5 @@ next-env.d.ts
 mcp-publisher
 mcp-publisher.exe
 packages/mcp-server/key.pem
+.env
+prisma/dev.db
