@@ -271,6 +271,12 @@ El protocolo garantiza que cualquier agente pueda completar el ciclo completo co
 
 **[Reparación eléctrica](./examples/home-repair.md)** — Vertical hogar. Visita a domicilio, fotos antes/después, lista de verificación, firma del cliente, pago en efectivo.
 
+### A2A Ready
+
+Servicialo soporta [A2A (Agent-to-Agent)](https://a2a-protocol.org/) como extensión opcional, permitiendo que agentes externos (Salesforce Agentforce, Google ADK, etc.) descubran y reserven servicios sin pasar por MCP.
+
+Guía completa: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
+
 ---
 
 ## Los 8 principios
@@ -413,8 +419,8 @@ servicialo/
 
 |  | Versión | Estado |
 |---|---------|--------|
-| Protocol | 0.6 | Estable |
-| @servicialo/mcp-server | 0.6.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.8 | Estable |
+| @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 

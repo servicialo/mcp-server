@@ -36,6 +36,12 @@ tags:
     description: "AI agent delegation management."
   - name: Resources
     description: "Physical resource management (rooms, boxes, equipment)."
+  - name: A2A Extension
+    description: |
+      Agent-to-Agent (A2A) interoperability endpoints.
+      Optional for basic Servicialo implementations.
+      Required for "Servicialo A2A Ready" certification.
+      See: https://a2a-protocol.org/
 
 security:
   - BearerAuth: []
@@ -1450,6 +1456,100 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
+  # ── A2A Extension ────────────────────────────
+
+  /.well-known/agents.json:
+    get:
+      operationId: a2aListAgents
+      summary: A2A agent directory
+      description: |
+        Returns a list of AgentCards for all organizations in this Servicialo node.
+        Enables A2A-compatible agents to discover available service providers.
+      tags: [A2A Extension]
+      security: []
+      responses:
+        "200":
+          description: Agent directory.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentCard"
+
+  /organizations/{org_slug}/.well-known/agent.json:
+    get:
+      operationId: a2aGetAgentCard
+      summary: A2A Agent Card for an organization
+      description: |
+        Returns the A2A Agent Card describing this organization's capabilities,
+        skills, and supported interaction modes. Used by external agents for
+        discovery before initiating A2A tasks.
+      tags: [A2A Extension]
+      security: []
+      parameters:
+        - name: org_slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug.
+      responses:
+        "200":
+          description: Agent Card.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentCard"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /organizations/{org_slug}/a2a:
+    post:
+      operationId: a2aTaskEndpoint
+      summary: A2A JSON-RPC task endpoint
+      description: |
+        JSON-RPC 2.0 endpoint for A2A task operations.
+        Supports methods: `tasks/send`, `tasks/get`, `tasks/cancel`.
+        The remote agent processes booking requests and returns task status.
+      tags: [A2A Extension]
+      parameters:
+        - name: org_slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Organization slug.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A2AJsonRpcRequest"
+            examples:
+              tasksSend:
+                summary: Send a booking task
+                value:
+                  jsonrpc: "2.0"
+                  id: "req-1"
+                  method: tasks/send
+                  params:
+                    id: "task-abc-123"
+                    message:
+                      role: user
+                      parts:
+                        - type: text
+                          text: "Book a kinesiology session for tomorrow at 10am"
+      responses:
+        "200":
+          description: JSON-RPC response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A2AJsonRpcResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 # ════════════════════════════════════════════════
 # Components
 # ════════════════════════════════════════════════
@@ -2605,3 +2705,236 @@ components:
                   type: object
                 actor:
                   $ref: "#/components/schemas/Actor"
+
+    # ── A2A Extension Schemas ──────────────────
+
+    AgentCard:
+      type: object
+      required: [name, url, version, skills]
+      description: |
+        A2A Agent Card — declares an agent's identity, capabilities, and skills.
+        See https://a2a-protocol.org/latest/specification/
+      properties:
+        name:
+          type: string
+          description: Human-readable agent name.
+          example: "Clínica Dental Sur"
+        description:
+          type: string
+          description: What this agent does.
+          example: "Booking agent for dental services"
+        url:
+          type: string
+          format: uri
+          description: Base URL for A2A communication.
+        provider:
+          type: object
+          properties:
+            organization:
+              type: string
+            url:
+              type: string
+              format: uri
+        version:
+          type: string
+          description: Agent implementation version.
+          example: "1.0.0"
+        a2aVersion:
+          type: string
+          description: A2A protocol version supported.
+          example: "0.3"
+        capabilities:
+          type: object
+          properties:
+            streaming:
+              type: boolean
+              default: false
+            pushNotifications:
+              type: boolean
+              default: false
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentSkill"
+        defaultInputModes:
+          type: array
+          items:
+            type: string
+          default: ["text"]
+        defaultOutputModes:
+          type: array
+          items:
+            type: string
+          default: ["text"]
+        securitySchemes:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [apiKey, http, oauth2, openIdConnect]
+              description:
+                type: string
+
+    AgentSkill:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          example: "booking"
+        name:
+          type: string
+          example: "Service Booking"
+        description:
+          type: string
+          example: "Book professional service appointments"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["scheduling", "healthcare"]
+        examples:
+          type: array
+          items:
+            type: string
+          example: ["Book a kinesiology session for tomorrow at 10am"]
+
+    A2AJsonRpcRequest:
+      type: object
+      required: [jsonrpc, method, id]
+      description: JSON-RPC 2.0 request for A2A task operations.
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          type: string
+          description: Request identifier.
+        method:
+          type: string
+          enum: [tasks/send, tasks/get, tasks/cancel]
+          description: A2A method name.
+        params:
+          type: object
+          description: Method-specific parameters.
+          properties:
+            id:
+              type: string
+              description: Task ID.
+            contextId:
+              type: string
+              description: Groups related tasks.
+            message:
+              $ref: "#/components/schemas/A2AMessage"
+
+    A2AJsonRpcResponse:
+      type: object
+      required: [jsonrpc, id]
+      description: JSON-RPC 2.0 response.
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          type: string
+        result:
+          $ref: "#/components/schemas/A2ATask"
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+            data:
+              type: object
+
+    A2ATask:
+      type: object
+      required: [id, status]
+      description: Represents a stateful unit of work in the A2A protocol.
+      properties:
+        id:
+          type: string
+        contextId:
+          type: string
+        status:
+          $ref: "#/components/schemas/A2ATaskStatus"
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/A2AMessage"
+        artifacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/A2AArtifact"
+        createdTime:
+          type: string
+          format: date-time
+        updatedTime:
+          type: string
+          format: date-time
+
+    A2ATaskStatus:
+      type: object
+      required: [state]
+      properties:
+        state:
+          type: string
+          enum: [submitted, working, input-required, completed, failed, canceled]
+          description: Current task state.
+        message:
+          type: string
+          description: Human-readable status description.
+        timestamp:
+          type: string
+          format: date-time
+
+    A2AMessage:
+      type: object
+      required: [role, parts]
+      properties:
+        role:
+          type: string
+          enum: [user, agent]
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/A2APart"
+
+    A2APart:
+      type: object
+      description: Polymorphic content part — text, file, or structured data.
+      properties:
+        type:
+          type: string
+          enum: [text, file, data]
+        text:
+          type: string
+          description: Text content (when type=text).
+        mimeType:
+          type: string
+          description: MIME type (when type=file).
+        fileUri:
+          type: string
+          format: uri
+          description: File URI (when type=file).
+        data:
+          type: object
+          description: Structured data (when type=data).
+
+    A2AArtifact:
+      type: object
+      required: [id, parts]
+      properties:
+        id:
+          type: string
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/A2APart"
+        metadata:
+          type: object
+          additionalProperties: true

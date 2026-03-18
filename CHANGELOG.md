@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 The **protocol** follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The **MCP server** (`@servicialo/mcp-server`) is versioned independently.
 
+## [Protocol v0.8 / MCP Server v0.8.0] - 2026-03-17
+
+### Added
+- **A2A v0.3 interoperability** — Agent-to-Agent protocol support as optional extension.
+- `a2a.get_agent_card` tool in MCP server for A2A agent discovery.
+- A2A Extension endpoints in `spec/openapi.yaml`: Agent Card, JSON-RPC task endpoint, agent directory.
+- "Servicialo A2A Ready" certification criteria.
+- `docs/a2a-interoperability.md` — A2A integration guide.
+
+### Changed
+- MCP server version bumped to 0.8.0.
+
 ## [Protocol v0.7] - 2026-03-10
 
 ### Added
