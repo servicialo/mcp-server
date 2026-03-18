@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "servicialo": {
+      "url": "https://servicialo.com/api/mcp"
+    }
+  }
+}

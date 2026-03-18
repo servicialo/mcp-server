@@ -36,6 +36,22 @@ export async function GET() {
         filtering: 'GET /api/servicialo/resolve/{country}?readiness=bookable → only booking-ready orgs',
       },
       how_it_works: 'Organizations register their rest_url via /resolve/register. The resolver probes their endpoints to verify capabilities (services, availability, booking). All /api/servicialo/{org}/* requests are proxied to the registered implementation. Responses include X-Servicialo-Readiness header.',
+      mcp: {
+        description: 'MCP (Model Context Protocol) endpoint for AI agent tool access',
+        url: 'https://servicialo.com/api/mcp',
+        transport: 'streamable-http',
+        discovery: 'https://servicialo.com/.well-known/mcp.json',
+        tools: ['servicialo_registry', 'servicialo_services', 'servicialo_availability', 'servicialo_book'],
+      },
+      a2a: {
+        description: 'A2A (Agent-to-Agent) protocol support for cross-agent interoperability',
+        version: '0.2.0',
+        endpoints: {
+          agent_card: 'GET /api/servicialo/{org}/.well-known/agent.json',
+          task: 'POST /api/servicialo/{org}/a2a',
+          directory: 'GET /api/.well-known/agents.json',
+        },
+      },
     },
     { headers: { 'X-Servicialo-Version': '1.0' } },
   );

@@ -13,6 +13,62 @@ import { updateCapabilityFromProxy } from './capabilities';
 const SERVICIALO_VERSION = '1.0';
 
 /**
+ * Resolve org slug → restUrl and fetch upstream, returning parsed JSON.
+ * Usable from MCP tools, A2A handlers, or anywhere that doesn't need NextResponse.
+ */
+export async function proxyToUpstream(
+  orgSlug: string,
+  path: string,
+  options?: { method?: string; body?: string; params?: Record<string, string> },
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+  const org = await prisma.organization.findUnique({
+    where: { slug: orgSlug },
+    select: { id: true, restUrl: true, discoverable: true },
+  });
+
+  if (!org) {
+    return { ok: false, status: 404, data: { error: `Organization "${orgSlug}" not found in resolver` } };
+  }
+  if (!org.restUrl) {
+    return { ok: false, status: 502, data: { error: `Organization "${orgSlug}" has no registered REST endpoint` } };
+  }
+
+  const baseUrl = org.restUrl.replace(/\/$/, '');
+  const targetPath = `/api/servicialo/${orgSlug}/${path}`;
+  const qs = options?.params
+    ? '?' + new URLSearchParams(options.params).toString()
+    : '';
+  const targetUrl = `${baseUrl}${targetPath}${qs}`;
+
+  try {
+    const method = options?.method ?? 'GET';
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    if (options?.body) headers['Content-Type'] = 'application/json';
+
+    const res = await fetch(targetUrl, {
+      method,
+      headers,
+      body: options?.body,
+    });
+
+    if (res.ok) {
+      updateCapabilityFromProxy(org.id, path, res.status).catch(() => {});
+    }
+
+    const text = await res.text();
+    let data: unknown;
+    try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    return { ok: res.ok, status: res.status, data };
+  } catch (err) {
+    return {
+      ok: false,
+      status: 502,
+      data: { error: 'upstream_unavailable', message: (err as Error).message },
+    };
+  }
+}
+
+/**
  * Resolve an org's rest_url from the resolver DB and proxy the request.
  */
 export async function resolveAndProxy(
