@@ -6,7 +6,7 @@
     "url": "https://github.com/servicialo/mcp-server",
     "source": "github"
   },
-  "version": "0.7.0",
+  "version": "0.8.0",
   "deprecatedEntries": [
     {
       "name": "io.github.danioni/servicialo",
@@ -19,7 +19,7 @@
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.7.0",
+      "version": "0.8.0",
       "transport": {
         "type": "stdio"
       }
