@@ -2,7 +2,7 @@
 
 Guía paso a paso para construir una plataforma compatible con Servicialo. No necesitas implementar todo — solo el core que hace tus datos de servicio interoperables.
 
-> **Versión del protocolo:** 0.8 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
+> **Versión del protocolo:** 0.9 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
 >
 > **[Read in English](./IMPLEMENTING.en.md)**
 
@@ -18,6 +18,22 @@ Para aparecer como implementación de Servicialo ([§16](./PROTOCOL.md#16-implem
 4. Exponer una API a la que un **servidor MCP pueda conectarse**
 
 Todo lo demás — Órdenes de Servicio, Agencia Delegada, Perfiles de Proveedor, Inteligencia de Red — es opcional.
+
+---
+
+## Modelo de Acceso de Tres Niveles
+
+Antes de empezar, entiende cómo se organiza el acceso al protocolo ([§2.1](./PROTOCOL.md#21-three-tier-access-model)):
+
+| Nivel | Nombre | Alcance | Auth | Lo que expone |
+|:-----:|--------|---------|------|---------------|
+| **0** | **Resolver** | Global — sin contexto de org | Ninguna | `resolve.lookup`, `resolve.search`, `trust.get_score` — ¿dónde está el endpoint de esta organización? |
+| **1** | **Descubrimiento** | Org-scoped | Ninguna | `registry.*`, `services.list`, `scheduling.check_availability`, `a2a.get_agent_card` — ¿qué ofrece y cuándo? |
+| **2** | **Autenticado** | Org-scoped | API key + mandato para agentes | Todo lo demás — ciclo de vida, entrega, pagos, recursos |
+
+**Para tu implementación:** Nivel 0 lo provee el resolver global de Servicialo — no necesitas implementarlo. Nivel 1 son los endpoints públicos que cualquier agente puede consultar sin credenciales. Nivel 2 requiere autenticación y es donde vive la lógica de negocio de tu plataforma.
+
+Tu API (Paso 4) debe exponer endpoints para Nivel 1 y Nivel 2. El servidor MCP se encarga de mapear las herramientas a tus endpoints.
 
 ---
 
@@ -304,10 +320,11 @@ function rescheduleService(
 
 ## Paso 4: Construir tu API
 
-Expón endpoints HTTP que cubran las 6 fases de agente del §13. Como mínimo, necesitas endpoints para:
+Expón endpoints HTTP que cubran las fases de agente del §13. La Fase 0 (resolución DNS) la provee el resolver global — no la implementas tú. Como mínimo, necesitas endpoints para:
 
 | Fase | Endpoint | Mapea a herramienta MCP |
 |------|----------|------------------------|
+| 0. Resolver | (provisto por el resolver global) | `resolve.lookup`, `resolve.search` |
 | 1. Descubrir | `GET /services` | `services.list` |
 | 1. Descubrir | `GET /availability?service_id=X&date_from=Y&date_to=Z` | `scheduling.check_availability` |
 | 3. Comprometer | `POST /bookings` | `scheduling.book` |
@@ -367,6 +384,8 @@ server.tool(
 
 // ... repetir para cada herramienta que soportes
 ```
+
+**Transporte:** El servidor MCP soporta dos transportes (§13.8): **stdio** para agentes locales y desarrollo, y **Streamable HTTP** para agentes remotos y servidores en producción. Si tu implementación será accesible por agentes remotos (no solo locales), Streamable HTTP es el transporte recomendado — permite conexiones HTTP sin requerir un proceso local.
 
 **Listo cuando:** Un agente AI (Claude, GPT, etc.) puede conectarse a tu servidor MCP y llamar al menos `services.list` y `scheduling.check_availability`.
 
@@ -443,6 +462,9 @@ Esto no es requerido para compliance pero está definido en el spec:
 | Service Orders | §8 | Cuando vendes paquetes, planes o acuerdos multi-sesión |
 | Agencia Delegada | §10 | Cuando agentes AI actúan en nombre de usuarios (mandatos, scopes, auditoría) |
 | Perfiles de Proveedor | §12 | Cuando necesitas descubrimiento de proveedores estructurado y machine-readable |
+| Modelo de Pago | §12.8 | Cuando necesitas prepago/checkout además del flujo post-servicio por defecto |
+| Resolución DNS | §13.0 | Cuando quieres registrar tu organización en el resolver global para ser descubierta |
+| Interoperabilidad A2A | §13.7 | Cuando agentes externos (Google ADK, Salesforce, etc.) necesitan interactuar sin MCP |
 | Inteligencia de Red | §14 | Cuando quieres contribuir/recibir benchmarks agregados |
 
 ---

@@ -39,7 +39,7 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 ## Qué Hace Este MCP Server
 
-Este paquete expone el protocolo Servicialo como 23 herramientas MCP organizadas por **7 fases** del ciclo de vida de un servicio (incluyendo resolución DNS). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+Este paquete expone el protocolo Servicialo como 33 herramientas MCP organizadas por **8 fases** del ciclo de vida de un servicio (incluyendo resolución DNS), más herramientas de gestión de recursos y administración del resolver. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
 
 ### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
 
@@ -49,14 +49,16 @@ Este paquete expone el protocolo Servicialo como 23 herramientas MCP organizadas
 | `resolve.search` | Buscar organizaciones registradas por país y vertical en el resolver global |
 | `trust.get_score` | Obtener puntaje de confianza de una organización (score 0-100, nivel, última actividad) |
 
-### Fase 1 — Descubrimiento (4 herramientas públicas, sin autenticación)
+### Fase 1 — Descubrimiento (6 herramientas públicas, sin autenticación)
 
 | Herramienta | Descripción |
 |---|---|
 | `registry.search` | Buscar organizaciones por vertical, ubicación, país |
 | `registry.get_organization` | Obtener detalles públicos: servicios, prestadores, configuración de reservas |
+| `registry.manifest` | Obtener manifiesto del servidor: capacidades, versión del protocolo, metadata de organización |
 | `scheduling.check_availability` | Consultar disponibilidad (3 variables: prestador ∧ cliente ∧ recurso) |
 | `services.list` | Listar el catálogo público de servicios de una organización |
+| `a2a.get_agent_card` | Obtener la Agent Card A2A de una organización para descubrimiento inter-agente |
 
 ### Fase 2 — Entender (2 herramientas)
 
@@ -99,6 +101,25 @@ Este paquete expone el protocolo Servicialo como 23 herramientas MCP organizadas
 | `payments.record_payment` | Registrar pago recibido contra una venta | `payment:write` |
 | `payments.get_status` | Obtener estado de pago de una venta o saldo de cuenta del cliente | `payment:read` |
 
+### Gestión de Recursos (6 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `resource.list` | Listar recursos físicos de una organización | `resource:read` |
+| `resource.get` | Obtener detalles de un recurso con sus slots de disponibilidad | `resource:read` |
+| `resource.create` | Crear un nuevo recurso físico (sala, box, equipamiento) | `resource:write` |
+| `resource.update` | Actualizar recurso (patch semántico) | `resource:write` |
+| `resource.delete` | Desactivar recurso (soft delete: `is_active = false`) | `resource:write` |
+| `resource.get_availability` | Consultar disponibilidad de un recurso por rango de fechas | `resource:read` |
+
+### Administración del Resolver (3 herramientas)
+
+| Herramienta | Descripción | Scopes |
+|---|---|---|
+| `resolve.register` | Registrar organización en el resolver global con endpoints MCP/REST | `resolve:write` |
+| `resolve.update_endpoint` | Actualizar endpoints registrados (portabilidad entre backends) | `resolve:write` |
+| `telemetry.heartbeat` | Enviar heartbeat al resolver indicando que el nodo está activo | `telemetry:write` |
+
 ## Instalación y Quickstart
 
 ### Opción 1: Modo descubrimiento (zero config)
@@ -107,7 +128,7 @@ Este paquete expone el protocolo Servicialo como 23 herramientas MCP organizadas
 npx -y @servicialo/mcp-server
 ```
 
-Sin API key. Sin org ID. 4 herramientas públicas disponibles de inmediato. Pruébalo:
+Sin API key. Sin org ID. 9 herramientas públicas disponibles de inmediato (resolver + descubrimiento). Pruébalo:
 
 ```json
 {
@@ -125,7 +146,7 @@ Sin API key. Sin org ID. 4 herramientas públicas disponibles de inmediato. Pru�
 SERVICIALO_API_KEY=tu_key SERVICIALO_ORG_ID=tu_org npx -y @servicialo/mcp-server
 ```
 
-Las 20 herramientas habilitadas.
+Las 33 herramientas habilitadas.
 
 ### Claude Desktop / Cursor / cualquier cliente MCP
 
@@ -362,10 +383,10 @@ La especificación completa del protocolo Servicialo está disponible en:
 
 - **Repositorio:** [github.com/servicialo/protocol](https://github.com/servicialo/protocol)
 - **Sitio web:** [servicialo.com](https://servicialo.com)
-- **Versión estable actual:** 0.7
-- **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
+- **Versión estable actual:** 0.9
+- **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json), [`resolution.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/resolution.schema.json), [`servicialo-config.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/servicialo-config.schema.json)
 
-La spec cubre las 8 dimensiones del servicio, 8 estados de ciclo de vida, 5 flujos de excepción (inasistencia, cancelación, disputa, reagendamiento, entrega parcial), la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), y el Modelo de Agencia Delegada.
+La spec cubre las 8 dimensiones del servicio, 9 estados de ciclo de vida, 7 flujos de excepción, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
 
 ## Implementación de Referencia
 

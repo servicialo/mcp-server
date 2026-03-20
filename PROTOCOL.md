@@ -4,11 +4,11 @@
 
 | | |
 |---|---|
-| **Version** | 0.8 |
-| **Date** | 2026-03-10 |
+| **Version** | 0.9 |
+| **Date** | 2026-03-20 |
 | **Status** | Draft |
 | **License** | Apache-2.0 |
-| **Canonical URL** | `https://servicialo.com/spec/v0.8` |
+| **Canonical URL** | `https://servicialo.com/spec/v0.9` |
 | **Schemas** | `https://servicialo.com/schema/` |
 
 ---
@@ -23,6 +23,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 1.  [Overview](#1-overview)
 2.  [Glossary](#2-glossary)
+    - 2.1 [Three-Tier Access Model](#21-three-tier-access-model)
 -   [Interoperability Channels](#interoperability-channels)
 3.  [Protocol Primitives](#3-protocol-primitives)
 4.  [Core Entities](#4-core-entities)
@@ -34,7 +35,11 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 10. [Delegated Agency Model](#10-delegated-agency-model)
 11. [Agent Decision Model](#11-agent-decision-model)
 12. [Provider Profile & Discoverable Attributes](#12-provider-profile--discoverable-attributes)
+    - 12.8 [Payment Model](#128-payment-model)
 13. [MCP Tool Interface](#13-mcp-tool-interface)
+    - 13.0 [Phase 0 — DNS Resolution](#130-phase-0--dns-resolution)
+    - 13.7 [A2A Interoperability](#137-a2a-interoperability)
+    - 13.8 [MCP Streamable HTTP Transport](#138-mcp-streamable-http-transport)
 14. [Network Intelligence](#14-network-intelligence)
 15. [Extensibility](#15-extensibility)
 16. [Implementations](#16-implementations)
@@ -43,7 +48,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 **Appendices**
 
 - [A. Glossary (extended)](#appendix-a-glossary)
-- [B. Changelog v0.6 → v0.7 → v0.8](#appendix-b-changelog)
+- [B. Changelog v0.6 → v0.7 → v0.8 → v0.9](#appendix-b-changelog)
 - [C. Scope Reference](#appendix-c-scope-reference)
 - [D. Attribute Key Reference](#appendix-d-attribute-key-reference)
 
@@ -102,6 +107,22 @@ Terms used throughout this specification. See [Appendix A](#appendix-a-glossary)
 | **ProviderAttribute** | A typed, origin-tracked descriptor of a provider's identity, capability, or operational profile. |
 | **Transition** | A recorded state change in a lifecycle, including actor, method, and timestamp. |
 | **Evidence** | A proof-of-delivery artifact (GPS, signature, photo, document, duration). |
+
+### 2.1 Three-Tier Access Model
+
+The protocol organizes all tool and endpoint access into three tiers based on scope and authentication requirements. This model formalizes the security boundary between public resolution, unauthenticated discovery, and authenticated operations.
+
+| Tier | Name | Scope | Auth | Tools |
+|:----:|------|-------|------|-------|
+| **0** | **Resolver** | Global — no org context | None | `resolve.lookup`, `resolve.search`, `trust.get_score` |
+| **1** | **Discovery** | Org-scoped | None | `registry.search`, `registry.get_organization`, `registry.manifest`, `services.list`, `scheduling.check_availability`, `a2a.get_agent_card` |
+| **2** | **Authenticated** | Org-scoped | API key + ServiceMandate for agents (§10) | All remaining tools — lifecycle, delivery, payments, resources, mandates, service orders, resolver admin |
+
+**Tier 0** tools operate against the global resolver and require no organizational context. They answer the question: *where is this organization's endpoint?*
+
+**Tier 1** tools operate within an organizational context but do not require authentication. They answer: *what does this organization offer, and when is it available?*
+
+**Tier 2** tools require API credentials (`SERVICIALO_API_KEY` + `SERVICIALO_ORG_ID`). When `actor.type` is `agent`, a valid ServiceMandate (§10) is additionally required. These tools perform mutations and access protected data.
 
 ---
 
@@ -740,7 +761,7 @@ An organizational administrator or system process MAY temporarily suspend a mand
 
 ### 10.5 Normative Validation Rules
 
-Any implementation claiming Servicialo v0.8 compliance MUST enforce these rules:
+Any implementation claiming Servicialo v0.9 compliance MUST enforce these rules:
 
 | Rule | Statement |
 |------|-----------|
@@ -1056,11 +1077,105 @@ Provider profiles SHOULD be serializable as JSON-LD for search engine indexation
 
 Attributes without a Schema.org equivalent SHOULD be placed under the `servicialo:` namespace.
 
+### 12.8 Payment Model
+
+The protocol defines two payment modes for service settlement. Both modes use the same `billing.status` track (§6.6), which runs independently from the service lifecycle.
+
+#### 12.8.1 Billing Status Track
+
+```
+pending → charged → invoiced → paid
+                                 ↘ disputed
+```
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Service completed, no financial action yet. |
+| `charged` | Amount debited from client balance or added to their debt. Occurs 1:1 with a completed session. |
+| `invoiced` | Tax document (boleta, factura, invoice) emitted. |
+| `paid` | Cash received. MAY occur upstream (prepaid package) or downstream (insurance reimbursement). |
+| `disputed` | Charge frozen pending resolution (§7.4). |
+
+`charged` and `paid` are distinct events: `charged` means the economic fact is recorded; `paid` means money moved. A prepaid package is `paid` before `charged`. An insurance claim is `charged` before `paid`.
+
+#### 12.8.2 Post-Service Settlement (Default)
+
+The default mode. Payment occurs after service delivery. The flow follows the Phase 6 tools (§13.2.5):
+
+```
+completed → documented → invoiced → collected → verified
+                          ↑                       ↑
+              payments.create_sale    payments.record_payment
+```
+
+| Step | Tool | What happens |
+|------|------|-------------|
+| 1 | `documentation.create` | Generate the service record (clinical note, inspection report, etc.). Moves session to `documented`. |
+| 2 | `payments.create_sale` | Create a sale (charge) for the documented service. Moves session to `invoiced`. Requires `client_id`, `service_id`, `provider_id`, and `unit_price`. |
+| 3 | `payments.record_payment` | Record payment received against the sale. Accepts `amount`, `method` (cash, transfer, card, etc.), and optional `reference`. |
+| 4 | `payments.get_status` | Query payment status by `sale_id` (single sale) or `client_id` (full account history). |
+
+#### 12.8.3 Prepayment Checkout
+
+Some services require payment before the appointment occurs. The prepayment flow is triggered when the service or organization manifest indicates prepayment is required, or when a booking attempt returns HTTP `402 Payment Required`.
+
+The checkout flow uses REST endpoints (not MCP tools) because it involves client-facing payment UIs:
+
+| Step | Endpoint | Description |
+|------|----------|-------------|
+| 1 | `POST /{org}/checkout` | Create a PaymentIntent for the service. Returns a payment link with a 15-minute expiry. |
+| 2 | Client pays | Client completes payment via the payment link (external to the protocol). |
+| 3 | `GET /{org}/checkout/{id}` | Poll payment status. Returns `pending`, `completed`, or `expired`. |
+| 4 | `scheduling.book` with `paymentIntentId` | Once payment is confirmed, complete the booking with the payment reference. The session starts in `requested` state with `billing.status = paid`. |
+
+**Prepayment vs. post-service:** When a service is prepaid, `billing.status` is `paid` from the moment the session is created. The lifecycle states still proceed normally — the session must still be delivered, documented, and verified. Prepayment settles the financial obligation; it does not skip the delivery obligation.
+
+#### 12.8.4 Payment Mode Discovery
+
+Agents SHOULD determine the payment mode before attempting to book:
+
+1. **Manifest flag:** The organization manifest (via `registry.manifest`) MAY include a `requires_prepayment` field per service.
+2. **402 response:** A `scheduling.book` call that returns HTTP `402` indicates prepayment is required. The response body SHOULD include the checkout endpoint URL.
+
+Implementations MUST support at least the post-service settlement mode. Prepayment checkout is OPTIONAL.
+
+**Cross-references:** Phase 6 tools (§13.2.5), Genesis Skill 4 — Prepayment Checkout (§13.6).
+
 ---
 
 ## 13. MCP Tool Interface
 
 Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
+
+### 13.0 Phase 0 — DNS Resolution
+
+Phase 0 operates at the **resolver** level — global scope, no organizational context required. It answers the fundamental question: *given an organization slug, where is its Servicialo-compatible endpoint?*
+
+Resolution is the entry point of the protocol. An agent that does not know which organization to contact starts here. The resolver maintains a global registry of organization endpoints, trust scores, and health status.
+
+#### 13.0.1 Public Resolution Tools (Tier 0)
+
+These tools require no authentication and no organizational context.
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `resolve.lookup` | Resolve an `orgSlug` to its MCP/REST endpoint and trust level. Equivalent to a DNS A-record lookup. | None. |
+| `resolve.search` | Search the global resolver for organizations by country and vertical. | None. |
+| `trust.get_score` | Get the trust score (0–100), trust level, and last activity timestamp for an organization. | None. |
+
+**Schema reference:** [`schema/resolution.schema.json`](./schema/resolution.schema.json) defines the resolution record structure. [`schema/servicialo-config.schema.json`](./schema/servicialo-config.schema.json) defines the per-organization configuration discovered via resolution.
+
+#### 13.0.2 Resolver Administration Tools (Tier 2)
+
+These tools require authentication and modify the resolver's global registry.
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `resolve.register` | Register an organization in the global resolver with its MCP and REST endpoints. | `resolve:write`. |
+| `resolve.update_endpoint` | Update the registered endpoints for an organization (portability). | `resolve:write`. |
+| `telemetry.heartbeat` | Send a heartbeat to the resolver indicating the organization's node is alive and healthy. | `telemetry:write`. |
+
+Resolver administration enables **portability**: an organization can migrate between Servicialo-compatible backends without losing its identity in the resolver. The `resolve.update_endpoint` tool updates the endpoint mapping without re-registration.
 
 ### 13.1 Discovery Mode (No Credentials)
 
@@ -1070,6 +1185,7 @@ Four public tools are available without authentication. These tools do not requi
 |------|-------------|-----------------|
 | `registry.search` | Search organizations by vertical and location. | None. |
 | `registry.get_organization` | Public details of an organization. | None. |
+| `registry.manifest` | Server manifest: capabilities, protocol version, organization metadata. | None. |
 | `scheduling.check_availability` | Check available time slots. | None. |
 | `services.list` | Public service catalog. | None. |
 
@@ -1316,6 +1432,44 @@ A compliant implementation SHOULD support the following five agent skills, which
 
 **Design principle:** The value of implementing Servicialo is that an implementor gets a complete AI assistant covering the full service lifecycle — not just booking, but discovery, management, payment, and verification. These five skills represent the minimum viable agent experience.
 
+### 13.7 A2A Interoperability
+
+Servicialo supports [A2A (Agent-to-Agent)](https://a2a-protocol.org/) as an optional interoperability channel, enabling external agent frameworks (Google ADK, Salesforce Agentforce, LangGraph, etc.) to discover and interact with Servicialo-compatible organizations without using MCP.
+
+#### 13.7.1 Agent Card Discovery
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `a2a.get_agent_card` | Returns the A2A-compliant Agent Card for an organization, describing its booking capabilities, supported skills, and authentication requirements. | None (Tier 1 — Discovery). |
+
+The Agent Card follows the [A2A Agent Card specification](https://a2a-protocol.org/) and is served at the well-known path `/.well-known/agent.json` for each organization. It includes:
+
+- Agent name, description, and provider metadata.
+- Supported skills (mapped from the organization's service catalog).
+- Authentication schemes accepted.
+- JSON-RPC endpoint for task submission.
+
+#### 13.7.2 JSON-RPC Bridge
+
+External agents interact with Servicialo organizations via the A2A JSON-RPC protocol. The bridge translates A2A task lifecycle (`submitted → working → completed`) to Servicialo lifecycle states (§6). Implementations that expose A2A MUST maintain semantic equivalence with the MCP tool interface — A2A is a transport, not a different protocol.
+
+**Reference:** [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
+
+### 13.8 MCP Streamable HTTP Transport
+
+The MCP server supports two transport mechanisms:
+
+| Transport | Use Case | Specification |
+|-----------|----------|---------------|
+| **stdio** | Local agent processes, CLI tools, development. | MCP Specification — stdio transport. |
+| **Streamable HTTP** | Remote agents, web-based clients, server-to-server. | MCP Specification — Streamable HTTP transport. |
+
+Streamable HTTP enables remote agents to connect to a Servicialo MCP server over HTTP without requiring a local process. The server exposes a single HTTP endpoint that accepts JSON-RPC messages and returns responses via server-sent events (SSE) for streaming or direct JSON for request-response patterns.
+
+Both transports expose identical tool sets and follow the same access model (§2.1). The transport choice does not affect protocol semantics.
+
+**HTTP contract reference:** [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) defines the canonical REST endpoints. [`spec/openapi.yaml`](./spec/openapi.yaml) provides the OpenAPI 3.1 specification.
+
 ---
 
 ## 14. Network Intelligence
@@ -1454,6 +1608,16 @@ The protocol version is independent from the MCP server package version.
 
 ## Appendix B: Changelog
 
+### v0.9 (2026-03-20)
+
+- **Three-Tier Access Model (§2.1).** Formalized the three access tiers: Tier 0 (Resolver — global, no auth), Tier 1 (Discovery — org-scoped, no auth), and Tier 2 (Authenticated — org-scoped, API key + mandate for agents).
+- **Phase 0 — DNS Resolution (§13.0).** Documented 6 resolver tools: 3 public (`resolve.lookup`, `resolve.search`, `trust.get_score`) and 3 authenticated (`resolve.register`, `resolve.update_endpoint`, `telemetry.heartbeat`). Cross-references `resolution.schema.json` and `servicialo-config.schema.json`.
+- **`registry.manifest` added to Discovery (§13.1).** Documents the server manifest tool for capabilities and version discovery.
+- **A2A Interoperability (§13.7).** Formalized `a2a.get_agent_card` as a Tier 1 discovery tool and documented the JSON-RPC bridge for external agent frameworks.
+- **MCP Streamable HTTP Transport (§13.8).** Documented stdio and Streamable HTTP as dual transport mechanisms. References `spec/HTTP_PROFILE.md` and `spec/openapi.yaml`.
+- **Payment Model (§12.8).** Formalized two payment modes: post-service settlement (default) and prepayment checkout. Documents billing status track, the 4 payment tools, and the checkout REST endpoint pattern.
+- **New scopes.** Added `resolve:write` (resolver administration) and `telemetry:write` (heartbeat/health).
+
 ### v0.8.1 (2026-03-16)
 
 - **Bookings Lookup (§13.5).** New protocol-level endpoint for querying existing appointments by client email. Enables AI agents to manage appointments without requiring a prior `session_id`.
@@ -1507,15 +1671,24 @@ Protocol-defined scopes. All scopes follow the `{resource}:{action}` pattern.
 | `profile:write` | Update provider profile attributes. | Profile management agent. |
 | `mandate:read` | View mandates issued by this principal. | Administrative agent. |
 | `mandate:admin` | Suspend mandates (not issue — only principals issue). | Organizational admin agent. |
+| `resource:read` | View physical resources and their availability. | Scheduling agent. |
+| `resource:write` | Create, update, or deactivate physical resources. | Resource management agent. |
+| `resolve:write` | Register and update organization endpoints in the global resolver. | Resolver administration agent. |
+| `telemetry:write` | Send heartbeat and health signals to the global resolver. | Operations/monitoring agent. |
 
 ### Tool-to-Scope Mapping
 
 | Tool | Required Scopes |
 |------|-----------------|
+| `resolve.lookup` | None (public). |
+| `resolve.search` | None (public). |
+| `trust.get_score` | None (public). |
 | `registry.search` | None (public). |
 | `registry.get_organization` | None (public). |
+| `registry.manifest` | None (public). |
 | `scheduling.check_availability` | None (public). |
 | `services.list` | None (public). |
+| `a2a.get_agent_card` | None (public). |
 | `service.get` | `service:read`. |
 | `contract.get` | `service:read` or `order:read`. |
 | `clients.get_or_create` | `patient:write`. |
@@ -1541,6 +1714,15 @@ Protocol-defined scopes. All scopes follow the `{resource}:{action}` pattern.
 | `mandates.list` | `mandate:read`. |
 | `mandates.get` | `mandate:read`. |
 | `mandates.suspend` | `mandate:admin`. |
+| `resolve.register` | `resolve:write`. |
+| `resolve.update_endpoint` | `resolve:write`. |
+| `telemetry.heartbeat` | `telemetry:write`. |
+| `resource.list` | `resource:read`. |
+| `resource.get` | `resource:read`. |
+| `resource.create` | `resource:write`. |
+| `resource.update` | `resource:write`. |
+| `resource.delete` | `resource:write`. |
+| `resource.get_availability` | `resource:read`. |
 
 ---
 
@@ -1633,6 +1815,8 @@ All trust attributes have `origin: "inferred"` and `visibility: "public"`.
 - [`schema/service.schema.json`](./schema/service.schema.json)
 - [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 - [`schema/service-mandate.schema.json`](./schema/service-mandate.schema.json)
+- [`schema/resolution.schema.json`](./schema/resolution.schema.json)
+- [`schema/servicialo-config.schema.json`](./schema/servicialo-config.schema.json)
 
 ---
 

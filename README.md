@@ -250,18 +250,21 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las 6 fases del agente — 20 herramientas
+### Las 8 fases del agente — 33 herramientas
 
 Un agente bien diseñado sigue este orden:
 
 | # | Fase | Qué resuelve | Herramientas |
 |:-:|------|-------------|--------------|
-| 1 | **Descubrir** | Qué hay disponible | `registry.search` · `registry.get_organization` · `scheduling.check_availability` · `services.list` |
+| 0 | **Resolver** | Dónde está el endpoint | `resolve.lookup` · `resolve.search` · `trust.get_score` |
+| 1 | **Descubrir** | Qué hay disponible | `registry.search` · `registry.get_organization` · `registry.manifest` · `scheduling.check_availability` · `services.list` · `a2a.get_agent_card` |
 | 2 | **Entender** | Dimensiones y reglas del servicio | `service.get` · `contract.get` |
 | 3 | **Comprometer** | Identidad del cliente y reserva | `clients.get_or_create` · `scheduling.book` · `scheduling.confirm` |
 | 4 | **Gestionar** | Estado y transiciones | `lifecycle.get_state` · `lifecycle.transition` · `scheduling.reschedule` · `scheduling.cancel` |
 | 5 | **Verificar** | Evidencia de que ocurrió | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
+| — | **Recursos** | Espacios físicos y equipamiento | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
+| — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
 
 El protocolo garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
@@ -304,7 +307,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: ciclo de vida (9 estados) · 8 dimensiones · gestión de recursos · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (20 herramientas)
+Incluye: ciclo de vida (9 estados) · 8 dimensiones · gestión de recursos · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -419,7 +422,7 @@ servicialo/
 
 |  | Versión | Estado |
 |---|---------|--------|
-| Protocol | 0.8 | Estable |
+| Protocol | 0.9 | Estable |
 | @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
