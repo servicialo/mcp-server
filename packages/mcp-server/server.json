@@ -1,25 +1,25 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.servicialo/mcp-server",
-  "description": "Open protocol for professional service delivery via AI agents",
+  "title": "Servicialo MCP Server",
+  "description": "Open protocol for booking and scheduling professional services via AI agents",
   "repository": {
-    "url": "https://github.com/servicialo/mcp-server",
-    "source": "github"
+    "url": "https://github.com/servicialo/servicialo",
+    "source": "github",
+    "subfolder": "packages/mcp-server"
   },
-  "version": "0.8.0",
-  "deprecatedEntries": [
+  "version": "0.9.0",
+  "remotes": [
     {
-      "name": "io.github.danioni/servicialo",
-      "version": "0.5.2",
-      "reason": "Migrated to com.servicialo/mcp-server. Use the canonical entry.",
-      "since": "2026-03"
+      "type": "streamable-http",
+      "url": "https://coordinalo.com/api/mcp"
     }
   ],
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "transport": {
         "type": "stdio"
       }
