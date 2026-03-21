@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://servicialo.com/schema/service.schema.json",
   "title": "Servicialo Service",
-  "description": "Atomic unit of professional service delivery — modeled across the 8 dimensions defined in the Servicialo protocol v0.7.",
+  "description": "Atomic unit of professional service delivery — modeled across the 8 dimensions defined in the Servicialo protocol v0.9.",
   "type": "object",
   "required": ["id", "type", "vertical", "name", "duration_minutes", "provider", "client", "schedule", "lifecycle", "billing"],
   "properties": {

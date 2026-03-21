@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://servicialo.com/schema/service-order.schema.json",
   "title": "Servicialo Service Order",
-  "description": "A bilateral commercial agreement that groups one or more Services under a defined scope, pricing, and payment schedule. Servicialo protocol v0.7.",
+  "description": "A bilateral commercial agreement that groups one or more Services under a defined scope, pricing, and payment schedule. Servicialo protocol v0.9.",
   "type": "object",
   "required": ["id", "organization_id", "client_id", "payer_id", "scope", "term", "pricing", "payment_schedule", "lifecycle"],
   "properties": {

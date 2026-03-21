@@ -62,8 +62,9 @@ export const LIFECYCLE_STATES = [
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado." },
   { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica." },
   { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical." },
-  { id: "collected", label: "Cobrado", icon: "7", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
-  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
+  { id: "invoiced", label: "Facturado", icon: "7", desc: "Documento tributario emitido. Boleta o factura generada según la normativa local." },
+  { id: "collected", label: "Cobrado", icon: "8", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
+  { id: "verified", label: "Verificado", icon: "9", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
 ] as const;
 
 export const ANATOMY = [
@@ -72,13 +73,13 @@ export const ANATOMY = [
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual, incluyendo el recurso físico cuando aplica", example: "Clínica / Box 3 / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición actual en los 8 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
+  { field: "Ciclo", desc: "Posición actual en los 9 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 8 estados del ciclo de vida son universales para cualquier servicio." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes AI." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
@@ -87,7 +88,7 @@ export const PRINCIPLES = [
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.6
+# SERVICIALO v0.9
 # Dos entidades: Orden + Servicios atómicos
 # ─────────────────────────────────────────────
 
@@ -107,6 +108,7 @@ orden_de_servicio:
       vertical: texto            # salud | legal | hogar | educación | ...
       nombre: texto              # Nombre legible
       duración_minutos: entero
+      visibilidad: texto         # public | unlisted | private
 
       proveedor:
         id: texto
@@ -129,7 +131,7 @@ orden_de_servicio:
         recurso_id: texto        # Opcional — referencia a recurso físico
 
       ciclo_de_vida:
-        estado_actual: enum[8]   # Los 8 estados universales
+        estado_actual: enum[9]   # Los 9 estados universales
         transiciones: transición[]
         excepciones: excepción[]
 
@@ -145,8 +147,16 @@ orden_de_servicio:
           valor: número
           moneda: texto          # ISO 4217
         pagador: referencia
-        estado: pendiente | cobrado | pagado | disputado
+        estado: pendiente | cobrado | facturado | pagado | disputado
         cobrado_en: fecha_hora
+        documento_tributario: referencia  # Boleta/factura si se emitió
+
+      mandato:                   # Delegación explícita a agente AI
+        mandato_id: texto        # UUID único
+        principal_id: texto      # Humano u organización
+        agente_id: texto         # Agente que recibe la delegación
+        alcances: texto[]        # resource:action (e.g. schedule:write)
+        estado: activo | expirado | revocado | suspendido
 
 # Ledger computado desde servicios verificados — nunca editable`;
 
@@ -236,12 +246,12 @@ export const MODULES = [
     desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega, cobro y órdenes de servicio.",
     audience: "Cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza de oficinas con múltiples cuentas, equipos y personal con alta rotación.",
     includes: [
-      "Ciclo de vida (8 estados universales)",
+      "Ciclo de vida (9 estados universales)",
       "8 dimensiones del servicio",
       "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Protocolo MCP para agentes AI (20 herramientas)",
+      "Protocolo MCP para agentes AI (23 herramientas)",
     ],
   },
   {
