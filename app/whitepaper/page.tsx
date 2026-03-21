@@ -46,11 +46,16 @@ const secciones = [
   {
     num: "07",
     titulo: "Servidor MCP",
-    desc: "20 herramientas organizadas en 6 fases para operar el protocolo desde agentes AI.",
+    desc: "23 herramientas organizadas en 6 fases para operar el protocolo desde agentes AI.",
   },
   {
     num: "08",
-    titulo: "Especificación técnica v0.6.0",
+    titulo: "Gobernanza del protocolo",
+    desc: "Centralización temporal transparente, hoja de ruta hacia descentralización y principios de neutralidad.",
+  },
+  {
+    num: "09",
+    titulo: "Especificación técnica v0.9.0",
     desc: "JSON Schema, endpoints REST y estructura completa de implementación.",
   },
 ];
@@ -151,9 +156,9 @@ export default function WhitepaperPage() {
       {/* CTA final */}
       <section className="mt-14 md:mt-20 border-t border-border pt-8">
         <p className="text-sm text-text-muted leading-relaxed mb-5">
-          Este whitepaper especifica el protocolo Servicialo v0.6.0 — definición
-          de servicios, ciclo de vida, resolución de disputas, y la interfaz MCP
-          para agentes AI.
+          Este whitepaper especifica el protocolo Servicialo v0.9.0 — definición
+          de servicios, ciclo de vida, resolución de disputas, gobernanza del
+          protocolo, y la interfaz MCP para agentes AI.
         </p>
         <a
           href="/docs/servicialo-whitepaper.pdf"

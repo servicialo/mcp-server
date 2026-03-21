@@ -1,6 +1,6 @@
 ---
 title: "Servicialo: Un Protocolo Abierto para la Orquestación de Servicios Profesionales en la Economía de Agentes de Inteligencia Artificial"
-version: "0.6.0"
+version: "0.9.0"
 date: "2026-03"
 author: "Servicialo (servicialo.com)"
 license: "MIT"
@@ -19,13 +19,13 @@ keywords:
 
 # Servicialo: Un Protocolo Abierto para la Orquestación de Servicios Profesionales en la Economía de Agentes de Inteligencia Artificial
 
-**Versión 0.6.0 — Marzo 2026**
+**Versión 0.9.0 — Marzo 2026**
 
 > **Citación APA:**
-> Servicialo. (2026). *Servicialo: Un protocolo abierto para la orquestación de servicios profesionales en la economía de agentes de inteligencia artificial* (Versión 0.6.0). https://servicialo.com
+> Servicialo. (2026). *Servicialo: Un protocolo abierto para la orquestación de servicios profesionales en la economía de agentes de inteligencia artificial* (Versión 0.9.0). https://servicialo.com
 >
 > **Citación ISO 690:**
-> SERVICIALO. *Servicialo: Un protocolo abierto para la orquestación de servicios profesionales en la economía de agentes de inteligencia artificial* [en línea]. Versión 0.6.0. Marzo 2026 [consultado en 2026]. Disponible en: https://servicialo.com
+> SERVICIALO. *Servicialo: Un protocolo abierto para la orquestación de servicios profesionales en la economía de agentes de inteligencia artificial* [en línea]. Versión 0.9.0. Marzo 2026 [consultado en 2026]. Disponible en: https://servicialo.com
 
 ---
 
@@ -35,7 +35,7 @@ Los servicios profesionales representan una proporción significativa de la acti
 
 Servicialo propone un protocolo abierto, licenciado bajo MIT, que define la capa de orquestación para la entrega de servicios profesionales. El protocolo modela cada servicio a través de 8 dimensiones canónicas — identidad, proveedor, cliente, agenda, ubicación, ciclo de vida, evidencia y cobro — y define un ciclo de vida de 9 estados universales que cualquier servicio debe recorrer desde la solicitud hasta la verificación final. Complementariamente, define la Orden de Servicio como el acuerdo bilateral que agrupa servicios atómicos bajo condiciones comerciales pactadas.
 
-El protocolo incluye flujos de excepción de primera clase, un mecanismo de resolución de disputas con arbitraje algorítmico, un modelo de decisión para agentes de IA con fronteras de autonomía explícitas, y un servidor de Protocolo de Contexto de Modelos (MCP) con 20 herramientas organizadas en 6 fases del ciclo de vida. Servicialo no es un producto: es infraestructura neutral de protocolo que cualquier plataforma puede implementar como nodo soberano.
+El protocolo incluye flujos de excepción de primera clase, un mecanismo de resolución de disputas con arbitraje algorítmico, un modelo de decisión para agentes de IA con fronteras de autonomía explícitas, y un servidor de Protocolo de Contexto de Modelos (MCP) con 23 herramientas organizadas en 6 fases del ciclo de vida. Servicialo no es un producto: es infraestructura neutral de protocolo que cualquier plataforma puede implementar como nodo soberano.
 
 ---
 
@@ -64,8 +64,9 @@ Protocolo abierto, servicios profesionales, agentes de inteligencia artificial, 
 15. [Módulos](#15-módulos)
 16. [Servidor de Protocolo de Contexto de Modelos](#16-servidor-de-protocolo-de-contexto-de-modelos)
 17. [Por qué Servicialo](#17-por-qué-servicialo)
-18. [Especificación técnica v0.6.0](#18-especificación-técnica-v060)
-19. [Cómo participar](#19-cómo-participar)
+18. [Especificación técnica v0.9.0](#18-especificación-técnica-v090)
+19. [Gobernanza del protocolo](#19-gobernanza-del-protocolo)
+20. [Cómo participar](#20-cómo-participar)
 
 ---
 
@@ -785,7 +786,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 - Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa, entrega parcial, conflicto de recurso)
 - Prueba de entrega con evidencia configurable por vertical
 - Contrato de servicio pre-acordado
-- Servidor MCP para agentes de IA (20 herramientas en 6 fases)
+- Servidor MCP para agentes de IA (23 herramientas en 6 fases)
 
 ### 15.2 Servicialo/Finanzas (En diseño)
 
@@ -825,9 +826,9 @@ Servicialo expone sus herramientas como un servidor de Model Context Protocol (M
 | Modo | Herramientas disponibles | Requisitos |
 |------|-------------------------|------------|
 | **Descubrimiento** | 4 herramientas públicas | Sin configuración |
-| **Autenticado** | 20 herramientas completas | API key + ID de organización |
+| **Autenticado** | 23 herramientas completas | API key + ID de organización |
 
-### 16.2 Las 6 fases y 20 herramientas
+### 16.2 Las 6 fases y 23 herramientas
 
 #### Fase 1: Descubrir (4 herramientas públicas)
 
@@ -890,6 +891,16 @@ Documentación, facturación y liquidación de pago.
 | `payments.create_sale` | Crear un cobro por servicio documentado (estado "Cobrado") |
 | `payments.record_payment` | Registrar pago recibido. El pago es independiente del ciclo de vida |
 | `payments.get_status` | Consultar estado de pago de una venta o historial de saldo del cliente |
+
+#### Gestión de mandatos (3 herramientas)
+
+Delegación explícita de capacidad de un principal humano a un agente de IA.
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `mandates.list` | Listar mandatos emitidos por el principal actual |
+| `mandates.get` | Obtener detalles de un mandato: alcances, restricciones, vigencia |
+| `mandates.suspend` | Suspender un mandato activo. El agente pierde acceso inmediatamente |
 
 ### 16.3 Flujo de extremo a extremo — sesión MCP completa
 
@@ -1057,11 +1068,11 @@ Este modelo replica la dinámica probada de los protocolos exitosos: HTTP es lib
 
 ---
 
-## 18. Especificación técnica v0.6.0
+## 18. Especificación técnica v0.9.0
 
 ```yaml
 # ─────────────────────────────────────────────
-# SERVICIALO v0.6.0
+# SERVICIALO v0.9.0
 # Especificación técnica completa
 # ─────────────────────────────────────────────
 
@@ -1252,11 +1263,61 @@ contrato_servicio:
 
 ---
 
-## 19. Cómo participar
+## 19. Gobernanza del protocolo
+
+Un protocolo abierto requiere gobernanza transparente. Esta sección documenta el estado actual de la gobernanza de Servicialo y la hoja de ruta hacia su descentralización.
+
+### 19.1 Estado actual: centralización temporal
+
+Servicialo es mantenido actualmente por su autor como maintainer único. Esta centralización es temporal, documentada de forma transparente, y existe porque el protocolo está en fase de diseño activo donde la velocidad de iteración es crítica. No es un modelo de gobernanza definitivo — es un punto de partida honesto.
+
+El autor toma decisiones sobre la evolución del protocolo, la aceptación de cambios y la certificación de implementaciones. Esta concentración de autoridad es explícita y tiene fecha de expiración: se disolverá cuando se cumplan las condiciones descritas a continuación.
+
+### 19.2 Hoja de ruta hacia la descentralización
+
+#### (a) Suite de tests objetivos como mecanismo de certificación
+
+El primer paso hacia la descentralización es eliminar la discrecionalidad en la certificación. Servicialo adoptará una suite de tests objetivos como único mecanismo de certificación: si una implementación pasa los tests, está certificada. Sin aprobación discrecional, sin gatekeepers, sin procesos de revisión subjetivos.
+
+Los tests verificarán:
+- Modelado correcto de las 8 dimensiones del servicio
+- Implementación de los 9 estados del ciclo de vida con transiciones válidas
+- Manejo de al menos 3 flujos de excepción
+- Respuestas conformes al JSON Schema del protocolo
+
+#### (b) Sistema de reputación bottom-up basado en entregas reales
+
+La reputación en el ecosistema Servicialo se construirá desde abajo: basada en entregas reales verificadas, no en governance tokens, votos delegados ni métricas de participación en foros. La confianza se gana entregando servicios verificables a través del protocolo, no acumulando tokens o influencia política.
+
+Este sistema se diferencia deliberadamente de los modelos de gobernanza basados en tokens, donde la influencia se compra en lugar de ganarse.
+
+#### (c) Transferencia de maintainership a comité multi-stakeholder
+
+Cuando existan **3 o más implementadores independientes en producción** — es decir, plataformas distintas que hayan pasado la suite de certificación y tengan usuarios reales — la maintainership se transferirá a un comité representativo multi-stakeholder. El criterio es adopción real, no promesas ni intenciones.
+
+Criterios específicos para la transferencia:
+1. Al menos 3 implementaciones independientes certificadas en producción
+2. Al menos 2 verticales distintas representadas (e.g., salud + hogar)
+3. Ningún implementador con más del 50% del volumen total de la red
+4. Mecanismo de votación ponderada por volumen verificado, no por inversión
+
+### 19.3 Principio rector: indiferencia al implementador
+
+El protocolo debe ser **indiferente a quién lo implementa** — igual que HTTP es indiferente a si usas Apache o Nginx, y SMTP es indiferente a si usas Gmail o Fastmail. Si cumples la especificación, eres un nodo válido de la red. Sin permisos, sin aprobaciones, sin excepciones.
+
+Este principio tiene consecuencias concretas:
+- No existe un "implementador preferido" ni acuerdos de exclusividad
+- La certificación es objetiva y automatizada (suite de tests)
+- Los datos de la red son un commons del protocolo — ninguna implementación puede capturarlos
+- La especificación se mantiene en repositorio público bajo licencia abierta
+
+---
+
+## 20. Cómo participar
 
 Servicialo es un protocolo abierto bajo licencia MIT. Existen tres formas de participar:
 
-### 19.1 Implementadores
+### 20.1 Implementadores
 
 Organizaciones que construyen plataformas de servicios profesionales pueden implementar el protocolo como nodo soberano.
 
@@ -1269,7 +1330,7 @@ Organizaciones que construyen plataformas de servicios profesionales pueden impl
 5. (Opcional) Modelar Órdenes de Servicio
 6. (Opcional) Contribuir a la inteligencia de red
 
-### 19.2 Proveedores de servicios
+### 20.2 Proveedores de servicios
 
 Profesionales y organizaciones que entregan servicios pueden adoptar el protocolo a través de cualquier implementación compatible. Los beneficios incluyen:
 
@@ -1277,7 +1338,7 @@ Profesionales y organizaciones que entregan servicios pueden adoptar el protocol
 - Puntaje de confianza basado en datos verificables, no en reseñas subjetivas
 - Acceso a benchmarks de la industria para optimizar su operación
 
-### 19.3 Desarrolladores de agentes de IA
+### 20.3 Desarrolladores de agentes de IA
 
 Equipos que construyen agentes de IA pueden integrar el servidor MCP para que sus agentes descubran, coordinen y liquiden servicios profesionales.
 
@@ -1289,7 +1350,7 @@ npx -y @servicialo/mcp-server
 
 Con 4 herramientas públicas disponibles sin autenticación, un agente puede inmediatamente buscar organizaciones, explorar catálogos de servicios y verificar disponibilidad.
 
-### 19.4 Contribuciones al protocolo
+### 20.4 Contribuciones al protocolo
 
 - **Diseño del protocolo:** Proponer cambios a dimensiones, estados o principios vía issues públicos
 - **Extensiones:** Diseñar módulos adicionales (Finanzas, Disputas, Telemetría)

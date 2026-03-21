@@ -37,7 +37,7 @@ function Line({ children }: { children: React.ReactNode }) {
 function SchemaBlock() {
   return (
     <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
-      <Line><span className={h}># ── SERVICIALO v0.6.0 ────────────────</span></Line>
+      <Line><span className={h}># ── SERVICIALO v0.9.0 ────────────────</span></Line>
       <Line><span className={h}># Dos entidades: Orden + Servicios atómicos</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={a}>orden_de_servicio:</span></Line>
@@ -78,7 +78,7 @@ function SchemaBlock() {
       <Line>        <span className={k}>recurso_id:</span> <span className={t}>texto</span>       <span className={c}># Opcional — referencia a recurso físico</span></Line>
       <Line>&nbsp;</Line>
       <Line>      <span className={a}>ciclo_de_vida:</span></Line>
-      <Line>        <span className={k}>estado_actual:</span> <span className={t}>enum[8]</span>  <span className={c}># Los 8 estados universales</span></Line>
+      <Line>        <span className={k}>estado_actual:</span> <span className={t}>enum[9]</span>  <span className={c}># Los 9 estados universales</span></Line>
       <Line>        <span className={k}>transiciones:</span> <span className={t}>transición[]</span></Line>
       <Line>        <span className={k}>excepciones:</span> <span className={t}>excepción[]</span></Line>
       <Line>&nbsp;</Line>
@@ -94,7 +94,7 @@ function SchemaBlock() {
       <Line>          <span className={k}>valor:</span> <span className={t}>número</span></Line>
       <Line>          <span className={k}>moneda:</span> <span className={t}>texto</span>         <span className={c}># ISO 4217</span></Line>
       <Line>        <span className={k}>pagador:</span> <span className={t}>referencia</span></Line>
-      <Line>        <span className={k}>estado:</span> <span className={t}>pendiente | cobrado | pagado | disputado</span></Line>
+      <Line>        <span className={k}>estado:</span> <span className={t}>pendiente | cobrado | facturado | pagado | disputado</span></Line>
       <Line>        <span className={k}>cobrado_en:</span> <span className={t}>fecha_hora</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={h}># Ledger computado desde servicios verificados — nunca editable</span></Line>
@@ -123,7 +123,7 @@ export function EstandarSection() {
       {/* Schema block */}
       <div className="bg-dark rounded-[20px] py-6 px-4 md:py-8 md:px-9 text-white mb-4">
         <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-4">
-          Protocolo de Entrega de Servicios v0.6
+          Protocolo de Entrega de Servicios v0.9
         </div>
         <SchemaBlock />
       </div>

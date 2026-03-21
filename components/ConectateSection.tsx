@@ -25,6 +25,9 @@ const authenticatedTools = [
   { tool: "payments.create_sale", desc: "Crear venta/cargo" },
   { tool: "payments.record_payment", desc: "Registrar pago" },
   { tool: "payments.get_status", desc: "Estado de pago" },
+  { tool: "mandates.list", desc: "Listar mandatos del principal" },
+  { tool: "mandates.get", desc: "Detalle de un mandato" },
+  { tool: "mandates.suspend", desc: "Suspender mandato activo" },
 ];
 
 // Syntax highlighting colors (matching EstandarSection)
@@ -220,7 +223,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 20 herramientas totales
+          Con credenciales — 23 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">

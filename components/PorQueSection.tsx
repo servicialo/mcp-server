@@ -49,7 +49,7 @@ export function PorQueSection() {
           </div>
           <div className="text-[13px] text-text-muted leading-[1.7]">
             Agendar, verificar entrega, cobrar, cerrar el ciclo completo.
-            Con credenciales. 20 herramientas en 6 fases.
+            Con credenciales. 23 herramientas en 6 fases.
           </div>
         </div>
       </div>
