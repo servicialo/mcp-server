@@ -99,7 +99,7 @@ export default function WhitepaperPage() {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] text-text-dim mb-8">
           <span>◆ Franco Danioni</span>
           <span>◆ Marzo 2026</span>
-          <span>◆ v1.0</span>
+          <span>◆ v0.9.0</span>
         </div>
 
         <a
