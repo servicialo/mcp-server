@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Servicialo — El estándar abierto para servicios",
     description:
-      "El estándar abierto para crear, entregar y verificar servicios — para humanos y para agentes AI.",
+      "El estándar abierto para crear, entregar y verificar servicios — para humanos y para agentes IA.",
   },
   metadataBase: new URL("https://servicialo.com"),
 };

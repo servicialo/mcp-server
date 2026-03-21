@@ -139,7 +139,7 @@ export function CicloSection() {
           &quot;Cobrado&quot;, no puedes saber si el pago fue efectivamente
           recibido. Sin separar &quot;Cobrado&quot; de &quot;Verificado&quot;,
           no puedes saber si el cliente aceptó el resultado. 9 es el mínimo
-          viable para que un agente AI pueda verificar con certeza que un
+          viable para que un agente IA pueda verificar con certeza que un
           servicio fue solicitado, entregado, documentado, facturado, cobrado y
           verificado.
         </div>

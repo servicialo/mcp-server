@@ -41,12 +41,12 @@ const secciones = [
   {
     num: "06",
     titulo: "Evidencia y cumplimiento",
-    desc: "Evidencia por vertical, cumplimiento regulatorio y trazabilidad de agentes AI.",
+    desc: "Evidencia por vertical, cumplimiento regulatorio y trazabilidad de agentes IA.",
   },
   {
     num: "07",
     titulo: "Servidor MCP",
-    desc: "23 herramientas organizadas en 6 fases para operar el protocolo desde agentes AI.",
+    desc: "23 herramientas organizadas en 6 fases para operar el protocolo desde agentes IA.",
   },
   {
     num: "08",
@@ -158,7 +158,7 @@ export default function WhitepaperPage() {
         <p className="text-sm text-text-muted leading-relaxed mb-5">
           Este whitepaper especifica el protocolo Servicialo v0.9.0 — definición
           de servicios, ciclo de vida, resolución de disputas, gobernanza del
-          protocolo, y la interfaz MCP para agentes AI.
+          protocolo, y la interfaz MCP para agentes IA.
         </p>
         <a
           href="/docs/servicialo-whitepaper.pdf"

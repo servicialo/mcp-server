@@ -11,12 +11,12 @@ const cards = [
   },
   {
     title: "Proveedores",
-    desc: "Ofrece servicios en un formato que agentes AI entienden y pueden coordinar.",
+    desc: "Ofrece servicios en un formato que agentes IA entienden y pueden coordinar.",
     icon: "\u{1F3AF}",
     label: "Ofrecer",
   },
   {
-    title: "Agentes AI",
+    title: "Agentes IA",
     desc: "Descubre, agenda y verifica servicios con un protocolo estandarizado.",
     icon: "\u{1F916}",
     label: "Conectar",

@@ -56,7 +56,7 @@ export const SERVICE_ORIGINS = [
 ] as const;
 
 export const LIFECYCLE_STATES = [
-  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente AI define qué necesita, cuándo y dónde." },
+  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente IA define qué necesita, cuándo y dónde." },
   { id: "scheduled", label: "Agendado", icon: "2", desc: "Fecha, hora y proveedor asignados. Se bloquea el horario en los calendarios de ambas partes." },
   { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes confirmaron el compromiso. Recordatorios programados. Prerrequisitos verificados." },
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado." },
@@ -80,10 +80,10 @@ export const ANATOMY = [
 
 export const PRINCIPLES = [
   { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
-  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes AI." },
+  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes IA." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
-  { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, tanto un humano como un agente AI pueden descubrirlo y coordinarlo." },
+  { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, tanto un humano como un agente IA pueden descubrirlo y coordinarlo." },
   { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
 ] as const;
 
@@ -151,7 +151,7 @@ orden_de_servicio:
         cobrado_en: fecha_hora
         documento_tributario: referencia  # Boleta/factura si se emitió
 
-      mandato:                   # Delegación explícita a agente AI
+      mandato:                   # Delegación explícita a agente IA
         mandato_id: texto        # UUID único
         principal_id: texto      # Humano u organización
         agente_id: texto         # Agente que recibe la delegación
@@ -251,7 +251,7 @@ export const MODULES = [
       "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Protocolo MCP para agentes AI (23 herramientas)",
+      "Protocolo MCP para agentes IA (23 herramientas)",
     ],
   },
   {

@@ -101,7 +101,7 @@ export function ConectateSection() {
       {/* Intro block */}
       <div className="bg-surface rounded-[14px] py-5 px-6 border border-border mb-4">
         <div className="text-[13px] text-text-body leading-relaxed mb-3">
-          Un implementador que adopta Servicialo obtiene un asistente AI completo gratis.
+          Un implementador que adopta Servicialo obtiene un asistente IA completo gratis.
           No solo booking — gestión completa del ciclo de vida del servicio: agendar, gestionar,
           pagar y verificar. Todo desde el primer día.
         </div>
@@ -117,7 +117,7 @@ export function ConectateSection() {
           Génesis — 5 habilidades
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-5">
-          Lo que un agente AI puede hacer con cualquier implementación compatible
+          Lo que un agente IA puede hacer con cualquier implementación compatible
         </div>
 
         <div className="grid gap-3">

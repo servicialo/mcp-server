@@ -12,7 +12,7 @@ export function ResolucionSection() {
       <SectionTitle
         tag="06 — Resolución de disputas"
         title="Cuando hay desacuerdo"
-        subtitle="Un mecanismo que no depende de buena voluntad, no requiere un juez centralizado, y que un agente AI puede ejecutar con la misma confianza que un humano."
+        subtitle="Un mecanismo que no depende de buena voluntad, no requiere un juez centralizado, y que un agente IA puede ejecutar con la misma confianza que un humano."
       />
 
       {/* Flujo de resolución — dark card con stepper vertical */}
