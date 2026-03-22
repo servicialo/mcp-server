@@ -39,6 +39,7 @@ export interface RegistryEntry {
   verticals: string[];
   locale: string;
   is_verified: boolean;
+  discoverable: boolean;
   ownership_token: string;
   last_heartbeat: string | null;
   trust_score: number;
@@ -67,6 +68,9 @@ export async function searchEntries(filters: {
   const params = new URLSearchParams();
   params.set('select', '*');
   params.set('order', 'trust_score.desc,display_name.asc');
+
+  // Only return orgs that explicitly opted in
+  params.append('discoverable', 'eq.true');
 
   if (filters.country) {
     params.append('country', `eq.${filters.country}`);
@@ -143,6 +147,7 @@ export async function createEntry(data: {
       implementer: data.implementer,
       verticals: data.verticals ?? [],
       locale: data.locale ?? 'es',
+      discoverable: false, // Orgs must explicitly opt in
       metadata: data.metadata ?? {},
     }),
   });
@@ -166,7 +171,7 @@ export async function updateEntry(
   country: string,
   slug: string,
   ownershipToken: string,
-  data: Partial<Pick<RegistryEntry, 'endpoint_url' | 'display_name' | 'verticals' | 'metadata'>>,
+  data: Partial<Pick<RegistryEntry, 'endpoint_url' | 'display_name' | 'verticals' | 'metadata' | 'discoverable'>>,
 ): Promise<RegistryEntry | null> {
   // First verify ownership
   const entry = await getEntry(country, slug);
@@ -237,7 +242,7 @@ export async function heartbeat(
 // ─── List all (for agents.json) ───
 
 export async function listAllEntries(): Promise<RegistryEntry[]> {
-  const res = await fetch(restUrl('registry_entries?select=*&order=trust_score.desc'), {
+  const res = await fetch(restUrl('registry_entries?select=*&discoverable=eq.true&order=trust_score.desc'), {
     headers: getHeaders(),
     next: { revalidate: 300 },
   });
@@ -266,6 +271,17 @@ export async function insertHealthCheck(data: {
   if (!res.ok) {
     console.error(`Health check insert failed: ${res.status}`);
   }
+}
+
+// ─── Set discoverable ───
+
+export async function setDiscoverable(
+  country: string,
+  slug: string,
+  ownershipToken: string,
+  value: boolean,
+): Promise<RegistryEntry | null> {
+  return updateEntry(country, slug, ownershipToken, { discoverable: value });
 }
 
 // ─── Errors ───

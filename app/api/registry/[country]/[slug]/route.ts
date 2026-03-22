@@ -74,6 +74,7 @@ export async function PATCH(
   if (typeof body.displayName === 'string') updateData.display_name = body.displayName;
   if (Array.isArray(body.verticals)) updateData.verticals = body.verticals;
   if (body.metadata && typeof body.metadata === 'object') updateData.metadata = body.metadata;
+  if (typeof body.discoverable === 'boolean') updateData.discoverable = body.discoverable;
 
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json(
