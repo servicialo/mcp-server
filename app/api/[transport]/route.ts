@@ -2,6 +2,7 @@ import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { proxyToUpstream } from '@/lib/servicialo/proxy';
+import { searchEntries } from '@/lib/registry-db';
 
 const handler = createMcpHandler(
   (server) => {
@@ -14,18 +15,40 @@ const handler = createMcpHandler(
         limit: z.number().default(10).describe('Max results (default 10)'),
       },
       async ({ vertical, location, limit }) => {
-        const where: Record<string, unknown> = { discoverable: true };
-        if (vertical) where.vertical = { contains: vertical, mode: 'insensitive' };
-        if (location) where.location = { contains: location, mode: 'insensitive' };
+        try {
+          // Primary: query the canonical Servicialo Registry
+          const entries = await searchEntries({
+            vertical: vertical ?? undefined,
+            q: location ?? undefined,
+            limit,
+          });
 
-        const orgs = await prisma.organization.findMany({
-          where,
-          select: { slug: true, name: true, description: true, vertical: true, location: true, country: true },
-          orderBy: { trustScore: 'desc' },
-          take: limit,
-        });
+          // Map to the same response shape as before (no breaking change)
+          const data = entries.map((e) => ({
+            slug: e.slug,
+            name: e.display_name,
+            description: (e.metadata as Record<string, unknown>)?.description ?? '',
+            vertical: e.verticals[0] ?? '',
+            location: (e.metadata as Record<string, unknown>)?.location ?? '',
+            country: e.country,
+          }));
 
-        return { content: [{ type: 'text' as const, text: JSON.stringify({ total: orgs.length, data: orgs }, null, 2) }] };
+          return { content: [{ type: 'text' as const, text: JSON.stringify({ total: data.length, data }, null, 2) }] };
+        } catch {
+          // Fallback: query the local resolver DB
+          const where: Record<string, unknown> = { discoverable: true };
+          if (vertical) where.vertical = { contains: vertical, mode: 'insensitive' };
+          if (location) where.location = { contains: location, mode: 'insensitive' };
+
+          const orgs = await prisma.organization.findMany({
+            where,
+            select: { slug: true, name: true, description: true, vertical: true, location: true, country: true },
+            orderBy: { trustScore: 'desc' },
+            take: limit,
+          });
+
+          return { content: [{ type: 'text' as const, text: JSON.stringify({ total: orgs.length, data: orgs, _source: 'local_fallback' }, null, 2) }] };
+        }
       },
     );
 
