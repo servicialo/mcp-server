@@ -24,7 +24,8 @@ export async function GET(
       );
     }
 
-    const { ownership_token: _t, ...publicEntry } = entry;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ownership_token, ...publicEntry } = entry;
 
     return NextResponse.json(publicEntry, {
       headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=60, s-maxage=120' },
@@ -90,7 +91,8 @@ export async function PATCH(
       );
     }
 
-    const { ownership_token: _t, ...publicEntry } = updated;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ownership_token, ...publicEntry } = updated;
 
     return NextResponse.json(publicEntry, { headers: CORS_HEADERS });
   } catch (error) {

@@ -20,7 +20,12 @@ export async function GET(request: NextRequest) {
   try {
     const entries = await searchEntries({ country, vertical, q, locale, limit });
 
-    const data = entries.map(({ ownership_token: _t, ...rest }) => rest);
+    // Strip ownership_token from public response
+    const data = entries.map((entry) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { ownership_token, ...rest } = entry;
+      return rest;
+    });
 
     return NextResponse.json(
       { total: data.length, data },
