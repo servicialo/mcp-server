@@ -410,7 +410,7 @@ Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar
 |------------|----------|-----------|:------:|
 | [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 7/7 principios | Live |
 
-> Construyendo para servicios profesionales? [Abre un issue](https://github.com/servicialo/mcp-server/issues) para listar tu implementación.
+> Coordinalo es la implementación de referencia. El segundo nodo es una oportunidad abierta — ver [`IMPLEMENTORS.md`](./IMPLEMENTORS.md).
 
 ### Para implementadores
 
@@ -431,6 +431,7 @@ servicialo/
 │   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
 ├── schema/               # JSON Schemas para validación
 ├── PROTOCOL.md           # Especificación completa
+├── IMPLEMENTORS.md       # Guía para construir una implementación
 ├── GOVERNANCE.md         # Gobernanza de red y política de datos
 └── README.md
 ```

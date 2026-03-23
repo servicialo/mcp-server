@@ -243,16 +243,16 @@ export function ConectateSection() {
           Implementaciones compatibles
         </div>
         <div className="text-[13px] text-text-muted leading-relaxed mb-3">
-          Cualquier plataforma que implemente la especificación Servicialo puede
-          conectarse a este servidor MCP.
+          Coordinalo es la implementación de referencia en producción.
+          El segundo nodo es una oportunidad abierta.
         </div>
         <a
-          href="https://github.com/servicialo/mcp-server"
+          href="https://github.com/servicialo/mcp-server/blob/main/IMPLEMENTORS.md"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block font-mono text-[11px] text-accent hover:text-text transition-colors"
         >
-          Ver lista en GitHub &rarr;
+          Guía para implementadores &rarr;
         </a>
       </div>
     </section>
