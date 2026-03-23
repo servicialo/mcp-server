@@ -17,6 +17,12 @@ export function Footer() {
           Whitepaper
         </a>
         <a
+          href="/spec"
+          className="text-text-muted hover:text-accent transition-colors"
+        >
+          Spec
+        </a>
+        <a
           href="https://github.com/servicialo/mcp-server"
           target="_blank"
           rel="noopener noreferrer"

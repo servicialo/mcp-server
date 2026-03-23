@@ -13,6 +13,8 @@ and financial settlement of professional services.
 
 **New to Servicialo? Start here → [`SPEC.md`](./SPEC.md)**
 
+**Full spec (crawler-friendly): https://servicialo.com/spec**
+
 **[Leer en Español](./README.md)**
 
 </div>

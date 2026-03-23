@@ -13,6 +13,8 @@ de entrega y liquidación financiera de servicios profesionales.
 
 **Nuevo en Servicialo? Empieza aqui → [`SPEC.md`](./SPEC.md)**
 
+**Spec completa (crawler-friendly): https://servicialo.com/spec**
+
 **[Read in English](./README.en.md)**
 
 </div>
