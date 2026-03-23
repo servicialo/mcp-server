@@ -326,61 +326,78 @@ Para plataformas con volumen suficiente o donde el monto por servicio hace que l
 JSON Schemas para validación automática: [`schema/service.schema.json`](./schema/service.schema.json) y [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.6 ──────────────────
-# Las 8 dimensiones de un servicio
+# ─────────────────────────────────────────────
+# SERVICIALO v0.9
+# Dos entidades: Orden + Servicios atómicos
+# ─────────────────────────────────────────────
 
-servicio:
-  id: texto
-  orden_de_servicio_id: texto         # Opcional — referencia a Orden padre
-  tipo: texto                         # Categoría del servicio
-  vertical: texto                     # salud | legal | hogar | educación | ...
-  nombre: texto
-  duración_minutos: entero
+orden_de_servicio:
+  id: texto                      # Identificador único
+  alcance: texto                 # Qué se acuerda entregar
+  precio: número                 # Precio total acordado
+  esquema_pagos: texto           # prepago | por_sesión | mensual
+  currency: texto                # ISO 4217
 
-  proveedor:
-    id: texto
-    credenciales: texto[]             # Certificaciones requeridas
-    puntaje_confianza: número         # 0-100 calculado por historial
-    organización_id: texto
+  servicios[]:                   # Cada servicio atómico — 8 dimensiones
 
-  cliente:
-    id: texto
-    pagador_id: texto                 # Puede diferir del cliente
+    servicio:
+      id: texto
+      orden_de_servicio_id: texto  # Referencia a la Orden padre
+      tipo: texto                # Categoría del servicio
+      vertical: texto            # salud | legal | hogar | educación | ...
+      nombre: texto              # Nombre legible
+      duración_minutos: entero
+      visibilidad: texto         # public | unlisted | private
 
-  agenda:
-    solicitado_en: fecha_hora
-    agendado_para: fecha_hora
-    duración_esperada: minutos
+      proveedor:
+        id: texto
+        credenciales: texto[]    # Certificaciones requeridas
+        puntaje_confianza: número  # 0-100 calculado por historial
+        organización_id: texto
 
-  ubicación:
-    tipo: presencial | virtual | domicilio
-    dirección: texto
-    sala: texto
-    recurso_id: texto                 # Opcional — referencia a Recurso (3.5b)
-    coordenadas:
-      lat: número
-      lng: número
+      cliente:
+        id: texto
+        pagador_id: texto        # Puede diferir del cliente
 
-  ciclo_de_vida:
-    estado_actual: enum[9]            # Los 9 estados universales
-    transiciones: transición[]
-    excepciones: excepción[]
+      agenda:
+        solicitado_en: fecha_hora
+        agendado_para: fecha_hora
+        duración_esperada: minutos
 
-  prueba_de_entrega:
-    entrada: fecha_hora
-    salida: fecha_hora
-    duración_real: minutos
-    evidencia: evidencia[]            # GPS, firma, fotos, documentos
+      ubicación:
+        tipo: presencial | virtual | domicilio
+        dirección: texto
+        recurso_id: texto        # Opcional — referencia a recurso físico
 
-  cobro:                              # Informativo si pertenece a una Orden
-    monto:
-      valor: número
-      moneda: texto                   # ISO 4217
-    pagador: referencia               # Puede diferir del cliente
-    estado: pendiente | cobrado | facturado | pagado | disputado
-    cobrado_en: fecha_hora
-    pago_id: referencia
-    documento_tributario: ref
+      ciclo_de_vida:
+        estado_actual: enum[9]   # Los 9 estados universales
+        transiciones: transición[]
+        excepciones: excepción[]
+
+      prueba_de_entrega:
+        entrada: fecha_hora
+        salida: fecha_hora
+        duración_real: minutos
+        evidencia: evidencia[]   # GPS, firma, fotos, documentos
+
+      cobro:
+        orden_de_servicio_id: texto  # Referencia a la Orden padre
+        monto:
+          valor: número
+          moneda: texto          # ISO 4217
+        pagador: referencia
+        estado: pendiente | cobrado | facturado | pagado | disputado
+        cobrado_en: fecha_hora
+        documento_tributario: referencia  # Boleta/factura si se emitió
+
+      mandato:                   # Delegación explícita a agente IA
+        mandato_id: texto        # UUID único
+        principal_id: texto      # Humano u organización
+        agente_id: texto         # Agente que recibe la delegación
+        alcances: texto[]        # resource:action (e.g. schedule:write)
+        estado: activo | expirado | revocado | suspendido
+
+# Ledger computado desde servicios verificados — nunca editable
 ```
 
 ---
