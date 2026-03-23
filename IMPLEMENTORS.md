@@ -1,5 +1,7 @@
 # Implementing Servicialo
 
+> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 34 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
+
 ## What you're building on
 
 Servicialo is an open protocol for professional service orchestration — scheduling, identity, delivery verification, and financial settlement. There is one production implementation today: [Coordinalo](https://coordinalo.com), which covers healthcare. The protocol is designed for multiple independent nodes across verticals and geographies, but that network does not exist yet. You would be the second.

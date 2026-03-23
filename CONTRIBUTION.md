@@ -20,7 +20,7 @@ npx -y @servicialo/mcp-server
 
 ## Notes
 
-- 20 tools total: 4 public (discovery) + 16 authenticated (lifecycle)
+- 34 tools total: 9 public (resolver + discovery) + 25 authenticated (lifecycle + resources + resolver admin)
 - Two modes: discovery (no auth) and authenticated (API key + org ID)
 - Protocol spec: [PROTOCOL.md](./PROTOCOL.md)
 - Reference implementation: [coordinalo.com](https://coordinalo.com)

@@ -35,7 +35,7 @@ Los servicios profesionales representan una proporción significativa de la acti
 
 Servicialo propone un protocolo abierto, licenciado bajo MIT, que define la capa de orquestación para la entrega de servicios profesionales. El protocolo modela cada servicio a través de 8 dimensiones canónicas — identidad, proveedor, cliente, agenda, ubicación, ciclo de vida, evidencia y cobro — y define un ciclo de vida de 9 estados universales que cualquier servicio debe recorrer desde la solicitud hasta la verificación final. Complementariamente, define la Orden de Servicio como el acuerdo bilateral que agrupa servicios atómicos bajo condiciones comerciales pactadas.
 
-El protocolo incluye flujos de excepción de primera clase, un mecanismo de resolución de disputas con arbitraje algorítmico, un modelo de decisión para agentes de IA con fronteras de autonomía explícitas, y un servidor de Protocolo de Contexto de Modelos (MCP) con 23 herramientas organizadas en 6 fases del ciclo de vida. Servicialo no es un producto: es infraestructura neutral de protocolo que cualquier plataforma puede implementar como nodo soberano.
+El protocolo incluye flujos de excepción de primera clase, un mecanismo de resolución de disputas con arbitraje algorítmico, un modelo de decisión para agentes de IA con fronteras de autonomía explícitas, y un servidor de Protocolo de Contexto de Modelos (MCP) con 34 herramientas organizadas en 7 fases del ciclo de vida. Servicialo no es un producto: es infraestructura neutral de protocolo que cualquier plataforma puede implementar como nodo soberano.
 
 ---
 
@@ -790,7 +790,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 - 7 principios fundamentales
 - Prueba de entrega con evidencia configurable por vertical
 - Contrato de servicio pre-acordado
-- Servidor MCP para agentes de IA (33 herramientas en 8 fases)
+- Servidor MCP para agentes de IA (34 herramientas en 7 fases + gestión de recursos y resolver)
 
 ### 15.2 Servicialo/Finanzas (En diseño)
 
@@ -829,12 +829,22 @@ Servicialo expone sus herramientas como un servidor de Model Context Protocol (M
 
 | Modo | Herramientas disponibles | Requisitos |
 |------|-------------------------|------------|
-| **Descubrimiento** | 4 herramientas públicas | Sin configuración |
-| **Autenticado** | 23 herramientas completas | API key + ID de organización |
+| **Descubrimiento** | 9 herramientas públicas | Sin configuración |
+| **Autenticado** | 34 herramientas completas | API key + ID de organización |
 
-### 16.2 Las 6 fases y 23 herramientas
+### 16.2 Las 7 fases y 34 herramientas
 
-#### Fase 1: Descubrir (4 herramientas públicas)
+#### Fase 0: Resolver (3 herramientas públicas)
+
+Resolución DNS: localizar el endpoint de una organización en el resolver global.
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `resolve.lookup` | Resolver un orgSlug a su endpoint MCP/REST y nivel de confianza |
+| `resolve.search` | Buscar organizaciones registradas por país y vertical |
+| `trust.get_score` | Obtener puntaje de confianza (0-100, nivel, última actividad) |
+
+#### Fase 1: Descubrir (6 herramientas públicas)
 
 Siempre disponibles, sin autenticación.
 
@@ -842,8 +852,10 @@ Siempre disponibles, sin autenticación.
 |-------------|-------------|
 | `registry.search` | Buscar organizaciones por vertical y ubicación |
 | `registry.get_organization` | Obtener detalles públicos de una organización |
+| `registry.manifest` | Obtener manifiesto del servidor: capacidades, versión del protocolo, metadata |
 | `scheduling.check_availability` | Verificar horarios disponibles (agendador de 3 variables: proveedor ∧ cliente ∧ recurso) |
 | `services.list` | Listar el catálogo público de servicios de una organización |
+| `a2a.get_agent_card` | Obtener la Agent Card A2A para descubrimiento inter-agente |
 
 #### Fase 2: Entender (2 herramientas)
 
@@ -906,9 +918,32 @@ Delegación explícita de capacidad de un principal humano a un agente de IA.
 | `mandates.get` | Obtener detalles de un mandato: alcances, restricciones, vigencia |
 | `mandates.suspend` | Suspender un mandato activo. El agente pierde acceso inmediatamente |
 
+#### Gestión de recursos (6 herramientas)
+
+Gestión de espacios físicos, salas, equipamiento.
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `resource.list` | Listar recursos físicos de una organización |
+| `resource.get` | Obtener detalles de un recurso con slots de disponibilidad |
+| `resource.create` | Crear un nuevo recurso físico (sala, box, equipamiento) |
+| `resource.update` | Actualizar recurso (patch semántico) |
+| `resource.delete` | Desactivar recurso (soft delete) |
+| `resource.get_availability` | Consultar disponibilidad por rango de fechas |
+
+#### Administración del resolver (3 herramientas)
+
+Portabilidad entre backends y telemetría.
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `resolve.register` | Registrar organización en el resolver global |
+| `resolve.update_endpoint` | Actualizar endpoints registrados (portabilidad) |
+| `telemetry.heartbeat` | Enviar heartbeat al resolver indicando nodo activo |
+
 ### 16.3 Flujo de extremo a extremo — sesión MCP completa
 
-El siguiente diagrama muestra cómo un agente de IA recorre las 6 fases para coordinar un servicio profesional completo, desde el descubrimiento hasta el cierre:
+El siguiente diagrama muestra cómo un agente de IA recorre las 7 fases para coordinar un servicio profesional completo, desde el descubrimiento hasta el cierre:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -1352,7 +1387,7 @@ Equipos que construyen agentes de IA pueden integrar el servidor MCP para que su
 npx -y @servicialo/mcp-server
 ```
 
-Con 4 herramientas públicas disponibles sin autenticación, un agente puede inmediatamente buscar organizaciones, explorar catálogos de servicios y verificar disponibilidad.
+Con 9 herramientas públicas disponibles sin autenticación, un agente puede inmediatamente buscar organizaciones, explorar catálogos de servicios y verificar disponibilidad.
 
 ### 20.4 Contribuciones al protocolo
 

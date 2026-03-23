@@ -12,7 +12,7 @@ What's already shipped:
 
 - [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
 - [x] **JSON Schemas** — `service.schema.json` and `service-order.schema.json` with lifecycle states, exception types, and evidence definitions (`schema/`).
-- [x] **MCP server** — `@servicialo/mcp-server` v0.5.3 published on npm. 20 tools across 6 agent phases (Discovery, Booking, Execution, Documentation, Billing, Support).
+- [x] **MCP server** — `@servicialo/mcp-server` v0.8.0 published on npm. 34 tools across 7 lifecycle phases (0–6) plus resource management and resolver administration.
 - [x] **Test suite** — Vitest tests for the MCP server (`packages/mcp-server/src/__tests__/`).
 - [x] **Website** — servicialo.com live with full protocol narrative (Next.js 14, Tailwind v3).
 - [x] **Agent examples** — two complete multi-turn conversations: kinesiology session and home repair (`examples/`).

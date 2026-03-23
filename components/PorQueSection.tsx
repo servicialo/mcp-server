@@ -36,7 +36,7 @@ export function PorQueSection() {
           </div>
           <div className="text-[13px] text-text-muted leading-[1.7]">
             Buscar organizaciones, consultar disponibilidad, listar servicios.
-            Sin credenciales. 4 herramientas públicas.
+            Sin credenciales. 9 herramientas públicas.
           </div>
         </div>
 
@@ -49,7 +49,7 @@ export function PorQueSection() {
           </div>
           <div className="text-[13px] text-text-muted leading-[1.7]">
             Agendar, verificar entrega, cobrar, cerrar el ciclo completo.
-            Con credenciales. 23 herramientas en 6 fases.
+            Con credenciales. 34 herramientas en 7 fases.
           </div>
         </div>
       </div>

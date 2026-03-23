@@ -46,7 +46,7 @@ const secciones = [
   {
     num: "07",
     titulo: "Servidor MCP",
-    desc: "23 herramientas organizadas en 6 fases para operar el protocolo desde agentes IA.",
+    desc: "34 herramientas organizadas en 7 fases para operar el protocolo desde agentes IA.",
   },
   {
     num: "08",

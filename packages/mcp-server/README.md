@@ -39,7 +39,7 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 ## Qué Hace Este MCP Server
 
-Este paquete expone el protocolo Servicialo como 33 herramientas MCP organizadas por **8 fases** del ciclo de vida de un servicio (incluyendo resolución DNS), más herramientas de gestión de recursos y administración del resolver. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+Este paquete expone el protocolo Servicialo como 34 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo resolución DNS), más herramientas de gestión de recursos y administración del resolver. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
 
 ### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
 
@@ -128,7 +128,7 @@ Este paquete expone el protocolo Servicialo como 33 herramientas MCP organizadas
 npx -y @servicialo/mcp-server
 ```
 
-Sin API key. Sin org ID. 9 herramientas públicas disponibles de inmediato (resolver + descubrimiento). Pruébalo:
+Sin API key. Sin org ID. Las 9 herramientas públicas disponibles de inmediato (resolver + descubrimiento). Pruébalo:
 
 ```json
 {
@@ -146,7 +146,7 @@ Sin API key. Sin org ID. 9 herramientas públicas disponibles de inmediato (reso
 SERVICIALO_API_KEY=tu_key SERVICIALO_ORG_ID=tu_org npx -y @servicialo/mcp-server
 ```
 
-Las 33 herramientas habilitadas.
+Las 34 herramientas habilitadas.
 
 ### Claude Desktop / Cursor / cualquier cliente MCP
 

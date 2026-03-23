@@ -11,6 +11,8 @@ de entrega y liquidación financiera de servicios profesionales.
 
 [Sitio web](https://servicialo.com) ・ [Especificación](./PROTOCOL.md) ・ [Gobernanza](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
+**Nuevo en Servicialo? Empieza aqui → [`SPEC.md`](./SPEC.md)**
+
 **[Read in English](./README.en.md)**
 
 </div>
@@ -249,7 +251,7 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las 8 fases del agente — 33 herramientas
+### Las fases del agente — 34 herramientas
 
 Un agente bien diseñado sigue este orden:
 
@@ -305,7 +307,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (34 herramientas) · resolución DNS · interoperabilidad A2A
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -445,6 +447,7 @@ servicialo/
 │   ├── service.schema.json
 │   ├── service-order.schema.json
 │   └── ...
+├── SPEC.md               # Quick spec — referencia autocontenida para evaluadores
 ├── PROTOCOL.md           # Especificación completa
 ├── ERRORS.md             # Códigos de error del protocolo
 ├── WEBHOOKS.md           # Especificación de webhooks (borrador)

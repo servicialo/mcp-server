@@ -5,7 +5,7 @@ startCommand:
     properties:
       apiKey:
         type: string
-        description: Servicialo API key (optional — 4 discovery tools work without auth)
+        description: Servicialo API key (optional — 9 public tools work without auth)
       orgId:
         type: string
         description: Your organization ID (required for authenticated tools)

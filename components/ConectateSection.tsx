@@ -197,7 +197,7 @@ export function ConectateSection() {
           Modo descubrimiento
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Sin credenciales — 4 herramientas públicas
+          Sin credenciales — 9 herramientas públicas
         </div>
         <DiscoveryBlock />
         <div className="mt-5 pt-5 border-t border-white/10 grid gap-1.5">
@@ -223,7 +223,7 @@ export function ConectateSection() {
           </a>
         </div>
         <div className="font-mono text-[10px] text-white/40 mb-4">
-          Con credenciales — 23 herramientas totales
+          Con credenciales — 34 herramientas totales
         </div>
         <AuthenticatedBlock />
         <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">

@@ -39,16 +39,26 @@ Any service, in any vertical, follows this sequence. Vertical-specific logic liv
 
 ## What This MCP Server Does
 
-This package exposes the Servicialo protocol as 20 MCP tools organized by the **6 phases** of a service lifecycle. An agent doesn't call endpoints by database entity — it follows the natural flow of coordinating a service.
+This package exposes the Servicialo protocol as 34 MCP tools organized by the **7 lifecycle phases** (0–6, including DNS resolution), plus resource management and resolver administration tools. An agent doesn't call endpoints by database entity — it follows the natural flow of coordinating a service.
 
-### Phase 1 — Discovery (4 public tools, no auth required)
+### Phase 0 — DNS Resolution (3 public tools, no auth required)
+
+| Tool | Description |
+|---|---|
+| `resolve.lookup` | Resolve an orgSlug to its MCP/REST endpoint and trust level (equivalent to DNS lookup) |
+| `resolve.search` | Search organizations registered in the global resolver by country and vertical |
+| `trust.get_score` | Get trust score for an organization (score 0-100, level, last activity) |
+
+### Phase 1 — Discovery (6 public tools, no auth required)
 
 | Tool | Description |
 |---|---|
 | `registry.search` | Search organizations by vertical, location, country |
 | `registry.get_organization` | Get public details: services, providers, booking config |
+| `registry.manifest` | Get server manifest: capabilities, protocol version, organization metadata |
 | `scheduling.check_availability` | Check available slots (3-variable: provider ∧ client ∧ resource) |
 | `services.list` | List the public service catalog of an organization |
+| `a2a.get_agent_card` | Get an organization's A2A Agent Card for inter-agent discovery |
 
 ### Phase 2 — Understand (2 tools)
 
@@ -91,6 +101,25 @@ This package exposes the Servicialo protocol as 20 MCP tools organized by the **
 | `payments.record_payment` | Record payment received against a sale | `payment:write` |
 | `payments.get_status` | Get payment status for a sale or client account balance | `payment:read` |
 
+### Resource Management (6 tools)
+
+| Tool | Description | Scopes |
+|---|---|---|
+| `resource.list` | List physical resources by organization | `resource:read` |
+| `resource.get` | Get resource details with availability slots | `resource:read` |
+| `resource.create` | Create a physical resource (room, box, equipment) | `resource:write` |
+| `resource.update` | Update resource (patch semantics) | `resource:write` |
+| `resource.delete` | Deactivate resource (soft delete: `is_active = false`) | `resource:write` |
+| `resource.get_availability` | Check resource availability by date range | `resource:read` |
+
+### Resolver Administration (3 tools)
+
+| Tool | Description | Scopes |
+|---|---|---|
+| `resolve.register` | Register organization in the global resolver with MCP/REST endpoints | `resolve:write` |
+| `resolve.update_endpoint` | Update registered endpoints (portability between backends) | `resolve:write` |
+| `telemetry.heartbeat` | Send heartbeat to the resolver indicating the node is active | `telemetry:write` |
+
 ## Installation & Quickstart
 
 ### Option 1: Discovery mode (zero config)
@@ -99,7 +128,7 @@ This package exposes the Servicialo protocol as 20 MCP tools organized by the **
 npx -y @servicialo/mcp-server
 ```
 
-No API key. No org ID. 4 public tools available immediately. Try it:
+No API key. No org ID. 9 public tools available immediately (resolver + discovery). Try it:
 
 ```json
 {
@@ -117,7 +146,7 @@ No API key. No org ID. 4 public tools available immediately. Try it:
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-All 20 tools unlocked.
+All 34 tools unlocked.
 
 ### Claude Desktop / Cursor / any MCP client
 

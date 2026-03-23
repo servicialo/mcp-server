@@ -11,6 +11,8 @@ and financial settlement of professional services.
 
 [Website](https://servicialo.com) ・ [Specification](./PROTOCOL.md) ・ [Governance](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
+**New to Servicialo? Start here → [`SPEC.md`](./SPEC.md)**
+
 **[Leer en Español](./README.md)**
 
 </div>
@@ -249,7 +251,7 @@ For the full cycle — schedule, verify delivery, collect payment:
 
 Credentials are obtained by each organization from their Servicialo-compatible platform.
 
-### The 8 agent phases — 33 tools
+### The agent phases — 34 tools
 
 A well-designed agent follows this order:
 
@@ -305,7 +307,7 @@ Everything needed to model a professional service from start to finish.
 
 For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
 
-Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (33 tools) · DNS resolution · A2A interoperability
+Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (34 tools) · DNS resolution · A2A interoperability
 
 ### Servicialo/Finance — `in design`
 
@@ -414,6 +416,7 @@ servicialo/
 ├── packages/
 │   └── mcp-server/       # @servicialo/mcp-server — MCP server (npm)
 ├── schema/               # JSON Schemas for validation
+├── SPEC.md               # Quick spec — self-contained reference for evaluators
 ├── PROTOCOL.md           # Full specification
 ├── GOVERNANCE.md         # Network governance and data policy
 └── README.md
