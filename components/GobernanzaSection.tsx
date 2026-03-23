@@ -1,23 +1,17 @@
 import { SectionTitle } from "./SectionTitle";
 
-const roadmapItems = [
+const antiCaptureItems = [
   {
     phase: "a",
-    title: "Suite de tests objetivos",
-    desc: "Mecanismo de certificación basado en resultados: si una implementación pasa los tests, está certificada. Sin aprobación discrecional, sin gatekeepers.",
+    title: "Certificación objetiva y automatizada",
+    desc: "Si una implementación pasa la suite de tests, está certificada. No hay aprobación discrecional, no hay gatekeepers, no hay procesos de revisión subjetivos.",
     borderColor: "border-l-[#2B8A3E]",
   },
   {
     phase: "b",
-    title: "Reputación bottom-up",
-    desc: "Sistema de reputación basado en entregas reales verificadas — no en governance tokens ni en votos delegados. La confianza se gana entregando servicios, no acumulando tokens.",
+    title: "Reputación basada en entregas verificadas",
+    desc: "La reputación en la red se deriva de entregas reales verificadas a través del protocolo — no de governance tokens, votos delegados ni métricas de participación.",
     borderColor: "border-l-accent",
-  },
-  {
-    phase: "c",
-    title: "Comité multi-stakeholder",
-    desc: "Cuando existan 3+ implementadores independientes en producción, la maintainership se transfiere a un comité representativo. El criterio es adopción real, no promesas.",
-    borderColor: "border-l-[#7EC8E3]",
   },
 ];
 
@@ -27,7 +21,7 @@ export function GobernanzaSection() {
       <SectionTitle
         tag="13 — Gobernanza"
         title="Gobernanza del protocolo"
-        subtitle="Un protocolo abierto requiere gobernanza transparente. Servicialo documenta su estado actual y su hoja de ruta hacia la descentralización."
+        subtitle="Servicialo es una especificación abierta. Cualquier plataforma que cumpla la especificación es un nodo válido de la red. Esta sección documenta los mecanismos que lo garantizan."
       />
 
       {/* Estado actual */}
@@ -36,24 +30,23 @@ export function GobernanzaSection() {
           Estado actual
         </div>
         <div className="font-serif text-lg text-text mb-2">
-          Centralización temporal y transparente
+          Maintainer único, especificación abierta
         </div>
         <div className="text-[13px] text-text-body leading-[1.7]">
-          Servicialo es mantenido actualmente por su autor como maintainer único.
-          Esta centralización es temporal, documentada de forma transparente, y
-          existe porque el protocolo está en fase de diseño activo donde la
-          velocidad de iteración es crítica. No es un modelo de gobernanza
-          definitivo — es un punto de partida honesto.
+          Servicialo es mantenido por su autor. El protocolo está en fase de
+          diseño activo donde la velocidad de iteración es prioritaria. Las
+          decisiones están concentradas en un maintainer único. Esto es explícito
+          y documentado.
         </div>
       </div>
 
       {/* Hoja de ruta */}
       <div className="mb-4">
         <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-2">
-          Hoja de ruta hacia la descentralización
+          Diseño anti-captura
         </div>
         <div className="grid grid-cols-1 gap-3">
-          {roadmapItems.map((item) => (
+          {antiCaptureItems.map((item) => (
             <div
               key={item.phase}
               className={`bg-surface rounded-xl py-4 px-5 border border-border-light border-l-[3px] ${item.borderColor}`}

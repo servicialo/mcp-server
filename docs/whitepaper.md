@@ -1304,41 +1304,31 @@ contrato_servicio:
 
 ## 19. Gobernanza del protocolo
 
-Un protocolo abierto requiere gobernanza transparente. Esta sección documenta el estado actual de la gobernanza de Servicialo y la hoja de ruta hacia su descentralización.
+Servicialo es una especificación abierta. Cualquier plataforma que cumpla la especificación es un nodo válido de la red — igual que cualquier servidor que implemente HTTP es un servidor web válido. No se requiere permiso, aprobación ni membresía.
 
-### 19.1 Estado actual: centralización temporal
+Esta sección documenta los mecanismos técnicos que garantizan que el protocolo permanezca abierto e implementable por cualquiera.
 
-Servicialo es mantenido actualmente por su autor como maintainer único. Esta centralización es temporal, documentada de forma transparente, y existe porque el protocolo está en fase de diseño activo donde la velocidad de iteración es crítica. No es un modelo de gobernanza definitivo — es un punto de partida honesto.
+### 19.1 Estado actual
 
-El autor toma decisiones sobre la evolución del protocolo, la aceptación de cambios y la certificación de implementaciones. Esta concentración de autoridad es explícita y tiene fecha de expiración: se disolverá cuando se cumplan las condiciones descritas a continuación.
+Servicialo es mantenido por su autor. El protocolo está en fase de diseño activo donde la velocidad de iteración es prioritaria. Las decisiones sobre evolución del protocolo, aceptación de cambios y certificación de implementaciones están concentradas en un maintainer único. Esto es explícito y documentado.
 
-### 19.2 Hoja de ruta hacia la descentralización
+### 19.2 Diseño anti-captura
 
-#### (a) Suite de tests objetivos como mecanismo de certificación
+El protocolo incorpora mecanismos estructurales que previenen la captura por parte de cualquier actor — incluyendo su propio autor.
 
-El primer paso hacia la descentralización es eliminar la discrecionalidad en la certificación. Servicialo adoptará una suite de tests objetivos como único mecanismo de certificación: si una implementación pasa los tests, está certificada. Sin aprobación discrecional, sin gatekeepers, sin procesos de revisión subjetivos.
+#### (a) Certificación objetiva y automatizada
 
-Los tests verificarán:
+La certificación de implementaciones es determinista: si una implementación pasa la suite de tests, está certificada. No hay aprobación discrecional, no hay gatekeepers, no hay procesos de revisión subjetivos.
+
+Los tests verifican:
 - Modelado correcto de las 8 dimensiones del servicio
 - Implementación de los 9 estados del ciclo de vida con transiciones válidas
 - Manejo de al menos 3 flujos de excepción
 - Respuestas conformes al JSON Schema del protocolo
 
-#### (b) Sistema de reputación bottom-up basado en entregas reales
+#### (b) Reputación basada en entregas verificadas
 
-La reputación en el ecosistema Servicialo se construirá desde abajo: basada en entregas reales verificadas, no en governance tokens, votos delegados ni métricas de participación en foros. La confianza se gana entregando servicios verificables a través del protocolo, no acumulando tokens o influencia política.
-
-Este sistema se diferencia deliberadamente de los modelos de gobernanza basados en tokens, donde la influencia se compra en lugar de ganarse.
-
-#### (c) Transferencia de maintainership a comité multi-stakeholder
-
-Cuando existan **3 o más implementadores independientes en producción** — es decir, plataformas distintas que hayan pasado la suite de certificación y tengan usuarios reales — la maintainership se transferirá a un comité representativo multi-stakeholder. El criterio es adopción real, no promesas ni intenciones.
-
-Criterios específicos para la transferencia:
-1. Al menos 3 implementaciones independientes certificadas en producción
-2. Al menos 2 verticales distintas representadas (e.g., salud + hogar)
-3. Ningún implementador con más del 50% del volumen total de la red
-4. Mecanismo de votación ponderada por volumen verificado, no por inversión
+La reputación en la red se deriva de entregas reales verificadas a través del protocolo — no de governance tokens, votos delegados ni métricas de participación. La confianza se gana entregando servicios, no acumulando influencia.
 
 ### 19.3 Principio rector: indiferencia al implementador
 
