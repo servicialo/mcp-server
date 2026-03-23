@@ -46,14 +46,26 @@ export const deliveryTools = {
       session_id: z.string().describe('ID de la sesión'),
       evidence_type: z.enum(['gps', 'signature', 'photo', 'document', 'duration', 'notes']).describe('Tipo de evidencia'),
       data: z.record(z.unknown()).describe('Payload de la evidencia (estructura varía por tipo)'),
+      data_sensitivity: z.enum(['public', 'internal', 'confidential', 'restricted']).optional().describe('Clasificación de sensibilidad del payload. Default: internal. Ver PROTOCOL.md §9.8.'),
       actor: ActorSchema.describe('Quién registra la evidencia'),
     }),
-    handler: async (client: ServicialoAdapter, args: { session_id: string; evidence_type: string; data: Record<string, unknown>; actor: z.infer<typeof ActorSchema> }) => {
-      return client.post(`/coordinalo/sessions/${args.session_id}/evidence`, {
+    handler: async (client: ServicialoAdapter, args: { session_id: string; evidence_type: string; data: Record<string, unknown>; data_sensitivity?: string; actor: z.infer<typeof ActorSchema> }) => {
+      const result = await client.post(`/coordinalo/sessions/${args.session_id}/evidence`, {
         evidenceType: args.evidence_type,
         data: args.data,
+        data_sensitivity: args.data_sensitivity,
         actor: args.actor,
       });
+
+      if (args.data_sensitivity === 'restricted') {
+        return {
+          ...result as Record<string, unknown>,
+          warning: 'RESTRICTED_EVIDENCE_STORED',
+          message: 'This evidence is classified as restricted. Ensure your implementation meets applicable regulatory requirements for storage, access logging, and retention.',
+        };
+      }
+
+      return result;
     },
   },
 };

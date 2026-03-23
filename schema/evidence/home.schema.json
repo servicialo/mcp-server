@@ -44,6 +44,7 @@
       "description": "Photo of initial state with timestamp and GPS metadata.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "public",
       "properties": {
         "type": { "const": "photo" },
         "method": { "const": "manual" },
@@ -71,6 +72,7 @@
       "description": "Photo of final state with timestamp and GPS metadata.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "public",
       "properties": {
         "type": { "const": "photo" },
         "method": { "const": "manual" },
@@ -98,6 +100,7 @@
       "description": "Agreed tasks marked as completed.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "internal",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },
@@ -133,6 +136,7 @@
       "description": "Digital signature from client confirming service receipt.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "confidential",
       "properties": {
         "type": { "const": "signature" },
         "method": { "const": "manual" },

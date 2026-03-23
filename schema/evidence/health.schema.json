@@ -48,6 +48,7 @@
       "description": "GPS timestamp of provider arrival.",
       "x-auto-captured": true,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "public",
       "properties": {
         "type": { "const": "gps" },
         "method": { "const": "auto" },
@@ -66,6 +67,7 @@
       "description": "GPS timestamp of provider departure.",
       "x-auto-captured": true,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "public",
       "properties": {
         "type": { "const": "gps" },
         "method": { "const": "auto" },
@@ -84,6 +86,8 @@
       "description": "Clinical record (ficha clínica) signed by both provider and patient.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "restricted",
+      "x-sensitivity-rule": "clinical_record evidence MUST be classified as restricted. Implementations that downgrade this classification are non-compliant with the protocol.",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },
@@ -114,6 +118,7 @@
       "description": "Checklist of executed treatment plan items. Optional — not required for resolution.",
       "x-auto-captured": false,
       "x-required-for-resolution": false,
+      "x-default-sensitivity": "confidential",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },

@@ -594,6 +594,49 @@ A Service Order defines *what was agreed*. Atomic Services define *what was deli
 
 Every node that implements the protocol contributes operational data to the network. The aggregate intelligence improves all nodes. This intelligence is a commons of the protocol, not an asset of any single implementation.
 
+### 9.8 Evidence Sensitivity Classification
+
+Every evidence envelope MAY include a `data_sensitivity` field that classifies the sensitivity of the payload. When absent, the evidence is treated as `internal`.
+
+| Level | Definition | Implementation obligations |
+|-------|-----------|---------------------------|
+| `public` | No restrictions. GPS coordinates, duration, before/after photos in non-clinical contexts. | No special handling required. |
+| `internal` | Default. Operational data visible to authorized parties (provider + platform). Scheduling evidence, attendance records, checklists. | Standard access control — only parties to the service may access. |
+| `confidential` | Business-sensitive or personally identifiable. Signatures, payment references, session notes, student evaluations, meeting minutes, deliverables. | Implementations SHOULD encrypt at rest and limit access to named roles. |
+| `restricted` | Clinical, legal, or privileged data subject to regulatory requirements. Clinical records, diagnoses, legal strategies. | Implementations MUST provide: encryption at rest, per-access audit logging, retention policies compliant with applicable regulations, and a data processing agreement with the implementing organization. |
+
+**Default sensitivity by vertical and evidence type:**
+
+| Vertical | Evidence type | Default sensitivity |
+|----------|--------------|-------------------|
+| Health | `gps_checkin` / `gps_checkout` | `public` |
+| Health | `clinical_record` | `restricted` |
+| Health | `treatment_adherence` | `confidential` |
+| Health | `notes` (when used in health) | `confidential` (minimum) |
+| Legal | `meeting_minutes` | `restricted` |
+| Legal | `document_delivery` | `confidential` |
+| Legal | `billable_hours` | `confidential` |
+| Home | `photo_before` / `photo_after` | `public` |
+| Home | `completion_checklist` | `internal` |
+| Home | `client_signature` | `confidential` |
+| Education | `attendance_record` | `internal` |
+| Education | `material_delivery` | `internal` |
+| Education | `evaluation` | `confidential` |
+| Consulting | `approved_deliverable` | `confidential` |
+| Consulting | `committee_minutes` | `confidential` |
+| Consulting | `billable_hours` | `confidential` |
+| Consulting | `milestone_progress` | `confidential` |
+
+**MUST:** Implementations handling `restricted` evidence MUST provide:
+1. Encryption at rest using industry-standard algorithms (AES-256 or equivalent)
+2. Per-access audit logging (who accessed what, when, from where)
+3. A documented retention policy consistent with applicable jurisdiction-specific regulations
+4. A data processing agreement (DPA) between the implementing organization and any sub-processors
+
+The protocol does not prescribe specific regulatory frameworks. The `restricted` classification implies compliance with applicable jurisdiction-specific health or legal data regulations (e.g., Ley 20.584 in Chile, HIPAA in the US, LGPD in Brazil, NOM-024 in Mexico, GDPR in the EU).
+
+**MUST NOT:** The `clinical_record` evidence type in the health vertical MUST be classified as `restricted`. Implementations that downgrade this classification are non-compliant with the protocol.
+
 ---
 
 ## 10. Delegated Agency Model

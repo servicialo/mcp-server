@@ -3,6 +3,23 @@
 All notable changes to the Servicialo open protocol and its reference tooling will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [Protocol v0.9 / MCP Server v0.9.0] - 2026-03-23
+
+### Added
+
+- **Evidence sensitivity classification** — `data_sensitivity` field (`public | internal | confidential | restricted`) on the base evidence envelope (§9.8).
+- Per-vertical default sensitivity annotations on all 5 vertical schemas (health, legal, home, education, consulting).
+- Non-downgrade rule: `clinical_record` evidence in the health vertical cannot be classified below `restricted`.
+- `sanitizeEvidence()` helper in MCP server — redacts `data` payload of `restricted` evidence before audit logging.
+- Non-blocking `RESTRICTED_EVIDENCE_STORED` warning in `delivery.record_evidence` when evidence is `restricted`.
+- New PROTOCOL.md §9.8 with implementation obligations per sensitivity level and jurisdiction reference table.
+- New "Implementando la Vertical de Salud" section in IMPLEMENTING.md.
+
+### Changed
+
+- `SPEC.md` dimension 7 updated to include `data_sensitivity`.
+- MCP server version bumped to 0.9.0.
 The **protocol** follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The **MCP server** (`@servicialo/mcp-server`) is versioned independently.
 

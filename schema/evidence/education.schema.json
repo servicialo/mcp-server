@@ -46,6 +46,7 @@
       "description": "Confirmation of presence of both student and instructor.",
       "x-auto-captured": true,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "internal",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "auto" },
@@ -69,6 +70,7 @@
       "description": "Course materials or assignments delivered to the student.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "internal",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },
@@ -104,6 +106,7 @@
       "x-auto-captured": false,
       "x-required-for-resolution": false,
       "x-conditionally-required": "When the service contract specifies evaluation as mandatory.",
+      "x-default-sensitivity": "confidential",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },

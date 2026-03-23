@@ -44,6 +44,7 @@
       "description": "Record of what was discussed and agreed in a session.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "restricted",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },
@@ -76,6 +77,7 @@
       "description": "Confirmation that generated documents were delivered to the client.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "confidential",
       "properties": {
         "type": { "const": "document" },
         "method": { "const": "manual" },
@@ -101,6 +103,7 @@
       "description": "Hours tracked with activity descriptions.",
       "x-auto-captured": false,
       "x-required-for-resolution": true,
+      "x-default-sensitivity": "confidential",
       "properties": {
         "type": { "const": "duration" },
         "method": { "const": "manual" },

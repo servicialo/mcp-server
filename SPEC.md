@@ -17,7 +17,7 @@ Every service is modeled across 8 canonical dimensions, universal across vertica
 | 4 | **Schedule (When)** | Temporal window for the service | `requested_at`, `scheduled_for`, `duration_expected` |
 | 5 | **Location (Where)** | Physical or virtual location; may reference a Resource entity | `type` (in_person/remote), `address`, `resource_id`, `coordinates` |
 | 6 | **Lifecycle (States)** | Current position in the 9-state lifecycle | `current_state`, `transitions[]` (audit trail), `exceptions[]` |
-| 7 | **Evidence (Proof)** | How the service proves it occurred | `checkin`, `checkout`, `duration_actual`, `evidence[]` |
+| 7 | **Evidence (Proof)** | How the service proves it occurred | `checkin`, `checkout`, `duration_actual`, `evidence[]`, `data_sensitivity` |
 | 8 | **Billing (Payment)** | Financial settlement, independent from lifecycle | `amount`, `payer`, `status`, `payment_id`, `tax_document` |
 
 A **Resource** (physical space/equipment) is a first-class entity with `capacity`, `buffer_minutes`, its own availability schedule, and equipment list. Optional — solo practices work without it.
@@ -150,6 +150,8 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 | `delivery.checkin` | Check-in: GPS + timestamp → `in_progress` | `evidence:write` |
 | `delivery.checkout` | Check-out: GPS + timestamp → `completed` (duration auto-calculated) | `evidence:write` |
 | `delivery.record_evidence` | Record evidence: gps, signature, photo, document, duration, notes | `evidence:write` |
+
+**Evidence sensitivity:** Each evidence envelope supports an optional `data_sensitivity` field (`public`, `internal`, `confidential`, `restricted`). Default: `internal`. See [PROTOCOL.md §9.8](./PROTOCOL.md#98-evidence-sensitivity-classification) for level definitions and per-vertical defaults. `restricted` evidence requires encryption at rest, access logging, and retention policies.
 
 ### Phase 6 — Close (4 tools)
 

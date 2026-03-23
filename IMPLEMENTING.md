@@ -453,6 +453,55 @@ Una vez que tu implementación pasa el checklist:
 
 ---
 
+## Implementando la Vertical de Salud
+
+La vertical de salud tiene los requisitos de sensibilidad de datos más estrictos del protocolo. Este paso cubre lo que necesitas saber para manejar evidencia clínica correctamente.
+
+### Evidencia `restricted` por defecto
+
+| Tipo de evidencia | Sensibilidad | Notas |
+|-------------------|-------------|-------|
+| `gps_checkin` / `gps_checkout` | `public` | Coordenadas GPS sin datos clínicos |
+| `clinical_record` | `restricted` | **No se puede degradar.** Implementaciones que clasifiquen `clinical_record` como algo menor a `restricted` no son compatibles con el protocolo. |
+| `treatment_adherence` | `confidential` | Checklist de tratamiento — contiene información de salud |
+| `notes` (en vertical salud) | `confidential` (mínimo) | Aunque el esquema base no lo impone, las implementaciones de salud DEBEN tratar `notes` como `confidential` mínimo, ya que puede contener observaciones clínicas en texto libre |
+
+### Requisitos mínimos para evidencia `restricted`
+
+Tu implementación DEBE proveer:
+
+1. **Cifrado en reposo** — AES-256 o equivalente. Los payloads de evidencia `restricted` nunca deben almacenarse en texto plano.
+2. **Log de acceso por evento** — Cada lectura del payload `data` debe registrar: quién accedió, cuándo, desde dónde (IP/agente), y el `mandate_id` si el acceso fue por agente AI.
+3. **Política de retención** — Definida y documentada. El período de retención debe ser consistente con la regulación aplicable.
+4. **Acuerdo de procesamiento de datos (DPA)** — Si usas sub-procesadores (cloud storage, analytics), debe existir un DPA firmado.
+
+### Jurisdicciones de referencia
+
+| Jurisdicción | Regulación | Retención mínima | Notas |
+|--------------|-----------|-------------------|-------|
+| Chile | Ley 20.584 + Decreto 41 | 15 años | Fichas clínicas. El paciente tiene derecho a copia. |
+| Estados Unidos | HIPAA | 6 años (mín.) | Varía por estado. BAA requerido con sub-procesadores. |
+| Brasil | LGPD + normas CFM | 20 años (CFM) | Consentimiento explícito requerido para procesamiento. |
+| México | NOM-024-SSA3 | 5 años (mín.) | Expediente clínico electrónico. |
+| Unión Europea | GDPR + eIDAS | Varía por país miembro | Derecho al olvido NO aplica a registros médicos obligatorios. |
+
+El protocolo es agnóstico a jurisdicción — no prescribe un framework regulatorio específico. La clasificación `restricted` señala que la implementación es responsable de cumplir con las regulaciones aplicables en su jurisdicción.
+
+### Comportamiento del servidor MCP
+
+Cuando se registra evidencia con `data_sensitivity: "restricted"` via `delivery.record_evidence`, el servidor MCP retorna un warning no-bloqueante:
+
+```json
+{
+  "warning": "RESTRICTED_EVIDENCE_STORED",
+  "message": "This evidence is classified as restricted. Ensure your implementation meets applicable regulatory requirements for storage, access logging, and retention."
+}
+```
+
+En los logs de auditoría (§10), el payload `data` de evidencia `restricted` se redacta automáticamente — se reemplaza con `{ "redacted": true, "reason": "restricted_evidence" }`.
+
+---
+
 ## Qué es opcional (pero vale la pena conocer)
 
 Esto no es requerido para compliance pero está definido en el spec:

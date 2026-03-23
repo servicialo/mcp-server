@@ -488,11 +488,36 @@ function sanitizeInput(args: Record<string, unknown>): Record<string, unknown> {
     if (SENSITIVE_FIELDS.has(key.toLowerCase())) {
       sanitized[key] = '[REDACTED]';
     } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      sanitized[key] = sanitizeInput(value as Record<string, unknown>);
+      // Check if this object is an evidence envelope with restricted sensitivity
+      const obj = value as Record<string, unknown>;
+      if (obj.data_sensitivity === 'restricted' && obj.data !== undefined) {
+        sanitized[key] = { ...sanitizeInput(obj), data: { redacted: true, reason: 'restricted_evidence' } };
+      } else {
+        sanitized[key] = sanitizeInput(obj);
+      }
+    } else if (Array.isArray(value)) {
+      sanitized[key] = sanitizeEvidence(value);
     } else {
       sanitized[key] = value;
     }
   }
 
   return sanitized;
+}
+
+/**
+ * Sanitizes an array of evidence objects. If any evidence item has
+ * `data_sensitivity: "restricted"`, its `data` payload is redacted.
+ */
+export function sanitizeEvidence(evidence: unknown[]): unknown[] {
+  return evidence.map((item) => {
+    if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+      const obj = item as Record<string, unknown>;
+      if (obj.data_sensitivity === 'restricted' && obj.data !== undefined) {
+        return { ...sanitizeInput(obj), data: { redacted: true, reason: 'restricted_evidence' } };
+      }
+      return sanitizeInput(obj);
+    }
+    return item;
+  });
 }

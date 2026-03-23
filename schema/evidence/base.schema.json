@@ -40,6 +40,12 @@
     "data": {
       "type": "object",
       "description": "Type-specific payload. Structure varies by evidence type — see vertical schemas for constraints."
+    },
+    "data_sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "default": "internal",
+      "description": "Sensitivity classification of this evidence payload. Implementations MUST enforce storage and access controls consistent with this classification. See PROTOCOL.md §9.8 for definitions."
     }
   },
 
