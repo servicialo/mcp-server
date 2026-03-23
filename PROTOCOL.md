@@ -138,7 +138,7 @@ The protocol defines four coordination primitives that together cover the comple
 
 ### 3.1 Schedule Coordination
 
-Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 9 lifecycle states, and 7 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
+Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 9 lifecycle states, and 6 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
 
 ### 3.2 Identity Verification
 
@@ -448,7 +448,7 @@ Completed → Disputed
 
 ### 7.5 Rescheduling
 
-**Trigger:** Either party needs to change the time.
+**Trigger:** Either party needs to change the time, or an assigned resource becomes unavailable.
 
 ```
 Scheduled/Confirmed → Rescheduling → Scheduled (new time)
@@ -456,6 +456,8 @@ Scheduled/Confirmed → Rescheduling → Scheduled (new time)
 
 - The system SHOULD find a compatible time for both parties.
 - The same provider SHOULD be maintained when possible.
+
+**Resource conflict variant:** When the trigger is an unavailable resource rather than a party request, the system MUST first search for an alternative resource within the same time slot. If an alternative is found, the session is reassigned without rescheduling — the provider MUST be notified, the client SHOULD be notified only if the change is material. If no alternative is found, the flow proceeds as a standard rescheduling. Resource conflicts MUST be recorded in `lifecycle.exceptions` with type `resource_conflict`.
 
 ### 7.6 Partial Delivery
 
@@ -467,19 +469,6 @@ In Progress → Partial
 
 - What was delivered MUST be documented.
 - The invoice SHOULD be adjusted proportionally.
-
-### 7.7 Resource Conflict
-
-**Trigger:** The assigned resource becomes unavailable after the session was confirmed.
-
-```
-Confirmed → Resource Reassigning → Confirmed (new resource) | Rescheduling (no alternative)
-```
-
-- The system MUST search for an alternative resource that satisfies the same requirements within the same time slot.
-- **If alternative found:** the session is reassigned. The provider MUST be notified. The client SHOULD be notified only if the change is material (different location, different room characteristics).
-- **If no alternative found:** the exception escalates to a Rescheduling flow (§7.5).
-- The conflict MUST be recorded in `lifecycle.exceptions` with type `resource_conflict`.
 
 ---
 
@@ -591,19 +580,15 @@ The protocol explicitly separates beneficiary, requester, and payer as independe
 
 No-shows, cancellations, reschedulings, disputes happen in 15–30% of all service appointments. A well-designed service defines what happens when things go wrong.
 
-### Principle 5: A Service Is a Product
+### Principle 5: A Service Is a Machine-Readable Product
 
-It has a name, price, duration, requirements, and expected outcome. Services that are not productized are invisible to agents.
+It has a name, price, duration, requirements, and expected outcome. Services that are not productized are invisible to agents. The protocol is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
 
-### Principle 6: AI Agents Are First-Class Citizens
-
-The protocol is designed so that an AI agent can request, verify, and settle a service with the same confidence as a human. Every field is machine-readable. Every state transition is deterministic. Every exception has a defined resolution path.
-
-### Principle 7: The Agreement Is Separate from the Delivery
+### Principle 6: The Agreement Is Separate from the Delivery
 
 A Service Order defines *what was agreed*. Atomic Services define *what was delivered*. These are two different objects with two different lifecycles. The ledger on the Service Order is the computed bridge between the two.
 
-### Principle 8: Collective Intelligence Is a Protocol Commons
+### Principle 7: Collective Intelligence Is a Protocol Commons
 
 Every node that implements the protocol contributes operational data to the network. The aggregate intelligence improves all nodes. This intelligence is a commons of the protocol, not an asset of any single implementation.
 
@@ -615,7 +600,7 @@ Every node that implements the protocol contributes operational data to the netw
 
 When an AI agent enters a professional service relationship — scheduling appointments, reading records, processing payments — the trust does not transfer automatically. It MUST be explicitly delegated, bounded, and auditable.
 
-The Delegated Agency Model solves a fundamental problem: how does a protocol that treats AI agents as first-class citizens (Principle 6) ensure that those agents never exceed the authority granted to them?
+The Delegated Agency Model solves a fundamental problem: how does a protocol that treats AI agents as first-class citizens (Principle 5) ensure that those agents never exceed the authority granted to them?
 
 Existing approaches fail in two modes:
 
@@ -1641,10 +1626,10 @@ The protocol version is independent from the MCP server package version.
 ### v0.6 (2026-03-01)
 
 - **Two-entity architecture.** Refactored protocol to center on two core objects: Service (atomic delivery unit) and Service Order (commercial agreement).
-- **8 lifecycle states.** Reduced from previous state model to 8 universal states plus exception states.
+- **9 lifecycle states.** Added Invoiced between Documented and Collected, bringing the total to 9 universal states plus exception states.
 - **Resource entity.** Introduced Resource as a first-class entity with its own availability calendar, capacity, and buffer semantics.
-- **Exception flow: Resource Conflict.** Added as the 7th exception flow.
-- **Principle 8.** Added "Collective Intelligence Is a Protocol Commons."
+- **Exception flow: Resource Conflict.** Added as a variant of Rescheduling (§7.5).
+- **Principle 7.** Added "Collective Intelligence Is a Protocol Commons" (Principles 5 and 6 merged into "A Service Is a Machine-Readable Product").
 
 ---
 

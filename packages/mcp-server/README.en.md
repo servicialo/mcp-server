@@ -29,10 +29,10 @@ Servicialo is an **open protocol**, not a platform. It defines how professional 
 
 The relationship is like HTTP to Apache, or SMTP to Gmail: Servicialo defines the rules, implementations bring them to life.
 
-The protocol models every service across **8 orthogonal dimensions** (identity, provider, client, schedule, location, lifecycle, proof of delivery, billing) and defines **8 lifecycle states** that are universal across verticals — healthcare, legal, education, home services:
+The protocol models every service across **8 dimensions**, **9 lifecycle states**, **6 exception flows**, and **7 core principles** that are universal across verticals — healthcare, legal, education, home services:
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Delivered → Documented → Charged → Verified
+Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
 ```
 
 Any service, in any vertical, follows this sequence. Vertical-specific logic lives *within* each state, but the state machine is invariant.
@@ -357,7 +357,7 @@ The full Servicialo protocol specification is available at:
 - **Current stable version:** 0.7
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
 
-The spec covers the 8 service dimensions, 8 lifecycle states, 5 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), the two-entity architecture (atomic Service + Service Order), and the Delegated Agency Model.
+The spec covers the 8 dimensions, 9 lifecycle states, 6 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), 7 core principles, the two-entity architecture (atomic Service + Service Order), the Delegated Agency Model, DNS resolution, and A2A interoperability.
 
 ## Reference Implementation
 

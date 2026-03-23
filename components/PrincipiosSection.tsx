@@ -7,7 +7,7 @@ export function PrincipiosSection() {
       <SectionTitle
         tag="08 — Principios"
         title="Las reglas del estándar"
-        subtitle="Servicialo se construye sobre 6 principios que aplican a cualquier servicio en cualquier industria."
+        subtitle="Servicialo se construye sobre 7 principios que aplican a cualquier servicio en cualquier industria."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -112,8 +112,9 @@ Any platform can implement Servicialo. To be listed as a compatible implementati
 
 1. Model services using the 8 dimensions
 2. Implement the 9 lifecycle states
-3. Handle at least 3 exception flows
-4. Expose an API connectable to the MCP server
+3. Handle at least 3 of the 6 exception flows
+4. Adhere to the 7 core principles
+5. Expose an API connectable to the MCP server
 
 Implementations are sovereign nodes. They own their data, their user relationships, and their business model. The protocol ensures interoperability — it does not prescribe how implementations operate internally.
 

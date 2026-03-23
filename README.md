@@ -31,7 +31,7 @@ Servicialo define cuatro primitivas de coordinación. Juntas cubren la cadena de
 
 | Primitiva | Qué resuelve | Superficie del protocolo |
 |-----------|-------------|--------------------------|
-| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | 9 estados del ciclo de vida, 7 flujos de excepción, scheduler de 3 variables |
+| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | 9 estados del ciclo de vida, 6 flujos de excepción, scheduler de 3 variables |
 | **Verificación de identidad** | Credenciales del proveedor, puntaje de confianza, separación cliente-pagador | Credenciales del proveedor, trust_score, separación payer_id |
 | **Liquidación financiera** | Facturación, cobranza, liquidación y revenue sharing con resolución de disputas | Dimensión de cobro, ledger de Orden de Servicio, payment_schedule |
 | **Señales de demanda** | Telemetría operacional anónima y agregada entre nodos de la red | Extensión de Telemetría (modelo contribuir-para-acceder) |
@@ -109,8 +109,7 @@ Las excepciones no son casos excepcionales. Ocurren en el **15–30% de las cita
 | **Inasistencia del proveedor** | Confirmado → Reasignando → Agendado | Se busca reemplazo automáticamente |
 | **Cancelación** | Cualquier pre-entrega → Cancelado | Se aplica la política de cancelación acordada |
 | **Disputa de calidad** | Completado → Disputado | Se congela el cobro, se solicita evidencia |
-| **Reagendamiento** | Agendado/Confirmado → Reagendando → Agendado | Se mantiene el proveedor si es posible |
-| **Conflicto de recurso** | Agendado → Reagendando → Agendado | Recurso con doble reserva o no disponible — se reasigna recurso o se reagenda |
+| **Reagendamiento** | Agendado/Confirmado → Reagendando → Agendado | Se mantiene el proveedor si es posible. Incluye conflictos de recurso (doble reserva, recurso no disponible) |
 | **Entrega parcial** | En Curso → Parcial | Se documenta lo entregado, se ajusta la factura |
 
 ---
@@ -282,7 +281,7 @@ Guía completa: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
 
 ---
 
-## Los 8 principios
+## Los 7 principios
 
 | # | Principio | |
 |:-:|-----------|---|
@@ -290,10 +289,9 @@ Guía completa: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
 | 2 | **La entrega debe ser verificable** | Si no puedes probar que el servicio ocurrió, no ocurrió. El protocolo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
 | 3 | **El pagador no siempre es el cliente** | En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador. |
 | 4 | **Las excepciones son la regla** | Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. |
-| 5 | **Un servicio es un producto** | Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo y coordinarlo. |
-| 6 | **Los agentes AI son ciudadanos de primera clase** | El protocolo está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano. |
-| 7 | **El acuerdo es separado de la entrega** | La Orden de Servicio define lo acordado. El servicio atómico define lo entregado. Son dos objetos distintos con dos ciclos de vida distintos. |
-| 8 | **La inteligencia colectiva es un bien común del protocolo** | Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos los nodos — como Waze, donde cada conductor contribuye y todos navegan mejor. Ninguna implementación es dueña de los datos de la red. |
+| 5 | **Un servicio es un producto legible por máquinas** | Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano. |
+| 6 | **El acuerdo es separado de la entrega** | La Orden de Servicio define lo acordado. El servicio atómico define lo entregado. Son dos objetos distintos con dos ciclos de vida distintos. |
+| 7 | **La inteligencia colectiva es un bien común del protocolo** | Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos los nodos — como Waze, donde cada conductor contribuye y todos navegan mejor. Ninguna implementación es dueña de los datos de la red. |
 
 ---
 
@@ -307,7 +305,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: ciclo de vida (9 estados) · 8 dimensiones · gestión de recursos · órdenes de servicio · flujos de excepción · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -389,7 +387,7 @@ servicio:
 
 ## Implementaciones
 
-Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 9 estados, manejar al menos 3 flujos de excepción y exponer una API conectable al MCP server.
+Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 9 estados, manejar al menos 3 de los 6 flujos de excepción, adherir a los 7 principios fundamentales y exponer una API conectable al MCP server.
 
 | Plataforma | Vertical | Cobertura | Estado |
 |------------|----------|-----------|:------:|

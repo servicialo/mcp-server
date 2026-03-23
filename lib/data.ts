@@ -83,8 +83,9 @@ export const PRINCIPLES = [
   { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes IA." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
-  { title: "Un servicio es un producto", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, tanto un humano como un agente IA pueden descubrirlo y coordinarlo." },
+  { title: "Un servicio es un producto legible por máquinas", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente IA puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano." },
   { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
+  { title: "La inteligencia colectiva es un bien común", body: "Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos — como Waze, donde cada conductor contribuye y todos navegan mejor." },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────

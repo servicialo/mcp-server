@@ -8,7 +8,7 @@ This guide covers how to participate, whether you want to propose changes to the
 
 ### Proposals to the Protocol (RFCs)
 
-Changes to the core protocol: the 8 dimensions, the 9 lifecycle states, the 8 principles, or the extensions (Core, Finance, Disputes). These follow the [RFC process](#rfc-process) described below.
+Changes to the core protocol: the 8 dimensions, the 9 lifecycle states, the 6 exception flows, the 7 principles, or the extensions (Core, Finance, Disputes). These follow the [RFC process](#rfc-process) described below.
 
 ### New Evidence Verticals
 

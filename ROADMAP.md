@@ -10,7 +10,7 @@ This roadmap reflects the current direction of the **Servicialo open protocol** 
 
 What's already shipped:
 
-- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 8 principles ([PROTOCOL.md](./PROTOCOL.md)).
+- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
 - [x] **JSON Schemas** — `service.schema.json` and `service-order.schema.json` with lifecycle states, exception types, and evidence definitions (`schema/`).
 - [x] **MCP server** — `@servicialo/mcp-server` v0.5.3 published on npm. 20 tools across 6 agent phases (Discovery, Booking, Execution, Documentation, Billing, Support).
 - [x] **Test suite** — Vitest tests for the MCP server (`packages/mcp-server/src/__tests__/`).
@@ -50,7 +50,7 @@ _Target: Protocol v0.5 – v0.8_
 
 _Target: Protocol v1.0_
 
-- [ ] **Protocol v1.0** — declare Core (8 dimensions, 9 states, 8 principles) as stable with backwards-compatibility guarantees.
+- [ ] **Protocol v1.0** — declare Core (8 dimensions, 9 states, 6 exception flows, 7 principles) as stable with backwards-compatibility guarantees.
 - [ ] **Formal governance body** — transition from single-maintainer to a multi-stakeholder steering committee (see [GOVERNANCE.md](./GOVERNANCE.md)).
 - [ ] **Certification program** — optional conformance certification for platforms implementing Servicialo.
 - [ ] **Industry adoption** — at least 3 independent implementations beyond [Coordinalo](https://coordinalo.com).

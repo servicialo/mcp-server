@@ -31,7 +31,7 @@ Servicialo defines four coordination primitives. Together they cover the complet
 
 | Primitive | What it solves | Protocol surface |
 |-----------|---------------|------------------|
-| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 9 lifecycle states, 7 exception flows, 3-variable scheduler |
+| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 9 lifecycle states, 6 exception flows, 3-variable scheduler |
 | **Identity verification** | Provider credentials, trust scores, client-payer separation | Provider credentials, trust_score, payer_id separation |
 | **Financial settlement** | Billing, invoicing, collection, and revenue sharing with dispute resolution | billing dimension, Service Order ledger, payment_schedule |
 | **Demand signals** | Aggregate, anonymous operational telemetry across network nodes | Telemetry Extension (contribute-to-access model) |
@@ -109,8 +109,7 @@ Exceptions are not edge cases. They occur in **15–30% of appointments**. A wel
 | **Provider no-show** | Confirmed → Reassigning → Scheduled | Automatic replacement search |
 | **Cancellation** | Any pre-delivery → Cancelled | Agreed cancellation policy applied |
 | **Quality dispute** | Completed → Disputed | Billing frozen, evidence requested |
-| **Rescheduling** | Scheduled/Confirmed → Rescheduling → Scheduled | Same provider kept if possible |
-| **Resource conflict** | Scheduled → Rescheduling → Scheduled | Resource double-booked or unavailable — reassign resource or reschedule |
+| **Rescheduling** | Scheduled/Confirmed → Rescheduling → Scheduled | Same provider kept if possible. Includes resource conflicts (double-booking, resource unavailable) |
 | **Partial delivery** | In Progress → Partial | Delivered portion documented, invoice adjusted |
 
 ---
@@ -250,18 +249,21 @@ For the full cycle — schedule, verify delivery, collect payment:
 
 Credentials are obtained by each organization from their Servicialo-compatible platform.
 
-### The 6 agent phases — 20 tools
+### The 8 agent phases — 33 tools
 
 A well-designed agent follows this order:
 
 | # | Phase | What it solves | Tools |
 |:-:|-------|---------------|-------|
-| 1 | **Discover** | What's available | `registry.search` · `registry.get_organization` · `scheduling.check_availability` · `services.list` |
+| 0 | **Resolve** | Where is the endpoint | `resolve.lookup` · `resolve.search` · `trust.get_score` |
+| 1 | **Discover** | What's available | `registry.search` · `registry.get_organization` · `registry.manifest` · `scheduling.check_availability` · `services.list` · `a2a.get_agent_card` |
 | 2 | **Understand** | Service dimensions and rules | `service.get` · `contract.get` |
 | 3 | **Commit** | Client identity and booking | `clients.get_or_create` · `scheduling.book` · `scheduling.confirm` |
 | 4 | **Manage** | State and transitions | `lifecycle.get_state` · `lifecycle.transition` · `scheduling.reschedule` · `scheduling.cancel` |
 | 5 | **Verify** | Proof of delivery | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Close** | Documentation and billing | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
+| — | **Resources** | Physical spaces and equipment | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
+| — | **Resolver admin** | Portability and telemetry | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
 
 The protocol guarantees that any agent can complete the full cycle with any compatible implementation.
 
@@ -271,20 +273,25 @@ The protocol guarantees that any agent can complete the full cycle with any comp
 
 **[Electrical repair](./examples/home-repair.md)** — Home vertical. Home visit, before/after photos, task checklist, client signature, cash payment.
 
+### A2A Ready
+
+Servicialo supports [A2A (Agent-to-Agent)](https://a2a-protocol.org/) as an optional extension, enabling external agents (Salesforce Agentforce, Google ADK, etc.) to discover and book services without going through MCP.
+
+Full guide: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
+
 ---
 
-## The 8 principles
+## The 7 principles
 
 | # | Principle | |
 |:-:|-----------|---|
 | 1 | **Every service has a lifecycle** | Whether it's a massage or an audit. The 9 states are universal. |
-| 2 | **Delivery must be verifiable** | If you can't prove the service happened, it didn't happen. Servicialo defines what constitutes valid evidence so humans and AI agents can trust it. |
+| 2 | **Delivery must be verifiable** | If you can't prove the service happened, it didn't happen. The protocol defines what constitutes valid evidence so humans and AI agents can trust it. |
 | 3 | **The payer is not always the client** | In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer. |
 | 4 | **Exceptions are the rule** | No-shows, cancellations, rescheduling, disputes. A well-designed service defines what happens when things don't go as planned. |
-| 5 | **A service is a product** | It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover and coordinate it. |
-| 6 | **AI agents are first-class citizens** | The protocol is designed so an AI agent can request, verify, and close a service with the same confidence as a human. |
-| 7 | **The agreement is separate from delivery** | The Service Order defines what was agreed. The atomic service defines what was delivered. Two distinct objects with two distinct lifecycles. |
-| 8 | **Collective intelligence is a protocol commons** | Every node that implements the protocol contributes operational data. The aggregate intelligence improves all nodes — like Waze, where each driver contributes and everyone navigates better. No single implementation owns the network data. |
+| 5 | **A service is a machine-readable product** | It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover, coordinate, and close it with the same confidence as a human. |
+| 6 | **The agreement is separate from delivery** | The Service Order defines what was agreed. The atomic service defines what was delivered. Two distinct objects with two distinct lifecycles. |
+| 7 | **Collective intelligence is a protocol commons** | Every node that implements the protocol contributes operational data. The aggregate intelligence improves all nodes — like Waze, where each driver contributes and everyone navigates better. No single implementation owns the network data. |
 
 ---
 
@@ -298,7 +305,7 @@ Everything needed to model a professional service from start to finish.
 
 For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
 
-Includes: lifecycle (9 states) · 8 dimensions · resource management · service orders · exception flows · proof of delivery · MCP protocol (20 tools)
+Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (33 tools) · DNS resolution · A2A interoperability
 
 ### Servicialo/Finance — `in design`
 
@@ -319,7 +326,7 @@ For platforms with enough volume or where the amount per service makes disputes 
 JSON Schemas for automated validation: [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.7 ──────────────────
+# ── SERVICIALO v0.6 ──────────────────
 # The 8 dimensions of a service
 
 service:
@@ -381,7 +388,7 @@ service:
 
 ## Implementations
 
-Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 9 states, handle at least 3 exception flows, and expose an API connectable to the MCP server.
+Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 9 states, handle at least 3 of the 6 exception flows, adhere to the 7 core principles, and expose an API connectable to the MCP server.
 
 | Platform | Vertical | Coverage | Status |
 |----------|----------|----------|:------:|
@@ -414,8 +421,8 @@ servicialo/
 
 |  | Version | Status |
 |---|---------|--------|
-| Protocol | 0.6 | Stable |
-| @servicialo/mcp-server | 0.6.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.9 | Stable |
+| @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 

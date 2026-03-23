@@ -38,7 +38,7 @@ Servicialo is now positioned as **neutral infrastructure** — an open protocol,
 - **§1 Overview**: Rewritten with orchestration layer positioning; added "no single implementation owns it"
 - **§1 What Servicialo is NOT**: Added "Not owned by any single company" bullet
 - **§2 Protocol Primitives** (new): Four primitives documented — Schedule Coordination, Identity Verification, Financial Settlement, Demand Signals
-- **§8 Principles**: Added Principle 8 (collective intelligence as protocol commons) with Waze parallel and governance reference
+- **§9 Principles**: Added Principle 7 (collective intelligence as protocol commons) with Waze parallel and governance reference. Merged former Principles 5 (service is a product) and 6 (AI agents are first-class) into Principle 5 (a service is a machine-readable product)
 - **§12 Network Intelligence** (new, replaces "Telemetry Extension"): Expanded with network effect narrative, contribute-to-access model, data governance principles
 - **Terminology**: "standard" → "protocol" in all normative references
 - **Cross-references**: Updated all section number references
@@ -54,7 +54,7 @@ Servicialo is now positioned as **neutral infrastructure** — an open protocol,
 
 #### ROADMAP.md
 - "open standard" → "open protocol"
-- "7 principles" → "8 principles"
+- "7 principles" → "8 principles" → "7 principles" (after merging Principles 5+6)
 - "Modular architecture" → "Layered architecture"
 - Added "Network Intelligence" milestone in Mid Term
 - Added GOVERNANCE.md reference in Done section
@@ -71,7 +71,7 @@ Servicialo is now positioned as **neutral infrastructure** — an open protocol,
 - "Proposals to the Standard" → "Proposals to the Protocol"
 - "the standard" → "the protocol" throughout
 - "modules" → "extensions"
-- "7 principles" → "8 principles"
+- "7 principles" → "8 principles" → "7 principles" (after merging Principles 5+6)
 
 #### packages/mcp-server/README.md
 - Added tagline in description

@@ -563,7 +563,7 @@ Cada vertical puede definir tipos de evidencia adicionales. El protocolo define 
 
 ## 10. Principios del estándar
 
-Seis principios guían el diseño del protocolo. No son aspiraciones — son restricciones de diseño que informan cada decisión técnica.
+Siete principios guían el diseño del protocolo. No son aspiraciones — son restricciones de diseño que informan cada decisión técnica.
 
 > **Principio 1: Todo servicio tiene un ciclo.**
 > No importa si es una sesión de rehabilitación o una auditoría financiera. Los 9 estados del ciclo de vida son universales para cualquier servicio profesional. Las particularidades de cada estado varían por vertical, pero la secuencia es invariante.
@@ -577,11 +577,14 @@ Seis principios guían el diseño del protocolo. No son aspiraciones — son res
 > **Principio 4: Las excepciones son la regla.**
 > Inasistencias, cancelaciones, reagendamientos, disputas — no son casos de borde. Ocurren en el 15–30% de todas las citas de servicio. Un servicio bien diseñado define qué pasa cuando algo falla.
 
-> **Principio 5: Un servicio es un producto.**
-> Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, tanto un humano como un agente de IA pueden descubrirlo y coordinarlo. Los servicios que no están productizados son invisibles para los agentes.
+> **Principio 5: Un servicio es un producto legible por máquinas.**
+> Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente de IA puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano. Cada campo es machine-readable. Cada transición de estado es determinista. Cada excepción tiene un camino de resolución definido.
 
 > **Principio 6: El acuerdo es separado de la entrega.**
 > La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos. El libro mayor computado en la Orden de Servicio es el puente entre ambos.
+
+> **Principio 7: La inteligencia colectiva es un bien común del protocolo.**
+> Cada nodo que implementa el protocolo contribuye datos operacionales a la red. La inteligencia agregada mejora a todos los nodos — como Waze, donde cada conductor contribuye y todos navegan mejor. Esta inteligencia es un bien común del protocolo, no un activo de ninguna implementación.
 
 ---
 
@@ -783,10 +786,11 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 - Las 8 dimensiones del servicio
 - Recurso físico como entidad de primera clase
 - Órdenes de servicio (acuerdo comercial + libro mayor computado)
-- Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa, entrega parcial, conflicto de recurso)
+- 6 flujos de excepción (cancelación, inasistencia, reagendamiento, disputa, entrega parcial)
+- 7 principios fundamentales
 - Prueba de entrega con evidencia configurable por vertical
 - Contrato de servicio pre-acordado
-- Servidor MCP para agentes de IA (23 herramientas en 6 fases)
+- Servidor MCP para agentes de IA (33 herramientas en 8 fases)
 
 ### 15.2 Servicialo/Finanzas (En diseño)
 

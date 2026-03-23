@@ -51,4 +51,4 @@ assignees: ''
 
 ---
 
-> **Note:** Changes to the core protocol (8 dimensions, 9 states, 7 principles) require a formal RFC with a 14-day discussion period. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for details.
+> **Note:** Changes to the core protocol (8 dimensions, 9 states, 6 exception flows, 7 principles) require a formal RFC with a 14-day discussion period. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for details.

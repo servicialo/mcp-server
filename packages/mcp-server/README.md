@@ -29,10 +29,10 @@ Servicialo es un **protocolo abierto**, no una plataforma. Define cómo los serv
 
 La relación es como HTTP con Apache, o SMTP con Gmail: Servicialo define las reglas, las implementaciones les dan vida.
 
-El protocolo modela cada servicio a través de **8 dimensiones ortogonales** (identidad, prestador, cliente, agenda, ubicación, ciclo de vida, prueba de entrega, facturación) y define **8 estados de ciclo de vida** universales entre verticales — salud, legal, educación, servicios domiciliarios:
+El protocolo modela cada servicio a través de **8 dimensiones**, **9 estados del ciclo de vida**, **6 flujos de excepción** y **7 principios fundamentales** — universales entre verticales (salud, legal, educación, servicios domiciliarios):
 
 ```
-Solicitado → Agendado → Confirmado → En Curso → Entregado → Documentado → Cobrado → Verificado
+Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
 ```
 
 Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica específica del vertical vive *dentro* de cada estado, pero la máquina de estados es invariante.
@@ -386,7 +386,7 @@ La especificación completa del protocolo Servicialo está disponible en:
 - **Versión estable actual:** 0.9
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json), [`resolution.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/resolution.schema.json), [`servicialo-config.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/servicialo-config.schema.json)
 
-La spec cubre las 8 dimensiones del servicio, 9 estados de ciclo de vida, 7 flujos de excepción, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
+La spec cubre las 8 dimensiones del servicio, 9 estados de ciclo de vida, 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
 
 ## Implementación de Referencia
 

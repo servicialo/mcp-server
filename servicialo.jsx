@@ -90,8 +90,9 @@ const LIFECYCLE_STATES = [
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado.", color: C.accent },
   { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica.", color: C.accent },
   { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical.", color: C.accent },
-  { id: "collected", label: "Cobrado", icon: "7", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido.", color: C.accent },
-  { id: "verified", label: "Verificado", icon: "8", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo.", color: C.green },
+  { id: "invoiced", label: "Facturado", icon: "7", desc: "Documento tributario emitido. Boleta, factura o nota de crédito generada según la jurisdicción.", color: C.accent },
+  { id: "collected", label: "Cobrado", icon: "8", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido.", color: C.accent },
+  { id: "verified", label: "Verificado", icon: "9", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo.", color: C.green },
 ];
 
 const ANATOMY = [
@@ -106,12 +107,13 @@ const ANATOMY = [
 ];
 
 const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Todo servicio se solicita, se agenda, se ejecuta, se documenta, se cobra y se verifica. Estos 8 estados son universales." },
-  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida de entrega para que humanos y agentes AI puedan confiar en ella." },
+  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Todo servicio se solicita, se agenda, se ejecuta, se documenta, se factura, se cobra y se verifica. Los 9 estados son universales." },
+  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. Servicialo define qué constituye evidencia válida de entrega para que humanos y agentes IA puedan confiar en ella." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El estándar separa estos tres roles: beneficiario, solicitante y pagador." },
   { title: "Las excepciones son la regla", body: "No-shows, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. Servicialo estandariza estos flujos." },
-  { title: "Un servicio es un producto", body: "Tiene un nombre, un precio, una duración, requisitos y un resultado esperado. Cuando lo defines así, cualquier agente AI puede descubrirlo, ofrecerlo y coordinarlo." },
-  { title: "Los agentes AI son ciudadanos de primera clase", body: "El estándar está diseñado para que un agente AI pueda solicitar, verificar y cerrar un servicio con la misma confianza que un humano. Cada estado y transición es legible por máquina." },
+  { title: "Un servicio es un producto legible por máquinas", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente IA puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano." },
+  { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
+  { title: "La inteligencia colectiva es un bien común", body: "Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos — como Waze, donde cada conductor contribuye y todos navegan mejor." },
 ];
 
 function Section({ children, id }) {
@@ -598,7 +600,7 @@ export default function Servicialo() {
         <Section id="ciclo">
           <SectionTitle
             tag="04 — Ciclo de vida"
-            title="8 estados universales"
+            title="9 estados universales"
             subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
           />
           <LifecycleInteractive />
@@ -610,11 +612,11 @@ export default function Servicialo() {
             padding: "20px 24px",
           }}>
             <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: C.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-              ¿Por qué 8 estados?
+              ¿Por qué 9 estados?
             </div>
             <div style={{ fontSize: 14, color: C.textBody, lineHeight: 1.8 }}>
-              Menos estados pierden información crítica — por ejemplo, sin separar "Completado" de "Documentado", no sabes si el registro fue generado.
-              Más estados agregan fricción innecesaria. 8 es el mínimo viable para que un agente AI pueda verificar con certeza que un servicio fue solicitado, entregado, documentado, cobrado y verificado.
+              Menos estados pierden información crítica — por ejemplo, sin separar "Completado" de "Documentado", no sabes si el registro fue generado. Sin separar "Facturado" de "Cobrado", no sabes si el documento tributario fue emitido.
+              Más estados agregan fricción innecesaria. 9 es el mínimo viable para que un agente IA pueda verificar con certeza que un servicio fue solicitado, entregado, documentado, facturado, cobrado y verificado.
             </div>
           </div>
         </Section>
@@ -714,7 +716,7 @@ export default function Servicialo() {
         duration_expected: minutes
 
       lifecycle:
-        current_state: enum[8]  # Los 8 estados universales
+        current_state: enum[9]  # Los 9 estados universales
         transitions: transition[]
         exceptions: exception[]
 
