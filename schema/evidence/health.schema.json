@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/evidence/health.schema.json",
+  "title": "Servicialo Evidence — Health Vertical",
+  "description": "Evidence requirements for the health (salud) vertical. Defined in PROTOCOL.md §9 / whitepaper §9.1.",
+  "type": "object",
+  "required": ["vertical", "evidence"],
+
+  "x-resolution-rule": {
+    "description": "If GPS check-in/check-out records exist AND clinical record is signed by both provider and patient, service is verified as delivered. If clinical record or any signature is missing, escalate to dispute.",
+    "required_for_resolution": ["gps_checkin", "gps_checkout", "clinical_record"],
+    "escalate_if_missing": ["clinical_record"]
+  },
+
+  "properties": {
+    "vertical": {
+      "type": "string",
+      "const": "health"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "base.schema.json"
+      },
+      "contains": {
+        "properties": { "type": { "const": "gps" }, "data": { "properties": { "event": { "const": "checkin" } } } },
+        "required": ["type"]
+      }
+    }
+  },
+
+  "$defs": {
+    "evidence_types": {
+      "description": "Catalog of evidence types for the health vertical.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/gps_checkin" },
+          { "$ref": "#/$defs/gps_checkout" },
+          { "$ref": "#/$defs/clinical_record" },
+          { "$ref": "#/$defs/treatment_adherence" }
+        ]
+      }
+    },
+
+    "gps_checkin": {
+      "type": "object",
+      "description": "GPS timestamp of provider arrival.",
+      "x-auto-captured": true,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "gps" },
+        "method": { "const": "auto" },
+        "data": {
+          "$ref": "base.schema.json#/$defs/gps_data",
+          "properties": {
+            "event": { "const": "checkin" }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "gps_checkout": {
+      "type": "object",
+      "description": "GPS timestamp of provider departure.",
+      "x-auto-captured": true,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "gps" },
+        "method": { "const": "auto" },
+        "data": {
+          "$ref": "base.schema.json#/$defs/gps_data",
+          "properties": {
+            "event": { "const": "checkout" }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "clinical_record": {
+      "type": "object",
+      "description": "Clinical record (ficha clínica) signed by both provider and patient.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "clinical_record" },
+                "signed_by": {
+                  "type": "array",
+                  "items": { "type": "string", "enum": ["provider", "client"] },
+                  "minItems": 2,
+                  "uniqueItems": true,
+                  "description": "Both provider and patient must sign."
+                }
+              },
+              "required": ["signed_by"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "treatment_adherence": {
+      "type": "object",
+      "description": "Checklist of executed treatment plan items. Optional — not required for resolution.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": false,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "type": "object",
+          "required": ["checklist"],
+          "properties": {
+            "document_type": { "const": "treatment_adherence" },
+            "checklist": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["item", "completed"],
+                "properties": {
+                  "item": { "type": "string" },
+                  "completed": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    }
+  }
+}

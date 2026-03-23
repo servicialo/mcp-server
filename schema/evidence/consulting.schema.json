@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/evidence/consulting.schema.json",
+  "title": "Servicialo Evidence — Consulting Vertical",
+  "description": "Evidence requirements for the consulting (consultor\u00eda) vertical. Defined in PROTOCOL.md \u00a79 / whitepaper \u00a79.5.",
+  "type": "object",
+  "required": ["vertical", "evidence"],
+
+  "x-resolution-rule": {
+    "description": "If the deliverable is approved by the client AND billable hours are within the authorized budget, service is verified as delivered. If hours exceed the budget without a scope change authorization, escalate to dispute.",
+    "required_for_resolution": ["approved_deliverable", "committee_minutes", "billable_hours", "milestone_progress"],
+    "escalate_condition": "hours_exceed_budget_without_scope_change_authorization"
+  },
+
+  "properties": {
+    "vertical": {
+      "type": "string",
+      "const": "consulting"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "base.schema.json"
+      }
+    }
+  },
+
+  "$defs": {
+    "evidence_types": {
+      "description": "Catalog of evidence types for the consulting vertical.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/approved_deliverable" },
+          { "$ref": "#/$defs/committee_minutes" },
+          { "$ref": "#/$defs/billable_hours" },
+          { "$ref": "#/$defs/milestone_progress" }
+        ]
+      }
+    },
+
+    "approved_deliverable": {
+      "type": "object",
+      "description": "Document or artifact delivered with formal client approval.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "deliverable" },
+                "approved_by": {
+                  "type": "string",
+                  "description": "Client ID who approved the deliverable."
+                },
+                "approved_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When approval was granted."
+                }
+              },
+              "required": ["approved_by", "approved_at"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "committee_minutes": {
+      "type": "object",
+      "description": "Record of committee or follow-up meeting with attendees and agreements.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "committee_minutes" },
+                "attendees": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "List of attendee identifiers."
+                },
+                "agreements": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Key agreements and decisions."
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "billable_hours": {
+      "type": "object",
+      "description": "Hours tracked by activity category.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "duration" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/duration_data" },
+            {
+              "required": ["category"],
+              "properties": {
+                "budget_authorized_minutes": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Total budget from the Service Order. Used for resolution rule evaluation."
+                },
+                "scope_change_ref": {
+                  "type": "string",
+                  "description": "Reference to scope change authorization, if hours exceed original budget."
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "milestone_progress": {
+      "type": "object",
+      "description": "Percentage of progress against the milestone defined in the Service Order.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "type": "object",
+          "required": ["document_type", "milestone_id", "progress_percent"],
+          "properties": {
+            "document_type": { "const": "milestone_progress" },
+            "milestone_id": {
+              "type": "string",
+              "description": "Identifier of the milestone from the Service Order."
+            },
+            "progress_percent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Completion percentage."
+            },
+            "notes": {
+              "type": "string",
+              "description": "Progress notes or blockers."
+            }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    }
+  }
+}

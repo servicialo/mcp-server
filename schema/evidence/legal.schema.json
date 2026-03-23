@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/evidence/legal.schema.json",
+  "title": "Servicialo Evidence — Legal Vertical",
+  "description": "Evidence requirements for the legal vertical. Defined in PROTOCOL.md §9 / whitepaper §9.3.",
+  "type": "object",
+  "required": ["vertical", "evidence"],
+
+  "x-resolution-rule": {
+    "description": "If meeting minutes exist AND billable hours are within the agreed range, service is verified as delivered. If hours exceed the agreed amount without justification, escalate to dispute.",
+    "required_for_resolution": ["meeting_minutes", "document_delivery", "billable_hours"],
+    "escalate_if_missing": ["meeting_minutes"],
+    "escalate_condition": "hours_exceed_agreed_range_without_justification"
+  },
+
+  "properties": {
+    "vertical": {
+      "type": "string",
+      "const": "legal"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "base.schema.json"
+      }
+    }
+  },
+
+  "$defs": {
+    "evidence_types": {
+      "description": "Catalog of evidence types for the legal vertical.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/meeting_minutes" },
+          { "$ref": "#/$defs/document_delivery" },
+          { "$ref": "#/$defs/billable_hours" }
+        ]
+      }
+    },
+
+    "meeting_minutes": {
+      "type": "object",
+      "description": "Record of what was discussed and agreed in a session.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "meeting_minutes" },
+                "attendees": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "List of attendee identifiers."
+                },
+                "agreements": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Key agreements reached during the session."
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "document_delivery": {
+      "type": "object",
+      "description": "Confirmation that generated documents were delivered to the client.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "legal_deliverable" },
+                "delivered_to": { "type": "string", "description": "Client ID who received the document." },
+                "delivered_at": { "type": "string", "format": "date-time" }
+              },
+              "required": ["delivered_to"]
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "billable_hours": {
+      "type": "object",
+      "description": "Hours tracked with activity descriptions.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "duration" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/duration_data" },
+            {
+              "properties": {
+                "agreed_range_minutes": {
+                  "type": "object",
+                  "properties": {
+                    "min": { "type": "number", "minimum": 0 },
+                    "max": { "type": "number", "minimum": 0 }
+                  },
+                  "description": "Agreed billable range from the contract. Used for resolution rule evaluation."
+                },
+                "justification": {
+                  "type": "string",
+                  "description": "Required if hours exceed the agreed range."
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    }
+  }
+}

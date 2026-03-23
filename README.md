@@ -417,6 +417,11 @@ Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar
 Guía paso a paso para construir una plataforma compatible desde cero — 7 pasos, el primero toma 20 minutos.
 Empezar aquí: [`IMPLEMENTING.md`](./IMPLEMENTING.md) ([English](./IMPLEMENTING.en.md))
 
+Referencias adicionales:
+- [`schema/evidence/`](./schema/evidence/) — Schemas de evidencia por vertical (salud, hogar, legal, educación, consultoría)
+- [`ERRORS.md`](./ERRORS.md) — Códigos de error del protocolo
+- [`WEBHOOKS.md`](./WEBHOOKS.md) — Notificaciones asíncronas de cambios de estado (borrador)
+
 ---
 
 ## Qué hay en este repositorio
@@ -430,7 +435,19 @@ servicialo/
 ├── packages/
 │   └── mcp-server/       # @servicialo/mcp-server — servidor MCP (npm)
 ├── schema/               # JSON Schemas para validación
+│   ├── evidence/         # Schemas de evidencia por vertical
+│   │   ├── base.schema.json       # Envelope compartido
+│   │   ├── health.schema.json     # Salud
+│   │   ├── home.schema.json       # Hogar
+│   │   ├── legal.schema.json      # Legal
+│   │   ├── education.schema.json  # Educación
+│   │   └── consulting.schema.json # Consultoría
+│   ├── service.schema.json
+│   ├── service-order.schema.json
+│   └── ...
 ├── PROTOCOL.md           # Especificación completa
+├── ERRORS.md             # Códigos de error del protocolo
+├── WEBHOOKS.md           # Especificación de webhooks (borrador)
 ├── IMPLEMENTORS.md       # Guía para construir una implementación
 ├── GOVERNANCE.md         # Gobernanza de red y política de datos
 └── README.md

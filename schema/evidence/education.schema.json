@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/evidence/education.schema.json",
+  "title": "Servicialo Evidence — Education Vertical",
+  "description": "Evidence requirements for the education (educaci\u00f3n) vertical. Defined in PROTOCOL.md \u00a79 / whitepaper \u00a79.4.",
+  "type": "object",
+  "required": ["vertical", "evidence"],
+
+  "x-resolution-rule": {
+    "description": "If attendance is recorded AND material was delivered, service is verified as delivered. If evaluation is missing and the contract requires it, escalate to dispute.",
+    "required_for_resolution": ["attendance_record", "material_delivery"],
+    "conditionally_required": {
+      "evaluation": "Required only if the service contract specifies evaluation as mandatory."
+    },
+    "escalate_if_missing": ["attendance_record"]
+  },
+
+  "properties": {
+    "vertical": {
+      "type": "string",
+      "const": "education"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "base.schema.json"
+      }
+    }
+  },
+
+  "$defs": {
+    "evidence_types": {
+      "description": "Catalog of evidence types for the education vertical.",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/attendance_record" },
+          { "$ref": "#/$defs/material_delivery" },
+          { "$ref": "#/$defs/evaluation" }
+        ]
+      }
+    },
+
+    "attendance_record": {
+      "type": "object",
+      "description": "Confirmation of presence of both student and instructor.",
+      "x-auto-captured": true,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "auto" },
+        "data": {
+          "type": "object",
+          "required": ["document_type", "student_present", "instructor_present"],
+          "properties": {
+            "document_type": { "const": "attendance_record" },
+            "student_present": { "type": "boolean" },
+            "instructor_present": { "type": "boolean" },
+            "session_start": { "type": "string", "format": "date-time" },
+            "session_end": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "material_delivery": {
+      "type": "object",
+      "description": "Course materials or assignments delivered to the student.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": true,
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "allOf": [
+            { "$ref": "base.schema.json#/$defs/document_data" },
+            {
+              "properties": {
+                "document_type": { "const": "course_material" },
+                "material_items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["title"],
+                    "properties": {
+                      "title": { "type": "string" },
+                      "uri": { "type": "string", "format": "uri" }
+                    }
+                  },
+                  "description": "List of materials delivered."
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    },
+
+    "evaluation": {
+      "type": "object",
+      "description": "Session evaluation or student performance feedback. Optional unless the contract requires it.",
+      "x-auto-captured": false,
+      "x-required-for-resolution": false,
+      "x-conditionally-required": "When the service contract specifies evaluation as mandatory.",
+      "properties": {
+        "type": { "const": "document" },
+        "method": { "const": "manual" },
+        "data": {
+          "type": "object",
+          "required": ["document_type"],
+          "properties": {
+            "document_type": { "const": "session_evaluation" },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Numeric score, if applicable."
+            },
+            "feedback": {
+              "type": "string",
+              "description": "Qualitative feedback on the session."
+            },
+            "competencies": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "level": { "type": "string", "enum": ["not_started", "in_progress", "achieved"] }
+                }
+              },
+              "description": "Competency tracking, if applicable."
+            }
+          }
+        }
+      },
+      "required": ["type", "captured_at", "actor", "data"]
+    }
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/evidence/base.schema.json",
+  "title": "Servicialo Evidence Envelope",
+  "description": "Shared evidence structure that all vertical-specific schemas extend. Defines the common envelope for any piece of delivery evidence in the Servicialo protocol v0.9.",
+  "type": "object",
+  "required": ["type", "captured_at", "actor", "data"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["gps", "signature", "photo", "document", "duration", "notes"],
+      "description": "Evidence type. Verticals MAY extend this enum via their own schemas."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the evidence was captured."
+    },
+    "actor": {
+      "type": "object",
+      "description": "Who captured or submitted this evidence.",
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["provider", "client", "system", "agent"],
+          "description": "Actor role. 'system' for auto-captured evidence, 'agent' for AI-driven capture."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the actor."
+        }
+      }
+    },
+    "method": {
+      "type": "string",
+      "enum": ["auto", "manual", "agent"],
+      "description": "How the evidence was captured. Aligns with transition.method for AI traceability (PROTOCOL.md §6.1)."
+    },
+    "data": {
+      "type": "object",
+      "description": "Type-specific payload. Structure varies by evidence type — see vertical schemas for constraints."
+    }
+  },
+
+  "$defs": {
+    "gps_data": {
+      "type": "object",
+      "description": "Payload for type='gps'.",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+        "accuracy_meters": { "type": "number", "minimum": 0, "description": "GPS accuracy in meters." },
+        "event": {
+          "type": "string",
+          "enum": ["checkin", "checkout"],
+          "description": "Whether this GPS reading is for arrival or departure."
+        }
+      }
+    },
+    "signature_data": {
+      "type": "object",
+      "description": "Payload for type='signature'.",
+      "required": ["signer_role", "format"],
+      "properties": {
+        "signer_role": {
+          "type": "string",
+          "enum": ["provider", "client", "both"],
+          "description": "Who signed."
+        },
+        "format": {
+          "type": "string",
+          "enum": ["image/png", "image/svg+xml", "application/pkcs7-signature"],
+          "description": "Signature format."
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "Location of the signature artifact."
+        }
+      }
+    },
+    "photo_data": {
+      "type": "object",
+      "description": "Payload for type='photo'.",
+      "required": ["uri"],
+      "properties": {
+        "uri": { "type": "string", "format": "uri", "description": "Photo location." },
+        "label": {
+          "type": "string",
+          "description": "Descriptive label, e.g. 'before', 'after', 'damage'."
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" },
+            "taken_at": { "type": "string", "format": "date-time" }
+          },
+          "description": "EXIF-style metadata embedded in or extracted from the photo."
+        }
+      }
+    },
+    "document_data": {
+      "type": "object",
+      "description": "Payload for type='document'.",
+      "required": ["uri", "document_type"],
+      "properties": {
+        "uri": { "type": "string", "format": "uri" },
+        "document_type": {
+          "type": "string",
+          "description": "Semantic document type, e.g. 'clinical_record', 'meeting_minutes', 'deliverable'."
+        },
+        "mime_type": { "type": "string", "description": "MIME type of the document." }
+      }
+    },
+    "duration_data": {
+      "type": "object",
+      "description": "Payload for type='duration'.",
+      "required": ["minutes"],
+      "properties": {
+        "minutes": { "type": "number", "minimum": 0, "description": "Duration in minutes." },
+        "description": { "type": "string", "description": "Activity description for billable hours." },
+        "category": { "type": "string", "description": "Activity category for time tracking." }
+      }
+    },
+    "notes_data": {
+      "type": "object",
+      "description": "Payload for type='notes'.",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "description": "Free-text notes." },
+        "language": { "type": "string", "description": "ISO 639-1 language code.", "examples": ["es", "en", "pt"] }
+      }
+    }
+  }
+}

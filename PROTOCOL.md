@@ -310,6 +310,8 @@ How the service proves it occurred.
 | `proof.duration_actual` | integer | OPTIONAL | Actual minutes. Auto-calculated from checkin/checkout. |
 | `proof.evidence` | evidence[] | OPTIONAL | Evidence items: GPS, signatures, photos, documents. |
 
+> **Vertical evidence schemas:** Each vertical defines required vs. optional evidence types, exact payload structures, and deterministic resolution rules. See [`schema/evidence/`](./schema/evidence/) — one schema per vertical (health, home, legal, education, consulting) extending the shared [`base.schema.json`](./schema/evidence/base.schema.json).
+
 ### 5.8 Billing (Payment)
 
 Financial settlement for the service. Billing has its own status independent from the lifecycle state.
@@ -570,7 +572,7 @@ The 9 states are universal. The specifics of each state vary by vertical, but th
 
 ### Principle 2: Delivery MUST Be Verifiable
 
-If you cannot prove the service occurred, it did not occur. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation.
+If you cannot prove the service occurred, it did not occur. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation. Each vertical defines its own required evidence and resolution rules — see [`schema/evidence/`](./schema/evidence/) for machine-readable schemas per vertical.
 
 ### Principle 3: The Payer Is Not Always the Client
 
