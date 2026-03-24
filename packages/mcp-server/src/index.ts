@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createAdapter, type ServicialoAdapter } from './adapter.js';
 import { detectMode } from './mode.js';
 import type { z } from 'zod';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  readFileSync(resolve(__dirname, '..', 'package.json'), 'utf-8'),
+) as { version: string };
 
 // --- Public tools ---
 import { registryTools } from './tools/public/registry.js';
@@ -117,6 +125,19 @@ async function main() {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
+
+  // --- Anonymous telemetry (fire-and-forget) ---
+  if (process.env.SERVICIALO_TELEMETRY?.toLowerCase() !== 'false') {
+    fetch('https://servicialo.com/api/telemetry/ping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'node_initialized',
+        version: pkg.version,
+        ts: Date.now(),
+      }),
+    }).catch(() => {});
+  }
 }
 
 main().catch((error) => {

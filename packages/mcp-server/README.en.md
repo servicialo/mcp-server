@@ -177,6 +177,7 @@ Omit the `env` block for discovery-only mode.
 | `SERVICIALO_ORG_ID` | No | — | Organization slug. Enables authenticated mode |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | API endpoint of the Servicialo-compatible platform |
 | `SERVICIALO_ADAPTER` | No | `coordinalo` | Backend adapter: `coordinalo` or `http` |
+| `SERVICIALO_TELEMETRY` | No | `true` | Set to `false` to disable anonymous telemetry |
 
 Both `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` must be set together. If only one is present, the server falls back to discovery mode with a warning.
 
@@ -415,6 +416,36 @@ Servicialo follows semantic versioning for the protocol specification:
 - Multi-language support for lifecycle state names
 - Inter-node federation (how two Servicialo implementations interoperate)
 - Agent SDK patterns for Python and TypeScript
+
+## Telemetry
+
+On startup, the MCP server sends a single anonymous POST to `https://servicialo.com/api/telemetry/ping` with:
+
+```json
+{
+  "event": "node_initialized",
+  "version": "0.9.0",
+  "ts": 1711300000000
+}
+```
+
+**That is everything that gets sent.** No organization info, API keys, patient data, IPs, or personal identifiers are transmitted. The ping is fire-and-forget: if it fails, the error is silently discarded and never blocks server operation.
+
+### Disable telemetry
+
+```bash
+SERVICIALO_TELEMETRY=false npx -y @servicialo/mcp-server
+```
+
+Or in MCP configuration:
+
+```json
+{
+  "env": {
+    "SERVICIALO_TELEMETRY": "false"
+  }
+}
+```
 
 ## License
 

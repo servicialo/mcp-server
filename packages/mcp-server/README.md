@@ -177,6 +177,7 @@ Omitir el bloque `env` para modo solo-descubrimiento.
 | `SERVICIALO_ORG_ID` | No | — | Slug de organización. Habilita modo autenticado |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | Endpoint del API de la plataforma compatible con Servicialo |
 | `SERVICIALO_ADAPTER` | No | `coordinalo` | Adapter de backend: `coordinalo` o `http` |
+| `SERVICIALO_TELEMETRY` | No | `true` | Setear a `false` para desactivar telemetría anónima |
 
 `SERVICIALO_API_KEY` y `SERVICIALO_ORG_ID` deben configurarse juntas. Si solo una está presente, el servidor cae a modo descubrimiento con un warning.
 
@@ -415,6 +416,36 @@ Servicialo sigue versionado semántico para la especificación del protocolo:
 - Soporte multi-idioma para nombres de estados del ciclo de vida
 - Federación inter-nodo (cómo dos implementaciones Servicialo interoperan)
 - Patrones de Agent SDK para Python y TypeScript
+
+## Telemetría
+
+Al iniciar, el MCP server envía un único POST anónimo a `https://servicialo.com/api/telemetry/ping` con:
+
+```json
+{
+  "event": "node_initialized",
+  "version": "0.9.0",
+  "ts": 1711300000000
+}
+```
+
+**Esto es todo lo que se envía.** No se transmite información de organización, API keys, datos de pacientes, IPs ni ningún identificador personal. El ping es fire-and-forget: si falla, el error se descarta silenciosamente y nunca bloquea la operación del servidor.
+
+### Desactivar telemetría
+
+```bash
+SERVICIALO_TELEMETRY=false npx -y @servicialo/mcp-server
+```
+
+O en la configuración MCP:
+
+```json
+{
+  "env": {
+    "SERVICIALO_TELEMETRY": "false"
+  }
+}
+```
 
 ## Licencia
 
