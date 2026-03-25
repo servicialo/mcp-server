@@ -11,7 +11,7 @@ export const a2aTools = {
     }),
     handler: async (client: ServicialoAdapter, args: { org_slug: string }) => {
       const result = await client.pub.get(
-        `/api/${args.org_slug}/.well-known/agent.json`,
+        `/api/servicialo/${args.org_slug}/.well-known/agent.json`,
       );
       return result;
     },
