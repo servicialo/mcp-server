@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getNetworkStats } from "@/lib/telemetry-stats";
+import type { CountryEntry } from "@/lib/telemetry-stats";
 
 export const revalidate = 60;
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 export default async function NetworkPage() {
   const stats = await getNetworkStats();
   const maxDaily = Math.max(...stats.dailyChart.map((d) => d.count), 1);
+  const totalGeo = stats.countryBreakdown.reduce((s, c) => s + c.count, 0);
 
   return (
     <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-12 pb-24">
@@ -61,6 +63,68 @@ export default async function NetworkPage() {
         <KpiCard label="Unique nodes (24 h)" value={String(stats.uniqueNodes24h)} />
         <KpiCard label="Unique nodes (7 d)" value={String(stats.uniqueNodes7d)} />
       </section>
+
+      {/* Country breakdown */}
+      {stats.countryBreakdown.length > 0 && (
+        <section className="mb-14">
+          <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+            Pings by country
+          </h2>
+
+          {/* Continent summary bar */}
+          {stats.continentBreakdown.length > 0 && (
+            <div className="mb-6">
+              <div className="flex h-3 rounded-full overflow-hidden mb-3">
+                {stats.continentBreakdown.map((c, i) => {
+                  const pct = totalGeo > 0 ? (c.count / totalGeo) * 100 : 0;
+                  return (
+                    <div
+                      key={c.continent}
+                      className="h-full first:rounded-l-full last:rounded-r-full"
+                      style={{
+                        width: `${Math.max(pct, 1)}%`,
+                        backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length],
+                        opacity: 0.75,
+                      }}
+                      title={`${c.continent}: ${c.count} (${Math.round(pct)}%)`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {stats.continentBreakdown.map((c, i) => (
+                  <span key={c.continent} className="inline-flex items-center gap-1.5 font-mono text-[10px] text-text-muted">
+                    <span
+                      className="inline-block w-2 h-2 rounded-full"
+                      style={{ backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length], opacity: 0.75 }}
+                    />
+                    {c.continent} ({c.count})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Country table */}
+          <div className="rounded-xl border border-border overflow-hidden">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-border bg-surface-alt">
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Country</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continent</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Pings</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium w-[120px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.countryBreakdown.map((c) => (
+                  <CountryRow key={c.country_code} entry={c} total={totalGeo} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* Version breakdown */}
       {stats.versionBreakdown.length > 0 && (
@@ -137,11 +201,14 @@ export default async function NetworkPage() {
       <p className="font-mono text-[10px] text-text-dim leading-relaxed">
         Telemetry is anonymous and opt-in. Each MCP server node sends a single
         ping on initialization containing only: event type, protocol version,
-        and a random node ID. No personal or organizational data is collected.
+        and a random node ID. Country is resolved server-side from the request
+        IP — no city, region, or IP address is ever stored.
       </p>
     </div>
   );
 }
+
+// ─── Components ───
 
 function KpiCard({ label, value }: { label: string; value: string }) {
   return (
@@ -155,3 +222,49 @@ function KpiCard({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+/** Country code → flag emoji (works on all modern browsers). */
+function countryFlag(code: string): string {
+  // Convert 2-letter country code to regional indicator symbols
+  const base = 0x1f1e6 - 65; // 'A' = 65
+  const upper = code.toUpperCase();
+  if (upper.length !== 2) return '';
+  return String.fromCodePoint(
+    base + upper.charCodeAt(0),
+    base + upper.charCodeAt(1),
+  );
+}
+
+function CountryRow({ entry, total }: { entry: CountryEntry; total: number }) {
+  const pct = total > 0 ? (entry.count / total) * 100 : 0;
+  return (
+    <tr className="border-b border-border last:border-b-0 hover:bg-surface-alt/50 transition-colors">
+      <td className="px-4 py-2.5">
+        <span className="inline-flex items-center gap-2">
+          <span className="text-base leading-none">{countryFlag(entry.country_code)}</span>
+          <span className="font-mono text-xs text-text">{entry.country_name}</span>
+          <span className="font-mono text-[10px] text-text-dim">({entry.country_code})</span>
+        </span>
+      </td>
+      <td className="px-4 py-2.5 font-mono text-xs text-text-muted">{entry.continent}</td>
+      <td className="px-4 py-2.5 font-mono text-xs text-text-muted text-right">{entry.count}</td>
+      <td className="px-4 py-2.5">
+        <div className="h-2 rounded-full bg-surface-alt overflow-hidden">
+          <div
+            className="h-full rounded-full bg-accent/60"
+            style={{ width: `${Math.max(pct, 2)}%` }}
+          />
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+const CONTINENT_COLORS = [
+  'var(--color-accent)',
+  'var(--color-green)',
+  'var(--color-blue)',
+  'var(--color-purple)',
+  '#e4a853',
+  '#e06c75',
+];
