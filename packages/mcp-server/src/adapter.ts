@@ -49,7 +49,7 @@ export type AdapterType = 'coordinalo' | 'http';
  */
 export async function createAdapter(): Promise<ServicialoAdapter> {
   const adapterType = (process.env.SERVICIALO_ADAPTER || 'coordinalo') as AdapterType;
-  const baseUrl = process.env.SERVICIALO_BASE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.SERVICIALO_BASE_URL || 'https://servicialo.com';
 
   const config = {
     baseUrl,
