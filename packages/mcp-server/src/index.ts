@@ -22,6 +22,7 @@ import { publicAvailabilityTools } from './tools/public/availability.js';
 import { publicServicesTools } from './tools/public/services.js';
 import { resolveTools } from './tools/public/resolve.js';
 import { a2aTools } from './tools/public/a2a.js';
+import { docsQuickstartTools } from './tools/public/docs-quickstart.js';
 
 // --- Authenticated tools (Phases 2–6) ---
 import { entenderTools } from './tools/authenticated/entender.js';
@@ -47,6 +48,7 @@ const publicTools: Record<string, ToolDef> = {
   ...publicServicesTools as unknown as Record<string, ToolDef>,
   ...resolveTools as unknown as Record<string, ToolDef>,
   ...a2aTools as unknown as Record<string, ToolDef>,
+  ...docsQuickstartTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Authenticated tools (only in authenticated mode) ---
@@ -78,7 +80,7 @@ async function main() {
   // --- Init MCP server ---
   const server = new McpServer({
     name: 'servicialo',
-    version: '0.8.0',
+    version: pkg.version,
   });
 
   // --- Register tools ---
@@ -183,7 +185,7 @@ main().catch((error) => {
 
 // --- Smithery sandbox (for registry scanning) ---
 export function createSandboxServer() {
-  const sandbox = new McpServer({ name: 'servicialo', version: '0.8.0' });
+  const sandbox = new McpServer({ name: 'servicialo', version: pkg.version });
   const allTools = { ...publicTools, ...authenticatedTools };
   for (const [name, tool] of Object.entries(allTools)) {
     sandbox.tool(name, tool.description, tool.schema.shape, async () => ({

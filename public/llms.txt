@@ -1,0 +1,81 @@
+# Servicialo
+
+> Open protocol for AI agents that coordinate professional services.
+
+Servicialo is the missing protocol layer for AI agents that need to discover, book, verify delivery, and settle professional services. Think HTTP for service coordination: any agent, any platform, one protocol.
+
+The protocol models every service through 8 dimensions, 9 lifecycle states, 6 exception flows, and 7 fundamental principles — universal across verticals (health, legal, education, home services).
+
+Lifecycle: Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Charged → Verified
+
+## Quickstart
+
+1. Install: `npx -y @servicialo/mcp-server` (discovery mode — 10 public tools, no credentials)
+2. Sign up: https://coordinalo.com/signup
+3. Get credentials: In Coordinalo → Settings → Servicialo → Generate MCP credentials (SERVICIALO_ORG_ID, SERVICIALO_API_KEY)
+4. Configure MCP client: add env vars SERVICIALO_API_KEY and SERVICIALO_ORG_ID to your MCP server config
+5. Publish: In Coordinalo → Settings → Servicialo → Publish (your org appears on servicialo.com/network)
+
+## MCP Tools (35 total)
+
+### Public tools (10) — always available, no credentials
+
+- docs.quickstart: Get the complete getting-started guide as structured JSON
+- resolve.lookup: Resolve orgSlug to endpoints and trust level
+- resolve.search: Search organizations by country and vertical in the global resolver
+- trust.get_score: Get organization trust score (0-100, level, last activity)
+- registry.search: Search organizations by vertical, location, country
+- registry.get_organization: Get public organization details (services, providers, booking config)
+- registry.manifest: Get server manifest (protocol version, capabilities, org metadata)
+- services.list: List catalog of services for an organization
+- scheduling.check_availability: Query availability (3-variable scheduler: provider ∧ client ∧ resource)
+- a2a.get_agent_card: Get A2A Agent Card for inter-agent discovery
+
+### Authenticated tools (25) — require SERVICIALO_API_KEY + SERVICIALO_ORG_ID
+
+Phase 2 — Understand:
+- service.get: Get 8 dimensions of a service
+- contract.get: Get contract terms (evidence required, cancellation policy, dispute window)
+
+Phase 3 — Commit:
+- clients.get_or_create: Resolve or create client identity by email/phone
+- scheduling.book: Create new session → requested state
+- scheduling.confirm: Confirm booked session → confirmed state
+
+Phase 4 — Lifecycle:
+- lifecycle.get_state: Get current state, available transitions, and history
+- lifecycle.transition: Execute state transition with evidence
+- scheduling.reschedule: Reschedule to new date/time (contractual policy may apply)
+- scheduling.cancel: Cancel with cancellation policy applied
+
+Phase 5 — Verify Delivery:
+- delivery.checkin: Check-in with GPS + timestamp → in_progress state
+- delivery.checkout: Check-out with GPS + timestamp → delivered state (duration auto-calculated)
+- delivery.record_evidence: Record evidence (gps, signature, photo, document, duration, notes)
+
+Phase 6 — Close:
+- documentation.create: Generate service record → documented state
+- payments.create_sale: Create charge for documented service → charged state
+- payments.record_payment: Record payment against sale
+- payments.get_status: Get payment status (sale or account)
+
+Resource Management:
+- resource.list: List physical resources (rooms, boxes, chairs, equipment)
+- resource.get: Get resource details with availability slots
+- resource.create: Create new physical resource
+- resource.update: Update resource (patch semantics)
+- resource.delete: Soft-delete resource (is_active = false)
+- resource.get_availability: Query resource availability by date range
+
+Resolver Administration:
+- resolve.register: Register organization in global resolver with MCP/REST endpoints
+- resolve.update_endpoint: Update registered endpoints (portability between backends)
+- telemetry.heartbeat: Send heartbeat to resolver indicating node is active
+
+## Links
+
+- Network (live organizations): https://servicialo.com/network
+- Sign up: https://coordinalo.com/signup
+- npm: https://npmjs.com/package/@servicialo/mcp-server
+- Protocol spec: https://servicialo.com
+- GitHub: https://github.com/servicialo/protocol

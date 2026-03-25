@@ -1,6 +1,6 @@
 {
   "name": "@servicialo/mcp-server",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "mcpName": "com.servicialo/mcp-server",
   "description": "Open protocol for professional service delivery — connects AI agents with scheduling, verification and settlement of professional services",
   "license": "Apache-2.0",

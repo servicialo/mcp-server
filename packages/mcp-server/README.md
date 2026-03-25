@@ -120,37 +120,37 @@ Este paquete expone el protocolo Servicialo como 34 herramientas MCP organizadas
 | `resolve.update_endpoint` | Actualizar endpoints registrados (portabilidad entre backends) | `resolve:write` |
 | `telemetry.heartbeat` | Enviar heartbeat al resolver indicando que el nodo está activo | `telemetry:write` |
 
-## Instalación y Quickstart
+## Quickstart — 5 pasos para estar en la red
 
-### Opción 1: Modo descubrimiento (zero config)
+### Paso 1. Instalar el servidor MCP
 
 ```bash
 npx -y @servicialo/mcp-server
 ```
 
-Sin API key. Sin org ID. Las 9 herramientas públicas disponibles de inmediato (resolver + descubrimiento). Pruébalo:
+Modo descubrimiento — 10 herramientas públicas, sin credenciales. Pruébalo de inmediato:
 
 ```json
 {
   "tool": "registry.search",
-  "arguments": {
-    "vertical": "kinesiologia",
-    "location": "santiago"
-  }
+  "arguments": { "vertical": "kinesiologia", "location": "santiago" }
 }
 ```
 
-### Opción 2: Modo completo (autenticado)
+### Paso 2. Crear tu organización
 
-```bash
-SERVICIALO_API_KEY=tu_key SERVICIALO_ORG_ID=tu_org npx -y @servicialo/mcp-server
-```
+Registra tu organización en [coordinalo.com/signup](https://coordinalo.com/signup). Coordinalo es la implementación de referencia del protocolo Servicialo.
 
-Las 34 herramientas habilitadas.
+### Paso 3. Obtener credenciales MCP
 
-### Claude Desktop / Cursor / cualquier cliente MCP
+En Coordinalo: **Settings → Servicialo → Generar credenciales MCP**. Obtendrás dos valores:
 
-Agregar a tu configuración MCP:
+- `SERVICIALO_ORG_ID` — slug de tu organización (ej: `clinica-dental-sur`)
+- `SERVICIALO_API_KEY` — bearer token para autenticación
+
+### Paso 4. Configurar el cliente MCP
+
+Agregar a la configuración de Claude Desktop, Cursor o cualquier cliente MCP:
 
 ```json
 {
@@ -159,27 +159,43 @@ Agregar a tu configuración MCP:
       "command": "npx",
       "args": ["-y", "@servicialo/mcp-server"],
       "env": {
-        "SERVICIALO_API_KEY": "tu_api_key",
-        "SERVICIALO_ORG_ID": "tu_org_id"
+        "SERVICIALO_API_KEY": "<tu_api_key>",
+        "SERVICIALO_ORG_ID": "<tu_org_slug>"
       }
     }
   }
 }
 ```
 
-Omitir el bloque `env` para modo solo-descubrimiento.
+Omitir el bloque `env` para modo solo-descubrimiento (10 herramientas públicas).
 
-### Variables de Entorno
+### Paso 5. Publicar en la red Servicialo
+
+En Coordinalo: **Settings → Servicialo → Publicar**. Tu organización aparece en [servicialo.com/network](https://servicialo.com/network) y es descubrible por otros agentes.
+
+> **Tip:** Un agente puede obtener estos 5 pasos como JSON estructurado llamando la herramienta `docs.quickstart`.
+
+## Red / Network
+
+La red Servicialo es el registro global de organizaciones que implementan el protocolo. Cada nodo autenticado envía un heartbeat periódico, y cualquier agente puede descubrir organizaciones por país, vertical y puntaje de confianza.
+
+- **Explorar la red:** [servicialo.com/network](https://servicialo.com/network)
+- **Buscar por vertical:** `registry.search({ vertical: "kinesiologia", country: "cl" })`
+- **Resolver un org:** `resolve.lookup({ org_slug: "clinica-dental-sur" })`
+
+## Credenciales
 
 | Variable | Requerida | Default | Descripción |
 |---|---|---|---|
-| `SERVICIALO_API_KEY` | No | — | Bearer token. Habilita modo autenticado |
+| `SERVICIALO_API_KEY` | No | — | Bearer token. Habilita modo autenticado (35 herramientas) |
 | `SERVICIALO_ORG_ID` | No | — | Slug de organización. Habilita modo autenticado |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | Endpoint del API de la plataforma compatible con Servicialo |
 | `SERVICIALO_ADAPTER` | No | `coordinalo` | Adapter de backend: `coordinalo` o `http` |
 | `SERVICIALO_TELEMETRY` | No | `true` | Setear a `false` para desactivar telemetría anónima |
 
 `SERVICIALO_API_KEY` y `SERVICIALO_ORG_ID` deben configurarse juntas. Si solo una está presente, el servidor cae a modo descubrimiento con un warning.
+
+Las credenciales se obtienen en [coordinalo.com](https://coordinalo.com) → Settings → Servicialo → Generar credenciales MCP.
 
 ## Conectar una implementación propia
 
