@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, join } from 'node:path';
+import { homedir } from 'node:os';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createAdapter, type ServicialoAdapter } from './adapter.js';
@@ -126,17 +128,51 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  // --- Anonymous telemetry (fire-and-forget) ---
+  // --- Telemetry (fire-and-forget, respects SERVICIALO_TELEMETRY=false) ---
   if (process.env.SERVICIALO_TELEMETRY?.toLowerCase() !== 'false') {
+    // 1. Persistent node_id: read or create ~/.servicialo/node_id
+    let nodeId: string | undefined;
+    try {
+      const dir = join(homedir(), '.servicialo');
+      const file = join(dir, 'node_id');
+      if (existsSync(file)) {
+        nodeId = readFileSync(file, 'utf-8').trim();
+      }
+      if (!nodeId) {
+        nodeId = randomUUID();
+        mkdirSync(dir, { recursive: true });
+        writeFileSync(file, nodeId, 'utf-8');
+      }
+    } catch {
+      // Non-critical — proceed without node_id
+    }
+
+    // 2. Anonymous telemetry ping
     fetch('https://servicialo.com/api/telemetry/ping', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         event: 'node_initialized',
         version: pkg.version,
+        node_id: nodeId,
         ts: Date.now(),
       }),
     }).catch(() => {});
+
+    // 3. Registry heartbeat (authenticated nodes only)
+    const apiKey = process.env.SERVICIALO_API_KEY;
+    const orgSlug = process.env.SERVICIALO_ORG_ID;
+    const country = process.env.SERVICIALO_COUNTRY || 'cl';
+    const baseUrl = process.env.SERVICIALO_BASE_URL || 'https://servicialo.com';
+    if (apiKey && orgSlug) {
+      fetch(`${baseUrl}/api/registry/${country}/${orgSlug}/heartbeat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }).catch(() => {});
+    }
   }
 }
 
