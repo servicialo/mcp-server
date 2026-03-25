@@ -35,21 +35,6 @@ export interface NetworkStats {
 
 // ─── Queries ───
 
-async function countPings(): Promise<number> {
-  const res = await fetch(
-    rest('telemetry_pings', 'select=id&head=true'),
-    {
-      method: 'HEAD',
-      headers: { ...headers(), Prefer: 'count=exact' },
-      next: { revalidate: 60 },
-    },
-  );
-  const range = res.headers.get('content-range'); // */123
-  if (!range) return 0;
-  const total = range.split('/')[1];
-  return total === '*' ? 0 : parseInt(total, 10);
-}
-
 async function uniqueNodes(interval: '24h' | '7d'): Promise<number> {
   const ago = interval === '24h'
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
@@ -131,14 +116,15 @@ export async function getNetworkStats(): Promise<NetworkStats> {
     };
   }
 
-  const [totalPings, uniqueNodes24h, uniqueNodes7d, versions, daily] =
+  const [uniqueNodes24h, uniqueNodes7d, versions, daily] =
     await Promise.all([
-      countPings(),
       uniqueNodes('24h'),
       uniqueNodes('7d'),
       versionBreakdown(),
       dailyChart(),
     ]);
+
+  const totalPings = versions.reduce((sum, v) => sum + v.count, 0);
 
   return {
     totalPings,

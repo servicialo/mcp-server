@@ -70,7 +70,7 @@ export default async function NetworkPage() {
           </h2>
           <div className="space-y-2">
             {stats.versionBreakdown.map((v) => {
-              const pct = Math.round((v.count / stats.totalPings) * 100);
+              const pct = stats.totalPings > 0 ? Math.round((v.count / stats.totalPings) * 100) : 0;
               return (
                 <div key={v.version} className="flex items-center gap-3">
                   <span className="font-mono text-xs text-text-muted w-20 shrink-0">
@@ -127,7 +127,7 @@ export default async function NetworkPage() {
       )}
 
       {/* Empty state */}
-      {stats.totalPings === 0 && (
+      {stats.totalPings === 0 && stats.uniqueNodes24h === 0 && stats.dailyChart.length === 0 && (
         <div className="text-center py-20 text-text-muted text-sm">
           No telemetry data yet. Nodes report in when they initialize.
         </div>
