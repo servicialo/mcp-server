@@ -65,57 +65,56 @@ export default async function NetworkPage() {
         <KpiCard label="Unique nodes (7 d)" value={String(stats.uniqueNodes7d)} />
       </section>
 
-      {/* Country breakdown */}
-      {stats.countryBreakdown.length > 0 && (
-        <section className="mb-14">
-          <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Pings by country
-          </h2>
+      {/* World map — always visible */}
+      <section className="mb-14">
+        <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+          Pings by country
+        </h2>
 
-          {/* Choropleth world map */}
+        <div className="mb-6">
+          <WorldMap
+            countryData={Object.fromEntries(
+              stats.countryBreakdown.map((c) => [c.country_code, c.count])
+            )}
+          />
+        </div>
+
+        {/* Continent summary bar */}
+        {stats.continentBreakdown.length > 0 && (
           <div className="mb-6">
-            <WorldMap
-              countryData={Object.fromEntries(
-                stats.countryBreakdown.map((c) => [c.country_code, c.count])
-              )}
-            />
-          </div>
-
-          {/* Continent summary bar */}
-          {stats.continentBreakdown.length > 0 && (
-            <div className="mb-6">
-              <div className="flex h-3 rounded-full overflow-hidden mb-3">
-                {stats.continentBreakdown.map((c, i) => {
-                  const pct = totalGeo > 0 ? (c.count / totalGeo) * 100 : 0;
-                  return (
-                    <div
-                      key={c.continent}
-                      className="h-full first:rounded-l-full last:rounded-r-full"
-                      style={{
-                        width: `${Math.max(pct, 1)}%`,
-                        backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length],
-                        opacity: 0.75,
-                      }}
-                      title={`${c.continent}: ${c.count} (${Math.round(pct)}%)`}
-                    />
-                  );
-                })}
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                {stats.continentBreakdown.map((c, i) => (
-                  <span key={c.continent} className="inline-flex items-center gap-1.5 font-mono text-[10px] text-text-muted">
-                    <span
-                      className="inline-block w-2 h-2 rounded-full"
-                      style={{ backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length], opacity: 0.75 }}
-                    />
-                    {c.continent} ({c.count})
-                  </span>
-                ))}
-              </div>
+            <div className="flex h-3 rounded-full overflow-hidden mb-3">
+              {stats.continentBreakdown.map((c, i) => {
+                const pct = totalGeo > 0 ? (c.count / totalGeo) * 100 : 0;
+                return (
+                  <div
+                    key={c.continent}
+                    className="h-full first:rounded-l-full last:rounded-r-full"
+                    style={{
+                      width: `${Math.max(pct, 1)}%`,
+                      backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length],
+                      opacity: 0.75,
+                    }}
+                    title={`${c.continent}: ${c.count} (${Math.round(pct)}%)`}
+                  />
+                );
+              })}
             </div>
-          )}
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {stats.continentBreakdown.map((c, i) => (
+                <span key={c.continent} className="inline-flex items-center gap-1.5 font-mono text-[10px] text-text-muted">
+                  <span
+                    className="inline-block w-2 h-2 rounded-full"
+                    style={{ backgroundColor: CONTINENT_COLORS[i % CONTINENT_COLORS.length], opacity: 0.75 }}
+                  />
+                  {c.continent} ({c.count})
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
-          {/* Country table */}
+        {/* Country table */}
+        {stats.countryBreakdown.length > 0 && (
           <div className="rounded-xl border border-border overflow-hidden">
             <table className="w-full text-left">
               <thead>
@@ -133,8 +132,8 @@ export default async function NetworkPage() {
               </tbody>
             </table>
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Version breakdown */}
       {stats.versionBreakdown.length > 0 && (
