@@ -86,8 +86,10 @@ async function main() {
   // --- Register tools ---
   function registerTools(tools: Record<string, ToolDef>) {
     for (const [name, tool] of Object.entries(tools)) {
+      // MCP spec requires tool names to match [a-zA-Z0-9_-]{1,64}
+      const safeName = name.replace(/\./g, '_');
       server.tool(
-        name,
+        safeName,
         tool.description,
         tool.schema.shape,
         async (args) => {
@@ -188,7 +190,8 @@ export function createSandboxServer() {
   const sandbox = new McpServer({ name: 'servicialo', version: pkg.version });
   const allTools = { ...publicTools, ...authenticatedTools };
   for (const [name, tool] of Object.entries(allTools)) {
-    sandbox.tool(name, tool.description, tool.schema.shape, async () => ({
+    const safeName = name.replace(/\./g, '_');
+    sandbox.tool(safeName, tool.description, tool.schema.shape, async () => ({
       content: [{ type: 'text' as const, text: '{}' }],
     }));
   }

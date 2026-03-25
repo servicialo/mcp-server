@@ -230,7 +230,9 @@ export function validateMandate(ctx: MandateValidationContext): void {
   }
 
   // 4. Scope coverage
-  const requiredScopes = TOOL_SCOPE_MAP[tool_name];
+  // Normalize: MCP registration uses underscores, scope map uses dots
+  const normalizedToolName = tool_name.replace(/_/g, '.');
+  const requiredScopes = TOOL_SCOPE_MAP[tool_name] ?? TOOL_SCOPE_MAP[normalizedToolName];
   if (requiredScopes === undefined) {
     throw new MandateValidationError(
       'UNKNOWN_TOOL',
