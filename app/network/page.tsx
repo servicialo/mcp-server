@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getNetworkStats } from "@/lib/telemetry-stats";
 import type { CountryEntry } from "@/lib/telemetry-stats";
+import { WorldMap } from "@/components/WorldMap";
 
 export const revalidate = 60;
 
@@ -70,6 +71,15 @@ export default async function NetworkPage() {
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
             Pings by country
           </h2>
+
+          {/* Choropleth world map */}
+          <div className="mb-6">
+            <WorldMap
+              countryData={Object.fromEntries(
+                stats.countryBreakdown.map((c) => [c.country_code, c.count])
+              )}
+            />
+          </div>
 
           {/* Continent summary bar */}
           {stats.continentBreakdown.length > 0 && (
