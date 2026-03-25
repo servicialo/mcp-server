@@ -8,18 +8,18 @@
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.9.0",
+  "version": "0.9.6",
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://coordinalo.com/api/mcp"
+      "url": "https://servicialo.com/api/mcp"
     }
   ],
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.9.0",
+      "version": "0.9.6",
       "transport": {
         "type": "stdio"
       }
