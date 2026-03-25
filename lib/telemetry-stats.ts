@@ -1,7 +1,7 @@
 /**
  * Telemetry stats queries.
  *
- * Reads from the telemetry_pings table in the registry Supabase
+ * Reads from the telemetry_instances table in the registry Supabase
  * project via PostgREST. All queries are read-only and public-safe.
  */
 
@@ -33,7 +33,7 @@ export interface CountryEntry {
 }
 
 export interface NetworkStats {
-  totalPings: number;
+  totalInstances: number;
   uniqueNodes24h: number;
   uniqueNodes7d: number;
   versionBreakdown: { version: string; count: number }[];
@@ -56,7 +56,7 @@ async function uniqueNodes(interval: '24h' | '7d'): Promise<number> {
     'node_id': 'not.is.null',
   });
 
-  const res = await fetch(rest('telemetry_pings', params.toString()), {
+  const res = await fetch(rest('telemetry_instances', params.toString()), {
     headers: headers(),
     next: { revalidate: 60 },
   });
@@ -70,7 +70,7 @@ async function uniqueNodes(interval: '24h' | '7d'): Promise<number> {
 async function versionBreakdown(): Promise<{ version: string; count: number }[]> {
   // Fetch all version values and aggregate client-side
   // (PostgREST doesn't support GROUP BY natively without an RPC/view)
-  const res = await fetch(rest('telemetry_pings', 'select=version'), {
+  const res = await fetch(rest('telemetry_instances', 'select=version'), {
     headers: headers(),
     next: { revalidate: 60 },
   });
@@ -95,7 +95,7 @@ async function dailyChart(): Promise<{ date: string; count: number }[]> {
     order: 'created_at.asc',
   });
 
-  const res = await fetch(rest('telemetry_pings', params.toString()), {
+  const res = await fetch(rest('telemetry_instances', params.toString()), {
     headers: headers(),
     next: { revalidate: 60 },
   });
@@ -121,7 +121,7 @@ async function countryBreakdown(): Promise<{
     'country_code': 'not.is.null',
   });
 
-  const res = await fetch(rest('telemetry_pings', params.toString()), {
+  const res = await fetch(rest('telemetry_instances', params.toString()), {
     headers: headers(),
     next: { revalidate: 60 },
   });
@@ -166,7 +166,7 @@ async function countryBreakdown(): Promise<{
 export async function getNetworkStats(): Promise<NetworkStats> {
   if (!REGISTRY_URL || !REGISTRY_KEY) {
     return {
-      totalPings: 0,
+      totalInstances: 0,
       uniqueNodes24h: 0,
       uniqueNodes7d: 0,
       versionBreakdown: [],
@@ -185,10 +185,10 @@ export async function getNetworkStats(): Promise<NetworkStats> {
       countryBreakdown(),
     ]);
 
-  const totalPings = versions.reduce((sum, v) => sum + v.count, 0);
+  const totalInstances = versions.reduce((sum, v) => sum + v.count, 0);
 
   return {
-    totalPings,
+    totalInstances,
     uniqueNodes24h,
     uniqueNodes7d,
     versionBreakdown: versions,

@@ -149,8 +149,8 @@ async function main() {
       // Non-critical — proceed without node_id
     }
 
-    // 2. Anonymous telemetry ping
-    fetch('https://servicialo.com/api/telemetry/ping', {
+    // 2. Anonymous telemetry instance registration
+    fetch('https://servicialo.com/api/telemetry/instance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -1,14 +1,14 @@
 import { worldPaths } from "@/lib/world-map-paths";
 
 interface WorldMapProps {
-  /** Map of uppercase country code → ping count */
+  /** Map of uppercase country code → instance count */
   countryData: Record<string, number>;
 }
 
 /**
- * Choropleth world map. Countries with telemetry pings are filled
+ * Choropleth world map. Countries with telemetry instances are filled
  * with the accent color at an opacity proportional to their share
- * of total pings. Countries without data are neutral grey.
+ * of total instances. Countries without data are neutral grey.
  *
  * SVG source: simple-world-map (CC BY-SA 3.0, Al MacDonald / Fritz Lekschas)
  * IDs are lowercase ISO 3166-1 alpha-2 codes.
@@ -21,7 +21,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
   for (const [code, count] of Object.entries(countryData)) {
     // Log scale for better visual spread when counts vary widely
     const ratio = Math.log(count + 1) / Math.log(maxCount + 1);
-    // Clamp to 0.15–1.0 so even 1-ping countries are visible
+    // Clamp to 0.15–1.0 so even 1-instance countries are visible
     fills.set(code.toLowerCase(), 0.15 + ratio * 0.85);
   }
 
@@ -30,7 +30,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
       <svg
         viewBox="30.767 241.591 784.077 458.627"
         className="w-full h-auto"
-        aria-label="World map showing telemetry ping distribution by country"
+        aria-label="World map showing telemetry instance distribution by country"
         role="img"
       >
         {worldPaths.map(({ id, d }) => {
@@ -49,7 +49,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
                 strokeOpacity={0.5}
               >
                 {isActive && (
-                  <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} pings`}</title>
+                  <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instances`}</title>
                 )}
               </path>
             );
@@ -70,7 +70,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
                 />
               ))}
               {isActive && (
-                <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} pings`}</title>
+                <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instances`}</title>
               )}
             </g>
           );

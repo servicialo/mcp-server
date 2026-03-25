@@ -60,7 +60,7 @@ export default async function NetworkPage() {
 
       {/* KPI cards */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-14">
-        <KpiCard label="Total pings" value={stats.totalPings.toLocaleString()} />
+        <KpiCard label="Total instances" value={stats.totalInstances.toLocaleString()} />
         <KpiCard label="Unique nodes (24 h)" value={String(stats.uniqueNodes24h)} />
         <KpiCard label="Unique nodes (7 d)" value={String(stats.uniqueNodes7d)} />
       </section>
@@ -68,7 +68,7 @@ export default async function NetworkPage() {
       {/* World map — always visible */}
       <section className="mb-14">
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-          Pings by country
+          Instances by country
         </h2>
 
         <div className="mb-6">
@@ -121,7 +121,7 @@ export default async function NetworkPage() {
                 <tr className="border-b border-border bg-surface-alt">
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Country</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continent</th>
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Pings</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Instances</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium w-[120px]"></th>
                 </tr>
               </thead>
@@ -143,7 +143,7 @@ export default async function NetworkPage() {
           </h2>
           <div className="space-y-2">
             {stats.versionBreakdown.map((v) => {
-              const pct = stats.totalPings > 0 ? Math.round((v.count / stats.totalPings) * 100) : 0;
+              const pct = stats.totalInstances > 0 ? Math.round((v.count / stats.totalInstances) * 100) : 0;
               return (
                 <div key={v.version} className="flex items-center gap-3">
                   <span className="font-mono text-xs text-text-muted w-20 shrink-0">
@@ -169,7 +169,7 @@ export default async function NetworkPage() {
       {stats.dailyChart.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Daily pings (last 30 days)
+            Daily instances (last 30 days)
           </h2>
           <div className="flex items-end gap-[2px] h-40">
             {stats.dailyChart.map((d) => {
@@ -200,7 +200,7 @@ export default async function NetworkPage() {
       )}
 
       {/* Empty state */}
-      {stats.totalPings === 0 && stats.uniqueNodes24h === 0 && stats.dailyChart.length === 0 && (
+      {stats.totalInstances === 0 && stats.uniqueNodes24h === 0 && stats.dailyChart.length === 0 && (
         <div className="text-center py-20 text-text-muted text-sm">
           No telemetry data yet. Nodes report in when they initialize.
         </div>
@@ -208,9 +208,10 @@ export default async function NetworkPage() {
 
       {/* Footer note */}
       <p className="font-mono text-[10px] text-text-dim leading-relaxed">
-        Telemetry is anonymous and opt-in. Each MCP server node sends a single
-        ping on initialization containing only: event type, protocol version,
-        and a random node ID. Country is resolved server-side from the request
+        Telemetry is anonymous and opt-in. Each MCP server node registers a single
+        instance on initialization containing only: event type, protocol version,
+        and a random node ID. Duplicate registrations from the same node on the
+        same day are deduplicated. Country is resolved server-side from the request
         IP — no city, region, or IP address is ever stored.
       </p>
     </div>

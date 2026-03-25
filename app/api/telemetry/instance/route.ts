@@ -70,10 +70,13 @@ function extractIp(request: Request): string {
 // ─── Route handlers ───
 
 /**
- * POST /api/telemetry/ping
+ * POST /api/telemetry/instance
  *
  * Anonymous telemetry endpoint. Accepts { event, version, node_id, ts }
- * and inserts into the telemetry_pings table. Fire-and-forget from clients.
+ * and upserts into the telemetry_instances table. Fire-and-forget from clients.
+ *
+ * Deduplication: if the same node_id + event already exists for today (UTC),
+ * the row is updated (version/ts/geo refreshed) instead of inserting a duplicate.
  *
  * Server-side: resolves the request IP to country-level geolocation.
  * Never stores city, region, or the IP itself.
@@ -104,13 +107,16 @@ export async function POST(request: Request) {
     const ip = extractIp(request);
     const geo = await resolveGeo(ip);
 
-    await fetch(`${REGISTRY_URL}/rest/v1/telemetry_pings`, {
+    // Upsert: the unique index idx_telemetry_instances_dedup on
+    // (node_id, event, day) ensures one row per node per day.
+    // On conflict we refresh version, ts, and geo data.
+    await fetch(`${REGISTRY_URL}/rest/v1/telemetry_instances`, {
       method: 'POST',
       headers: {
         apikey: REGISTRY_KEY,
         Authorization: `Bearer ${REGISTRY_KEY}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
+        Prefer: 'return=minimal,resolution=merge-duplicates',
       },
       body: JSON.stringify({
         event,
