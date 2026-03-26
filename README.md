@@ -21,6 +21,16 @@ de entrega y liquidación financiera de servicios profesionales.
 
 ---
 
+## ¿Por dónde empiezo?
+
+**Soy una organización** que quiere usar servicios coordinados por agentes AI
+→ Ve directamente a una plataforma compatible: [Coordinalo](https://coordinalo.com) es la implementación de referencia. No necesitas este repositorio.
+
+**Soy un desarrollador** que quiere construir una plataforma compatible con el protocolo
+→ Sigue leyendo. Empieza por [`IMPLEMENTING.md`](./IMPLEMENTING.md).
+
+---
+
 ## El problema
 
 Sin un protocolo estándar, cada plataforma de servicios habla su propio idioma. Un agente AI que quiere agendar una cita médica, verificar una reparación a domicilio o cobrar una consulta legal necesita una integración distinta para cada una. Los datos quedan en silos, la interoperabilidad requiere integraciones custom, y la inteligencia colectiva sobre entrega de servicios nunca se forma.
@@ -226,6 +236,8 @@ Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes
 
 ### Inicio rápido
 
+El package `@servicialo/mcp-server` es un thin-client que conecta a la API HTTP de una plataforma Servicialo-compatible. Por defecto apunta a [Coordinalo](https://coordinalo.com) (`servicialo.com`). Si estás construyendo tu propio backend, apunta al tuyo con `SERVICIALO_BASE_URL`. Si eres una organización usuaria (clínica, consultora, etc.), las credenciales las obtienes desde tu plataforma — no necesitas instalar este package directamente.
+
 ```bash
 npx -y @servicialo/mcp-server
 ```
@@ -253,7 +265,7 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las fases del agente — 34 herramientas
+### Las fases del agente — 33 herramientas
 
 Un agente bien diseñado sigue este orden:
 
@@ -267,7 +279,9 @@ Un agente bien diseñado sigue este orden:
 | 5 | **Verificar** | Evidencia de que ocurrió | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 | — | **Recursos** | Espacios físicos y equipamiento | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
-| — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
+| — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` |
+
+*El servidor envía telemetría anónima al arrancar para estadísticas del protocolo. Se puede desactivar con `SERVICIALO_TELEMETRY=false`.*
 
 El protocolo garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
@@ -309,7 +323,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (34 herramientas) · resolución DNS · interoperabilidad A2A
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
 
 ### Servicialo/Finanzas — `en diseño`
 
