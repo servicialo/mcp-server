@@ -3,12 +3,17 @@
  *
  * Reads from the telemetry_instances table in the registry Supabase
  * project via PostgREST. All queries are read-only and public-safe.
+ *
+ * Counting strategy:
+ * - "Unique nodes" uses DISTINCT ip_hash (fingerprint) when available,
+ *   falling back to DISTINCT node_id. This prevents ephemeral containers
+ *   (each generating a new node_id) from inflating counts.
  */
 
 const REGISTRY_URL = process.env.REGISTRY_SUPABASE_URL;
 const REGISTRY_KEY = process.env.REGISTRY_SUPABASE_SERVICE_KEY;
 
-function headers(): Record<string, string> {
+function hdrs(): Record<string, string> {
   if (!REGISTRY_URL || !REGISTRY_KEY) {
     throw new Error('Missing REGISTRY_SUPABASE_URL or REGISTRY_SUPABASE_SERVICE_KEY');
   }
@@ -44,71 +49,114 @@ export interface NetworkStats {
 
 // ─── Queries ───
 
+/**
+ * Count unique nodes by distinct ip_hash (preferred) or node_id (fallback).
+ * ip_hash deduplicates ephemeral containers that generate new node_ids.
+ */
 async function uniqueNodes(interval: '24h' | '7d'): Promise<number> {
   const ago = interval === '24h'
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Use PostgREST to select distinct node_ids after the cutoff
   const params = new URLSearchParams({
-    select: 'node_id',
+    select: 'node_id,ip_hash',
     created_at: `gte.${ago}`,
-    'node_id': 'not.is.null',
   });
 
   const res = await fetch(rest('telemetry_instances', params.toString()), {
-    headers: headers(),
+    headers: hdrs(),
     next: { revalidate: 60 },
   });
 
   if (!res.ok) return 0;
-  const rows: { node_id: string }[] = await res.json();
-  const unique = new Set(rows.map((r) => r.node_id));
+  const rows: { node_id: string | null; ip_hash: string | null }[] = await res.json();
+
+  // Prefer ip_hash for uniqueness; fall back to node_id for old rows without ip_hash
+  const unique = new Set<string>();
+  for (const r of rows) {
+    const key = r.ip_hash ?? r.node_id;
+    if (key) unique.add(key);
+  }
+  return unique.size;
+}
+
+/**
+ * Total unique instances (all time) — by ip_hash, not row count.
+ */
+async function totalUniqueInstances(): Promise<number> {
+  const params = new URLSearchParams({
+    select: 'node_id,ip_hash',
+  });
+
+  const res = await fetch(rest('telemetry_instances', params.toString()), {
+    headers: hdrs(),
+    next: { revalidate: 60 },
+  });
+
+  if (!res.ok) return 0;
+  const rows: { node_id: string | null; ip_hash: string | null }[] = await res.json();
+
+  const unique = new Set<string>();
+  for (const r of rows) {
+    const key = r.ip_hash ?? r.node_id;
+    if (key) unique.add(key);
+  }
   return unique.size;
 }
 
 async function versionBreakdown(): Promise<{ version: string; count: number }[]> {
-  // Fetch all version values and aggregate client-side
-  // (PostgREST doesn't support GROUP BY natively without an RPC/view)
-  const res = await fetch(rest('telemetry_instances', 'select=version'), {
-    headers: headers(),
+  // Deduplicate by ip_hash per version to avoid bot inflation
+  const res = await fetch(rest('telemetry_instances', 'select=version,ip_hash,node_id'), {
+    headers: hdrs(),
     next: { revalidate: 60 },
   });
 
   if (!res.ok) return [];
-  const rows: { version: string }[] = await res.json();
-  const counts = new Map<string, number>();
+  const rows: { version: string; ip_hash: string | null; node_id: string | null }[] =
+    await res.json();
+
+  // Count unique fingerprints per version
+  const versionSets = new Map<string, Set<string>>();
   for (const r of rows) {
     const v = r.version ?? 'unknown';
-    counts.set(v, (counts.get(v) ?? 0) + 1);
+    const key = r.ip_hash ?? r.node_id ?? 'unknown';
+    if (!versionSets.has(v)) versionSets.set(v, new Set());
+    versionSets.get(v)!.add(key);
   }
-  return Array.from(counts.entries())
-    .map(([version, count]) => ({ version, count }))
+
+  return Array.from(versionSets.entries())
+    .map(([version, keys]) => ({ version, count: keys.size }))
     .sort((a, b) => b.count - a.count);
 }
 
 async function dailyChart(): Promise<{ date: string; count: number }[]> {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const params = new URLSearchParams({
-    select: 'created_at',
+    select: 'created_at,ip_hash,node_id',
     created_at: `gte.${since}`,
     order: 'created_at.asc',
   });
 
   const res = await fetch(rest('telemetry_instances', params.toString()), {
-    headers: headers(),
+    headers: hdrs(),
     next: { revalidate: 60 },
   });
 
   if (!res.ok) return [];
-  const rows: { created_at: string }[] = await res.json();
-  const counts = new Map<string, number>();
+  const rows: { created_at: string; ip_hash: string | null; node_id: string | null }[] =
+    await res.json();
+
+  // Count unique fingerprints per day
+  const daySets = new Map<string, Set<string>>();
   for (const r of rows) {
-    const day = r.created_at.slice(0, 10); // YYYY-MM-DD
-    counts.set(day, (counts.get(day) ?? 0) + 1);
+    const day = r.created_at.slice(0, 10);
+    const key = r.ip_hash ?? r.node_id ?? 'unknown';
+    if (!daySets.has(day)) daySets.set(day, new Set());
+    daySets.get(day)!.add(key);
   }
-  return Array.from(counts.entries())
-    .map(([date, count]) => ({ date, count }))
+
+  return Array.from(daySets.entries())
+    .map(([date, keys]) => ({ date, count: keys.size }))
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -117,45 +165,56 @@ async function countryBreakdown(): Promise<{
   continents: { continent: string; count: number }[];
 }> {
   const params = new URLSearchParams({
-    select: 'country_code,country_name,continent',
+    select: 'country_code,country_name,continent,ip_hash,node_id',
     'country_code': 'not.is.null',
   });
 
   const res = await fetch(rest('telemetry_instances', params.toString()), {
-    headers: headers(),
+    headers: hdrs(),
     next: { revalidate: 60 },
   });
 
   if (!res.ok) return { countries: [], continents: [] };
 
-  const rows: { country_code: string; country_name: string; continent: string }[] =
-    await res.json();
+  const rows: {
+    country_code: string;
+    country_name: string;
+    continent: string;
+    ip_hash: string | null;
+    node_id: string | null;
+  }[] = await res.json();
 
-  // Aggregate by country
-  const countryMap = new Map<string, { country_name: string; continent: string; count: number }>();
-  const continentMap = new Map<string, number>();
+  // Count unique fingerprints per country
+  const countrySets = new Map<string, { country_name: string; continent: string; keys: Set<string> }>();
+  const continentSets = new Map<string, Set<string>>();
 
   for (const r of rows) {
-    const key = r.country_code;
-    const existing = countryMap.get(key);
-    if (existing) {
-      existing.count++;
-    } else {
-      countryMap.set(key, {
+    const key = r.ip_hash ?? r.node_id ?? 'unknown';
+
+    if (!countrySets.has(r.country_code)) {
+      countrySets.set(r.country_code, {
         country_name: r.country_name,
         continent: r.continent,
-        count: 1,
+        keys: new Set(),
       });
     }
-    continentMap.set(r.continent, (continentMap.get(r.continent) ?? 0) + 1);
+    countrySets.get(r.country_code)!.keys.add(key);
+
+    if (!continentSets.has(r.continent)) continentSets.set(r.continent, new Set());
+    continentSets.get(r.continent)!.add(key);
   }
 
-  const countries = Array.from(countryMap.entries())
-    .map(([country_code, v]) => ({ country_code, ...v }))
+  const countries = Array.from(countrySets.entries())
+    .map(([country_code, v]) => ({
+      country_code,
+      country_name: v.country_name,
+      continent: v.continent,
+      count: v.keys.size,
+    }))
     .sort((a, b) => b.count - a.count);
 
-  const continents = Array.from(continentMap.entries())
-    .map(([continent, count]) => ({ continent, count }))
+  const continents = Array.from(continentSets.entries())
+    .map(([continent, keys]) => ({ continent, count: keys.size }))
     .sort((a, b) => b.count - a.count);
 
   return { countries, continents };
@@ -176,16 +235,15 @@ export async function getNetworkStats(): Promise<NetworkStats> {
     };
   }
 
-  const [uniqueNodes24h, uniqueNodes7d, versions, daily, geo] =
+  const [totalInstances, uniqueNodes24h, uniqueNodes7d, versions, daily, geo] =
     await Promise.all([
+      totalUniqueInstances(),
       uniqueNodes('24h'),
       uniqueNodes('7d'),
       versionBreakdown(),
       dailyChart(),
       countryBreakdown(),
     ]);
-
-  const totalInstances = versions.reduce((sum, v) => sum + v.count, 0);
 
   return {
     totalInstances,

@@ -60,15 +60,15 @@ export default async function NetworkPage() {
 
       {/* KPI cards */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-14">
-        <KpiCard label="Total instances" value={stats.totalInstances.toLocaleString()} />
-        <KpiCard label="Unique nodes (24 h)" value={String(stats.uniqueNodes24h)} />
-        <KpiCard label="Unique nodes (7 d)" value={String(stats.uniqueNodes7d)} />
+        <KpiCard label="Unique nodes" value={stats.totalInstances.toLocaleString()} />
+        <KpiCard label="Active (24 h)" value={String(stats.uniqueNodes24h)} />
+        <KpiCard label="Active (7 d)" value={String(stats.uniqueNodes7d)} />
       </section>
 
       {/* World map — always visible */}
       <section className="mb-14">
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-          Instances by country
+          Nodes by country
         </h2>
 
         <div className="mb-6">
@@ -121,7 +121,7 @@ export default async function NetworkPage() {
                 <tr className="border-b border-border bg-surface-alt">
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Country</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continent</th>
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Instances</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Nodes</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium w-[120px]"></th>
                 </tr>
               </thead>
@@ -169,7 +169,7 @@ export default async function NetworkPage() {
       {stats.dailyChart.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Daily instances (last 30 days)
+            Daily unique nodes (last 30 days)
           </h2>
           <div className="flex items-end gap-[2px] h-40">
             {stats.dailyChart.map((d) => {
@@ -208,11 +208,12 @@ export default async function NetworkPage() {
 
       {/* Footer note */}
       <p className="font-mono text-[10px] text-text-dim leading-relaxed">
-        Telemetry is anonymous and opt-in. Each MCP server node registers a single
-        instance on initialization containing only: event type, protocol version,
-        and a random node ID. Duplicate registrations from the same node on the
-        same day are deduplicated. Country is resolved server-side from the request
-        IP — no city, region, or IP address is ever stored.
+        Telemetry is anonymous and opt-in. Each MCP server node reports on
+        initialization: event type, protocol version, and a random node ID.
+        Nodes are deduplicated by cryptographic fingerprint (SHA-256 of
+        request metadata) to prevent inflation from ephemeral containers.
+        Rate-limited to 3 registrations per origin per hour. Country is
+        resolved server-side — no city, region, or IP address is ever stored.
       </p>
     </div>
   );
