@@ -23,7 +23,8 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:conformance": "vitest run conformance --reporter=verbose"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

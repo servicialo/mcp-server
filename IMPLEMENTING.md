@@ -453,6 +453,53 @@ Una vez que tu implementación pasa el checklist:
 
 ---
 
+## Conectar el MCP server a tu implementación
+
+Una vez que tu backend expone los endpoints `/v1/*` del [HTTP_PROFILE.md](./spec/HTTP_PROFILE.md), los usuarios
+pueden apuntar `@servicialo/mcp-server` a tu implementación así:
+
+```json
+{
+  "mcpServers": {
+    "servicialo": {
+      "command": "npx",
+      "args": ["-y", "@servicialo/mcp-server"],
+      "env": {
+        "SERVICIALO_ADAPTER": "http",
+        "SERVICIALO_BASE_URL": "https://tu-backend.com",
+        "SERVICIALO_API_KEY": "api_key_del_usuario",
+        "SERVICIALO_ORG_ID": "org_slug"
+      }
+    }
+  }
+}
+```
+
+El adapter `http` traduce automáticamente todos los tool handlers a los paths
+canónicos de tu implementación. No necesitas modificar el package.
+
+---
+
+## Paso 8 — Verificar conformance
+
+Antes de solicitar el listing en el registro oficial, verifica que tu implementación
+pasa el suite de conformance:
+
+```bash
+SERVICIALO_BASE_URL=https://tu-backend.com \
+SERVICIALO_API_KEY=tu_api_key \
+SERVICIALO_ORG_ID=tu_org_id \
+npm run test:conformance --prefix packages/mcp-server
+```
+
+Una implementación `CONFORMANT` cubre las fases 0–4 (Resolver, Descubrir, Entender,
+Comprometer, Gestionar). Las fases 5–6 (Verificar, Cerrar) son opcionales en v0.9
+pero requeridas para listing en verticales regulados (salud, legal).
+
+Guarda el output del test — lo necesitarás al abrir el PR en [IMPLEMENTORS.md](./IMPLEMENTORS.md).
+
+---
+
 ## Implementando la Vertical de Salud
 
 La vertical de salud tiene los requisitos de sensibilidad de datos más estrictos del protocolo. Este paso cubre lo que necesitas saber para manejar evidencia clínica correctamente.

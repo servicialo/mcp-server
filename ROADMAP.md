@@ -44,6 +44,7 @@ _Target: Protocol v0.5 – v0.8_
 - [ ] **Multi-implementation interoperability** — define and test cross-platform compatibility between independent Servicialo implementations.
 - [ ] **Agent SDK / client libraries** — reference libraries (TypeScript, Python) for building Servicialo-aware AI agents.
 - [ ] **Webhook / event specification** — standardize real-time notifications for state transitions.
+- [ ] **Tiers de conformance: CORE vs FULL** — hoy un implementador puede ser CONFORMANT sin cubrir las fases 5–6 (delivery + cierre financiero), porque están marcadas como opcionales en v0.9. A medida que la red crezca, necesitaremos distinguir: CORE (fases 0–4: discovery, scheduling, lifecycle) vs FULL (fases 0–6: + delivery evidence + financial close). Esto afecta la tabla de IMPLEMENTORS.md, el conformance test suite, y potencialmente el `trust_score` del protocolo.
 - [ ] **Governance expansion** — establish a contributors group and formalize the RFC review process with multiple reviewers.
 
 ## Long Term — Standard Maturity

@@ -60,6 +60,11 @@ export class HttpAdapter implements ServicialoAdapter {
       return '/v1/registry';
     }
 
+    // Public: /api/servicialo/resolve/* → /v1/resolve/*
+    if (path.startsWith('/api/servicialo/resolve')) {
+      return '/v1/resolve' + path.slice('/api/servicialo/resolve'.length);
+    }
+
     // Public: /api/servicialo/{slug}/* → /v1/organizations/{slug}/*
     const pubMatch = path.match(/^\/api\/servicialo\/([^/]+)\/(.+)$/);
     if (pubMatch) {

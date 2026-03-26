@@ -2,6 +2,18 @@
 
 > **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 34 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
 
+## Cómo listar tu implementación
+
+1. Corre el conformance test suite contra tu backend (ver [IMPLEMENTING.md paso 8](./IMPLEMENTING.md#paso-8--verificar-conformance)).
+2. Abre un PR que agregue tu fila a la tabla de abajo.
+3. Incluye en la descripción del PR el output completo del conformance test.
+4. El equipo de Servicialo revisa la cobertura de fases y mergea si es ≥ CONFORMANT.
+
+Las implementaciones listadas son verificadas — no aceptamos auto-declaraciones
+sin evidencia de conformance.
+
+---
+
 ## What you're building on
 
 Servicialo is an open protocol for professional service orchestration — scheduling, identity, delivery verification, and financial settlement. There is one production implementation today: [Coordinalo](https://coordinalo.com), which covers healthcare. The protocol is designed for multiple independent nodes across verticals and geographies, but that network does not exist yet. You would be the second.
@@ -55,9 +67,9 @@ When you pass these, open a PR adding your platform to the table below.
 
 ## Compatible implementations
 
-| Platform | Vertical | Coverage | Status |
-|----------|----------|----------|:------:|
-| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensions · 9/9 states · 6/6 exceptions | Production |
+| Plataforma | Vertical | Fases cubiertas | Conformance | Estado |
+|------------|----------|-----------------|:-----------:|:------:|
+| [**Coordinalo**](https://coordinalo.com) | Healthcare | 0–6 (completo) | CONFORMANT | Live |
 
 ## What the second implementor gets
 
