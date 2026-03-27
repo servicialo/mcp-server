@@ -23,8 +23,8 @@ de entrega y liquidación financiera de servicios profesionales.
 
 ## ¿Por dónde empiezo?
 
-**Soy una organización** que quiere usar servicios coordinados por agentes AI
-→ Ve directamente a una plataforma compatible: [Coordinalo](https://coordinalo.com) es la implementación de referencia. No necesitas este repositorio.
+**Tengo un negocio de servicios** y quiero que agentes AI descubran y agenden mis servicios
+→ Necesitas una plataforma compatible con el protocolo, no este repositorio. [Coordinalo](https://coordinalo.com) es la implementación de referencia. A medida que el protocolo madure, esperamos que surjan muchas más plataformas compatibles.
 
 **Soy un desarrollador** que quiere construir una plataforma compatible con el protocolo
 → Sigue leyendo. Empieza por [`IMPLEMENTING.md`](./IMPLEMENTING.md).
