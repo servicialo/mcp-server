@@ -70,6 +70,19 @@ function recordResult(passed: boolean) {
 }
 
 // ---------------------------------------------------------------------------
+// Helper: extract array from response (handles both raw arrays and wrapped objects)
+// ---------------------------------------------------------------------------
+
+function toArray(body: unknown, key: string): unknown[] {
+  if (Array.isArray(body)) return body;
+  if (body && typeof body === 'object') {
+    const val = (body as Record<string, unknown>)[key];
+    if (Array.isArray(val)) return val;
+  }
+  return [];
+}
+
+// ---------------------------------------------------------------------------
 // Helper: direct fetch for endpoints the adapter doesn't expose directly
 // ---------------------------------------------------------------------------
 
@@ -192,9 +205,7 @@ describeAuth('Phase 2 — Understand (authenticated)', () => {
       const listRes = await httpGet(
         `/v1/organizations/${ORG_ID}/services`,
       );
-      const services = Array.isArray(listRes.body)
-        ? listRes.body
-        : (listRes.body as Record<string, unknown>)?.services ?? [];
+      const services = toArray(listRes.body, 'services');
 
       if (Array.isArray(services) && services.length > 0) {
         const serviceId = (services[0] as Record<string, unknown>).id;
@@ -261,9 +272,7 @@ describeAuth('Phase 3 — Commit (authenticated)', () => {
     try {
       // Resolve a provider and service for booking
       const servicesRes = await httpGet(`/v1/organizations/${ORG_ID}/services`);
-      const services = Array.isArray(servicesRes.body)
-        ? servicesRes.body
-        : (servicesRes.body as Record<string, unknown>)?.services ?? [];
+      const services = toArray(servicesRes.body, 'services');
 
       expect(Array.isArray(services) && services.length > 0).toBe(true);
       const svc = services[0] as Record<string, unknown>;
@@ -276,9 +285,7 @@ describeAuth('Phase 3 — Commit (authenticated)', () => {
       const availRes = await httpGet(
         `/v1/organizations/${slug}/availability?from=${from}&to=${to}&serviceId=${serviceId}`,
       );
-      const slots = Array.isArray(availRes.body)
-        ? availRes.body
-        : (availRes.body as Record<string, unknown>)?.slots ?? [];
+      const slots = toArray(availRes.body, 'slots');
 
       let scheduledAt: string;
       if (Array.isArray(slots) && slots.length > 0) {
@@ -356,9 +363,7 @@ describeAuth('Phase 4 — Manage (authenticated)', () => {
 
     // Get a service and slot
     const servicesRes = await httpGet(`/v1/organizations/${ORG_ID}/services`);
-    const services = Array.isArray(servicesRes.body)
-      ? servicesRes.body
-      : (servicesRes.body as Record<string, unknown>)?.services ?? [];
+    const services = toArray(servicesRes.body, 'services');
 
     if (Array.isArray(services) && services.length > 0) {
       const svc = services[0] as Record<string, unknown>;
@@ -369,9 +374,7 @@ describeAuth('Phase 4 — Manage (authenticated)', () => {
       const availRes = await httpGet(
         `/v1/organizations/${ORG_ID}/availability?from=${from}&to=${to}&serviceId=${serviceId}`,
       );
-      const slots = Array.isArray(availRes.body)
-        ? availRes.body
-        : (availRes.body as Record<string, unknown>)?.slots ?? [];
+      const slots = toArray(availRes.body, 'slots');
 
       let scheduledAt: string;
       let providerId: string;
@@ -445,9 +448,7 @@ describeAuth('Phase 5 — Deliver (authenticated)', () => {
     const clientId = ((clientRes.body as Record<string, unknown>)?.id as string) ?? '';
 
     const servicesRes = await httpGet(`/v1/organizations/${ORG_ID}/services`);
-    const services = Array.isArray(servicesRes.body)
-      ? servicesRes.body
-      : (servicesRes.body as Record<string, unknown>)?.services ?? [];
+    const services = toArray(servicesRes.body, 'services');
 
     if (Array.isArray(services) && services.length > 0) {
       const svc = services[0] as Record<string, unknown>;
@@ -458,9 +459,7 @@ describeAuth('Phase 5 — Deliver (authenticated)', () => {
       const availRes = await httpGet(
         `/v1/organizations/${ORG_ID}/availability?from=${from}&to=${to}&serviceId=${serviceId}`,
       );
-      const slots = Array.isArray(availRes.body)
-        ? availRes.body
-        : (availRes.body as Record<string, unknown>)?.slots ?? [];
+      const slots = toArray(availRes.body, 'slots');
 
       let scheduledAt: string;
       let providerId: string;
@@ -560,9 +559,7 @@ describeAuth('Phase 6 — Close (authenticated)', () => {
     const clientId = ((clientRes.body as Record<string, unknown>)?.id as string) ?? '';
 
     const servicesRes = await httpGet(`/v1/organizations/${ORG_ID}/services`);
-    const services = Array.isArray(servicesRes.body)
-      ? servicesRes.body
-      : (servicesRes.body as Record<string, unknown>)?.services ?? [];
+    const services = toArray(servicesRes.body, 'services');
 
     if (Array.isArray(services) && services.length > 0) {
       const svc = services[0] as Record<string, unknown>;
@@ -573,9 +570,7 @@ describeAuth('Phase 6 — Close (authenticated)', () => {
       const availRes = await httpGet(
         `/v1/organizations/${ORG_ID}/availability?from=${from}&to=${to}&serviceId=${serviceId}`,
       );
-      const slots = Array.isArray(availRes.body)
-        ? availRes.body
-        : (availRes.body as Record<string, unknown>)?.slots ?? [];
+      const slots = toArray(availRes.body, 'slots');
 
       let scheduledAt: string;
       let providerId: string;
