@@ -1,3 +1,16 @@
+# Smithery configuration for @servicialo/mcp-server
+# Docs: https://smithery.ai/docs/build/project-config/smithery.yaml
+#
+# Build step ensures Smithery can compile and scan tools locally.
+# The createSandboxServer() export in src/index.ts registers all 20 tools
+# with empty handlers so the scanner discovers them without credentials.
+#
+# Alternative: production HTTP endpoint at https://servicialo.com/api/mcp
+# (Streamable HTTP transport — can be registered as external URL on Smithery)
+
+build:
+  dockerBuildPath: packages/mcp-server
+
 startCommand:
   type: stdio
   configSchema:
@@ -12,8 +25,8 @@ startCommand:
     required: []
   commandFunction: |-
     (config) => ({
-      command: 'npx',
-      args: ['-y', '@servicialo/mcp-server@latest'],
+      command: 'node',
+      args: ['packages/mcp-server/dist/index.js'],
       env: Object.assign({},
         config.apiKey ? { SERVICIALO_API_KEY: config.apiKey } : {},
         config.orgId ? { SERVICIALO_ORG_ID: config.orgId } : {}

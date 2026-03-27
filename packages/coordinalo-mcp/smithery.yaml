@@ -1,0 +1,23 @@
+# Smithery configuration for @coordinalo/mcp-server
+# Coordinalo is the reference implementation of the Servicialo protocol.
+# Production HTTP endpoint — 41 tools, Streamable HTTP transport.
+#
+# Register on Smithery via "Bring your own hosting" with URL:
+# https://coordinalo.com/api/mcp
+
+startCommand:
+  type: http
+  configSchema:
+    type: object
+    required:
+      - apiKey
+      - orgId
+    properties:
+      apiKey:
+        type: string
+        title: API Key
+        description: API key for your Coordinalo organization
+      orgId:
+        type: string
+        title: Organization Slug
+        description: Your organization slug (e.g. "mamapro")

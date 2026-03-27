@@ -1,0 +1,22 @@
+{
+  "name": "@coordinalo/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for Coordinalo — reference implementation of the Servicialo protocol for professional service delivery",
+  "license": "Apache-2.0",
+  "homepage": "https://coordinalo.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/servicialo/mcp-server.git",
+    "directory": "packages/coordinalo-mcp"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "coordinalo",
+    "servicialo",
+    "professional-services",
+    "scheduling",
+    "booking",
+    "ai-agents"
+  ]
+}
