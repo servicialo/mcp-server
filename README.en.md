@@ -7,7 +7,7 @@
 An open protocol for scheduling, identity, delivery verification,<br>
 and financial settlement of professional services.
 
-`Open protocol` `Machine-readable` `Agent-native` `MIT license`
+`Open protocol` `Machine-readable` `Agent-native` `Apache-2.0`
 
 [Website](https://servicialo.com) ・ [Specification](./PROTOCOL.md) ・ [Governance](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
@@ -18,6 +18,18 @@ and financial settlement of professional services.
 **[Leer en Español](./README.md)**
 
 </div>
+
+---
+
+## Who is this for?
+
+**I want AI agents to discover and book my services →**
+You run an organization or platform offering professional services (healthcare, legal, home, education). You want AI agents to find you, check availability, and complete the full booking-to-payment cycle without custom integrations.
+Jump to: [MCP Server](#mcp-server) · [Implementations](#implementations)
+
+**I want to build a Servicialo-compatible platform →**
+You're a developer building a CRM, EHR, or service platform. You want to implement the protocol so any Servicialo-compatible agent can connect to your backend as a sovereign node.
+Jump to: [Schema](#schema) · [Layered architecture](#layered-architecture) · [`IMPLEMENTING.md`](./IMPLEMENTING.md)
 
 ---
 
@@ -427,10 +439,10 @@ servicialo/
 |  | Version | Status |
 |---|---------|--------|
 | Protocol | 0.9 | Stable |
-| @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| @servicialo/mcp-server | 0.9.7 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 
 ## License
 
-MIT — Servicialo is an open protocol. Anyone can implement it.
+Apache-2.0 — Servicialo is an open protocol. Anyone can implement it, commercially or otherwise.

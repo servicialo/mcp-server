@@ -9,6 +9,16 @@
 
 There is no standard way for an AI agent to book, verify, and settle a professional service. Servicialo is an open protocol that fixes this — and this MCP server is its reference implementation. Think HTTP for service coordination: any agent, any platform, one protocol.
 
+---
+
+**Using Servicialo as a service coordinator?**
+Your organization's services become discoverable and bookable by any AI agent. Get started with [discovery mode](#option-1-discovery-mode-zero-config) — no credentials needed.
+
+**Building a Servicialo-compatible platform?**
+Connect your backend via the pluggable adapter layer. See [Connecting to a custom implementation](#connecting-to-a-custom-implementation) and [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md).
+
+---
+
 ## The Problem
 
 AI agents can browse the web, write code, and hold conversations. But ask one to book a physiotherapy session, verify it happened, and process the payment — and it falls apart.
@@ -384,7 +394,7 @@ The full Servicialo protocol specification is available at:
 
 - **Repository:** [github.com/servicialo/protocol](https://github.com/servicialo/protocol)
 - **Website:** [servicialo.com](https://servicialo.com)
-- **Current stable version:** 0.7
+- **Current stable version:** 0.9
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
 
 The spec covers the 8 dimensions, 9 lifecycle states, 6 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), 7 core principles, the two-entity architecture (atomic Service + Service Order), the Delegated Agency Model, DNS resolution, and A2A interoperability.
