@@ -11,8 +11,8 @@ There is no standard way for an AI agent to book, verify, and settle a professio
 
 ---
 
-**Using Servicialo as a service coordinator?**
-Your organization's services become discoverable and bookable by any AI agent. Get started with [discovery mode](#option-1-discovery-mode-zero-config) — no credentials needed.
+**Running a service business?**
+Your services become discoverable and bookable by any AI agent. Get started with [discovery mode](#option-1-discovery-mode-zero-config) — no credentials needed.
 
 **Building a Servicialo-compatible platform?**
 Connect your backend via the pluggable adapter layer. See [Connecting to a custom implementation](#connecting-to-a-custom-implementation) and [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md).

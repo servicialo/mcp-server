@@ -23,8 +23,8 @@ and financial settlement of professional services.
 
 ## Who is this for?
 
-**I want AI agents to discover and book my services →**
-You run an organization or platform offering professional services (healthcare, legal, home, education). You want AI agents to find you, check availability, and complete the full booking-to-payment cycle without custom integrations.
+**I run a service business and want AI agents to discover and book my services →**
+You offer professional services (healthcare, legal, home, education) and want AI agents to find you, check availability, and complete the full booking-to-payment cycle without custom integrations.
 Jump to: [MCP Server](#mcp-server) · [Implementations](#implementations)
 
 **I want to build a Servicialo-compatible platform →**
