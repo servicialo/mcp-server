@@ -23,12 +23,11 @@ and financial settlement of professional services.
 
 ## Who is this for?
 
-**I run a service business and want AI agents to discover and book my services →**
-You offer professional services (healthcare, legal, home, education) and want AI agents to find you, check availability, and complete the full booking-to-payment cycle without custom integrations.
-Jump to: [MCP Server](#mcp-server) · [Implementations](#implementations)
+**I run a service business →**
+You don't need to implement Servicialo directly. You need a Servicialo-compatible platform — one that speaks the protocol so AI agents can discover and book your services automatically. [Coordinalo](https://coordinalo.com) is the reference implementation. We expect many more compatible platforms to emerge as the protocol matures.
 
-**I want to build a Servicialo-compatible platform →**
-You're a developer building a CRM, EHR, or service platform. You want to implement the protocol so any Servicialo-compatible agent can connect to your backend as a sovereign node.
+**I'm building a platform for service businesses →**
+Servicialo is your protocol. Implement it and any Servicialo-compatible agent connects to your backend without custom integrations — as a sovereign node that owns its own data.
 Jump to: [Schema](#schema) · [Layered architecture](#layered-architecture) · [`IMPLEMENTING.md`](./IMPLEMENTING.md)
 
 ---

@@ -12,10 +12,10 @@ There is no standard way for an AI agent to book, verify, and settle a professio
 ---
 
 **Running a service business?**
-Your services become discoverable and bookable by any AI agent. Get started with [discovery mode](#option-1-discovery-mode-zero-config) — no credentials needed.
+You need a Servicialo-compatible platform, not this package directly. [Coordinalo](https://coordinalo.com) is the reference implementation — it implements this protocol so your services become discoverable and bookable by AI agents. As the protocol matures, we expect many more compatible platforms to emerge.
 
-**Building a Servicialo-compatible platform?**
-Connect your backend via the pluggable adapter layer. See [Connecting to a custom implementation](#connecting-to-a-custom-implementation) and [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md).
+**Building a platform for service businesses?**
+This is for you. Implement the protocol and any Servicialo-compatible agent connects to your backend automatically. See [Connecting to a custom implementation](#connecting-to-a-custom-implementation) and [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md).
 
 ---
 
