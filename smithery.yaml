@@ -2,7 +2,7 @@
 # Docs: https://smithery.ai/docs/build/project-config/smithery.yaml
 #
 # Build step ensures Smithery can compile and scan tools locally.
-# The createSandboxServer() export in src/index.ts registers all 20 tools
+# The createSandboxServer() export in src/index.ts registers all 34 tools
 # with empty handlers so the scanner discovers them without credentials.
 #
 # Alternative: production HTTP endpoint at https://servicialo.com/api/mcp

@@ -1,6 +1,7 @@
 {
   "name": "servicialo",
   "version": "0.1.0",
+  "description": "Open protocol for professional service delivery — scheduling, verification & settlement for AI agents",
   "private": true,
   "scripts": {
     "dev": "next dev",
