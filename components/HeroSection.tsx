@@ -1,4 +1,10 @@
-export function HeroSection() {
+import { getNetworkStats } from "@/lib/telemetry-stats";
+
+export async function HeroSection() {
+  const stats = await getNetworkStats();
+  const nodeCount = stats.totalInstances;
+  const countryCount = stats.countryBreakdown.length;
+
   return (
     <section className="mb-14 md:mb-20">
       <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
@@ -19,6 +25,23 @@ export function HeroSection() {
         <span>◆ Legible por máquinas</span>
         <span>◆ Diseñado para humanos</span>
       </div>
+      {nodeCount > 0 && (
+        <a
+          href="/network"
+          className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full border border-border bg-surface-alt hover:border-accent transition-colors group"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+          </span>
+          <span className="font-mono text-[11px] text-text-muted group-hover:text-accent transition-colors">
+            {nodeCount} nodes across {countryCount} {countryCount === 1 ? "country" : "countries"}
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim group-hover:text-accent transition-colors">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </a>
+      )}
       <div className="mt-6 md:mt-8">
         <a
           href="/whitepaper"

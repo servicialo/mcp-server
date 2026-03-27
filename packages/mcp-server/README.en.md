@@ -7,6 +7,8 @@
 
 **The missing protocol layer for AI agents that coordinate professional services.**
 
+[![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
+
 There is no standard way for an AI agent to book, verify, and settle a professional service. Servicialo is an open protocol that fixes this — and this MCP server is its reference implementation. Think HTTP for service coordination: any agent, any platform, one protocol.
 
 ---
@@ -456,6 +458,12 @@ Or in MCP configuration:
   }
 }
 ```
+
+## Join the network
+
+When you install `@servicialo/mcp-server`, your node automatically registers with the [network telemetry](https://servicialo.com/network) (opt-in, anonymous). This helps the ecosystem measure real protocol adoption — without collecting personal or client data.
+
+Telemetry reports only: package version, country (IP geolocation, IPs are not stored), and an anonymous node hash. You can disable it at any time with `SERVICIALO_TELEMETRY=false`.
 
 ## License
 

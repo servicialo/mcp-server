@@ -17,6 +17,8 @@ and financial settlement of professional services.
 
 **[Leer en Español](./README.md)**
 
+[![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
+
 </div>
 
 ---

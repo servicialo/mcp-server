@@ -25,6 +25,7 @@ const desktopSections = [
   { name: "Módulos", id: "modulos" },
   { name: "Estándar", id: "estandar" },
   { name: "Servidor MCP", id: "mcp-server" },
+  { name: "Network", id: "_network", href: "/network" },
 ];
 
 export function Navbar() {
@@ -79,6 +80,17 @@ export function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-0.5">
           {desktopSections.map((section) => {
+            if ("href" in section && section.href) {
+              return (
+                <a
+                  key={section.id}
+                  href={section.href}
+                  className="font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 border-transparent text-text-muted hover:text-accent"
+                >
+                  {section.name}
+                </a>
+              );
+            }
             // Map intermediate sections to their parent nav item
             const isActive =
               activeId === section.id ||
@@ -172,6 +184,13 @@ export function Navbar() {
               {section.name}
             </button>
           ))}
+          <a
+            href="/network"
+            onClick={() => setMenuOpen(false)}
+            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
+          >
+            Network
+          </a>
         </div>
       </div>
     </nav>
