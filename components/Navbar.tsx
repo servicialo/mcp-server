@@ -167,7 +167,7 @@ export function Navbar() {
       {/* Menú desplegable mobile */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          menuOpen ? "max-h-96 border-t border-border" : "max-h-0"
+          menuOpen ? "max-h-[32rem] border-t border-border" : "max-h-0"
         }`}
       >
         <div className="max-w-content mx-auto px-4 py-3 flex flex-col gap-0.5">
