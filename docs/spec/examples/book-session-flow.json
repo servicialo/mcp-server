@@ -1,0 +1,274 @@
+{
+  "scenario": "Padre agenda hora de kinesiologia musculoesqueletica para su hijo esta semana",
+  "org": "mamapro",
+  "platform": "coordinalo",
+  "base_url": "https://coordinalo.com/api/servicialo/mamapro",
+  "protocol_version": "0.2.0",
+  "date_context": "2026-03-30",
+  "turns": [
+    {
+      "turn": 1,
+      "phase": "discovery",
+      "user": "Quiero una hora de kinesio esta semana para mi hijo",
+      "agent_calls": [
+        {
+          "intent": "list_services",
+          "method": "GET",
+          "url": "/services",
+          "request_body": null,
+          "response_status": 200,
+          "response_body": {
+            "servicialo_version": "1.0",
+            "organization": {
+              "name": "Mama Pro",
+              "slug": "mamapro"
+            },
+            "services": [
+              {
+                "id": "cmiofy9re007fus0wn9g1t3h3",
+                "name": "Kinesiologia de Piso Pelvico",
+                "description": "Rehabilitacion del piso pelvico: fortalecimiento, incontinencia, prolapso y recuperacion postparto.",
+                "price": 46000,
+                "currency": "CLP",
+                "price_unit": "servicio",
+                "modality": "a_domicilio",
+                "duration_minutes": 60
+              },
+              {
+                "id": "cmiofy3o7005zus0wvsk0xqdc",
+                "name": "Kinesiologia Musculoesqueletica",
+                "description": "Kinesiologia para dolor muscular, articular y postural durante el embarazo y postparto.",
+                "price": 40000,
+                "currency": "CLP",
+                "price_unit": "servicio",
+                "modality": "a_domicilio",
+                "duration_minutes": 60
+              },
+              {
+                "id": "cmiofy7f0006vus0wvr9z8ze8",
+                "name": "Kinesiologia Online",
+                "description": "Sesion de kinesiologia por videollamada: ejercicios guiados, seguimiento y educacion.",
+                "price": 30000,
+                "currency": "CLP",
+                "price_unit": "servicio",
+                "modality": "presencial",
+                "duration_minutes": 60
+              }
+            ]
+          }
+        }
+      ],
+      "agent_response": "En Mama Pro tienen tres opciones de kinesiologia:\n1. Kinesiologia de Piso Pelvico - $46.000 CLP, 60 min, a domicilio\n2. Kinesiologia Musculoesqueletica - $40.000 CLP, 60 min, a domicilio\n3. Kinesiologia Online - $30.000 CLP, 60 min, remoto\n\nCual necesitas para tu hijo?"
+    },
+    {
+      "turn": 2,
+      "phase": "availability",
+      "user": "La musculoesqueletica, presencial",
+      "agent_calls": [
+        {
+          "intent": "check_availability",
+          "method": "GET",
+          "url": "/availability?serviceId=cmiofy3o7005zus0wvsk0xqdc&from=2026-03-30&days=7",
+          "request_body": null,
+          "response_status": 200,
+          "response_body": {
+            "servicialo_version": "1.0",
+            "organization": {
+              "name": "Mama Pro",
+              "slug": "mamapro"
+            },
+            "results": [
+              {
+                "date": "2026-03-30",
+                "provider": {
+                  "id": "clx1abc123provider",
+                  "name": "Dra. Maria Gonzalez"
+                },
+                "service": {
+                  "id": "cmiofy3o7005zus0wvsk0xqdc",
+                  "duration_minutes": 60
+                },
+                "available_slots": [],
+                "timezone": "America/Santiago",
+                "reason": "NO_SLOTS_FOR_DATE"
+              },
+              {
+                "date": "2026-03-31",
+                "provider": {
+                  "id": "clx1abc123provider",
+                  "name": "Dra. Maria Gonzalez"
+                },
+                "service": {
+                  "id": "cmiofy3o7005zus0wvsk0xqdc",
+                  "duration_minutes": 60
+                },
+                "available_slots": [
+                  { "start": "09:00", "end": "10:00" },
+                  { "start": "11:00", "end": "12:00" }
+                ],
+                "timezone": "America/Santiago"
+              },
+              {
+                "date": "2026-04-01",
+                "provider": {
+                  "id": "clx1abc123provider",
+                  "name": "Dra. Maria Gonzalez"
+                },
+                "service": {
+                  "id": "cmiofy3o7005zus0wvsk0xqdc",
+                  "duration_minutes": 60
+                },
+                "available_slots": [
+                  { "start": "10:00", "end": "11:00" },
+                  { "start": "14:00", "end": "15:00" },
+                  { "start": "15:00", "end": "16:00" }
+                ],
+                "timezone": "America/Santiago"
+              },
+              {
+                "date": "2026-04-02",
+                "provider": {
+                  "id": "clx1abc123provider",
+                  "name": "Dra. Maria Gonzalez"
+                },
+                "service": {
+                  "id": "cmiofy3o7005zus0wvsk0xqdc",
+                  "duration_minutes": 60
+                },
+                "available_slots": [],
+                "timezone": "America/Santiago",
+                "reason": "ALL_SLOTS_BOOKED"
+              },
+              {
+                "date": "2026-04-03",
+                "provider": {
+                  "id": "clx1abc123provider",
+                  "name": "Dra. Maria Gonzalez"
+                },
+                "service": {
+                  "id": "cmiofy3o7005zus0wvsk0xqdc",
+                  "duration_minutes": 60
+                },
+                "available_slots": [
+                  { "start": "09:00", "end": "10:00" },
+                  { "start": "10:00", "end": "11:00" },
+                  { "start": "11:00", "end": "12:00" }
+                ],
+                "timezone": "America/Santiago"
+              }
+            ]
+          }
+        }
+      ],
+      "agent_response": "Esta semana con la Dra. Maria Gonzalez hay estas horas disponibles:\n\nMartes 31 marzo: 09:00 o 11:00\nMiercoles 1 abril: 10:00, 14:00 o 15:00\nJueves 2 abril: todo ocupado\nViernes 3 abril: 09:00, 10:00 o 11:00\n\nCual prefieres?"
+    },
+    {
+      "turn": 3,
+      "phase": "confirmation",
+      "user": "El miercoles a las 10. Mi hijo se llama Joaquin Lopez, su email es joaquin.lopez@mail.com",
+      "agent_calls": [],
+      "agent_response": "Confirmo la reserva:\n- Servicio: Kinesiologia Musculoesqueletica ($40.000 CLP)\n- Fecha: Miercoles 1 de abril, 10:00 - 11:00\n- Profesional: Dra. Maria Gonzalez\n- Paciente: Joaquin Lopez (joaquin.lopez@mail.com)\n- Modalidad: A domicilio\n\nConfirmo?",
+      "note": "Agent MUST confirm with user before executing book_session. No API call in this turn."
+    },
+    {
+      "turn": 4,
+      "phase": "booking",
+      "user": "Si, confirma",
+      "agent_calls": [
+        {
+          "intent": "book_session",
+          "method": "POST",
+          "url": "/book",
+          "request_body": {
+            "clientEmail": "joaquin.lopez@mail.com",
+            "clientName": "Joaquin",
+            "clientLastName": "Lopez",
+            "serviceId": "cmiofy3o7005zus0wvsk0xqdc",
+            "providerId": "clx1abc123provider",
+            "scheduledAt": "2026-04-01T10:00:00-04:00",
+            "notes": "Hijo de usuario, consulta por dolor muscular"
+          },
+          "response_status": 201,
+          "response_body": {
+            "servicialo_version": "1.0",
+            "success": true,
+            "session": {
+              "id": "cm5session123abc",
+              "status": "agendado",
+              "derived_state": "scheduled",
+              "derived_state_index": 1,
+              "scheduled_at": "2026-04-01T14:00:00.000Z",
+              "duration_minutes": 60,
+              "service": "Kinesiologia Musculoesqueletica",
+              "client_email": "joaquin.lopez@mail.com"
+            },
+            "client_portal_url": "https://coordinalo.com/portal/mamapro?token=eyJhbGciOiJIUzI1NiJ9...",
+            "order_id": "cm5order456def",
+            "venta_id": "cm5venta789ghi"
+          }
+        }
+      ],
+      "agent_response": "Listo! Hora reservada:\n- Miercoles 1 de abril, 10:00 - 11:00\n- Kinesiologia Musculoesqueletica con Dra. Maria Gonzalez\n- Joaquin Lopez recibira un email de confirmacion en joaquin.lopez@mail.com\n\nSi necesitan cancelar o cambiar la hora, avisame."
+    }
+  ],
+  "alternative_flows": [
+    {
+      "name": "slot_conflict",
+      "description": "What happens when the chosen slot gets booked between check_availability and book_session",
+      "trigger": "409 SLOT_CONFLICT on book_session",
+      "recovery": [
+        "Agent re-calls check_availability for the same date range",
+        "Agent presents updated available slots to user",
+        "User picks a new slot",
+        "Agent confirms and re-attempts book_session"
+      ]
+    },
+    {
+      "name": "no_availability",
+      "description": "What happens when no slots are available this week",
+      "trigger": "All dates return empty available_slots",
+      "recovery": [
+        "Agent informs user that no slots are available this week",
+        "Agent suggests checking next week: from=2026-04-06&days=7",
+        "Agent may suggest alternative services or providers"
+      ]
+    },
+    {
+      "name": "payment_required",
+      "description": "What happens when the service requires prepayment",
+      "trigger": "402 PAYMENT_REQUIRED on book_session",
+      "recovery": [
+        "Agent informs user that the service requires advance payment",
+        "Agent does NOT collect payment details",
+        "Agent directs user to the organization's payment portal or contacts the org directly"
+      ]
+    }
+  ],
+  "contract": {
+    "must_do": [
+      "Fetch Agent Card to discover capabilities before any calls",
+      "Call list_services before check_availability",
+      "Call check_availability before book_session",
+      "Confirm with user before executing book_session",
+      "Include clientEmail in book_session (identity key)",
+      "Include clientName + clientLastName for new clients",
+      "Use exact serviceId and providerId from prior responses",
+      "Use exact slot time from check_availability in scheduledAt",
+      "Preserve timezone in scheduledAt (e.g. -04:00 for Chile)",
+      "Present prices in human-readable format ($40.000 CLP)",
+      "Handle empty availability gracefully (show reason)"
+    ],
+    "must_not_do": [
+      "Call book_session without prior check_availability",
+      "Assume a slot is available without checking",
+      "Book without explicit user confirmation",
+      "Expose internal IDs (CUIDs, session IDs) to the user",
+      "Invent or guess serviceId/providerId values",
+      "Retry 409 SLOT_CONFLICT without re-checking availability",
+      "Send scheduledAt without timezone offset",
+      "Omit clientEmail from book_session",
+      "Cache availability results (slots change in real time)",
+      "Collect payment information directly"
+    ]
+  }
+}
