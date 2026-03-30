@@ -12,6 +12,7 @@ import { EstandarSection } from "@/components/EstandarSection";
 import { PorQueSection } from "@/components/PorQueSection";
 import { ConectateSection } from "@/components/ConectateSection";
 import { GobernanzaSection } from "@/components/GobernanzaSection";
+import { InclusionSection } from "@/components/InclusionSection";
 import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
 
@@ -57,6 +58,9 @@ export default function Home() {
       </FadeIn>
       <FadeIn>
         <GobernanzaSection />
+      </FadeIn>
+      <FadeIn>
+        <InclusionSection />
       </FadeIn>
       <FadeIn>
         <Footer />

@@ -5,11 +5,22 @@
 
 > **[English version](./README.en.md)**
 
-**La capa de protocolo que falta para agentes de IA que coordinan servicios profesionales.**
+**La interfaz MCP a nivel de protocolo para el estándar Servicialo — la capa de destino para servicios humanos en la era de agentes de IA.**
 
 [![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
 
-No existe una forma estándar para que un agente de IA reserve, verifique y liquide un servicio profesional. Servicialo es un protocolo abierto que resuelve esto — y este MCP server es su implementación de referencia. Piensa en HTTP para coordinación de servicios: cualquier agente, cualquier plataforma, un solo protocolo.
+HTTP hizo los documentos direccionables. Servicialo hace los servicios direccionables. MCP y A2A son el transporte. Servicialo es el destino al que los agentes llegan.
+
+Este paquete es la interfaz MCP a nivel de protocolo para **cualquier backend compatible con Servicialo** — no un conector a una plataforma específica. Coordinalo es la implementación de referencia (y el default), pero puedes conectar tu propio backend.
+
+## Arquitectura
+
+```
+@servicialo/mcp-server  →  interfaz MCP a nivel de protocolo
+        ↓ se conecta a cualquier backend compatible con Servicialo
+Coordinalo              →  implementación de referencia (default)
+Tu implementación       →  trae tu propio backend
+```
 
 ## El Problema
 

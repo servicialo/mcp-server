@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.servicialo.com/schemas/org-card.json",
+  "title": "Servicialo Organization Card (Level 1 Registry Entry)",
+  "description": "JSON Schema for an organization entry in an implementation's Level 1 registry (/.well-known/agents.json)",
+  "type": "object",
+  "required": ["slug", "name", "vertical", "country", "agent_card"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "Organization slug, unique within the implementation",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 50
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the organization",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the organization",
+      "maxLength": 500
+    },
+    "vertical": {
+      "type": "string",
+      "description": "Primary service vertical (e.g., health, legal, education, fitness, home_services)"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country code (ISO 3166-1 alpha-2)",
+      "pattern": "^[a-z]{2}$"
+    },
+    "region": {
+      "type": "string",
+      "description": "Region or city for more specific location"
+    },
+    "trust_score": {
+      "type": "number",
+      "description": "Network trust score (0-100), computed from verified deliveries",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "agent_card": {
+      "type": "string",
+      "description": "URL to the organization's Level 2 agent card",
+      "format": "uri"
+    },
+    "services_count": {
+      "type": "integer",
+      "description": "Number of active services",
+      "minimum": 0
+    },
+    "providers_count": {
+      "type": "integer",
+      "description": "Number of active providers",
+      "minimum": 0
+    },
+    "verified_deliveries": {
+      "type": "integer",
+      "description": "Total verified service deliveries",
+      "minimum": 0
+    },
+    "active_since": {
+      "type": "string",
+      "description": "Date the organization joined the network",
+      "format": "date"
+    },
+    "last_heartbeat": {
+      "type": "string",
+      "description": "Last resolver heartbeat timestamp",
+      "format": "date-time"
+    }
+  }
+}

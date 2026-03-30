@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "description": "Known Servicialo-compliant implementation registries",
+  "registries": [
+    {
+      "name": "Coordinalo",
+      "description": "Reference implementation — multi-tenant SaaS for professional services",
+      "registry": "https://coordinalo.com/.well-known/agents.json",
+      "platform": "https://coordinalo.com",
+      "status": "production",
+      "since": "2026-03-31"
+    }
+  ]
+}

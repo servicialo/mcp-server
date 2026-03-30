@@ -93,9 +93,9 @@ export function ConectateSection() {
   return (
     <section id="mcp-server" className="mb-16">
       <SectionTitle
-        tag="12 — Servidor MCP"
+        tag="12 — Servidor MCP + A2A"
         title="Hecho para agentes"
-        subtitle="Servicialo expone sus herramientas como un servidor MCP, permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa."
+        subtitle="Servicialo expone sus herramientas como un servidor MCP (Model Context Protocol) y es compatible con A2A (Agent-to-Agent), permitiendo que agentes de IA descubran y coordinen servicios profesionales de forma nativa a través de ambos estándares."
       />
 
       {/* Intro block */}
@@ -243,7 +243,7 @@ export function ConectateSection() {
           Implementaciones compatibles
         </div>
         <div className="text-[13px] text-text-muted leading-relaxed mb-3">
-          Coordinalo es la implementación de referencia en producción.
+          Coordinalo es la implementación de referencia del protocolo Servicialo — el primer despliegue en producción sirviendo proveedores y pacientes reales, en operación desde el 31 de marzo de 2026.
           El segundo nodo es una oportunidad abierta.
         </div>
         <a

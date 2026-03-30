@@ -6,6 +6,7 @@ export function PorQueSection() {
       <SectionTitle
         tag="11 — Por qué Servicialo"
         title="Un idioma común para agentes"
+        subtitle="MCP define cómo los agentes acceden a herramientas y datos. A2A define cómo los agentes hablan entre sí. Servicialo es la capa de dominio que les da un destino en el mundo real."
       />
 
       {/* Why the protocol */}

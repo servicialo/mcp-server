@@ -8,17 +8,20 @@ export async function HeroSection() {
   return (
     <section className="mb-14 md:mb-20">
       <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
-        El estándar abierto para servicios
+        La capa de destino para servicios humanos
       </div>
       <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
-        Cualquier persona puede crear un servicio.{" "}
+        The destination layer for human services.{" "}
         <span className="text-accent">
-          Cualquier agente puede coordinarlo.
+          MCP and A2A handle the transport — Servicialo is where agents arrive.
         </span>
       </h1>
-      <p className="text-[15px] md:text-lg text-text-muted leading-[1.7] max-w-[540px]">
+      <p className="text-[15px] md:text-lg text-text-body leading-[1.7] max-w-[600px] mb-3">
+        HTTP made documents addressable. Servicialo makes services addressable.
+      </p>
+      <p className="text-[14px] md:text-[15px] text-text-muted leading-[1.7] max-w-[540px]">
         El protocolo abierto que coordina servicios profesionales
-        — para humanos y para agentes de inteligencia artificial.
+        — para humanos y para agentes de inteligencia artificial. Construido sobre MCP y A2A, los estándares emergentes de comunicación entre agentes.
       </p>
       <div className="flex flex-wrap gap-3 md:gap-6 mt-6 md:mt-8 font-mono text-[11px] text-text-dim">
         <span>◆ Estándar abierto</span>
