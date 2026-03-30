@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.servicialo.com/schemas/registries.json",
+  "title": "Servicialo Meta-Registry",
+  "description": "JSON Schema for the Level 0 meta-registry at servicialo.com/.well-known/registries.json",
+  "type": "object",
+  "required": ["version", "description", "registries"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version (semver)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this meta-registry"
+    },
+    "registries": {
+      "type": "array",
+      "description": "List of known Servicialo-compliant implementation registries",
+      "items": {
+        "type": "object",
+        "required": ["name", "description", "registry", "platform", "status", "since"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Implementation name",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the implementation"
+          },
+          "registry": {
+            "type": "string",
+            "description": "URL to the implementation's Level 1 registry (/.well-known/agents.json)",
+            "format": "uri"
+          },
+          "platform": {
+            "type": "string",
+            "description": "URL to the implementation's main platform/website",
+            "format": "uri"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current operational status",
+            "enum": ["production", "beta", "development", "deprecated"]
+          },
+          "since": {
+            "type": "string",
+            "description": "Date the implementation went live (ISO 8601)",
+            "format": "date"
+          },
+          "verticals": {
+            "type": "array",
+            "description": "Service verticals supported by this implementation",
+            "items": { "type": "string" }
+          },
+          "countries": {
+            "type": "array",
+            "description": "Countries where this implementation operates (ISO 3166-1 alpha-2)",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z]{2}$"
+            }
+          },
+          "certification_level": {
+            "type": "integer",
+            "description": "Servicialo certification level (1, 2, or 3)",
+            "minimum": 1,
+            "maximum": 3
+          }
+        }
+      }
+    }
+  }
+}

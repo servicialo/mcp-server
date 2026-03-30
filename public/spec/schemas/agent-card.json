@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.servicialo.com/schemas/agent-card.json",
+  "title": "Servicialo Agent Card",
+  "description": "JSON Schema for a Servicialo organization agent card (Level 2 discovery endpoint)",
+  "type": "object",
+  "required": ["version", "organization", "capabilities", "services", "endpoints", "authentication"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Servicialo protocol version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "organization": {
+      "type": "object",
+      "required": ["slug", "name", "vertical", "country", "timezone"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "vertical": { "type": "string" },
+        "country": { "type": "string", "pattern": "^[a-z]{2}$" },
+        "timezone": { "type": "string" },
+        "trust_score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "verified_deliveries": { "type": "integer", "minimum": 0 },
+        "active_since": { "type": "string", "format": "date" }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["lifecycle_states", "exception_flows", "evidence_types"],
+      "properties": {
+        "lifecycle_states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["requested", "scheduled", "confirmed", "in_progress", "completed", "documented", "invoiced", "charged", "verified"]
+          },
+          "minItems": 9
+        },
+        "exception_flows": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["cancellation", "no_show", "rescheduling", "dispute", "partial_delivery", "resource_conflict"]
+          },
+          "minItems": 3
+        },
+        "evidence_types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["gps", "signature", "photo", "document", "duration", "notes"]
+          }
+        },
+        "service_orders": { "type": "boolean" },
+        "resources": { "type": "boolean" },
+        "a2a": { "type": "boolean" },
+        "mandates": { "type": "boolean" }
+      }
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "vertical", "duration_minutes", "price", "modality"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "vertical": { "type": "string" },
+          "duration_minutes": { "type": "integer", "minimum": 5, "maximum": 480 },
+          "price": {
+            "type": "object",
+            "required": ["amount", "currency"],
+            "properties": {
+              "amount": { "type": "number", "minimum": 0 },
+              "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+            }
+          },
+          "modality": { "type": "string", "enum": ["in_person", "virtual", "at_home"] },
+          "requires_resource": { "type": "boolean" },
+          "required_evidence": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "specializations": { "type": "array", "items": { "type": "string" } },
+          "trust_score": { "type": "number", "minimum": 0, "maximum": 100 },
+          "services": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "required": ["mcp"],
+      "properties": {
+        "mcp": { "type": "string", "format": "uri" },
+        "rest": { "type": "string", "format": "uri" },
+        "a2a": { "type": "string", "format": "uri" },
+        "booking": { "type": "string", "format": "uri" }
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["api_key", "oauth2", "none"] },
+        "registration_url": { "type": "string", "format": "uri" },
+        "scopes": { "type": "array", "items": { "type": "string" } },
+        "public_tools_count": { "type": "integer", "minimum": 0 },
+        "authenticated_tools_count": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
