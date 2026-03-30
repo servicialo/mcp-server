@@ -45,7 +45,7 @@ export async function GET() {
       },
       a2a: {
         description: 'A2A (Agent-to-Agent) protocol support for cross-agent interoperability',
-        version: '0.2.0',
+        version: '0.3.0',
         endpoints: {
           agent_card: 'GET /api/servicialo/{org}/.well-known/agent.json',
           task: 'POST /api/servicialo/{org}/a2a',

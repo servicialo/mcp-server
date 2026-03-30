@@ -252,7 +252,7 @@ export const MODULES = [
       "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
       "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
       "Prueba de entrega con evidencia por vertical",
-      "Protocolo MCP para agentes IA (34 herramientas)",
+      "Protocolo MCP para agentes IA (35 herramientas)",
     ],
   },
   {

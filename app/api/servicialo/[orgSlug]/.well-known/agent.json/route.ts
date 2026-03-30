@@ -3,7 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { withRateLimit } from '@/lib/servicialo/response';
 import { type NextRequest } from 'next/server';
 
-const A2A_VERSION = '0.2.0';
+const A2A_VERSION = '0.3.0';
+const SERVICIALO_PROTOCOL_VERSION = '0.9';
 
 export async function GET(
   request: NextRequest,
@@ -74,11 +75,18 @@ export async function GET(
     });
   }
 
+  const baseUrl = 'https://servicialo.com';
+  const orgBase = `${baseUrl}/api/servicialo/${org.slug}`;
+
   const agentCard = {
     name: org.name,
     description: org.description || `Professional services at ${org.name}`,
-    url: `https://servicialo.com/api/servicialo/${org.slug}/a2a`,
+    url: `${orgBase}/a2a`,
     protocolVersion: A2A_VERSION,
+    provider: {
+      organization: 'Servicialo',
+      url: baseUrl,
+    },
     capabilities: {
       streaming: false,
       pushNotifications: false,
@@ -88,6 +96,23 @@ export async function GET(
     skills,
     authentication: {
       schemes: [],
+    },
+    // Servicialo-specific extensions
+    'x-servicialo': {
+      protocolVersion: SERVICIALO_PROTOCOL_VERSION,
+      implementer: {
+        name: 'Coordinalo',
+        url: 'https://coordinalo.com',
+        status: 'verified',
+        type: 'reference-implementation',
+      },
+      endpoints: {
+        mcp: `${baseUrl}/api/mcp`,
+        rest: `${orgBase}`,
+        agentCard: `${orgBase}/.well-known/agent.json`,
+        a2a: `${orgBase}/a2a`,
+      },
+      registry: `${baseUrl}/.well-known/agents.json`,
     },
   };
 

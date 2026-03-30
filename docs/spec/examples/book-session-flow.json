@@ -3,7 +3,7 @@
   "org": "mamapro",
   "platform": "coordinalo",
   "base_url": "https://coordinalo.com/api/servicialo/mamapro",
-  "protocol_version": "0.2.0",
+  "protocol_version": "0.3.0",
   "date_context": "2026-03-30",
   "turns": [
     {

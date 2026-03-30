@@ -26,7 +26,7 @@
 
 Servicialo A2A intents allow an external agent (e.g. a personal assistant) to discover, query, and book professional services on behalf of a user — without touching the implementation's source code.
 
-All communication uses **Google's A2A protocol v0.2.0** over **JSON-RPC 2.0**. The transport is a single POST endpoint per organization.
+All communication uses **Google's A2A protocol v0.3.0** over **JSON-RPC 2.0**. The transport is a single POST endpoint per organization.
 
 ### The 5 Intents
 
@@ -108,7 +108,7 @@ GET https://{platform}/api/servicialo/{orgSlug}/.well-known/agent.json
   "name": "Mama Pro",
   "description": "Centro de estimulacion y terapias infantiles",
   "url": "https://coordinalo.com/api/servicialo/mamapro/a2a",
-  "protocolVersion": "0.2.0",
+  "protocolVersion": "0.3.0",
   "capabilities": {
     "streaming": false,
     "pushNotifications": false

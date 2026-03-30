@@ -35,11 +35,11 @@ GET /.well-known/agent.json          ← Descubrimiento A2A
     Agent Card                        ← Capacidades, skills, auth
         │
         ▼
-POST /{orgSlug}/a2a                  ← JSON-RPC: tasks/send
-  { method: "tasks/send",
+POST /{orgSlug}/a2a                  ← JSON-RPC: message/send
+  { method: "message/send",
     params: {
       message: { role: "user",
-        parts: [{ type: "text",
+        parts: [{ kind: "text",
           text: "Reservar kinesiología mañana 10am" }]
     }}
   }
@@ -92,7 +92,7 @@ El agente decide: usar MCP tools     ← Si quiere control granular
 Una implementación obtiene la certificación A2A Ready cuando:
 
 1. Expone `/.well-known/agent.json` con un Agent Card válido
-2. Implementa `POST /{orgSlug}/a2a` con soporte para `tasks/send` y `tasks/get`
+2. Implementa `POST /{orgSlug}/a2a` con soporte para `message/send`
 3. El Agent Card declara al menos un skill de tipo `booking`
 4. Soporta al menos un esquema de autenticación estándar (apiKey, http, oauth2)
 
@@ -129,7 +129,7 @@ GET /.well-known/agent.json          ← A2A Discovery
     Agent Card                        ← Capabilities, skills, auth
         │
         ▼
-POST /{orgSlug}/a2a                  ← JSON-RPC: tasks/send
+POST /{orgSlug}/a2a                  ← JSON-RPC: message/send
         │
         ▼
     Servicialo booking engine         ← Processes the booking
@@ -145,6 +145,6 @@ The external agent **does not need MCP, Claude, or internal credentials**. It on
 An implementation earns A2A Ready certification when:
 
 1. It exposes `/.well-known/agent.json` with a valid Agent Card
-2. It implements `POST /{orgSlug}/a2a` supporting `tasks/send` and `tasks/get`
+2. It implements `POST /{orgSlug}/a2a` supporting `message/send`
 3. The Agent Card declares at least one `booking` skill
 4. It supports at least one standard authentication scheme (apiKey, http, oauth2)
