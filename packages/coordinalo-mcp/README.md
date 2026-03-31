@@ -23,7 +23,7 @@ Production endpoint: `https://coordinalo.com/api/mcp` (Streamable HTTP transport
 
 1. Go to [coordinalo.com](https://coordinalo.com) and create an organization
 2. Your **API key** is provided on organization creation
-3. Your **org slug** is the URL-friendly identifier you chose (e.g. `mamapro`)
+3. Your **org slug** is the URL-friendly identifier you chose (e.g. `clinica-demo`)
 
 ## Configuration
 

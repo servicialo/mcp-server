@@ -1,8 +1,8 @@
 {
   "scenario": "Padre agenda hora de kinesiologia musculoesqueletica para su hijo esta semana",
-  "org": "mamapro",
+  "org": "clinica-demo",
   "platform": "coordinalo",
-  "base_url": "https://coordinalo.com/api/servicialo/mamapro",
+  "base_url": "https://coordinalo.com/api/servicialo/clinica-demo",
   "protocol_version": "0.3.0",
   "date_context": "2026-03-30",
   "turns": [
@@ -21,7 +21,7 @@
             "servicialo_version": "1.0",
             "organization": {
               "name": "Mama Pro",
-              "slug": "mamapro"
+              "slug": "clinica-demo"
             },
             "services": [
               {
@@ -75,7 +75,7 @@
             "servicialo_version": "1.0",
             "organization": {
               "name": "Mama Pro",
-              "slug": "mamapro"
+              "slug": "clinica-demo"
             },
             "results": [
               {
@@ -202,7 +202,7 @@
               "service": "Kinesiologia Musculoesqueletica",
               "client_email": "joaquin.lopez@mail.com"
             },
-            "client_portal_url": "https://coordinalo.com/portal/mamapro?token=eyJhbGciOiJIUzI1NiJ9...",
+            "client_portal_url": "https://coordinalo.com/portal/clinica-demo?token=eyJhbGciOiJIUzI1NiJ9...",
             "order_id": "cm5order456def",
             "venta_id": "cm5venta789ghi"
           }

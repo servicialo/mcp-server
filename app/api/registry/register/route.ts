@@ -11,8 +11,8 @@ import { validateSlug, validateCountry, validateUrl } from '@/lib/servicialo/val
  *
  * Body: {
  *   country: "cl",
- *   slug: "mamapro",
- *   displayName: "Mamá Pro",
+ *   slug: "clinica-demo",
+ *   displayName: "Clínica Demo",
  *   endpointUrl: "https://coordinalo.com/api/servicialo",
  *   implementer: "coordinalo",
  *   verticals?: ["kinesiologia"],

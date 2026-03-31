@@ -1,16 +1,16 @@
 {
   "organizations": [
     {
-      "slug": "mamapro",
-      "name": "Mamá Pro",
+      "slug": "clinica-demo",
+      "name": "Clínica Demo",
       "description": "Atención kinesiológica integral a domicilio para madres y recién nacidos",
       "vertical": "kinesiologia",
       "location": "Santiago",
       "country": "cl",
       "discoverable": true,
       "endpoints": {
-        "services": "https://coordinalo.com/api/servicialo/mamapro/services",
-        "availability": "https://coordinalo.com/api/servicialo/mamapro/availability"
+        "services": "https://coordinalo.com/api/servicialo/clinica-demo/services",
+        "availability": "https://coordinalo.com/api/servicialo/clinica-demo/availability"
       }
     }
   ]

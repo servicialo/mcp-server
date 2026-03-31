@@ -50,7 +50,7 @@ All communication uses **Google's A2A protocol v0.3.0** over **JSON-RPC 2.0**. T
 POST https://{platform}/api/servicialo/{orgSlug}/a2a
 ```
 
-**Reference:** `POST https://coordinalo.com/api/servicialo/mamapro/a2a`
+**Reference:** `POST https://coordinalo.com/api/servicialo/clinica-demo/a2a`
 
 ### Protocol
 
@@ -107,7 +107,7 @@ GET https://{platform}/api/servicialo/{orgSlug}/.well-known/agent.json
 {
   "name": "Mama Pro",
   "description": "Centro de estimulacion y terapias infantiles",
-  "url": "https://coordinalo.com/api/servicialo/mamapro/a2a",
+  "url": "https://coordinalo.com/api/servicialo/clinica-demo/a2a",
   "protocolVersion": "0.3.0",
   "capabilities": {
     "streaming": false,
@@ -168,7 +168,7 @@ No query parameters. No authentication.
   "servicialo_version": "1.0",
   "organization": {
     "name": "Mama Pro",
-    "slug": "mamapro"
+    "slug": "clinica-demo"
   },
   "services": [
     {
@@ -252,7 +252,7 @@ GET /api/servicialo/{orgSlug}/availability?serviceId={id}&from={date}&days={n}
   "servicialo_version": "1.0",
   "organization": {
     "name": "Mama Pro",
-    "slug": "mamapro"
+    "slug": "clinica-demo"
   },
   "results": [
     {
@@ -298,7 +298,7 @@ GET /api/servicialo/{orgSlug}/availability?serviceId={id}&from={date}&days={n}
   "servicialo_version": "1.0",
   "organization": {
     "name": "Mama Pro",
-    "slug": "mamapro"
+    "slug": "clinica-demo"
   },
   "results": [
     {
@@ -411,7 +411,7 @@ Content-Type: application/json
     "service": "Asesoria Lactancia",
     "client_email": "martin.lopez@gmail.com"
   },
-  "client_portal_url": "https://coordinalo.com/portal/mamapro?token=abc123...",
+  "client_portal_url": "https://coordinalo.com/portal/clinica-demo?token=abc123...",
   "order_id": "cm5xyz789order",
   "venta_id": "cm5xyz789venta"
 }
@@ -625,14 +625,14 @@ This is the complete sequence an external agent follows to book a session from z
 **Agent action:** Fetch service catalog
 
 ```
-GET https://coordinalo.com/api/servicialo/mamapro/services
+GET https://coordinalo.com/api/servicialo/clinica-demo/services
 ```
 
 **Response:**
 ```json
 {
   "servicialo_version": "1.0",
-  "organization": { "name": "Mama Pro", "slug": "mamapro" },
+  "organization": { "name": "Mama Pro", "slug": "clinica-demo" },
   "services": [
     {
       "id": "cmiofy9re007fus0wn9g1t3h3",
@@ -672,14 +672,14 @@ GET https://coordinalo.com/api/servicialo/mamapro/services
 **Agent action:** Check availability for this week
 
 ```
-GET https://coordinalo.com/api/servicialo/mamapro/availability?serviceId=cmiofy3o7005zus0wvsk0xqdc&from=2026-03-30&days=7
+GET https://coordinalo.com/api/servicialo/clinica-demo/availability?serviceId=cmiofy3o7005zus0wvsk0xqdc&from=2026-03-30&days=7
 ```
 
 **Response:**
 ```json
 {
   "servicialo_version": "1.0",
-  "organization": { "name": "Mama Pro", "slug": "mamapro" },
+  "organization": { "name": "Mama Pro", "slug": "clinica-demo" },
   "results": [
     {
       "date": "2026-03-31",
@@ -749,7 +749,7 @@ GET https://coordinalo.com/api/servicialo/mamapro/availability?serviceId=cmiofy3
 **Agent action:** Book the session
 
 ```
-POST https://coordinalo.com/api/servicialo/mamapro/book
+POST https://coordinalo.com/api/servicialo/clinica-demo/book
 Content-Type: application/json
 
 {
@@ -778,7 +778,7 @@ Content-Type: application/json
     "service": "Kinesiologia Musculoesqueletica",
     "client_email": "joaquin.lopez@mail.com"
   },
-  "client_portal_url": "https://coordinalo.com/portal/mamapro?token=eyJhbG...",
+  "client_portal_url": "https://coordinalo.com/portal/clinica-demo?token=eyJhbG...",
   "order_id": "cm5order456",
   "venta_id": "cm5venta789"
 }
