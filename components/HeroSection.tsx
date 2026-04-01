@@ -8,16 +8,16 @@ export async function HeroSection() {
   return (
     <section className="mb-14 md:mb-20">
       <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
-        La capa de destino para servicios humanos
+        El estándar abierto para servicios profesionales
       </div>
       <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
-        The destination layer for human services.{" "}
+        Donde los agentes encuentran servicios reales.{" "}
         <span className="text-accent">
-          MCP and A2A handle the transport — Servicialo is where agents arrive.
+          MCP y A2A son el transporte — Servicialo es el destino.
         </span>
       </h1>
       <p className="text-[15px] md:text-lg text-text-body leading-[1.7] max-w-[600px] mb-3">
-        HTTP made documents addressable. Servicialo makes services addressable.
+        HTTP le dio una dirección a cada documento. Servicialo le da una dirección a cada servicio.
       </p>
       <p className="text-[14px] md:text-[15px] text-text-muted leading-[1.7] max-w-[540px]">
         El protocolo abierto que coordina servicios profesionales
@@ -38,7 +38,7 @@ export async function HeroSection() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="font-mono text-[11px] text-text-muted group-hover:text-accent transition-colors">
-            {nodeCount} nodes across {countryCount} {countryCount === 1 ? "country" : "countries"}
+            {nodeCount} nodos en {countryCount} {countryCount === 1 ? "país" : "países"}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim group-hover:text-accent transition-colors">
             <polyline points="9 18 15 12 9 6" />

@@ -30,7 +30,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
       <svg
         viewBox="30.767 241.591 784.077 458.627"
         className="w-full h-auto"
-        aria-label="World map showing telemetry instance distribution by country"
+        aria-label="Mapa mundial mostrando distribución de instancias por país"
         role="img"
       >
         {worldPaths.map(({ id, d }) => {
@@ -49,7 +49,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
                 strokeOpacity={0.5}
               >
                 {isActive && (
-                  <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instances`}</title>
+                  <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instancias`}</title>
                 )}
               </path>
             );
@@ -70,7 +70,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
                 />
               ))}
               {isActive && (
-                <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instances`}</title>
+                <title>{`${id.toUpperCase()}: ${countryData[id.toUpperCase()] ?? 0} instancias`}</title>
               )}
             </g>
           );
