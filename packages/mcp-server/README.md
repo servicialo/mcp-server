@@ -453,7 +453,7 @@ Al iniciar, el MCP server envía un único POST anónimo a `https://servicialo.c
 ```json
 {
   "event": "node_initialized",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "node_id": "a1b2c3d4-...",
   "ts": 1711300000000
 }

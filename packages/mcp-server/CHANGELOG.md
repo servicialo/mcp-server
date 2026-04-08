@@ -1,5 +1,12 @@
 # Changelog — @servicialo/mcp-server
 
+## [0.9.8] - 2026-04-08
+
+### Fixed
+- Telemetry POST target corrected to `/api/telemetry/instance` (was silently 404ing)
+- First-run stderr notice with opt-out instructions (sentinel: `~/.servicialo/.telemetry-notice-shown`)
+- README telemetry docs updated: corrected payload fields, added `node_id`, removed misleading "opt-in" language
+
 ## [0.8.0] - 2026-03-17
 
 ### Added

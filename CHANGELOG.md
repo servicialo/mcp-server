@@ -4,6 +4,12 @@ All notable changes to the Servicialo open protocol and its reference tooling wi
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [MCP Server v0.9.8] - 2026-04-08
+
+### Fixed
+- Telemetry endpoint URL corrected (`/api/telemetry/instance`) — pings were silently 404ing since v0.8
+- Added first-run opt-out notice to stderr with sentinel file
+
 ## [Protocol v0.9 / MCP Server v0.9.0] - 2026-03-23
 
 ### Added

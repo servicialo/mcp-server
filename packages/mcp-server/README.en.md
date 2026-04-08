@@ -436,7 +436,7 @@ On startup, the MCP server sends a single anonymous POST to `https://servicialo.
 ```json
 {
   "event": "node_initialized",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "node_id": "a1b2c3d4-...",
   "ts": 1711300000000
 }
