@@ -431,17 +431,27 @@ Servicialo follows semantic versioning for the protocol specification:
 
 ## Telemetry
 
-On startup, the MCP server sends a single anonymous POST to `https://servicialo.com/api/telemetry/ping` with:
+On startup, the MCP server sends a single anonymous POST to `https://servicialo.com/api/telemetry/instance` with:
 
 ```json
 {
   "event": "node_initialized",
-  "version": "0.9.0",
+  "version": "0.9.7",
+  "node_id": "a1b2c3d4-...",
   "ts": 1711300000000
 }
 ```
 
-**That is everything that gets sent.** No organization info, API keys, patient data, IPs, or personal identifiers are transmitted. The ping is fire-and-forget: if it fails, the error is silently discarded and never blocks server operation.
+| Field | Description |
+|---|---|
+| `event` | Always `"node_initialized"` |
+| `version` | Package version |
+| `node_id` | Persistent UUID stored at `~/.servicialo/node_id` |
+| `ts` | Timestamp in milliseconds |
+
+**That is everything that gets sent.** No organization info, API keys, patient data, or personal identifiers are transmitted. The IP is hashed (SHA-256) server-side before storage. The ping is fire-and-forget: if it fails, the error is silently discarded and never blocks server operation.
+
+On first run with telemetry enabled, the server prints a notice to stderr explaining what is sent and how to opt out.
 
 ### Disable telemetry
 
@@ -459,11 +469,13 @@ Or in MCP configuration:
 }
 ```
 
+More details: [servicialo.com/docs/telemetry](https://servicialo.com/docs/telemetry)
+
 ## Join the network
 
-When you install `@servicialo/mcp-server`, your node automatically registers with the [network telemetry](https://servicialo.com/network) (opt-in, anonymous). This helps the ecosystem measure real protocol adoption — without collecting personal or client data.
+When you install `@servicialo/mcp-server`, your node automatically registers with the [network telemetry](https://servicialo.com/network). This helps the ecosystem measure real protocol adoption — without collecting personal or client data.
 
-Telemetry reports only: package version, country (IP geolocation, IPs are not stored), and an anonymous node hash. You can disable it at any time with `SERVICIALO_TELEMETRY=false`.
+Telemetry reports only: package version, a persistent node UUID, and an IP hash (for approximate geolocation — IPs are not stored). You can disable it at any time with `SERVICIALO_TELEMETRY=false`.
 
 ## License
 

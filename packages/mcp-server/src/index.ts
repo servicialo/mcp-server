@@ -136,19 +136,37 @@ async function main() {
   if (process.env.SERVICIALO_TELEMETRY?.toLowerCase() !== 'false') {
     // 1. Persistent node_id: read or create ~/.servicialo/node_id
     let nodeId: string | undefined;
+    const servicialoDir = join(homedir(), '.servicialo');
     try {
-      const dir = join(homedir(), '.servicialo');
-      const file = join(dir, 'node_id');
+      const file = join(servicialoDir, 'node_id');
       if (existsSync(file)) {
         nodeId = readFileSync(file, 'utf-8').trim();
       }
       if (!nodeId) {
         nodeId = randomUUID();
-        mkdirSync(dir, { recursive: true });
+        mkdirSync(servicialoDir, { recursive: true });
         writeFileSync(file, nodeId, 'utf-8');
       }
     } catch {
       // Non-critical — proceed without node_id
+    }
+
+    // 1b. First-run notice (shown once, then sentinel file prevents repeat)
+    try {
+      const sentinelFile = join(servicialoDir, '.telemetry-notice-shown');
+      if (!existsSync(sentinelFile)) {
+        console.error(
+          '\n  Servicialo sends anonymous usage telemetry (node_id + version).\n' +
+          '  To opt out, set SERVICIALO_TELEMETRY=false\n' +
+          '  Details: https://servicialo.com/docs/telemetry\n',
+        );
+        try {
+          mkdirSync(servicialoDir, { recursive: true });
+          writeFileSync(sentinelFile, new Date().toISOString(), 'utf-8');
+        } catch { /* non-critical */ }
+      }
+    } catch {
+      // Non-critical — proceed without notice
     }
 
     // 2. Anonymous telemetry instance registration

@@ -448,17 +448,27 @@ Servicialo sigue versionado semántico para la especificación del protocolo:
 
 ## Telemetría
 
-Al iniciar, el MCP server envía un único POST anónimo a `https://servicialo.com/api/telemetry/ping` con:
+Al iniciar, el MCP server envía un único POST anónimo a `https://servicialo.com/api/telemetry/instance` con:
 
 ```json
 {
   "event": "node_initialized",
-  "version": "0.9.0",
+  "version": "0.9.7",
+  "node_id": "a1b2c3d4-...",
   "ts": 1711300000000
 }
 ```
 
-**Esto es todo lo que se envía.** No se transmite información de organización, API keys, datos de pacientes, IPs ni ningún identificador personal. El ping es fire-and-forget: si falla, el error se descarta silenciosamente y nunca bloquea la operación del servidor.
+| Campo | Descripción |
+|---|---|
+| `event` | Siempre `"node_initialized"` |
+| `version` | Versión del paquete |
+| `node_id` | UUID persistente almacenado en `~/.servicialo/node_id` |
+| `ts` | Timestamp en milisegundos |
+
+**Esto es todo lo que se envía.** No se transmite información de organización, API keys, datos de pacientes ni ningún identificador personal. La IP se hashea (SHA-256) en el servidor antes de almacenarse. El ping es fire-and-forget: si falla, el error se descarta silenciosamente y nunca bloquea la operación del servidor.
+
+La primera vez que se ejecuta con telemetría activa, el servidor imprime un aviso en stderr indicando qué se envía y cómo desactivarlo.
 
 ### Desactivar telemetría
 
@@ -476,11 +486,13 @@ O en la configuración MCP:
 }
 ```
 
+Más detalles: [servicialo.com/docs/telemetry](https://servicialo.com/docs/telemetry)
+
 ## Únete a la red
 
-Al instalar `@servicialo/mcp-server`, tu nodo se registra automáticamente en la [telemetría de la red](https://servicialo.com/network) (opt-in, anónimo). Esto ayuda al ecosistema a medir adopción real del protocolo — sin recopilar datos personales ni de tus clientes.
+Al instalar `@servicialo/mcp-server`, tu nodo se registra automáticamente en la [telemetría de la red](https://servicialo.com/network). Esto ayuda al ecosistema a medir adopción real del protocolo — sin recopilar datos personales ni de tus clientes.
 
-La telemetría reporta únicamente: versión del paquete, país (geolocalización de IP, no almacenamos IP), y un hash anónimo del nodo. Puedes desactivarla en cualquier momento con `SERVICIALO_TELEMETRY=false`.
+La telemetría reporta únicamente: versión del paquete, un UUID de nodo persistente, y un hash de IP (para geolocalización aproximada — no almacenamos IPs). Puedes desactivarla en cualquier momento con `SERVICIALO_TELEMETRY=false`.
 
 ## Licencia
 
