@@ -8,7 +8,7 @@
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.9.8",
+  "version": "0.9.9",
   "remotes": [
     {
       "type": "streamable-http",
@@ -19,9 +19,19 @@
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.9.8",
+      "version": "0.9.9",
       "transport": {
-        "type": "stdio"
+        "type": "stdio",
+        "env": {
+          "SERVICIALO_API_KEY": {
+            "description": "API key for authenticated tools (booking, lifecycle, payments). Optional — 10 public discovery tools work without it.",
+            "required": false
+          },
+          "SERVICIALO_ORG_ID": {
+            "description": "Organization slug for authenticated mode. Optional — omit for discovery-only mode.",
+            "required": false
+          }
+        }
       }
     }
   ]
