@@ -23,6 +23,16 @@ de entrega y liquidación financiera de servicios profesionales.
 
 ---
 
+## Protocol Specification
+
+For a formal description of the architecture, message flows, and data model:
+
+- [Whitepaper v0.9](https://servicialo.com/whitepaper) — formal protocol specification
+- [Protocol repository](https://github.com/servicialo/protocol) — schemas, RFCs, and reference materials
+- [PROTOCOL.md](./PROTOCOL.md) — full specification in this repo
+
+---
+
 ## ¿Por dónde empiezo?
 
 **Tengo un negocio de servicios** y quiero que agentes AI descubran y agenden mis servicios
@@ -478,6 +488,14 @@ servicialo/
 |---|---------|--------|
 | Protocol | 0.9 | Estable |
 | @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+
+---
+
+## Ecosystem
+
+- [Network explorer](https://servicialo.com/network) — live nodes implementing the protocol
+- [awesome-servicialo](https://github.com/servicialo/awesome-servicialo) — curated list of integrations, clients, and tools
+- Using Servicialo? [Add your implementation](https://github.com/servicialo/awesome-servicialo/issues/new)
 
 ---
 

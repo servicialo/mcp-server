@@ -15,7 +15,7 @@ export const resolveAuthTools = {
       rest_url: z.string().optional().describe('URL de la API REST de la organización'),
       health_url: z.string().optional().describe('URL del health-check endpoint'),
       legal_name: z.string().optional().describe('Nombre legal (si difiere del nombre comercial)'),
-      verticals: z.array(z.string()).optional().describe('Verticales de servicio (ej: ["salud", "dental"])'),
+      verticals: z.array(z.string()).optional().describe('Verticales de servicio. Valores comunes: tecnologia, consultoria, kinesiologia, psicologia, dental, nutricion, fonoaudiologia, terapia-ocupacional, medicina, veterinaria, educacion, fitness, legal, belleza, hogar (ej: ["tecnologia", "consultoria"])'),
       contact_email: z.string().optional().describe('Email de contacto'),
     }),
     handler: async (client: ServicialoAdapter, args: {

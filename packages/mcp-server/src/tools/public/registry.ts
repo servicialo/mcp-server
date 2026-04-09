@@ -10,12 +10,12 @@ export const registryTools = {
       'Do NOT use if you already have an org_slug (use registry.get_organization instead). ' +
       'Returns a ranked list of organizations with names, slugs, and service summaries.',
     schema: z.object({
-      vertical: z.string().describe('Service vertical to search (e.g. "kinesiologia", "psicologia", "dental", "legal", "educacion")'),
+      vertical: z.string().optional().describe('Vertical del servicio. Valores comunes: tecnologia, consultoria, kinesiologia, psicologia, dental, nutricion, fonoaudiologia, terapia-ocupacional, medicina, veterinaria, educacion, fitness, legal, belleza, hogar. Omitir para buscar en todas las verticales.'),
       location: z.string().optional().describe('City or district to filter by (e.g. "santiago", "providencia"). Omit for country-wide results.'),
       country: z.string().default('cl').describe('ISO 3166-1 alpha-2 country code (e.g. "cl", "mx", "ar"). Default: "cl"'),
       limit: z.number().default(10).describe('Max results to return (1-100). Default: 10'),
     }),
-    handler: async (client: ServicialoAdapter, args: { vertical: string; location?: string; country?: string; limit?: number }) => {
+    handler: async (client: ServicialoAdapter, args: { vertical?: string; location?: string; country?: string; limit?: number }) => {
       const result = await client.pub.get('/api/servicialo/registry', {
         vertical: args.vertical,
         location: args.location,

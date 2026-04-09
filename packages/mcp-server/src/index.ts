@@ -78,10 +78,51 @@ async function main() {
   const adapter = await createAdapter();
 
   // --- Init MCP server ---
-  const server = new McpServer({
-    name: 'servicialo',
-    version: pkg.version,
-  });
+  const serverInstructions = [
+    'Servicialo es un protocolo abierto para agendar y gestionar servicios profesionales mediante agentes de IA.',
+    '',
+    '## Autenticación',
+    '',
+    'Las siguientes tools son **públicas** y NO requieren API key ni autenticación:',
+    '- registry_search — Buscar organizaciones por vertical, ubicación y país',
+    '- registry_manifest — Obtener metadata del servidor MCP',
+    '- registry_get_organization — Obtener perfil público de una organización',
+    '- services_list — Listar catálogo de servicios de una organización',
+    '- scheduling_check_availability — Consultar disponibilidad horaria',
+    '- resolve_lookup — Resolver orgSlug a endpoints y nivel de confianza',
+    '- resolve_search — Buscar organizaciones en el resolver global',
+    '- trust_get_score — Obtener score de confianza de una organización',
+    '- a2a_get_agent_card — Obtener Agent Card A2A para comunicación inter-agente',
+    '- docs_quickstart — Guía de onboarding paso a paso',
+    '',
+    'Para operaciones de **booking y gestión** (book, confirm, cancel, reschedule, delivery, payments, etc.)',
+    'se requiere configurar las variables de entorno SERVICIALO_API_KEY y SERVICIALO_ORG_ID.',
+    'Estas tools solo aparecen cuando las credenciales están presentes (modo autenticado).',
+    '',
+    '## Flujo típico de descubrimiento (sin auth)',
+    '',
+    '1. registry_search → encontrar organizaciones',
+    '2. registry_get_organization o services_list → ver servicios disponibles',
+    '3. scheduling_check_availability → consultar horarios libres',
+    '',
+    '## Flujo de booking (requiere auth)',
+    '',
+    '1. service_get → entender las 8 dimensiones del servicio',
+    '2. contract_get → entender reglas y políticas',
+    '3. clients_get_or_create → identificar al cliente',
+    '4. scheduling_book → crear la sesión',
+    '5. lifecycle_transition → avanzar por el ciclo de vida',
+  ].join('\n');
+
+  const server = new McpServer(
+    {
+      name: 'servicialo',
+      version: pkg.version,
+    },
+    {
+      instructions: serverInstructions,
+    },
+  );
 
   // --- Register tools ---
   function registerTools(tools: Record<string, ToolDef>) {

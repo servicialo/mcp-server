@@ -27,7 +27,7 @@ export const resolveTools = {
       'Unlike registry.search, this queries the DNS-level resolver and returns endpoint URLs + trust levels.',
     schema: z.object({
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl'),
-      vertical: z.string().optional().describe('Vertical del servicio (ej: salud, hogar, legal, educacion)'),
+      vertical: z.string().optional().describe('Vertical del servicio. Valores comunes: tecnologia, consultoria, kinesiologia, psicologia, dental, nutricion, fonoaudiologia, terapia-ocupacional, medicina, veterinaria, educacion, fitness, legal, belleza, hogar. Omitir para buscar en todas las verticales.'),
       limit: z.number().default(20).describe('Cantidad máxima de resultados (1-100). Default: 20'),
     }),
     handler: async (client: ServicialoAdapter, args: { country?: string; vertical?: string; limit?: number }) => {
