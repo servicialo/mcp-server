@@ -2,7 +2,7 @@ import { getNetworkStats } from "@/lib/telemetry-stats";
 
 export async function HeroSection() {
   const stats = await getNetworkStats();
-  const nodeCount = stats.totalInstances;
+  const nodeCount = stats.uniqueHosts;
   const countryCount = stats.countryBreakdown.length;
 
   return (

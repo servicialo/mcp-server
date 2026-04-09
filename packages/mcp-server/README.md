@@ -494,6 +494,20 @@ Al instalar `@servicialo/mcp-server`, tu nodo se registra automáticamente en la
 
 La telemetría reporta únicamente: versión del paquete, un UUID de nodo persistente, y un hash de IP (para geolocalización aproximada — no almacenamos IPs). Puedes desactivarla en cualquier momento con `SERVICIALO_TELEMETRY=false`.
 
+## Verificación de implementador
+
+Si operas una implementación propia del protocolo, puedes identificar tu nodo y solicitar el estatus de **implementador verificado**. Configura estas variables de entorno opcionales:
+
+```bash
+SERVICIALO_IMPL_NAME="Mi Plataforma"    # Nombre de tu implementación
+SERVICIALO_IMPL_URL="https://example.com" # Tu sitio web o repositorio
+SERVICIALO_IMPL_CONTACT="admin@example.com" # Email de contacto (hasheado, nunca se muestra)
+```
+
+Cuando un nuevo `IMPL_NAME` aparece por primera vez, el equipo de Servicialo recibe una notificación y revisa manualmente. Una vez verificado, tu implementación aparece en [servicialo.com/implementors](https://servicialo.com/implementors) con un badge de verificado.
+
+Si no configuras estas variables, tu nodo permanece completamente anónimo — sin cambios en el comportamiento.
+
 ## Licencia
 
 Apache-2.0 — cualquier implementación, comercial o no, es bienvenida. Ver [LICENSE](./LICENSE).

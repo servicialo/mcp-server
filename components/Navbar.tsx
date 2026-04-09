@@ -26,6 +26,7 @@ const desktopSections = [
   { name: "Estándar", id: "estandar" },
   { name: "Servidor MCP", id: "mcp-server" },
   { name: "Red", id: "_network", href: "/network" },
+  { name: "Implementors", id: "_implementors", href: "/implementors" },
 ];
 
 export function Navbar() {
@@ -190,6 +191,13 @@ export function Navbar() {
             className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
           >
             Red
+          </a>
+          <a
+            href="/implementors"
+            onClick={() => setMenuOpen(false)}
+            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
+          >
+            Implementors
           </a>
         </div>
       </div>

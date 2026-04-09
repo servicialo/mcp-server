@@ -477,6 +477,20 @@ When you install `@servicialo/mcp-server`, your node automatically registers wit
 
 Telemetry reports only: package version, a persistent node UUID, and an IP hash (for approximate geolocation — IPs are not stored). You can disable it at any time with `SERVICIALO_TELEMETRY=false`.
 
+## Verified implementor
+
+If you operate your own implementation of the protocol, you can identify your node and apply for **verified implementor** status. Set these optional environment variables:
+
+```bash
+SERVICIALO_IMPL_NAME="My Platform"         # Name of your implementation
+SERVICIALO_IMPL_URL="https://example.com"  # Your website or repository
+SERVICIALO_IMPL_CONTACT="admin@example.com" # Contact email (hashed, never displayed)
+```
+
+When a new `IMPL_NAME` appears for the first time, the Servicialo team is notified and reviews manually. Once verified, your implementation appears at [servicialo.com/implementors](https://servicialo.com/implementors) with a verified badge.
+
+If you don't set these variables, your node remains fully anonymous — no change in behavior.
+
 ## License
 
 Apache-2.0 — any implementation, commercial or otherwise, is welcome. See [LICENSE](./LICENSE).

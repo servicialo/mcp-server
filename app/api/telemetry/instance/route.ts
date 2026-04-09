@@ -140,11 +140,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { event, version, node_id, ts } = body as {
+    const { event, version, node_id, ts, impl_name, impl_url, impl_contact } = body as {
       event?: string;
       version?: string;
       node_id?: string;
       ts?: number;
+      impl_name?: string;
+      impl_url?: string;
+      impl_contact?: string;
     };
 
     if (!event || !version || !ts) {
@@ -171,6 +174,47 @@ export async function POST(request: Request) {
 
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
+    // Hash contact email if provided (never store raw)
+    let implContactHash: string | null = null;
+    if (impl_contact) {
+      const contactEncoded = new TextEncoder().encode(impl_contact.toLowerCase().trim());
+      const contactHashBuffer = await crypto.subtle.digest('SHA-256', contactEncoded);
+      implContactHash = Array.from(new Uint8Array(contactHashBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    // Determine verification_status for identified nodes
+    let verificationStatus: string | undefined;
+    if (impl_name) {
+      // Check if this impl_name already exists (to avoid re-notifying)
+      const checkParams = new URLSearchParams({
+        select: 'verification_status',
+        impl_name: `eq.${impl_name}`,
+        limit: '1',
+      });
+      const existingRes = await fetch(
+        `${REGISTRY_URL}/rest/v1/telemetry_instances?${checkParams.toString()}`,
+        {
+          headers: {
+            apikey: REGISTRY_KEY,
+            Authorization: `Bearer ${REGISTRY_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      const existingRows = existingRes.ok ? await existingRes.json() : [];
+
+      if (existingRows.length === 0) {
+        // First ping with this impl_name — set to pending and notify
+        verificationStatus = 'pending';
+        notifyNewImplementor(impl_name, impl_url, geo.country_name).catch(() => {});
+      } else {
+        // Preserve existing status
+        verificationStatus = existingRows[0].verification_status;
+      }
+    }
+
     // Upsert with dual dedup:
     // - idx_telemetry_ip_dedup: (ip_hash, event, day) — catches ephemeral node_ids
     // - idx_telemetry_instances_dedup: (node_id, event, day) — catches same node restarting
@@ -193,6 +237,10 @@ export async function POST(request: Request) {
         country_code: geo.country_code,
         country_name: geo.country_name,
         continent: geo.continent,
+        ...(impl_name ? { impl_name } : {}),
+        ...(impl_url ? { impl_url } : {}),
+        ...(implContactHash ? { impl_contact_hash: implContactHash } : {}),
+        ...(verificationStatus ? { verification_status: verificationStatus } : {}),
       }),
     });
 
@@ -204,4 +252,51 @@ export async function POST(request: Request) {
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
+// ─── Internal notification for new implementor verification requests ───
+
+const NOTIFY_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || 'franco@coordinalo.com';
+const RESEND_KEY = process.env.RESEND_API_KEY;
+
+async function notifyNewImplementor(
+  implName: string,
+  implUrl: string | undefined,
+  country: string | null,
+) {
+  // Try Resend email first, fall back to console log
+  if (RESEND_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${RESEND_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Servicialo Network <network@servicialo.com>',
+          to: NOTIFY_EMAIL,
+          subject: `[Servicialo] New implementor verification request: ${implName}`,
+          text: [
+            `A new node has identified itself and is pending verification.`,
+            ``,
+            `Implementation: ${implName}`,
+            implUrl ? `URL: ${implUrl}` : null,
+            country ? `Country: ${country}` : null,
+            ``,
+            `Review at: https://servicialo.com/admin/implementors`,
+            `Or query directly: SELECT * FROM telemetry_instances WHERE impl_name = '${implName.replace(/'/g, "''")}';`,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        }),
+      });
+    } catch {
+      // Fall through to console
+    }
+  }
+
+  console.log(
+    `[servicialo] New implementor verification request: ${implName}${implUrl ? ` (${implUrl})` : ''}${country ? ` from ${country}` : ''}`,
+  );
 }

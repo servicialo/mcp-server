@@ -39,6 +39,7 @@ export interface CountryEntry {
 
 export interface NetworkStats {
   totalInstances: number;
+  uniqueHosts: number;
   uniqueNodes24h: number;
   uniqueNodes7d: number;
   versionBreakdown: { version: string; count: number }[];
@@ -81,9 +82,10 @@ async function uniqueNodes(interval: '24h' | '7d'): Promise<number> {
 }
 
 /**
- * Total unique instances (all time) — by ip_hash, not row count.
+ * Total unique instances (all time).
+ * Returns both node_id count (raw) and ip_hash count (deduplicated hosts).
  */
-async function totalUniqueInstances(): Promise<number> {
+async function totalUniqueInstances(): Promise<{ byNodeId: number; byIpHash: number }> {
   const params = new URLSearchParams({
     select: 'node_id,ip_hash',
   });
@@ -93,15 +95,17 @@ async function totalUniqueInstances(): Promise<number> {
     next: { revalidate: 60 },
   });
 
-  if (!res.ok) return 0;
+  if (!res.ok) return { byNodeId: 0, byIpHash: 0 };
   const rows: { node_id: string | null; ip_hash: string | null }[] = await res.json();
 
-  const unique = new Set<string>();
+  const nodeIds = new Set<string>();
+  const ipHashes = new Set<string>();
   for (const r of rows) {
-    const key = r.ip_hash ?? r.node_id;
-    if (key) unique.add(key);
+    if (r.node_id) nodeIds.add(r.node_id);
+    const hostKey = r.ip_hash ?? r.node_id;
+    if (hostKey) ipHashes.add(hostKey);
   }
-  return unique.size;
+  return { byNodeId: nodeIds.size, byIpHash: ipHashes.size };
 }
 
 async function versionBreakdown(): Promise<{ version: string; count: number }[]> {
@@ -220,12 +224,80 @@ async function countryBreakdown(): Promise<{
   return { countries, continents };
 }
 
+// ─── Verified implementors ───
+
+export interface VerifiedImplementor {
+  impl_name: string;
+  impl_url: string | null;
+  country_code: string | null;
+  country_name: string | null;
+  node_count: number;
+}
+
+export async function getVerifiedImplementors(): Promise<VerifiedImplementor[]> {
+  if (!REGISTRY_URL || !REGISTRY_KEY) return [];
+
+  const params = new URLSearchParams({
+    select: 'impl_name,impl_url,country_code,country_name,ip_hash,node_id',
+    verification_status: 'eq.verified',
+    'impl_name': 'not.is.null',
+  });
+
+  const res = await fetch(rest('telemetry_instances', params.toString()), {
+    headers: hdrs(),
+    next: { revalidate: 60 },
+  });
+
+  if (!res.ok) return [];
+
+  const rows: {
+    impl_name: string;
+    impl_url: string | null;
+    country_code: string | null;
+    country_name: string | null;
+    ip_hash: string | null;
+    node_id: string | null;
+  }[] = await res.json();
+
+  // Group by impl_name, count unique hosts per implementation
+  const implMap = new Map<string, {
+    impl_url: string | null;
+    country_code: string | null;
+    country_name: string | null;
+    hosts: Set<string>;
+  }>();
+
+  for (const r of rows) {
+    const key = r.ip_hash ?? r.node_id ?? 'unknown';
+    if (!implMap.has(r.impl_name)) {
+      implMap.set(r.impl_name, {
+        impl_url: r.impl_url,
+        country_code: r.country_code,
+        country_name: r.country_name,
+        hosts: new Set(),
+      });
+    }
+    implMap.get(r.impl_name)!.hosts.add(key);
+  }
+
+  return Array.from(implMap.entries())
+    .map(([impl_name, v]) => ({
+      impl_name,
+      impl_url: v.impl_url,
+      country_code: v.country_code,
+      country_name: v.country_name,
+      node_count: v.hosts.size,
+    }))
+    .sort((a, b) => b.node_count - a.node_count);
+}
+
 // ─── Combined fetch ───
 
 export async function getNetworkStats(): Promise<NetworkStats> {
   if (!REGISTRY_URL || !REGISTRY_KEY) {
     return {
       totalInstances: 0,
+      uniqueHosts: 0,
       uniqueNodes24h: 0,
       uniqueNodes7d: 0,
       versionBreakdown: [],
@@ -235,7 +307,7 @@ export async function getNetworkStats(): Promise<NetworkStats> {
     };
   }
 
-  const [totalInstances, uniqueNodes24h, uniqueNodes7d, versions, daily, geo] =
+  const [totals, uniqueNodes24h, uniqueNodes7d, versions, daily, geo] =
     await Promise.all([
       totalUniqueInstances(),
       uniqueNodes('24h'),
@@ -246,7 +318,8 @@ export async function getNetworkStats(): Promise<NetworkStats> {
     ]);
 
   return {
-    totalInstances,
+    totalInstances: totals.byNodeId,
+    uniqueHosts: totals.byIpHash,
     uniqueNodes24h,
     uniqueNodes7d,
     versionBreakdown: versions,

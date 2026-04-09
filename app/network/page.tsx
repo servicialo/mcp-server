@@ -59,8 +59,16 @@ export default async function NetworkPage() {
       </section>
 
       {/* KPI cards */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-14">
-        <KpiCard label="Unique nodes" value={stats.totalInstances.toLocaleString()} />
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-14">
+        <KpiCard
+          label="Nodes"
+          value={stats.totalInstances.toLocaleString()}
+          subtitle={stats.uniqueHosts < stats.totalInstances
+            ? `${stats.uniqueHosts} unique hosts`
+            : undefined}
+          tooltip="Unique node IDs registered. 'Unique hosts' deduplicates by network fingerprint — a more conservative count that filters ephemeral containers."
+        />
+        <KpiCard label="Unique hosts" value={String(stats.uniqueHosts)} tooltip="Deduplicated by cryptographic fingerprint (SHA-256 of request metadata). More conservative than node count — filters container restarts and ephemeral IDs." />
         <KpiCard label="Active (24 h)" value={String(stats.uniqueNodes24h)} />
         <KpiCard label="Active (7 d)" value={String(stats.uniqueNodes7d)} />
       </section>
@@ -221,15 +229,29 @@ export default async function NetworkPage() {
 
 // ─── Components ───
 
-function KpiCard({ label, value }: { label: string; value: string }) {
+function KpiCard({ label, value, subtitle, tooltip }: { label: string; value: string; subtitle?: string; tooltip?: string }) {
   return (
-    <div className="rounded-xl border border-border p-5 bg-surface">
-      <div className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] mb-2">
+    <div className="rounded-xl border border-border p-5 bg-surface group relative">
+      <div className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] mb-2 flex items-center gap-1">
         {label}
+        {tooltip && (
+          <span className="cursor-help" title={tooltip}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </span>
+        )}
       </div>
       <div className="font-serif text-[36px] md:text-[44px] text-text leading-none tracking-[-0.02em]">
         {value}
       </div>
+      {subtitle && (
+        <div className="font-mono text-[10px] text-text-dim mt-1.5">
+          {subtitle}
+        </div>
+      )}
     </div>
   );
 }

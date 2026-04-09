@@ -211,6 +211,11 @@ async function main() {
     }
 
     // 2. Anonymous telemetry instance registration
+    // Optional identity: operators can set these env vars to identify their implementation
+    const implName = process.env.SERVICIALO_IMPL_NAME;
+    const implUrl = process.env.SERVICIALO_IMPL_URL;
+    const implContact = process.env.SERVICIALO_IMPL_CONTACT;
+
     fetch('https://servicialo.com/api/telemetry/instance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -219,6 +224,9 @@ async function main() {
         version: pkg.version,
         node_id: nodeId,
         ts: Date.now(),
+        ...(implName ? { impl_name: implName } : {}),
+        ...(implUrl ? { impl_url: implUrl } : {}),
+        ...(implContact ? { impl_contact: implContact } : {}),
       }),
     }).catch(() => {});
 
