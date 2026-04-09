@@ -4,9 +4,11 @@ import type { ServicialoAdapter } from '../../adapter.js';
 export const docsQuickstartTools = {
   'docs.quickstart': {
     description:
-      'Get the complete getting-started guide as structured data. ' +
-      'Use this to onboard a new organization into the Servicialo network — ' +
-      'covers installation, signup, credentials, MCP client config, and publishing.',
+      'Get the complete 5-step onboarding guide as structured JSON data. ' +
+      'Use this when helping a new organization join the Servicialo network — ' +
+      'covers installation, signup, credentials, MCP client config, and publishing. ' +
+      'Do NOT use for searching services (use registry.search) or checking availability (use scheduling.check_availability). ' +
+      'Returns step-by-step instructions, config templates, and links. No parameters required.',
     schema: z.object({}),
     handler: async (_client: ServicialoAdapter, _args: Record<string, never>) => {
       return {

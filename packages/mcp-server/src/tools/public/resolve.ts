@@ -4,9 +4,10 @@ import type { ServicialoAdapter } from '../../adapter.js';
 export const resolveTools = {
   'resolve.lookup': {
     description:
-      'Resuelve un orgSlug a su endpoint MCP/REST, nivel de confianza e identidad. ' +
-      'Es el equivalente a un DNS lookup: dado un nombre único global, devuelve dónde ' +
-      'están los servicios de esa organización.',
+      'Resolve an organization slug to its MCP/REST endpoints and trust level — the DNS of professional services. ' +
+      'Use this when you know the org_slug and need its API endpoint before calling any other tool. ' +
+      'Do NOT use for searching by vertical or location (use resolve.search or registry.search instead). ' +
+      'Returns: endpoint URLs, trust score (0-100), trust level, and last heartbeat timestamp.',
     schema: z.object({
       org_slug: z.string().describe('Slug de la organización (ej: clinica-dental-sur)'),
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl'),
@@ -19,9 +20,11 @@ export const resolveTools = {
 
   'resolve.search': {
     description:
-      'Busca organizaciones registradas en el resolver Servicialo por país y vertical. ' +
-      'Devuelve una lista con slug, nombre, endpoints y nivel de confianza. ' +
-      'Útil para descubrimiento: "¿qué clínicas dentales hay en Chile?"',
+      'Search the global Servicialo resolver for registered organizations by country and vertical. ' +
+      'Use this for broad discovery when you need to find all organizations in a country/vertical ' +
+      '(e.g., "what physiotherapy clinics exist in Chile?"). ' +
+      'Do NOT use if you already have an org_slug (use resolve.lookup instead). ' +
+      'Unlike registry.search, this queries the DNS-level resolver and returns endpoint URLs + trust levels.',
     schema: z.object({
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2 (ej: cl, mx, ar). Default: cl'),
       vertical: z.string().optional().describe('Vertical del servicio (ej: salud, hogar, legal, educacion)'),
@@ -38,9 +41,11 @@ export const resolveTools = {
 
   'trust.get_score': {
     description:
-      'Obtiene el puntaje de confianza de una organización en el resolver Servicialo. ' +
-      'Devuelve score (0-100), nivel (unverified/declared/vouched/verified), y última actividad. ' +
-      'El trust es pasivo: se acumula con historial de servicios verificados.',
+      'Get the trust score of an organization from the Servicialo resolver. ' +
+      'Use this to evaluate reliability before booking — returns score (0-100), ' +
+      'trust level (unverified → declared → vouched → verified), and last activity timestamp. ' +
+      'Do NOT use this to find organizations (use resolve.search). ' +
+      'Trust accumulates passively from verified service history; it cannot be purchased or self-declared.',
     schema: z.object({
       org_slug: z.string().describe('Slug de la organización (ej: clinica-dental-sur)'),
       country: z.string().default('cl').describe('País ISO 3166-1 alpha-2. Default: cl'),
