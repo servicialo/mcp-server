@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 3.  [Protocol Primitives](#3-protocol-primitives)
 4.  [Core Entities](#4-core-entities)
 5.  [The 8 Dimensions of a Service](#5-the-8-dimensions-of-a-service)
-6.  [The 9 Universal States](#6-the-9-universal-states)
+6.  [The 6 + 3 Universal States](#6-the-6--3-universal-states)
 7.  [Exception Flows](#7-exception-flows)
 8.  [Service Order](#8-service-order)
 9.  [Principles](#9-principles)
@@ -138,7 +138,7 @@ The protocol defines four coordination primitives that together cover the comple
 
 ### 3.1 Schedule Coordination
 
-Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 9 lifecycle states, and 6 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
+Multi-party availability intersection between provider, client, and physical resource. The protocol defines a 3-variable scheduler, 6+3 lifecycle states (6 core + 3 financial extension), and 6 exception flows that handle the reality of service delivery — including no-shows, cancellations, rescheduling, and resource conflicts.
 
 ### 3.2 Identity Verification
 
@@ -291,11 +291,11 @@ The combination of `resource_id + day_of_week + block_order` MUST be unique.
 
 ### 5.6 Lifecycle (States)
 
-Current position in the 9-state lifecycle. See [Section 6](#6-the-9-universal-states).
+Current position in the 6+3 state lifecycle (6 core + 3 financial extension). See [Section 6](#6-the-6--3-universal-states).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lifecycle.current_state` | enum | REQUIRED | One of the 9 universal states or exception states. |
+| `lifecycle.current_state` | enum | REQUIRED | One of the 6 core states, 3 financial extension states, or exception states. |
 | `lifecycle.transitions` | transition[] | OPTIONAL | State change history (audit trail). |
 | `lifecycle.exceptions` | exception[] | OPTIONAL | No-shows, disputes, resource conflicts. |
 
@@ -329,12 +329,14 @@ Financial settlement for the service. Billing has its own status independent fro
 
 ---
 
-## 6. The 9 Universal States
+## 6. The 6 + 3 Universal States
 
-Every service passes through the same lifecycle. The 9 states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, documented, and settled.
+Every service passes through the same core lifecycle. The 6 core states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, and documented. The 3 financial extension states are OPTIONAL — implementations MAY bundle them into the session lifecycle or manage them independently.
+
+### Core Lifecycle (REQUIRED — states 1–6)
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
+Requested → Scheduled → Confirmed → In Progress → Completed → Documented
 ```
 
 | # | Key (enum) | Description | Trigger |
@@ -345,13 +347,24 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 | 4 | `in_progress` | Service is being delivered. | Check-in detected. |
 | 5 | `completed` | Provider marks delivery complete. | Provider confirms. |
 | 6 | `documented` | Record/evidence generated. | Clinical note, report, or evidence filed. |
+
+### Financial Extension (OPTIONAL — states 7–9)
+
+| # | Key (enum) | Description | Trigger |
+|---|------------|-------------|---------|
 | 7 | `invoiced` | Tax document issued. | Tax document emitted. |
 | 8 | `collected` | Payment received and confirmed. | Payment received and confirmed. |
 | 9 | `verified` | Client confirms OK or silence window expires. | Client responds OK, or auto-verified after window. |
 
+> Implementations that decouple financial lifecycle MUST expose financial state via `payments.get_status`, not through `lifecycle.get_state`. The REQUIRED terminal state for the core service lifecycle is `documented` (or `verified` if delivery verification is implemented). States 7–9 are OPTIONAL — implementations MAY bundle them into the session lifecycle or manage them independently.
+
+### 6.0.1 Optional State: `pending_confirmation`
+
+Implementations that require explicit confirmation after booking MAY use the state `pending_confirmation` between `requested` and `scheduled`. Agents MUST handle this as a valid state where valid transitions are `confirm` → `scheduled` or `cancel` → `cancelled`.
+
 ### 6.1 State Transition Rules
 
-States MUST be strictly ordered. The 9 universal states MUST NOT be skipped (e.g., a service MUST NOT jump from `scheduled` directly to `documented`). Implementations MAY add intermediate states between the universal states; these intermediate states MUST follow the same forward-only rule. Exception flows (§7) MAY redirect a service out of the happy path at any point.
+Core states (1–6) MUST be strictly ordered — no skipping. Financial extension states (7–9), when implemented, MUST also be strictly ordered. Implementations MUST NOT skip states within their implemented set (e.g., a service MUST NOT jump from `scheduled` directly to `documented`). Implementations MAY add intermediate states between the universal states; these intermediate states MUST follow the same forward-only rule. Exception flows (§7) MAY redirect a service out of the happy path at any point.
 
 Each transition MUST record:
 
@@ -373,7 +386,11 @@ When a session has an assigned Resource, the `scheduled` state implies that thre
 
 ### 6.3 Verification as Closure
 
-Verification is the closure of the cycle, not a step in the middle. The client cannot meaningfully verify until the service has been documented, invoiced, and collected. Verification that comes before documentation is premature.
+Verification is the closure of the cycle, not a step in the middle. The client cannot meaningfully verify until the service has been documented (and, when financial extension states are implemented, invoiced and collected). Verification that comes before documentation is premature.
+
+### 6.3.1 Verification Deadline
+
+After transitioning to `delivered`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `delivered`.
 
 ### 6.4 Revenue Recognition
 
@@ -568,7 +585,7 @@ A quote IS a Service Order in pre-active state. There is no separate "quote" obj
 
 ### Principle 1: Every Service Has a Lifecycle
 
-The 9 states are universal. The specifics of each state vary by vertical, but the sequence is invariant.
+The 6 core states (+ 3 financial extension states) are universal. The specifics of each state vary by vertical, but the sequence is invariant.
 
 ### Principle 2: Delivery MUST Be Verifiable
 
@@ -1429,7 +1446,7 @@ GET /api/servicialo/{orgSlug}/bookings?email={email}&status={status}
   "bookings": [
     {
       "session_id": "string",
-      "servicialo_state": "string (one of the 9 universal states)",
+      "servicialo_state": "string (one of the 6+3 universal states)",
       "service": { "name": "string", "vertical": "string" },
       "provider": { "name": "string" },
       "scheduled_for": "string (ISO 8601 datetime)",
@@ -1536,7 +1553,7 @@ Implementations MAY add fields to any dimension. Additional fields MUST NOT conf
 
 ### 15.2 Intermediate States
 
-Implementations MAY add states between the 9 universal states. Intermediate states MUST follow the same forward-only rule. Intermediate states MUST NOT replace or skip any of the 9 universal states.
+Implementations MAY add states between the universal states. Intermediate states MUST follow the same forward-only rule. Intermediate states MUST NOT replace or skip any of the 6 core states (or financial extension states, when implemented).
 
 ### 15.3 Custom Scopes
 
@@ -1562,7 +1579,7 @@ When extending the protocol:
 Any platform can implement the Servicialo specification. To be listed as a compatible implementation, a platform MUST:
 
 1. Model services using the 8 dimensions (§5).
-2. Implement the 9 lifecycle states (§6).
+2. Implement the 6 core lifecycle states (requested through documented). Financial states (invoiced, collected, verified) are optional extensions (§6).
 3. Handle at least 3 exception flows (§7).
 4. Expose an API that an MCP server can connect to.
 5. (OPTIONAL) Model Service Orders using the schema in §8.
@@ -1671,7 +1688,7 @@ The protocol version is independent from the MCP server package version.
 ### v0.6 (2026-03-01)
 
 - **Two-entity architecture.** Refactored protocol to center on two core objects: Service (atomic delivery unit) and Service Order (commercial agreement).
-- **9 lifecycle states.** Added Invoiced between Documented and Collected, bringing the total to 9 universal states plus exception states.
+- **6+3 lifecycle states.** Added Invoiced between Documented and Collected, bringing the total to 6 core states + 3 financial extension states (OPTIONAL), plus exception states.
 - **Resource entity.** Introduced Resource as a first-class entity with its own availability calendar, capacity, and buffer semantics.
 - **Exception flow: Resource Conflict.** Added as a variant of Rescheduling (§7.5).
 - **Principle 7.** Added "Collective Intelligence Is a Protocol Commons" (Principles 5 and 6 merged into "A Service Is a Machine-Readable Product").

@@ -16,7 +16,7 @@ Every service is modeled across 8 canonical dimensions, universal across vertica
 | 3 | **Client (Who Receives)** | Beneficiary of the service; payer is explicitly separated | `client.id`, `client.payer_id` |
 | 4 | **Schedule (When)** | Temporal window for the service | `requested_at`, `scheduled_for`, `duration_expected` |
 | 5 | **Location (Where)** | Physical or virtual location; may reference a Resource entity | `type` (in_person/remote), `address`, `resource_id`, `coordinates` |
-| 6 | **Lifecycle (States)** | Current position in the 9-state lifecycle | `current_state`, `transitions[]` (audit trail), `exceptions[]` |
+| 6 | **Lifecycle (States)** | Current position in the 6+3 state lifecycle (6 core + 3 financial extension) | `current_state`, `transitions[]` (audit trail), `exceptions[]` |
 | 7 | **Evidence (Proof)** | How the service proves it occurred | `checkin`, `checkout`, `duration_actual`, `evidence[]`, `data_sensitivity` |
 | 8 | **Billing (Payment)** | Financial settlement, independent from lifecycle | `amount`, `payer`, `status`, `payment_id`, `tax_document` |
 
@@ -24,10 +24,12 @@ A **Resource** (physical space/equipment) is a first-class entity with `capacity
 
 ---
 
-## 2. The 9 Lifecycle States
+## 2. The 6+3 Lifecycle States
+
+### Core Lifecycle (REQUIRED — states 1–6)
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
+Requested → Scheduled → Confirmed → In Progress → Completed → Documented
 ```
 
 | # | State | Trigger | Notes |
@@ -38,11 +40,26 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 | 4 | `in_progress` | Check-in detected (GPS + timestamp) | Delivery begins |
 | 5 | `completed` | Provider marks delivery complete | Duration auto-calculated from checkin/checkout |
 | 6 | `documented` | Clinical note, report, or evidence filed | Vertical-specific evidence schema applied |
+
+### Financial Extension (OPTIONAL — states 7–9)
+
+| # | State | Trigger | Notes |
+|:-:|-------|---------|-------|
 | 7 | `invoiced` | Tax document emitted | Billing dimension updated |
 | 8 | `collected` | Payment received and confirmed | Only `collected` sessions count toward payroll |
 | 9 | `verified` | Client confirms OK, or silence window expires (auto-verify) | Terminal happy-path state |
 
-**Rules:** States are strictly ordered — no skipping. Each transition records `from`, `to`, `at`, `by`, `method` (auto/manual/agent), and `metadata`. When `method = agent`, `mandate_id` is required.
+> Implementations that decouple financial lifecycle MUST expose financial state via `payments.get_status`, not through `lifecycle.get_state`. The REQUIRED terminal state for the core service lifecycle is `documented` (or `verified` if delivery verification is implemented). States 7–9 are OPTIONAL — implementations MAY bundle them into the session lifecycle or manage them independently.
+
+### Verification Deadline
+
+> After transitioning to `delivered`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `delivered`.
+
+### Optional State: `pending_confirmation`
+
+> Implementations that require explicit confirmation after booking MAY use the state `pending_confirmation` between `requested` and `scheduled`. Agents MUST handle this as a valid state where valid transitions are `confirm` → `scheduled` or `cancel` → `cancelled`.
+
+**Rules:** Core states (1–6) are strictly ordered — no skipping. Financial extension states (7–9) are strictly ordered when implemented. Each transition records `from`, `to`, `at`, `by`, `method` (auto/manual/agent), and `metadata`. When `method = agent`, `mandate_id` is required.
 
 ---
 
@@ -190,7 +207,7 @@ From PROTOCOL.md §16. To be listed as a compatible Servicialo implementation:
 | # | Requirement | Reference | Mandatory |
 |:-:|-------------|-----------|:---------:|
 | 1 | Model services using the **8 dimensions** | §5 | Yes |
-| 2 | Implement the **9 lifecycle states** | §6 | Yes |
+| 2 | Implement the **6 core lifecycle states** (requested through documented). Financial states (invoiced, collected, verified) are optional extensions. | §6 | Yes |
 | 3 | Handle **at least 3 exception flows** | §7 | Yes |
 | 4 | Expose an **API that an MCP server can connect to** | §13 | Yes |
 | 5 | Model Service Orders (§8 schema) | §8 | No |
