@@ -1224,6 +1224,27 @@ These tools require authentication and modify the resolver's global registry.
 
 Resolver administration enables **portability**: an organization can migrate between Servicialo-compatible backends without losing its identity in the resolver. The `resolve.update_endpoint` tool updates the endpoint mapping without re-registration.
 
+##### Registry Readiness Validation
+
+Before accepting `resolve.register`, the resolver MUST verify that the organization meets minimum bookability requirements:
+
+- At least one active service
+- At least one provider assigned to that service
+- At least one availability block configured for that provider
+
+Registration attempts that fail this check MUST return HTTP 422 with error code `not_bookable` and a human-readable message indicating which requirement is missing. Implementations MAY perform this validation at registration time (server-side) or delegate to the resolver (registry-side). At least one party MUST enforce it.
+
+#### 13.0.3 Rate Limiting
+
+Public (unauthenticated) endpoints MUST implement rate limiting. Rate-limited responses MUST return HTTP 429 with a `Retry-After` header (seconds until next allowed request).
+
+Implementations SHOULD include the following headers on all public responses:
+
+- `X-RateLimit-Limit` — maximum requests per window
+- `X-RateLimit-Remaining` — remaining requests in current window
+
+MCP servers that proxy to an upstream backend MUST forward 429 responses and `Retry-After` values to the calling agent.
+
 ### 13.1 Discovery Mode (No Credentials)
 
 Four public tools are available without authentication. These tools do not require a ServiceMandate.
@@ -1338,6 +1359,18 @@ All authenticated tools require API credentials. Tools that mutate state require
 | `clients.get_or_create` | Find or register a client. | `patient:write`. |
 | `scheduling.book` | Book a service appointment. | `schedule:write`. |
 | `scheduling.confirm` | Confirm a booking. | `schedule:write`. |
+
+##### Submission Context
+
+`scheduling.book` MAY accept a `submission` object for channel/agent attribution:
+
+- `channel` (enum: `web` | `whatsapp` | `phone` | `chat` | `api` | `other`) — REQUIRED
+- `submitted_by_type` (enum: `human` | `agent` | `human_with_agent_assistance`) — REQUIRED
+- `agent_id` (string) — REQUIRED when `submitted_by_type` includes "agent"
+- `agent_name` (string) — OPTIONAL
+- `platform` (string) — OPTIONAL
+
+When `submitted_by_type` is `agent` or `human_with_agent_assistance`, `agent_id` MUST reference a valid mandate. Implementations MUST persist submission context for audit purposes.
 
 #### 13.2.3 Phase 4 — Lifecycle
 

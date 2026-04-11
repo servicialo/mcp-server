@@ -148,7 +148,7 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 | Tool | Description | Scopes |
 |------|-------------|--------|
 | `clients.get_or_create` | Find or create client by email/phone | `patient:write` |
-| `scheduling.book` | Book session → `requested`. Optional `resource_id` | `schedule:write` |
+| `scheduling.book` | Book session → `requested`. Optional `resource_id`, optional `submission` | `schedule:write` |
 | `scheduling.confirm` | Confirm booking → `confirmed` | `schedule:write` |
 
 ### Phase 4 — Lifecycle (4 tools)
@@ -247,7 +247,7 @@ The MCP server connects to a backend via an adapter. The backend must expose end
 | Get service (8 dimensions) | `service_id` | Full service object |
 | Get contract | `service_id` or `order_id` | Contract terms |
 | Get or create client | `email` or `phone`, `name` | Client record |
-| Book session | `service_id`, `provider_id`, `client_id`, `datetime`, `resource_id`? | Booking in `requested` state |
+| Book session | `service_id`, `provider_id`, `client_id`, `datetime`, `resource_id`?, `submission`? | Booking in `requested` state |
 | Confirm session | `booking_id` | Booking in `confirmed` state |
 | Get lifecycle state | `session_id` | Current state + transitions + history |
 | Transition state | `session_id`, `to_state`, `evidence`? | Updated state |
@@ -262,8 +262,41 @@ The MCP server connects to a backend via an adapter. The backend must expose end
 | Get payment status | `sale_id` or `client_id` | Payment status / balance |
 | CRUD resources | `resource_id`?, fields | Resource entity |
 | Resource availability | `resource_id`, `date_from`, `date_to` | Available slots |
-| Register in resolver | `org_slug`, `endpoints` | Registration confirmed |
+| Register in resolver | `org_slug`, `endpoints` | Registration confirmed (subject to readiness validation) |
 | Update endpoint | `org_slug`, `endpoints` | Endpoints updated |
 | Send heartbeat | `org_slug` | Heartbeat acknowledged |
+
+### Submission Context
+
+`scheduling.book` MAY accept a `submission` object:
+
+- `channel` (enum: `web` | `whatsapp` | `phone` | `chat` | `api` | `other`) — REQUIRED
+- `submitted_by_type` (enum: `human` | `agent` | `human_with_agent_assistance`) — REQUIRED
+- `agent_id` (string) — REQUIRED when `submitted_by_type` includes "agent"
+- `agent_name` (string) — OPTIONAL
+- `platform` (string) — OPTIONAL
+
+When `submitted_by_type` is `agent` or `human_with_agent_assistance`, `agent_id` MUST reference a valid mandate. Implementations MUST persist submission context for audit purposes.
+
+### Rate Limiting
+
+Public (unauthenticated) endpoints MUST implement rate limiting. Rate-limited responses MUST return HTTP 429 with a `Retry-After` header (seconds until next allowed request).
+
+Implementations SHOULD include the following headers on all public responses:
+
+- `X-RateLimit-Limit` — maximum requests per window
+- `X-RateLimit-Remaining` — remaining requests in current window
+
+MCP servers that proxy to an upstream backend MUST forward 429 responses and `Retry-After` values to the calling agent.
+
+### Registry Readiness Validation
+
+Before accepting `resolve.register`, the resolver MUST verify that the organization meets minimum bookability requirements:
+
+- At least one active service
+- At least one provider assigned to that service
+- At least one availability block configured for that provider
+
+Registration attempts that fail this check MUST return HTTP 422 with error code `not_bookable` and a human-readable message indicating which requirement is missing. Implementations MAY perform this validation at registration time (server-side) or delegate to the resolver (registry-side). At least one party MUST enforce it.
 
 **Authentication:** All authenticated operations require `X-API-Key` + `X-Org-Id` headers. When `actor.type = agent`, a valid ServiceMandate (§10) with appropriate scopes is additionally required.
