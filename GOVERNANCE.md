@@ -1,5 +1,11 @@
 # Servicialo Governance
 
+| | |
+|---|---|
+| **Canonical URL** | `https://servicialo.com/governance` |
+| **Version** | 0.9 |
+| **License** | Apache-2.0 |
+
 **The orchestration layer for the AI-agent service economy**
 
 This document defines the governance framework for the Servicialo protocol: how decisions are made, how data is governed, and how the network operates as neutral infrastructure.
@@ -12,7 +18,7 @@ Servicialo is an open protocol, not a product. It defines the common language fo
 
 - **Coordinalo** is the reference implementation — not the owner
 - Any platform can implement the protocol as a sovereign node
-- The protocol is MIT-licensed and community-governed
+- The protocol is Apache-2.0-licensed and community-governed
 - Governance decisions follow the RFC process defined in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 The relationship is analogous to HTTP and Apache/Nginx, or SQL and PostgreSQL/MySQL. Servicialo is the protocol. Implementations are sovereign.
@@ -127,4 +133,4 @@ Implementations are sovereign nodes. They own their data, their user relationshi
 
 ## License
 
-MIT — Servicialo is an open protocol. This governance document is part of the protocol specification.
+Apache-2.0 — Servicialo is an open protocol. This governance document is part of the protocol specification.

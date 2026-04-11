@@ -1,14 +1,7 @@
 # @servicialo/mcp-server
-
-> **Entrada canónica en el registro MCP:** `com.servicialo/mcp-server`
-> La entrada `io.github.danioni/servicialo` está deprecated desde marzo 2026.
-
 > **[English version](./README.en.md)**
 
 **La interfaz MCP a nivel de protocolo para el estándar Servicialo — la capa de destino para servicios humanos en la era de agentes de IA.**
-
-[![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
-
 HTTP hizo los documentos direccionables. Servicialo hace los servicios direccionables. MCP y A2A son el transporte. Servicialo es el destino al que los agentes llegan.
 
 Este paquete es la interfaz MCP a nivel de protocolo para **cualquier backend compatible con Servicialo** — no un conector a una plataforma específica. Coordinalo es la implementación de referencia (y el default), pero puedes conectar tu propio backend.

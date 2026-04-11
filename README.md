@@ -7,7 +7,7 @@
 Un protocolo abierto para coordinación de agenda, identidad, verificación<br>
 de entrega y liquidación financiera de servicios profesionales.
 
-`Protocolo abierto` `Legible por máquinas` `Agent-native` `Licencia MIT`
+`Protocolo abierto` `Legible por máquinas` `Agent-native` `Apache-2.0`
 
 [Sitio web](https://servicialo.com) ・ [Especificación](./PROTOCOL.md) ・ [Gobernanza](./GOVERNANCE.md) ・ [MCP Server](./packages/mcp-server) ・ [npm](https://www.npmjs.com/package/@servicialo/mcp-server)
 
@@ -277,7 +277,7 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las fases del agente — 33 herramientas
+### Las fases del agente — 34 herramientas
 
 Un agente bien diseñado sigue este orden:
 
@@ -291,7 +291,7 @@ Un agente bien diseñado sigue este orden:
 | 5 | **Verificar** | Evidencia de que ocurrió | `delivery.checkin` · `delivery.checkout` · `delivery.record_evidence` |
 | 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 | — | **Recursos** | Espacios físicos y equipamiento | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
-| — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` |
+| — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
 
 *El servidor envía telemetría anónima al arrancar para estadísticas del protocolo. Se puede desactivar con `SERVICIALO_TELEMETRY=false`.*
 
@@ -335,7 +335,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (33 herramientas) · resolución DNS · interoperabilidad A2A
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (34 herramientas) · resolución DNS · interoperabilidad A2A
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -501,4 +501,4 @@ servicialo/
 
 ## Licencia
 
-MIT — Servicialo es un protocolo abierto. Cualquiera puede implementarlo.
+Apache-2.0 — Servicialo es un protocolo abierto. Cualquiera puede implementarlo.

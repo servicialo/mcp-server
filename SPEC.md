@@ -1,7 +1,7 @@
 # Servicialo Protocol — Quick Spec
 
 > Self-contained reference for developers and AI agents evaluating or implementing the protocol.
-> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.9. Last synced: 2026-03-23.
+> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.9. Last synced: 2026-04-11.
 
 ---
 
@@ -250,3 +250,7 @@ The MCP server connects to a backend via an adapter. The backend must expose end
 | Send heartbeat | `org_slug` | Heartbeat acknowledged |
 
 **Authentication:** All authenticated operations require `X-API-Key` + `X-Org-Id` headers. When `actor.type = agent`, a valid ServiceMandate (§10) with appropriate scopes is additionally required.
+
+---
+
+> Governance, data policy, and network neutrality: [GOVERNANCE.md](./GOVERNANCE.md) ([canonical](https://servicialo.com/governance))
