@@ -17,7 +17,6 @@ de entrega y liquidación financiera de servicios profesionales.
 
 **[Read in English](./README.en.md)**
 
-[![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
 
 </div>
 
