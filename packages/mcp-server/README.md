@@ -1,9 +1,7 @@
 # @servicialo/mcp-server
-
 > **[English version](./README.en.md)**
 
 **La interfaz MCP a nivel de protocolo para el estándar Servicialo — la capa de destino para servicios humanos en la era de agentes de IA.**
-
 HTTP hizo los documentos direccionables. Servicialo hace los servicios direccionables. MCP y A2A son el transporte. Servicialo es el destino al que los agentes llegan.
 
 Este paquete es la interfaz MCP a nivel de protocolo para **cualquier backend compatible con Servicialo** — no un conector a una plataforma específica. Coordinalo es la implementación de referencia (y el default), pero puedes conectar tu propio backend.
@@ -37,14 +35,13 @@ Servicialo es un **protocolo abierto**, no una plataforma. Define cómo los serv
 
 La relación es como HTTP con Apache, o SMTP con Gmail: Servicialo define las reglas, las implementaciones les dan vida.
 
-El protocolo modela cada servicio a través de **8 dimensiones**, **6+3 estados del ciclo de vida** (6 core + 3 extensión financiera), **6 flujos de excepción** y **7 principios fundamentales** — universales entre verticales (salud, legal, educación, servicios domiciliarios):
+El protocolo modela cada servicio a través de **8 dimensiones**, **9 estados del ciclo de vida**, **6 flujos de excepción** y **7 principios fundamentales** — universales entre verticales (salud, legal, educación, servicios domiciliarios):
 
 ```
-Core:      Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado
-Extensión: Facturado → Cobrado → Verificado (OPCIONAL)
+Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
 ```
 
-Cualquier servicio, en cualquier vertical, sigue la secuencia core. Los estados financieros (7–9) son opcionales — las implementaciones PUEDEN integrarlos al ciclo de vida de la sesión o gestionarlos independientemente.
+Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica específica del vertical vive *dentro* de cada estado, pero la máquina de estados es invariante.
 
 ## Qué Hace Este MCP Server
 
@@ -412,7 +409,7 @@ La especificación completa del protocolo Servicialo está disponible en:
 - **Versión estable actual:** 0.9
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json), [`resolution.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/resolution.schema.json), [`servicialo-config.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/servicialo-config.schema.json)
 
-La spec cubre las 8 dimensiones del servicio, 6+3 estados de ciclo de vida (6 core + 3 extensión financiera), 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
+La spec cubre las 8 dimensiones del servicio, 9 estados de ciclo de vida, 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
 
 ## Implementación de Referencia
 

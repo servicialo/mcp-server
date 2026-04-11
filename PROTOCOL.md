@@ -703,6 +703,7 @@ A ServiceMandate is a first-class protocol object that represents the explicit d
 | `revocation_reason` | string | OPTIONAL | Human-readable reason for revocation. |
 | `status` | enum | REQUIRED | `active` \| `expired` \| `revoked` \| `suspended`. |
 | `metadata` | object | OPTIONAL | Implementation-specific data. The protocol does not interpret this field. |
+| `signature` | string | Reserved | Reserved for cryptographic mandate verification. Implementations MUST accept and persist this field if present but MUST NOT require it until a future specification version promotes it to REQUIRED. |
 
 #### 10.3.2 Scopes
 
@@ -1398,6 +1399,8 @@ When `submitted_by_type` is `agent` or `human_with_agent_assistance`, `agent_id`
 | `payments.record_payment` | Record a payment. | `payment:write`. |
 | `payments.get_status` | Get payment status. | `payment:read`. |
 
+> **Note:** The following tool groups (§13.2.6 and §13.2.7) extend the core 34 tools defined in Phases 0–6 and Resource Management. They are OPTIONAL per §6 (Minimum Implementation Requirements) and are not included in the base tool count. Implementations that support Service Orders (§8) SHOULD expose §13.2.6 tools; implementations that support the Delegated Agency Model (§10) SHOULD expose §13.2.7 tools.
+
 #### 13.2.6 Service Order Tools
 
 | Tool | Description | Required Scopes |
@@ -1575,6 +1578,8 @@ The data contributed to the network is governed by the protocol, not by any sing
 - Network data is a protocol commons — no implementation can capture, resell, or monopolize it.
 - Implementations retain full sovereignty over their operational data.
 - Only aggregate, anonymous metrics flow to the protocol layer.
+
+> For data governance policies, network neutrality principles, and decision-making processes, see [GOVERNANCE.md](./GOVERNANCE.md) ([canonical](https://servicialo.com/governance)).
 
 ---
 

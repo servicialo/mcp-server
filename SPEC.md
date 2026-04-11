@@ -1,7 +1,7 @@
 # Servicialo Protocol — Quick Spec
 
 > Self-contained reference for developers and AI agents evaluating or implementing the protocol.
-> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.9. Last synced: 2026-03-23.
+> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.9. Last synced: 2026-04-11.
 
 ---
 
@@ -300,3 +300,7 @@ Before accepting `resolve.register`, the resolver MUST verify that the organizat
 Registration attempts that fail this check MUST return HTTP 422 with error code `not_bookable` and a human-readable message indicating which requirement is missing. Implementations MAY perform this validation at registration time (server-side) or delegate to the resolver (registry-side). At least one party MUST enforce it.
 
 **Authentication:** All authenticated operations require `X-API-Key` + `X-Org-Id` headers. When `actor.type = agent`, a valid ServiceMandate (§10) with appropriate scopes is additionally required.
+
+---
+
+> Governance, data policy, and network neutrality: [GOVERNANCE.md](./GOVERNANCE.md) ([canonical](https://servicialo.com/governance))
