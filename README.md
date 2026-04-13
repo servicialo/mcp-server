@@ -32,6 +32,12 @@ For a formal description of the architecture, message flows, and data model:
 
 ---
 
+## Protocol Units
+
+See [GLOSSARY.md](./GLOSSARY.md) for definitions of TC, CAC, and RAC.
+
+---
+
 ## ¿Por dónde empiezo?
 
 **Tengo un negocio de servicios** y quiero que agentes AI descubran y agenden mis servicios
