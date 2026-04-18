@@ -34,7 +34,9 @@ For a formal description of the architecture, message flows, and data model:
 
 ## Protocol Units
 
-See [GLOSSARY.md](./GLOSSARY.md) for definitions of TC, CAC, and RAC.
+El protocolo distingue primitivas de evento (SC, CAC) de modelos 
+de billing (SC, CAC, RAC). Ver [GLOSSARY.md](./GLOSSARY.md) para 
+definiciones completas.
 
 ---
 
