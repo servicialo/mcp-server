@@ -34,7 +34,7 @@ Changes to the protocol require a structured proposal:
    - **Impact** — Which existing implementations are affected?
    - **Alternatives considered** — What other approaches were evaluated?
 4. **Discussion period** — A minimum of 14 days of open discussion before a decision is made.
-5. **Review** — The maintainer (currently [@francodanioni](https://github.com/francodanioni)) reviews the proposal, may request changes, and accepts or rejects it with a public justification.
+5. **Review** — The maintainer (currently [@danioni](https://github.com/danioni)) reviews the proposal, may request changes, and accepts or rejects it with a public justification.
 6. **Merge** — Accepted proposals are assigned to a milestone for the next version of the protocol.
 
 ## Pull Requests

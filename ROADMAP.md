@@ -8,7 +8,7 @@
 |-------|-------|
 | Document version | 1.0 |
 | Authored | 2026-05-17 |
-| Author | Servicialo SpA — Franco Danioni ([@francodanioni](https://github.com/francodanioni)), acting maintainer |
+| Author | Servicialo SpA — Franco Danioni ([@danioni](https://github.com/danioni)), acting maintainer |
 | Status | Draft — open for community comment |
 | License | Apache-2.0 |
 | Supersedes | Previous `ROADMAP.md` (v0.1 → v0.7 trajectory) |

@@ -30,9 +30,9 @@ La adopción por parte de Coordinalo o cualquier otra implementación se registr
 
 ## Index / Índice
 
-**EN:** RFCs 001–004 were authored by Servicialo SpA as the protocol's initial maintainer. Current maintainer: [@francodanioni](https://github.com/francodanioni). The governance and stewardship plan is described in [GOVERNANCE.md](../GOVERNANCE.md).
+**EN:** RFCs 001–004 were authored by Servicialo SpA as the protocol's initial maintainer. Current maintainer: [@danioni](https://github.com/danioni). The governance and stewardship plan is described in [GOVERNANCE.md](../GOVERNANCE.md).
 
-**ES:** Los RFCs 001–004 fueron escritos por Servicialo SpA como mantenedor inicial del protocolo. Mantenedor actual: [@francodanioni](https://github.com/francodanioni). El plan de gobernanza y stewardship está descrito en [GOVERNANCE.md](../GOVERNANCE.md).
+**ES:** Los RFCs 001–004 fueron escritos por Servicialo SpA como mantenedor inicial del protocolo. Mantenedor actual: [@danioni](https://github.com/danioni). El plan de gobernanza y stewardship está descrito en [GOVERNANCE.md](../GOVERNANCE.md).
 
 | # | Title | Type | Status | Target version |
 |:-:|-------|------|--------|----------------|

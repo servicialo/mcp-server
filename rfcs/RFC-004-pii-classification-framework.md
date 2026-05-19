@@ -4,7 +4,7 @@
 |-------|-------|
 | RFC number | 004 |
 | Title | PII / PHI Classification Framework (Entity-level Sensitivity) |
-| Author(s) | Servicialo SpA — Franco Danioni ([@francodanioni](https://github.com/francodanioni)), acting maintainer |
+| Author(s) | Servicialo SpA — Franco Danioni ([@danioni](https://github.com/danioni)), acting maintainer |
 | Status | Draft |
 | Created | 2026-05-17 |
 | Target version | Servicialo Protocol v1.0 |

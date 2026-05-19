@@ -16,7 +16,7 @@ This document defines the governance framework for the Servicialo protocol: who 
 
 Servicialo SpA (Santiago, Chile) is the **initial steward** of the Servicialo Protocol. Stewardship means hosting the canonical specification repository, coordinating the RFC process, and accepting or rejecting protocol changes per the RFC procedure (see [RFC-001](./rfcs/RFC-001-rfc-process-and-deprecation-policy.md)).
 
-The current maintainer acting on behalf of Servicialo SpA is [@francodanioni](https://github.com/francodanioni).
+The current maintainer acting on behalf of Servicialo SpA is [@danioni](https://github.com/danioni).
 
 Stewardship is **not ownership**. The protocol is Apache-2.0-licensed, the canonical events and lifecycle are open, and any implementation can build on the spec without permission. Servicialo SpA does not gate adoption, does not run a certification program, and does not collect fees for protocol use.
 
@@ -117,7 +117,7 @@ The current governance model is single-maintainer. The long-term goal is to enab
 
 | Stage | Governance model | Conditions |
 |-------|-----------------|------------|
-| **Current** | Single maintainer ([@francodanioni](https://github.com/francodanioni)) acting on behalf of Servicialo SpA | — |
+| **Current** | Single maintainer ([@danioni](https://github.com/danioni)) acting on behalf of Servicialo SpA | — |
 | **Contributors group** | Maintainer + active external contributors with review rights | Sustained external contribution to RFCs and review |
 | **Multi-stakeholder stewardship** | Shared stewardship across multiple independent implementers | Multiple production implementations and willingness to share governance load |
 
