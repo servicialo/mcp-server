@@ -1,14 +1,6 @@
 # @servicialo/mcp-server
 
-> **Canonical MCP Registry entry:** `com.servicialo/mcp-server`
-> The entry `io.github.danioni/servicialo` has been deprecated since March 2026.
-
-> **[Versión en español](./README.md)**
-
 **The missing protocol layer for AI agents that coordinate professional services.**
-
-<!-- TODO(servicialo): replace with a dynamic badge once /api/stats/badge ships on servicialo.com (shields.io endpoint JSON format). For now these numbers are refreshed manually at release time. -->
-[![Live network](https://img.shields.io/badge/live_network-59_nodes_across_13_countries-brightgreen)](https://servicialo.com/network)
 
 There is no standard way for an AI agent to book, verify, and settle a professional service. Servicialo is an open protocol that fixes this — and this MCP server is its reference implementation. Think HTTP for service coordination: any agent, any platform, one protocol.
 

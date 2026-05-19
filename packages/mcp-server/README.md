@@ -1,8 +1,4 @@
 # @servicialo/mcp-server
-> **[English version](./README.en.md)**
-
-<!-- TODO(servicialo): reemplazar por badge dinámico cuando exista el endpoint /api/stats/badge en servicialo.com (formato shields.io endpoint JSON). Por ahora estos números se refrescan a mano en cada release. -->
-[![Live network](https://img.shields.io/badge/live_network-59_nodes_across_13_countries-brightgreen)](https://servicialo.com/network)
 
 **La interfaz MCP a nivel de protocolo para el estándar Servicialo — la capa de destino para servicios humanos en la era de agentes de IA.**
 HTTP hizo los documentos direccionables. Servicialo hace los servicios direccionables. MCP y A2A son el transporte. Servicialo es el destino al que los agentes llegan.

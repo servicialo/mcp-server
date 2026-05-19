@@ -20,7 +20,9 @@ Esta versión **no introduce cambios al protocolo** ni al surface area de las 34
 
 ### Docs
 - README (ES + EN): nueva sección **Road to 1.0** con tabla de hitos pendientes y links al cohort de RFCs y la discusión.
-- README (ES + EN): badge `live_network` actualizado de `9 nodes / 4 countries` (desactualizado ~6×) a `59 nodes / 13 countries`. La red cubre 5 continentes; documentado en la narrativa de red.
+- README (ES + EN): removido el badge `live_network`. Los conteos hardcodeados envejecen mal entre releases y la página renderizada en npm exponía números obsoletos por semanas. La métrica vive ahora solamente en [servicialo.com/network](https://servicialo.com/network).
+- README EN: removido el bloque "Canonical MCP Registry entry / io.github.danioni deprecated" — la transición ya está consumada y la nota agregaba ruido al lector que llega vía npm.
+- README (ES + EN): removidos los cross-links `[English version]` / `[Versión en español]` (rutas relativas que no resuelven cuando el README se renderiza en la página de npm).
 
 ## [0.9.9] - 2026-04-XX
 
