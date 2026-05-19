@@ -5,7 +5,8 @@
 | RFC number | 003 |
 | Title | Refunds & Credit Notes (Forward-Only Ledger) |
 | Author(s) | Servicialo SpA — Franco Danioni ([@danioni](https://github.com/danioni)), acting maintainer |
-| Status | Draft |
+| Status | Draft — Open for Comment (window opened 2026-05-18) |
+| Discussion | [#14](https://github.com/servicialo/mcp-server/discussions/14) |
 | Created | 2026-05-17 |
 | Target version | Servicialo Protocol v1.0 |
 | Closes gap | Gap 5 (from v1.0 gap analysis) |
