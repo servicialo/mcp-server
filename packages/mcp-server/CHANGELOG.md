@@ -1,5 +1,31 @@
 # Changelog — @servicialo/mcp-server
 
+## [0.9.10] - 2026-05-19
+
+### Road to 1.0
+
+El protocolo Servicialo entra en **fase de estabilización** hacia 1.0. El primer cohort formal de RFCs está abierto a comentarios — ventana mínima de 4 semanas antes de Final Comment Period.
+
+- **RFC cohort (PR #13):** https://github.com/servicialo/mcp-server/pull/13
+- **Proceso 1.0 / Discusión:** https://github.com/servicialo/mcp-server/discussions/14
+
+Esta versión **no introduce cambios al protocolo** ni al surface area de las 34 tools MCP. Mantiene compatibilidad total con `0.9.9`. Hasta 1.0, los releases siguen siendo `0.9.x` patch.
+
+### Added
+- Identidad opcional del implementor en telemetría — los operadores pueden setear `SERVICIALO_IMPL_NAME`, `SERVICIALO_IMPL_URL`, `SERVICIALO_IMPL_CONTACT` para postular al estatus de *verified implementor*. Si no se setean, el nodo permanece completamente anónimo (sin cambio de comportamiento).
+- `.env.example` documenta las nuevas variables de entorno.
+
+### Changed
+- `server.json`: `SERVICIALO_API_KEY` y `SERVICIALO_ORG_ID` declarados explícitamente como `required: false` para el MCP Registry (ya eran opcionales en runtime).
+
+### Docs
+- README (ES + EN): nueva sección **Road to 1.0** con tabla de hitos pendientes y links al cohort de RFCs y la discusión.
+- README (ES + EN): badge `live_network` actualizado de `9 nodes / 4 countries` (desactualizado ~6×) a `59 nodes / 13 countries`. La red cubre 5 continentes; documentado en la narrativa de red.
+
+## [0.9.9] - 2026-04-XX
+
+> Entrada faltante en el changelog original. Diff vs 0.9.8 disponible en GitHub: [`13112b9`](https://github.com/servicialo/mcp-server/commit/13112b9).
+
 ## [0.9.8] - 2026-04-08
 
 ### Fixed

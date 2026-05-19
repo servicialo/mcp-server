@@ -7,7 +7,8 @@
 
 **The missing protocol layer for AI agents that coordinate professional services.**
 
-[![Live network](https://img.shields.io/badge/live_network-9_nodes_across_4_countries-brightgreen)](https://servicialo.com/network)
+<!-- TODO(servicialo): replace with a dynamic badge once /api/stats/badge ships on servicialo.com (shields.io endpoint JSON format). For now these numbers are refreshed manually at release time. -->
+[![Live network](https://img.shields.io/badge/live_network-59_nodes_across_13_countries-brightgreen)](https://servicialo.com/network)
 
 There is no standard way for an AI agent to book, verify, and settle a professional service. Servicialo is an open protocol that fixes this — and this MCP server is its reference implementation. Think HTTP for service coordination: any agent, any platform, one protocol.
 
@@ -20,6 +21,24 @@ You need a Servicialo-compatible platform, not this package directly. [Coordinal
 This is for you. Implement the protocol and any Servicialo-compatible agent connects to your backend automatically. See [Connecting to a custom implementation](#connecting-to-a-custom-implementation) and [`HTTP_PROFILE.md`](../../HTTP_PROFILE.md).
 
 ---
+
+## Road to 1.0
+
+The Servicialo protocol is entering its **stabilization phase**. The first formal RFC cohort is **open for comment** during a minimum 4-week window before moving to Final Comment Period. Until 1.0, releases remain `0.9.x` patch bumps and any breaking protocol change requires its RFC merged and prior communication.
+
+- **RFC cohort (PR #13):** [servicialo/mcp-server#13](https://github.com/servicialo/mcp-server/pull/13)
+- **1.0 process / discussion:** [servicialo/mcp-server#14](https://github.com/servicialo/mcp-server/discussions/14)
+
+### Outstanding milestones toward 1.0
+
+| Milestone | Status |
+|---|---|
+| RFC-001 — RFC Process & Deprecation Policy | Draft / Open for Comment |
+| RFC-002 — Prepayment & Client Credit Balance | Draft / Open for Comment |
+| RFC-003 — Refunds & Credit Notes (Forward-Only Ledger) | Draft / Open for Comment |
+| RFC-004 — PII / PHI Classification Framework | Draft / Open for Comment |
+| Stable Core declaration (8 dimensions · 9 states · 6 flows · 7 principles) with backwards-compatibility guarantees | Pending |
+| ≥ 3 independent implementations in production | In progress |
 
 ## The Problem
 

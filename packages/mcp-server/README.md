@@ -1,10 +1,31 @@
 # @servicialo/mcp-server
 > **[English version](./README.en.md)**
 
+<!-- TODO(servicialo): reemplazar por badge dinámico cuando exista el endpoint /api/stats/badge en servicialo.com (formato shields.io endpoint JSON). Por ahora estos números se refrescan a mano en cada release. -->
+[![Live network](https://img.shields.io/badge/live_network-59_nodes_across_13_countries-brightgreen)](https://servicialo.com/network)
+
 **La interfaz MCP a nivel de protocolo para el estándar Servicialo — la capa de destino para servicios humanos en la era de agentes de IA.**
 HTTP hizo los documentos direccionables. Servicialo hace los servicios direccionables. MCP y A2A son el transporte. Servicialo es el destino al que los agentes llegan.
 
 Este paquete es la interfaz MCP a nivel de protocolo para **cualquier backend compatible con Servicialo** — no un conector a una plataforma específica. Coordinalo es la implementación de referencia (y el default), pero puedes conectar tu propio backend.
+
+## Road to 1.0
+
+El protocolo Servicialo entra en **fase de estabilización**. El primer cohort formal de RFCs está **abierto a comentarios** durante una ventana mínima de 4 semanas antes de pasar a Final Comment Period. Hasta 1.0, los releases siguen siendo `0.9.x` patch y cualquier cambio breaking al protocolo requiere su RFC merged y comunicación previa.
+
+- **RFC cohort (PR #13):** [servicialo/mcp-server#13](https://github.com/servicialo/mcp-server/pull/13)
+- **Proceso 1.0 / Discusión:** [servicialo/mcp-server#14](https://github.com/servicialo/mcp-server/discussions/14)
+
+### Hitos pendientes hacia 1.0
+
+| Hito | Estado |
+|---|---|
+| RFC-001 — RFC Process & Deprecation Policy | Draft / Open for Comment |
+| RFC-002 — Prepayment & Client Credit Balance | Draft / Open for Comment |
+| RFC-003 — Refunds & Credit Notes (Forward-Only Ledger) | Draft / Open for Comment |
+| RFC-004 — PII / PHI Classification Framework | Draft / Open for Comment |
+| Declaración de Core estable (8 dimensiones · 9 estados · 6 flujos · 7 principios) con garantías de backwards-compat | Pendiente |
+| ≥ 3 implementaciones independientes en producción | En progreso |
 
 ## Arquitectura
 
