@@ -47,3 +47,6 @@ mcp-publisher.exe
 packages/mcp-server/key.pem
 .env
 prisma/dev.db
+
+# internal planning artifacts (private to maintainer)
+docs/internal/
