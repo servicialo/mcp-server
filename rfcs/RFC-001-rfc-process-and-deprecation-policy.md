@@ -55,24 +55,27 @@ Without this process, declaring Servicialo a "candidate global standard" lacks i
 
 ```
 Draft ──► Open for Comment ──► Final Comment Period ──► Accepted ──► Implemented
-   │             │                      │                   │
-   └─► Withdrawn │                      │                   │
-                 └─► Rejected           │                   │
-                                        └─► Returned        │
+   ▲             │                      │                   │
+   │             └─► Withdrawn          │                   │
+   │                 │                  │                   │
+   └── return-to-Draft (maintainer action) ──┘             │
+                     │                  │                   │
+                     └─► Rejected ◄─────┘                   │
                                                             └─► Superseded
 ```
 
 | State | Definition | Who can transition |
 |-------|------------|--------------------|
-| `Draft` | Author iterating, not yet ready for public comment | Author |
+| `Draft` | Author iterating, not yet ready for public comment. An RFC returned by the maintainer re-enters this state. | Author |
 | `Open for Comment` | Public comment window active (minimum 4 wks for major, 2 wks for minor) | Maintainer (PR merge) |
 | `Final Comment Period` | 1 wk final comment window before decision | Maintainer |
-| `Accepted` | Approved, implementation may proceed | Maintainer (initially); Governance body (post-v1.0) |
+| `Accepted` | Approved, protocol change to be merged into the specification | Maintainer (initially); broader stewardship (when seated, per [GOVERNANCE.md](../GOVERNANCE.md)) |
 | `Rejected` | Declined with rationale captured in the RFC | Maintainer |
-| `Returned` | Sent back to author for revision | Maintainer |
 | `Withdrawn` | Author retracts | Author |
-| `Implemented` | Merged into protocol and implementation | Maintainer (after impl verified) |
+| `Implemented` | Accepted RFC merged into the protocol specification. Adoption by implementations, including Coordinalo, is tracked separately. | Maintainer (after spec merge) |
 | `Superseded` | Replaced by a later RFC | Maintainer (after later RFC accepted) |
+
+**Return-to-Draft is a maintainer action, not a state.** When an RFC needs more work, the maintainer marks it as `Draft` again with feedback. There is no separate `Returned` state — the lifecycle distinguishes states (positions) from actions (transitions).
 
 ### 3.2 RFC categories / Categorías
 
@@ -103,13 +106,13 @@ RFC files live at `/rfcs/RFC-NNN-{slug}.md` with sequential numbering. An index 
 ### 3.4 Submission workflow / Flujo de envío
 
 ```
-1. Author forks repo, creates /rfcs/RFC-NNN-{slug}.md based on the template
+1. Author forks repo, creates /rfcs/RFC-NNN-{slug}.md from RFC-TEMPLATE.md
 2. Opens PR — PR title: "RFC-NNN: {title}"
-3. PR gets RFC label; Discussions thread auto-created
+3. PR gets RFC label; maintainer opens or links a Discussions thread when the RFC enters Open for Comment
 4. Author iterates in Draft until ready
 5. Maintainer marks Open for Comment → starts comment window
 6. After window: Final Comment Period (1 wk)
-7. Decision: Accepted, Rejected, or Returned
+7. Decision: Accepted, Rejected, or return-to-Draft with feedback
 8. If Accepted: implementation tracked via linked GitHub issue
 9. RFC marked Implemented after merge of implementation
 ```
@@ -326,4 +329,6 @@ Esta RFC es la base — no rompe nada del comportamiento v0.9 actual. Define pro
 
 ---
 
-> Maintained by Servicialo SpA (Chile) under Apache-2.0 license. Foundation-mode bylaws in effect. / Mantenido por Servicialo SpA (Chile) bajo licencia Apache-2.0. Estatutos modo-fundación en vigencia.
+> Maintained by Servicialo SpA (Santiago, Chile). Protocol specification licensed under Apache-2.0. Governance and stewardship plan: [GOVERNANCE.md](../GOVERNANCE.md).
+>
+> Mantenido por Servicialo SpA (Santiago, Chile). Especificación del protocolo bajo licencia Apache-2.0. Gobernanza y plan de stewardship: [GOVERNANCE.md](../GOVERNANCE.md).

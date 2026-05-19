@@ -51,4 +51,6 @@ Gap 5 — Credit Notes (RFC-003) ──── parallel ──── Gap 3 — PI
 
 ---
 
-> Maintained by Servicialo SpA (Chile) under Apache-2.0 license. Foundation-mode bylaws in effect. / Mantenido por Servicialo SpA (Chile) bajo licencia Apache-2.0. Estatutos modo-fundación en vigencia.
+> Maintained by Servicialo SpA (Santiago, Chile). Protocol specification licensed under Apache-2.0. Governance and stewardship plan: [GOVERNANCE.md](../../../GOVERNANCE.md).
+>
+> Mantenido por Servicialo SpA (Santiago, Chile). Especificación del protocolo bajo licencia Apache-2.0. Gobernanza y plan de stewardship: [GOVERNANCE.md](../../../GOVERNANCE.md).

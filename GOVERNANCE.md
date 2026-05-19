@@ -8,7 +8,19 @@
 
 **The orchestration layer for the AI-agent service economy**
 
-This document defines the governance framework for the Servicialo protocol: how decisions are made, how data is governed, and how the network operates as neutral infrastructure.
+This document defines the governance framework for the Servicialo protocol: who stewards it today, how protocol decisions are made, how data is governed, and how the network operates as neutral infrastructure.
+
+---
+
+## Stewardship
+
+Servicialo SpA (Santiago, Chile) is the **initial steward** of the Servicialo Protocol. Stewardship means hosting the canonical specification repository, coordinating the RFC process, and accepting or rejecting protocol changes per the RFC procedure (see [RFC-001](./rfcs/RFC-001-rfc-process-and-deprecation-policy.md)).
+
+The current maintainer acting on behalf of Servicialo SpA is [@francodanioni](https://github.com/francodanioni).
+
+Stewardship is **not ownership**. The protocol is Apache-2.0-licensed, the canonical events and lifecycle are open, and any implementation can build on the spec without permission. Servicialo SpA does not gate adoption, does not run a certification program, and does not collect fees for protocol use.
+
+Coordinalo, the reference implementation, is a separate product. It does not define the protocol unilaterally — protocol changes flow only through the RFC process.
 
 ---
 
@@ -19,7 +31,7 @@ Servicialo is an open protocol, not a product. It defines the common language fo
 - **Coordinalo** is the reference implementation — not the owner
 - Any platform can implement the protocol as a sovereign node
 - The protocol is Apache-2.0-licensed and community-governed
-- Governance decisions follow the RFC process defined in [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Governance decisions follow the RFC process defined in [RFC-001](./rfcs/RFC-001-rfc-process-and-deprecation-policy.md) and summarized in [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 The relationship is analogous to HTTP and Apache/Nginx, or SQL and PostgreSQL/MySQL. Servicialo is the protocol. Implementations are sovereign.
 
@@ -89,26 +101,36 @@ The algorithms that aggregate and distribute network intelligence are open sourc
 
 ### Protocol changes
 
-Changes to the Servicialo specification (dimensions, states, principles, extensions) follow the RFC process:
+Changes to the Servicialo specification (dimensions, states, principles, extensions) follow the RFC process defined in [RFC-001](./rfcs/RFC-001-rfc-process-and-deprecation-policy.md):
 
-1. Proposal via GitHub Issue using the RFC template
-2. 14-day open discussion period
-3. Review and decision by maintainers
-4. Accepted proposals assigned to a version milestone
+1. Proposal via pull request using [`rfcs/RFC-TEMPLATE.md`](./rfcs/RFC-TEMPLATE.md), assigned the next sequential number.
+2. Open comment window — duration depends on RFC type (see RFC-001 §3.2). The maintainer opens or links a GitHub Discussion thread when the RFC enters `Open for Comment`.
+3. Final Comment Period — 1 week before decision.
+4. The maintainer takes one of four actions: **Accept**, **Reject** (with rationale), **Return to Draft** (with feedback), or extend the comment period.
+5. Accepted RFCs are merged into the specification and assigned a target version.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full process.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution overview and [RFC-001](./rfcs/RFC-001-rfc-process-and-deprecation-policy.md) for the full RFC procedure.
 
 ### Governance evolution
 
-The current governance model is single-maintainer. As the ecosystem grows, governance will evolve:
+The current governance model is single-maintainer. The long-term goal is to enable broader stewardship as external adoption matures. Concrete evolution depends on the conditions below, not on a fixed schedule:
 
-| Stage | Governance model | Trigger |
-|-------|-----------------|---------|
-| **Current** | Single maintainer ([@fdanioni](https://github.com/fdanioni)) | — |
-| **Contributors group** | Maintainer + active contributors with review rights | 3+ active external contributors |
-| **Steering committee** | Multi-stakeholder committee with formal voting | 3+ independent implementations |
+| Stage | Governance model | Conditions |
+|-------|-----------------|------------|
+| **Current** | Single maintainer ([@francodanioni](https://github.com/francodanioni)) acting on behalf of Servicialo SpA | — |
+| **Contributors group** | Maintainer + active external contributors with review rights | Sustained external contribution to RFCs and review |
+| **Multi-stakeholder stewardship** | Shared stewardship across multiple independent implementers | Multiple production implementations and willingness to share governance load |
 
-The goal is decentralized governance that matches the decentralized nature of the protocol.
+The pace of evolution is not predetermined. No automatic transition is promised, and any change to this model will itself go through the RFC process.
+
+### Stewardship transition principles
+
+These principles guide how stewardship evolves as the ecosystem matures:
+
+- **Broader stewardship requires active external implementers.** Stewardship widens when there is demonstrated, sustained participation from implementers outside the initial maintainer — not on a calendar trigger.
+- **Protocol governance should remain implementation-neutral.** No implementation, including the reference implementation, should be in a position to define protocol semantics outside the RFC process.
+- **Operational proof informs RFCs but does not replace them.** Patterns proven in production by reference implementations are valuable input to RFCs but are not, on their own, protocol changes.
+- **Future governance changes must themselves be proposed through RFC.** Any modification to this governance document — including stewardship transitions — flows through the same RFC procedure as any other protocol change.
 
 ---
 

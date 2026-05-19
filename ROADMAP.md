@@ -348,4 +348,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the formal RFC process (formalized as
 
 > **Source of truth / Fuente de verdad:** This roadmap reflects current intent and is **not** a contract. Material changes go through the RFC process formalized in Gap 7a. / Esta hoja de ruta refleja la intención actual y **no** es un contrato. Los cambios materiales pasan por el proceso RFC formalizado en Gap 7a.
 >
-> Maintained by Servicialo SpA (Chile) under Apache-2.0 license. Foundation-mode bylaws in effect. / Mantenido por Servicialo SpA (Chile) bajo licencia Apache-2.0. Estatutos modo-fundación en vigencia.
+> Maintained by Servicialo SpA (Santiago, Chile). Protocol specification licensed under Apache-2.0. Governance and stewardship plan: [GOVERNANCE.md](GOVERNANCE.md).
+>
+> Mantenido por Servicialo SpA (Santiago, Chile). Especificación del protocolo bajo licencia Apache-2.0. Gobernanza y plan de stewardship: [GOVERNANCE.md](GOVERNANCE.md).
