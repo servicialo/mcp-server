@@ -1,3 +1,19 @@
+// This schema is used ONLY to generate the Prisma client (typed query
+// builder). It does NOT manage migrations from this repo.
+//
+// The Postgres database it describes is owned and migrated by the
+// Coordinalo repo (the reference implementation). That repo applies all
+// DDL to the `servicialo` schema via its own prisma/migrations/ directory.
+//
+// If you change this file, you must keep it in sync with the actual
+// database structure manually (e.g. via `prisma db pull` after
+// Coordinalo lands a migration that affects these tables). For new
+// protocol-level tables (e.g. A2ATask was added during v0.10), apply
+// the DDL out-of-band on the database and update this file to match.
+//
+// See README.md / IMPLEMENTORS.md for the protocol-vs-implementation
+// separation.
+
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["multiSchema"]
