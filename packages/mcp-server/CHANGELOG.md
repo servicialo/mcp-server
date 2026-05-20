@@ -1,5 +1,19 @@
 # Changelog — @servicialo/mcp-server
 
+## [0.9.12] - 2026-05-20
+
+Docs-only patch. No code or tool surface changes. The `0.9.11` release added 5 tools and the operational-telemetry hook but shipped with a stale README — readers on npmjs.com saw "37 tools / 10 public" and zero mention of `SERVICIALO_VERTICAL`, `SERVICIALO_REGION`, `SERVICIALO_NODE_TOKEN`, `SERVICIALO_OPERATIONAL_TELEMETRY`. This release fixes that.
+
+### Docs
+
+- README (ES + EN): tool counts corrected (40 / 15 public / 25 authenticated). Added the two new tool families that were missing from the navigation: **Inteligencia de Red / Network Intelligence** (`market.list_segments`, `market.get_benchmark`) and **Discovery de Taxonomía / Cold-start Discovery** (`registry.list_verticals`, `registry.list_regions`, `registry.list_event_types`).
+- README (ES + EN): new "Operational telemetry + benchmarks" subsection under Credentials with the 6 env vars that govern emission and tier-2 access (`SERVICIALO_VERTICAL`, `SERVICIALO_REGION`, `SERVICIALO_NODE_TOKEN`, `SERVICIALO_OPERATIONAL_TELEMETRY`, `SERVICIALO_PROTOCOL_VERSION`, `SERVICIALO_TELEMETRY_BASE_URL`), with explicit links to GOVERNANCE.md and docs/telemetry-operational.md.
+- `.env.example`: documented the 4 user-relevant operational-telemetry vars with comments explaining each.
+
+### Why a docs-only patch instead of waiting
+
+The runtime `serverInstructions` (what an AI agent sees when the server loads) was already correct in 0.9.11. The README in the npm registry was not. A human reading docs on npmjs.com couldn't discover the network-intelligence surface without spelunking through GitHub. Shipping the fix now avoids a window where readers infer the wrong contract.
+
 ## [0.9.11] - 2026-05-20
 
 Sigue en `0.9.x` por la cadencia de patches hacia 1.0, pero esta versión SÍ introduce nuevas tools al surface. Tres áreas:

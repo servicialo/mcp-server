@@ -62,7 +62,7 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 ## Qué Hace Este MCP Server
 
-Este paquete expone el protocolo Servicialo como 37 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo el resolver de descubrimiento — análogo a DNS, sobre HTTP), más herramientas de gestión de recursos, administración del resolver, e inteligencia de red (`market.list_segments`, `market.get_benchmark`). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+Este paquete expone el protocolo Servicialo como 40 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo el resolver de descubrimiento — análogo a DNS, sobre HTTP), más gestión de recursos, administración del resolver, **inteligencia de red** (`market.*`) y **descubrimiento cold-start** (`registry.list_*` para conocer la taxonomía sin saberla previamente). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
 
 ### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
 
@@ -143,6 +143,25 @@ Este paquete expone el protocolo Servicialo como 37 herramientas MCP organizadas
 | `resolve.update_endpoint` | Actualizar endpoints registrados (portabilidad entre backends) | `resolve:write` |
 | `telemetry.heartbeat` | Enviar heartbeat al resolver indicando que el nodo está activo | `telemetry:write` |
 
+### Inteligencia de Red (2 herramientas públicas, sin autenticación)
+
+Benchmarks de mercado anonimizados sobre la telemetría operacional contribuida por los nodos. Política **contribuir-para-acceder** (k-anonimato ≥ 5):
+
+| Herramienta | Descripción |
+|---|---|
+| `market.list_segments` | Listar segmentos `(event_type × vertical × region)` con datos disponibles (filtra por k-anon ≥ 5 distintos contribuidores) |
+| `market.get_benchmark` | Obtener la distribución de buckets de un segmento (p. ej. share de cada `price_band` para `payment_settled` en `health/CL`). Tier 0/1 ven datos con 90 días de delay; tier 2 (≥ 50 eventos en 30 días) ven real-time |
+
+### Discovery de Taxonomía (3 herramientas públicas, sin autenticación)
+
+Cold-start: el agente no necesita conocer la taxonomía del protocolo de antemano. Empezar acá si llega sin contexto:
+
+| Herramienta | Descripción |
+|---|---|
+| `registry.list_verticals` | Verticals presentes en la red (declarados + observados en telemetría 30d) |
+| `registry.list_regions` | Países/regiones ISO 3166-1 alpha-2 con actividad en la red |
+| `registry.list_event_types` | Catálogo de los 4 tipos de eventos de telemetría operacional + sus `payload_fields` |
+
 ## Quickstart — 5 pasos para estar en la red
 
 ### Paso 1. Instalar el servidor MCP
@@ -151,7 +170,7 @@ Este paquete expone el protocolo Servicialo como 37 herramientas MCP organizadas
 npx -y @servicialo/mcp-server
 ```
 
-Modo descubrimiento — 10 herramientas públicas, sin credenciales. Pruébalo de inmediato:
+Modo descubrimiento — 15 herramientas públicas, sin credenciales. Pruébalo de inmediato:
 
 ```json
 {
@@ -190,7 +209,7 @@ Agregar a la configuración de Claude Desktop, Cursor o cualquier cliente MCP:
 }
 ```
 
-Omitir el bloque `env` para modo solo-descubrimiento (10 herramientas públicas).
+Omitir el bloque `env` para modo solo-descubrimiento (15 herramientas públicas).
 
 ### Paso 5. Publicar en la red Servicialo
 
@@ -208,15 +227,32 @@ La red Servicialo es el registro global de organizaciones que implementan el pro
 
 ## Credenciales
 
+### Esenciales
+
 | Variable | Requerida | Default | Descripción |
 |---|---|---|---|
-| `SERVICIALO_API_KEY` | No | — | Bearer token. Habilita modo autenticado (35 herramientas) |
+| `SERVICIALO_API_KEY` | No | — | Bearer token. Habilita modo autenticado (25 tools adicionales = 40 total) |
 | `SERVICIALO_ORG_ID` | No | — | Slug de organización. Habilita modo autenticado |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | Endpoint del API de la plataforma compatible con Servicialo |
 | `SERVICIALO_ADAPTER` | No | `coordinalo` | Adapter de backend: `coordinalo` o `http` |
-| `SERVICIALO_TELEMETRY` | No | `true` | Setear a `false` para desactivar telemetría anónima |
+| `SERVICIALO_TELEMETRY` | No | `true` | Setear a `false` para desactivar telemetría anónima del nodo (heartbeat) |
 
 `SERVICIALO_API_KEY` y `SERVICIALO_ORG_ID` deben configurarse juntas. Si solo una está presente, el servidor cae a modo descubrimiento con un warning.
+
+### Telemetría operacional + benchmarks (opcional)
+
+Estas variables habilitan que tu nodo contribuya eventos anonimizados a los benchmarks de la red y acceda a datos en tiempo real (tier 2). Ver [docs/telemetry-operational.md](https://github.com/servicialo/mcp-server/blob/main/docs/telemetry-operational.md):
+
+| Variable | Requerida | Default | Descripción |
+|---|---|---|---|
+| `SERVICIALO_VERTICAL` | No | `unspecified` | Tu vertical (e.g. `health`, `legal`, `home`). Necesario para que los eventos se agreguen al segmento correcto |
+| `SERVICIALO_REGION` | No | `CL` | ISO 3166-1 alpha-2 del país operativo. Los eventos se etiquetan con esto |
+| `SERVICIALO_NODE_TOKEN` | No | — | `ownership_token` de tu nodo en el registry. Se envía como header `X-Servicialo-Node-Token` en los calls `market.*` para identificar tu tier (incluye tier 2 = real-time access) |
+| `SERVICIALO_OPERATIONAL_TELEMETRY` | No | `true` | Setear a `false` para desactivar la emisión automática de eventos operacionales (booking_created, service_completed, dispute_opened, payment_settled) |
+| `SERVICIALO_PROTOCOL_VERSION` | No | `0.9` | Versión del protocolo declarada en los eventos emitidos |
+| `SERVICIALO_TELEMETRY_BASE_URL` | No | `https://servicialo.com` | Endpoint receptor de telemetría operacional (sólo cambiar para testing) |
+
+> **Cómo se relaciona con tiers de benchmarks:** un nodo que emite ≥ 50 eventos operacionales en 30 días automáticamente alcanza tier 2 y `market.get_benchmark` devuelve datos en tiempo real (en lugar del default tier 0/1 con 90 días de delay). Política completa: [GOVERNANCE.md#contribute-to-access-policy-v01](https://github.com/servicialo/mcp-server/blob/main/GOVERNANCE.md#contribute-to-access-policy-v01).
 
 Las credenciales se obtienen en [coordinalo.com](https://coordinalo.com) → Settings → Servicialo → Generar credenciales MCP.
 

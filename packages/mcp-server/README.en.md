@@ -62,7 +62,7 @@ Any service, in any vertical, follows this sequence. Vertical-specific logic liv
 
 ## What This MCP Server Does
 
-This package exposes the Servicialo protocol as 34 MCP tools organized by the **7 lifecycle phases** (0–6, including DNS resolution), plus resource management and resolver administration tools. An agent doesn't call endpoints by database entity — it follows the natural flow of coordinating a service.
+This package exposes the Servicialo protocol as 40 MCP tools organized by the **7 lifecycle phases** (0–6, including the discovery resolver — analog to DNS, over HTTP), plus resource management, resolver administration, **network intelligence** (`market.*`), and **cold-start discovery** (`registry.list_*` for the agent to learn the taxonomy without prior knowledge). An agent doesn't call endpoints by database entity — it follows the natural flow of coordinating a service.
 
 ### Phase 0 — DNS Resolution (3 public tools, no auth required)
 
@@ -143,6 +143,25 @@ This package exposes the Servicialo protocol as 34 MCP tools organized by the **
 | `resolve.update_endpoint` | Update registered endpoints (portability between backends) | `resolve:write` |
 | `telemetry.heartbeat` | Send heartbeat to the resolver indicating the node is active | `telemetry:write` |
 
+### Network Intelligence (2 public tools, no auth required)
+
+Anonymized market benchmarks over operational telemetry contributed by network nodes. **Contribute-to-access** policy (k-anonymity ≥ 5):
+
+| Tool | Description |
+|---|---|
+| `market.list_segments` | List segments `(event_type × vertical × region)` with available data (filtered by k-anon ≥ 5 distinct contributors) |
+| `market.get_benchmark` | Get the bucket distribution of a segment (e.g. share of each `price_band` for `payment_settled` in `health/CL`). Tier 0/1 sees 90-day-delayed data; tier 2 (≥ 50 events in 30 days) sees real-time |
+
+### Cold-start Discovery (3 public tools, no auth required)
+
+The agent doesn't need to know the protocol taxonomy in advance. Start here when arriving without context:
+
+| Tool | Description |
+|---|---|
+| `registry.list_verticals` | Verticals present in the network (declared by nodes + observed in telemetry over 30d) |
+| `registry.list_regions` | Countries/regions (ISO 3166-1 alpha-2) with activity in the network |
+| `registry.list_event_types` | Catalog of the 4 operational telemetry event types + their `payload_fields` |
+
 ## Installation & Quickstart
 
 ### Option 1: Discovery mode (zero config)
@@ -151,7 +170,7 @@ This package exposes the Servicialo protocol as 34 MCP tools organized by the **
 npx -y @servicialo/mcp-server
 ```
 
-No API key. No org ID. 9 public tools available immediately (resolver + discovery). Try it:
+No API key. No org ID. 15 public tools available immediately (resolver + discovery + market benchmarks + cold-start discovery). Try it:
 
 ```json
 {
@@ -169,7 +188,7 @@ No API key. No org ID. 9 public tools available immediately (resolver + discover
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-All 37 tools unlocked.
+All 40 tools unlocked (15 public + 25 authenticated).
 
 ### Claude Desktop / Cursor / any MCP client
 
@@ -194,15 +213,32 @@ Omit the `env` block for discovery-only mode.
 
 ### Environment Variables
 
+**Core:**
+
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `SERVICIALO_API_KEY` | No | — | Bearer token. Enables authenticated mode |
+| `SERVICIALO_API_KEY` | No | — | Bearer token. Enables authenticated mode (25 additional tools = 40 total) |
 | `SERVICIALO_ORG_ID` | No | — | Organization slug. Enables authenticated mode |
 | `SERVICIALO_BASE_URL` | No | `http://localhost:3000` | API endpoint of the Servicialo-compatible platform |
 | `SERVICIALO_ADAPTER` | No | `coordinalo` | Backend adapter: `coordinalo` or `http` |
-| `SERVICIALO_TELEMETRY` | No | `true` | Set to `false` to disable anonymous telemetry |
+| `SERVICIALO_TELEMETRY` | No | `true` | Set to `false` to disable anonymous node-init telemetry (heartbeat) |
 
 Both `SERVICIALO_API_KEY` and `SERVICIALO_ORG_ID` must be set together. If only one is present, the server falls back to discovery mode with a warning.
+
+**Operational telemetry + benchmarks (optional):**
+
+Enable your node to contribute anonymized bucketed events to network benchmarks and access real-time data (tier 2). See [docs/telemetry-operational.md](https://github.com/servicialo/mcp-server/blob/main/docs/telemetry-operational.md):
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `SERVICIALO_VERTICAL` | No | `unspecified` | Your vertical (e.g. `health`, `legal`, `home`). Required so emitted events aggregate into the right segment |
+| `SERVICIALO_REGION` | No | `CL` | ISO 3166-1 alpha-2 country code |
+| `SERVICIALO_NODE_TOKEN` | No | — | Your node's `ownership_token` from the registry. Sent as `X-Servicialo-Node-Token` header on `market.*` calls to identify tier (tier 2 = real-time access) |
+| `SERVICIALO_OPERATIONAL_TELEMETRY` | No | `true` | Set to `false` to disable automatic emission of operational events (booking_created, service_completed, dispute_opened, payment_settled) |
+| `SERVICIALO_PROTOCOL_VERSION` | No | `0.9` | Protocol version declared in emitted events |
+| `SERVICIALO_TELEMETRY_BASE_URL` | No | `https://servicialo.com` | Operational telemetry receiver endpoint (change only for testing) |
+
+> **How it relates to benchmark tiers:** a node that emits ≥ 50 operational events in 30 days automatically reaches tier 2, and `market.get_benchmark` returns real-time data (instead of the default 90-day-delayed view). Full policy: [GOVERNANCE.md#contribute-to-access-policy-v01](https://github.com/servicialo/mcp-server/blob/main/GOVERNANCE.md#contribute-to-access-policy-v01).
 
 ## Connecting to a custom implementation
 
