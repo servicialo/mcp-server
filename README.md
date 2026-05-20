@@ -284,7 +284,7 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las fases del agente — 37 herramientas
+### Las fases del agente — 40 herramientas
 
 Un agente bien diseñado sigue este orden:
 
@@ -300,6 +300,7 @@ Un agente bien diseñado sigue este orden:
 | — | **Recursos** | Espacios físicos y equipamiento | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
 | — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
 | — | **Inteligencia de red** | Benchmarks de mercado anonimizados | `market.list_segments` · `market.get_benchmark` |
+| — | **Discovery (cold start)** | Taxonomía sin conocimiento previo — qué verticals, regiones y eventos existen | `registry.list_verticals` · `registry.list_regions` · `registry.list_event_types` |
 
 *El servidor envía telemetría anónima al arrancar para estadísticas del protocolo. Se puede desactivar con `SERVICIALO_TELEMETRY=false`. Adicionalmente, los servidores autenticados emiten telemetría operacional bucketeada para alimentar los benchmarks de red — opt-out con `SERVICIALO_OPERATIONAL_TELEMETRY=false`. Ver [`docs/telemetry-operational.md`](./docs/telemetry-operational.md).*
 
@@ -357,7 +358,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (37 herramientas) · resolver de descubrimiento (análogo a DNS, sobre HTTP) · interoperabilidad A2A · inteligencia de red (benchmarks bucketeados con k-anonimato ≥5 y contribuir-para-acceder) · webhooks para distribución push
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (40 herramientas) · resolver de descubrimiento (análogo a DNS, sobre HTTP) · interoperabilidad A2A · inteligencia de red (benchmarks bucketeados con k-anonimato ≥5 y contribuir-para-acceder) · webhooks para distribución push · descubrimiento de taxonomía sin conocimiento previo (cold-start)
 
 ### Servicialo/Finanzas — `en diseño`
 

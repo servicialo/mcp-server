@@ -26,6 +26,7 @@ import { resolveTools } from './tools/public/resolve.js';
 import { a2aTools } from './tools/public/a2a.js';
 import { docsQuickstartTools } from './tools/public/docs-quickstart.js';
 import { marketTools } from './tools/public/market.js';
+import { registryDiscoveryTools } from './tools/public/registry-discovery.js';
 
 // --- Authenticated tools (Phases 2–6) ---
 import { entenderTools } from './tools/authenticated/entender.js';
@@ -53,6 +54,7 @@ const publicTools: Record<string, ToolDef> = {
   ...a2aTools as unknown as Record<string, ToolDef>,
   ...docsQuickstartTools as unknown as Record<string, ToolDef>,
   ...marketTools as unknown as Record<string, ToolDef>,
+  ...registryDiscoveryTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Authenticated tools (only in authenticated mode) ---
@@ -100,6 +102,9 @@ async function main() {
     '- docs_quickstart — Guía de onboarding paso a paso',
     '- market_list_segments — Listar segmentos (event_type × vertical × region) con benchmarks disponibles',
     '- market_get_benchmark — Distribución de buckets de un segmento (price bands, lead times, outcomes, etc.)',
+    '- registry_list_verticals — Listar verticals activos en la red (sin necesidad de conocer la taxonomía)',
+    '- registry_list_regions — Listar regiones/países activos en la red',
+    '- registry_list_event_types — Catálogo de event types de telemetría operacional',
     '',
     'Para operaciones de **booking y gestión** (book, confirm, cancel, reschedule, delivery, payments, etc.)',
     'se requiere configurar las variables de entorno SERVICIALO_API_KEY y SERVICIALO_ORG_ID.',

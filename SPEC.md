@@ -115,7 +115,7 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 
 ## 5. MCP Tools by Phase
 
-37 tools implemented in `@servicialo/mcp-server`. 12 public (no auth) + 25 authenticated (API key + org ID). New public tools since v0.8: `a2a.get_agent_card`, `market.list_segments`, `market.get_benchmark`.
+40 tools implemented in `@servicialo/mcp-server`. 15 public (no auth) + 25 authenticated (API key + org ID). New public tools since v0.8: `a2a.get_agent_card`, `market.list_segments`, `market.get_benchmark`, `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types`.
 
 ### Phase 0 — Resolver (3 public tools)
 

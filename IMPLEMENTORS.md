@@ -1,6 +1,6 @@
 # Implementing Servicialo
 
-> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 37 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
+> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 40 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
 
 ## Cómo listar tu implementación
 

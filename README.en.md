@@ -265,7 +265,7 @@ For the full cycle — schedule, verify delivery, collect payment:
 
 Credentials are obtained by each organization from their Servicialo-compatible platform.
 
-### The agent phases — 37 tools
+### The agent phases — 40 tools
 
 A well-designed agent follows this order:
 
@@ -281,6 +281,7 @@ A well-designed agent follows this order:
 | — | **Resources** | Physical spaces and equipment | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
 | — | **Resolver admin** | Portability and telemetry | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
 | — | **Network intelligence** | Anonymized market benchmarks | `market.list_segments` · `market.get_benchmark` |
+| — | **Discovery (cold start)** | Taxonomy without prior knowledge — what verticals, regions, events exist | `registry.list_verticals` · `registry.list_regions` · `registry.list_event_types` |
 
 The protocol guarantees that any agent can complete the full cycle with any compatible implementation.
 
