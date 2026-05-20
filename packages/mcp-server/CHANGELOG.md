@@ -1,5 +1,34 @@
 # Changelog — @servicialo/mcp-server
 
+## [0.9.11] - 2026-05-20
+
+Sigue en `0.9.x` por la cadencia de patches hacia 1.0, pero esta versión SÍ introduce nuevas tools al surface. Tres áreas:
+
+### Added — Network intelligence (Promise 2)
+
+- `market.list_segments` (public) — lista los segmentos `(event_type × vertical × region)` con k-anonimato ≥ 5 sobre los últimos 90 días.
+- `market.get_benchmark` (public) — distribución de buckets de un segmento (price bands, lead times, outcomes). Política de tiers 0/1/2 (contribuir-para-acceder) aplicada en el endpoint.
+- Telemetría operacional emitida automáticamente al backend tras llamadas exitosas a `scheduling.book`, `delivery.checkout`, `lifecycle.transition` (Cancelado / Inasistencia_*), y `payments.record_payment`. Bucketing (precio en bandas, duración en rangos, región a país, fingerprint por org) hecho client-side antes de transmitir.
+- `SERVICIALO_OPERATIONAL_TELEMETRY=false` para opt-out.
+- `SERVICIALO_VERTICAL`, `SERVICIALO_REGION` para tipear los eventos. `SERVICIALO_ORG_ID` se reutiliza para derivar el `org_fingerprint`.
+- `SERVICIALO_NODE_TOKEN` se propaga automáticamente como header `X-Servicialo-Node-Token` en los calls `market.*` para identificar tier (incluyendo tier 2 = real-time).
+
+### Added — Cold-start discovery
+
+- `registry.list_verticals` (public) — lista verticals presentes en la red (declarados o observados en telemetría 30d). Sin necesidad de conocer la taxonomía previamente.
+- `registry.list_regions` (public) — lista regiones ISO 3166-1 alpha-2.
+- `registry.list_event_types` (public) — catálogo estático de los 4 tipos de eventos de telemetría operacional con sus `payload_fields`.
+
+### Tool count
+
+- v0.9.10: 35 tools (10 public + 25 authenticated) — *el CHANGELOG previo decía 37 por un fix de docs aplicado retroactivamente; lo real era 35.*
+- v0.9.11: **40 tools** (15 public + 25 authenticated). Diff: +5 públicas, 0 breaking.
+
+### Notes
+
+- El surface autenticado (lifecycle + delivery + payments + resources) no cambió — `0.9.10` clients siguen funcionando idénticos contra el mismo backend.
+- El backend HTTP que el package consume agrega los endpoints `/api/benchmarks*`, `/api/registry/{verticals,regions,event_types}`, `/api/telemetry/operational`, y `/api/webhooks/*`. Los clientes que sólo usan tools existentes no notan nada nuevo.
+
 ## [0.9.10] - 2026-05-19
 
 ### Road to 1.0

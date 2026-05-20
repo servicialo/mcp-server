@@ -4,7 +4,7 @@ All notable changes to the Servicialo open protocol and its reference tooling wi
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Protocol v0.10 / MCP Server v0.9.10] - 2026-05-20
+## [Protocol v0.10 / MCP Server v0.9.11] - 2026-05-20
 
 Closes the two protocol-level promises: discovery-and-routing (Promise 1) and network intelligence (Promise 2). Both are now functionally complete.
 
