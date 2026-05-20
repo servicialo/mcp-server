@@ -1,5 +1,11 @@
 # Changelog — @servicialo/mcp-server
 
+This file tracks the **`@servicialo/mcp-server` npm package**: tool surface, code changes, env vars, README. It bumps on every npm publish, independent of the underlying protocol version.
+
+For protocol-level changes (new schemas, new endpoints, governance), see the [root CHANGELOG](../../CHANGELOG.md). A protocol release usually maps to one or more package releases — the relationship is annotated in each entry where it matters.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning is independent of the protocol's SemVer.
+
 ## [0.9.12] - 2026-05-20
 
 Docs-only patch. No code or tool surface changes. The `0.9.11` release added 5 tools and the operational-telemetry hook but shipped with a stale README — readers on npmjs.com saw "37 tools / 10 public" and zero mention of `SERVICIALO_VERTICAL`, `SERVICIALO_REGION`, `SERVICIALO_NODE_TOKEN`, `SERVICIALO_OPERATIONAL_TELEMETRY`. This release fixes that.

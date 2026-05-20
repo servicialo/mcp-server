@@ -1,10 +1,17 @@
 # Changelog
 
-All notable changes to the Servicialo open protocol and its reference tooling will be documented in this file.
+This file tracks **the Servicialo open protocol** — schemas, endpoints, governance, and the contract that any compatible implementation must follow. Entries describe what changed at the protocol level and link out to the implementation pieces (Next.js endpoints, MCP server tools, Supabase migrations) that ship under each protocol version.
+
+For changes scoped only to the `@servicialo/mcp-server` npm package (bug fixes, README updates, release versioning), see [`packages/mcp-server/CHANGELOG.md`](./packages/mcp-server/CHANGELOG.md). The two changelogs version independently:
+
+- **Protocol** follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). v1.0 is the first stable contract.
+- **MCP server package** follows its own `0.9.x` cadence and bumps on each npm publish, even when no protocol change is involved.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Protocol v0.10 / MCP Server v0.9.11] - 2026-05-20
+## [Protocol v0.10] - 2026-05-20
+
+Ships in `@servicialo/mcp-server` v0.9.11+ (package CHANGELOG covers v0.9.11 = code surface, v0.9.12 = docs sync).
 
 Closes the two protocol-level promises: discovery-and-routing (Promise 1) and network intelligence (Promise 2). Both are now functionally complete.
 
