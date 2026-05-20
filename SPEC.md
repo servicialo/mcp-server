@@ -115,9 +115,11 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 
 ## 5. MCP Tools by Phase
 
-34 tools implemented in `@servicialo/mcp-server` v0.8.0. 9 public (no auth) + 25 authenticated (API key + org ID).
+37 tools implemented in `@servicialo/mcp-server`. 12 public (no auth) + 25 authenticated (API key + org ID). New public tools since v0.8: `a2a.get_agent_card`, `market.list_segments`, `market.get_benchmark`.
 
-### Phase 0 — DNS Resolution (3 public tools)
+### Phase 0 — Resolver (3 public tools)
+
+> "DNS" in the section title and elsewhere is used by analogy. The resolver is an HTTP service backed by Postgres with a trust score — not literal DNS records. The metaphor captures *what it does* (slug → endpoint lookup) not *how* it does it.
 
 | Tool | Description | Auth |
 |------|-------------|------|

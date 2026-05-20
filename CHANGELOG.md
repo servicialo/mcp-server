@@ -4,6 +4,68 @@ All notable changes to the Servicialo open protocol and its reference tooling wi
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Protocol v0.10 / MCP Server v0.9.10] - 2026-05-20
+
+Closes the two protocol-level promises: discovery-and-routing (Promise 1) and network intelligence (Promise 2). Both are now functionally complete.
+
+### Added — A2A endpoint
+
+- `POST /{orgSlug}/a2a` JSON-RPC 2.0 endpoint with `message/send`, `tasks/get`, `tasks/cancel`. Multi-turn booking conversation persisted via the new `A2ATask` model. HTTP authentication scheme declared in the Agent Card. Detailed in [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md).
+- `apiKey` scheme advertised in `/.well-known/agent.json` — optional `X-Servicialo-API-Key` header validated when `SERVICIALO_A2A_API_KEY` is set.
+- `scripts/verify-a2a.mjs` — 9-check E2E smoke test.
+
+### Added — Operational telemetry
+
+- `schema/telemetry/operational-event.schema.json` — anonymized, bucketed event contract for `booking_created`, `service_completed`, `dispute_opened`, `payment_settled`.
+- `POST /api/telemetry/operational` — receiver with Zod validation + Supabase persistence into `telemetry_events`.
+- `packages/mcp-server/src/telemetry/{operational,dispatch}.ts` — bucketing helpers (`bucketPriceCLP`, `bucketDurationMinutes`, `bucketSlotHour`, …) and a tool dispatch wrapper that emits events after successful `scheduling.book`, `delivery.checkout`, `lifecycle.transition`, and `payments.record_payment` calls.
+- `SERVICIALO_OPERATIONAL_TELEMETRY=false` opt-out env var.
+
+### Added — Benchmarks API
+
+- `GET /api/benchmarks` — distribution of bucketed payload fields per `(event_type, vertical, region)` segment with k-anonymity ≥ 5 enforced.
+- `GET /api/benchmarks/segments` — discoverability endpoint backed by the `list_telemetry_segments(from_ts, to_ts)` Postgres RPC.
+- MCP tools `market.list_segments` and `market.get_benchmark` (public, no auth needed).
+- `docs/benchmarks.md` with response shape, k-anon rule, and curl examples.
+
+### Added — Contribute-to-access gating
+
+- `lib/servicialo/contribution.ts` — tier resolver based on `org_fingerprint` (SHA-256(slug ‖ salt)) and last-30-days event count.
+- Tier 0 (anonymous) & tier 1 (identified, no contribution) → window clamped to `[now-180d, now-90d]`. Tier 2 (≥50 events in 30 days) → real-time window.
+- Tier policy documented in [`GOVERNANCE.md`](./GOVERNANCE.md#contribute-to-access-policy-v01).
+- `MCP server` propagates `X-Servicialo-Node-Token` (from `SERVICIALO_NODE_TOKEN` env) on every `market.*` call.
+
+### Added — Webhooks (v0.2)
+
+- `webhook_subscriptions` and `webhook_deliveries` tables with RLS; only the service role writes.
+- Full subscription API: `POST/GET /api/webhooks/subscriptions`, `PATCH/DELETE /[id]`, `POST /[id]/rotate-secret` (rate-limited 1/min), `POST /[id]/reactivate`, `POST /[id]/test`, `GET /api/webhooks/deliveries/[id]`.
+- HMAC-SHA256 signing (`X-Servicialo-Signature: sha256=<hex>`) + standard `X-Servicialo-Event-Id` / `Event-Type` / `Delivery-Id` / `Timestamp` headers.
+- Retry schedule 1m → 5m → 30m, max 3 attempts, then `abandoned`. After 3 consecutive abandoned deliveries → auto-deactivate.
+- HTTP semantics: 2xx delivered · 410 Gone abandons + auto-deactivates · other 4xx fails without retry · 5xx/timeout/network retries.
+- Vercel Cron jobs in `vercel.json`: `/api/cron/webhook-retries` every 5 min, `/api/cron/benchmark-weekly-snapshot` Mondays 00:00 UTC.
+- `WEBHOOKS.md` rewritten as v0.2 with the full live contract.
+
+### Added — Supabase schema migrations
+
+- `add_a2a_task` (Prisma) for the A2A task store.
+- `add_telemetry_events_operational`, `add_telemetry_segments_view`, `add_list_telemetry_segments_rpc` (Supabase) for telemetry storage & rollup.
+- `add_webhook_subscriptions_and_deliveries`, `align_webhook_subscriptions_schema_with_h5_spec`, `webhook_url_allow_loopback_http` (Supabase) for the webhook tables.
+- `silence_registry_alert_for_test_fixtures` (Supabase) — the registry alert trigger skips slugs matching `\_%` so seed scripts don't spam the admin inbox.
+
+### Added — Verification scripts
+
+- `verify-a2a.mjs`, `verify-operational-telemetry.mjs`, `verify-benchmarks.mjs`, `verify-benchmarks-gating.mjs`, `verify-webhooks-api.mjs`, `verify-webhooks-delivery.mjs` (with embedded HTTP mock receiver), and idempotent `seed-test-*.sql` + `cleanup-test-*.sql` for each.
+
+### Changed
+
+- README — tool count corrected from 34 to 37; "DNS resolution" reframed as "resolver de descubrimiento (análogo a DNS, sobre HTTP)" to stop overselling the metaphor; new "Inteligencia de red" section.
+- SPEC.md — same tool-count correction + analogy note in §5.
+- ROADMAP.md — Network Intelligence and Webhooks moved from Mid Term to Done.
+
+### Fixed
+
+- The `notify_registry_alert()` Postgres trigger formerly emailed the admin on every fixture row; now skips slugs prefixed `_` (convention enforced in all seed scripts).
+
 ## [MCP Server v0.9.8] - 2026-04-08
 
 ### Fixed

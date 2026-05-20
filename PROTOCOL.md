@@ -1399,7 +1399,7 @@ When `submitted_by_type` is `agent` or `human_with_agent_assistance`, `agent_id`
 | `payments.record_payment` | Record a payment. | `payment:write`. |
 | `payments.get_status` | Get payment status. | `payment:read`. |
 
-> **Note:** The following tool groups (§13.2.6 and §13.2.7) extend the core 34 tools defined in Phases 0–6 and Resource Management. They are OPTIONAL per §6 (Minimum Implementation Requirements) and are not included in the base tool count. Implementations that support Service Orders (§8) SHOULD expose §13.2.6 tools; implementations that support the Delegated Agency Model (§10) SHOULD expose §13.2.7 tools.
+> **Note:** The following tool groups (§13.2.6 and §13.2.7) extend the core 37 tools defined in Phases 0–6, Resource Management, Resolver Admin, and Network Intelligence (`market.*`). They are OPTIONAL per §6 (Minimum Implementation Requirements) and are not included in the base tool count. Implementations that support Service Orders (§8) SHOULD expose §13.2.6 tools; implementations that support the Delegated Agency Model (§10) SHOULD expose §13.2.7 tools.
 
 #### 13.2.6 Service Order Tools
 

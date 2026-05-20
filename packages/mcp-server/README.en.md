@@ -169,7 +169,7 @@ No API key. No org ID. 9 public tools available immediately (resolver + discover
 SERVICIALO_API_KEY=your_key SERVICIALO_ORG_ID=your_org npx -y @servicialo/mcp-server
 ```
 
-All 34 tools unlocked.
+All 37 tools unlocked.
 
 ### Claude Desktop / Cursor / any MCP client
 

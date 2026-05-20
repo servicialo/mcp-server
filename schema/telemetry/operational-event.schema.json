@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://servicialo.com/schema/telemetry/operational-event.schema.json",
+  "title": "Servicialo Operational Telemetry Event",
+  "description": "Anonymized, bucketed event emitted by a Servicialo-compatible node to the protocol registry. Designed to enable market-level benchmarks (medians, percentiles, distributions) without exposing per-customer or per-provider data. All identifiers must be hashes or bucketed values — never raw IDs, names, emails, GPS, or exact prices.",
+  "type": "object",
+  "required": ["protocol_version", "event_type", "vertical", "region", "occurred_at", "payload"],
+  "properties": {
+    "protocol_version": {
+      "type": "string",
+      "description": "Servicialo protocol version under which the event was emitted.",
+      "examples": ["0.9", "1.0"]
+    },
+    "node_version": {
+      "type": "string",
+      "description": "MCP server / implementation version that emitted the event."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["booking_created", "service_completed", "dispute_opened", "payment_settled"],
+      "description": "One of the four supported operational events. Future events MUST go through an RFC."
+    },
+    "vertical": {
+      "type": "string",
+      "description": "Industry vertical of the service.",
+      "examples": ["health", "legal", "home", "education", "consulting"]
+    },
+    "region": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code. No sub-national granularity is permitted — only country level — to avoid re-identification in low-volume segments.",
+      "pattern": "^[A-Z]{2}$",
+      "examples": ["CL", "AR", "MX", "BR", "US"]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the underlying event. Day-bucketed in storage; sub-minute precision is irrelevant."
+    },
+    "org_fingerprint": {
+      "type": "string",
+      "description": "Opaque per-contributor identifier. SHA-256 of (org_slug + salt) computed by the emitter. Stable across events from the same node, but not reversible to org_slug. Used for k-anonymity (≥5 distinct fingerprints required before an aggregate is published)."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Event-specific bucketed fields. Schema depends on event_type — see oneOf below.",
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+
+  "oneOf": [
+    {
+      "title": "booking_created",
+      "properties": {
+        "event_type": { "const": "booking_created" },
+        "payload": {
+          "type": "object",
+          "required": ["lead_time_bucket", "slot_hour_bucket", "weekday"],
+          "properties": {
+            "lead_time_bucket": {
+              "type": "string",
+              "enum": ["same_day", "1-2_days", "3-7_days", "1-2_weeks", "2-4_weeks", "1+_months"],
+              "description": "Distance between booking creation and the service start time."
+            },
+            "slot_hour_bucket": {
+              "type": "string",
+              "enum": ["00-06", "06-09", "09-12", "12-15", "15-18", "18-21", "21-24"],
+              "description": "Hour-of-day bucket for the scheduled service in local time."
+            },
+            "weekday": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7,
+              "description": "ISO weekday (1=Monday … 7=Sunday) of the scheduled service."
+            },
+            "channel": {
+              "type": "string",
+              "enum": ["agent", "human"],
+              "description": "Was the booking created by an AI agent or a human-facing UI."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "title": "service_completed",
+      "properties": {
+        "event_type": { "const": "service_completed" },
+        "payload": {
+          "type": "object",
+          "required": ["duration_bucket", "outcome"],
+          "properties": {
+            "duration_bucket": {
+              "type": "string",
+              "enum": ["under_15min", "15-30min", "30-60min", "60-90min", "90-120min", "over_120min"],
+              "description": "Bucketed actual duration (checkout − checkin)."
+            },
+            "outcome": {
+              "type": "string",
+              "enum": ["completed", "no_show_client", "no_show_provider", "partial", "canceled_late"],
+              "description": "Terminal outcome of the service lifecycle."
+            },
+            "evidence_completeness": {
+              "type": "string",
+              "enum": ["complete", "partial", "missing"],
+              "description": "Whether the required evidence for the vertical was captured."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "title": "dispute_opened",
+      "properties": {
+        "event_type": { "const": "dispute_opened" },
+        "payload": {
+          "type": "object",
+          "required": ["opened_by", "reason_category"],
+          "properties": {
+            "opened_by": {
+              "type": "string",
+              "enum": ["client", "provider", "organization"]
+            },
+            "reason_category": {
+              "type": "string",
+              "enum": ["quality", "no_show", "billing", "scope", "evidence_missing", "other"]
+            },
+            "time_to_resolve_bucket": {
+              "type": "string",
+              "enum": ["under_24h", "1-3_days", "3-7_days", "1-2_weeks", "over_2_weeks", "unresolved"],
+              "description": "Time between dispute_opened and its resolution. Sent in a follow-up event when the dispute closes."
+            },
+            "resolved_in_favor_of": {
+              "type": "string",
+              "enum": ["client", "provider", "split", "unresolved"]
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "title": "payment_settled",
+      "properties": {
+        "event_type": { "const": "payment_settled" },
+        "payload": {
+          "type": "object",
+          "required": ["price_band", "currency", "payment_method", "time_to_collect_bucket"],
+          "properties": {
+            "price_band": {
+              "type": "string",
+              "enum": ["0-10k", "10-25k", "25-50k", "50-100k", "100-250k", "250-500k", "500k-1M", "1M+"],
+              "description": "Price expressed in CLP-equivalent bands. Emitters convert via daily FX before bucketing. Bands are coarse enough that they cannot be inverted to an exact price for any specific transaction."
+            },
+            "currency": {
+              "type": "string",
+              "description": "ISO 4217 currency code of the original transaction (before normalization to CLP).",
+              "pattern": "^[A-Z]{3}$"
+            },
+            "payment_method": {
+              "type": "string",
+              "enum": ["cash", "transfer", "card_credit", "card_debit", "insurance", "voucher", "subscription", "other"]
+            },
+            "time_to_collect_bucket": {
+              "type": "string",
+              "enum": ["immediate", "within_24h", "1-7_days", "1-4_weeks", "over_1_month", "uncollected"],
+              "description": "Time between service_completed and payment_settled."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

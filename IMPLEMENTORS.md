@@ -1,6 +1,6 @@
 # Implementing Servicialo
 
-> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 34 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
+> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 37 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
 
 ## Cómo listar tu implementación
 
@@ -34,7 +34,11 @@ To be listed as a Servicialo-compatible implementation, your platform MUST satis
 - Service Orders — commercial agreements grouping multiple services (§8)
 - Delegated Agency Model — ServiceMandate for AI agent authorization (§10)
 - Provider Profiles — typed, origin-tracked attributes (§12)
-- Network Intelligence — contribute-to-access operational telemetry (§14)
+- **Network Intelligence** — contribute-to-access operational telemetry (§14). To participate:
+  1. Set `SERVICIALO_VERTICAL`, `SERVICIALO_REGION`, `SERVICIALO_ORG_ID` on the `@servicialo/mcp-server` process so events carry the right segment metadata.
+  2. The MCP server hooks `scheduling.book`, `delivery.checkout`, `lifecycle.transition`, and `payments.record_payment` to emit bucketed events automatically (POST to `https://servicialo.com/api/telemetry/operational`). Opt-out with `SERVICIALO_OPERATIONAL_TELEMETRY=false`.
+  3. Once your node emits ≥ 50 events per 30 days you reach tier 2 and `market.get_benchmark` returns real-time data instead of the 90-day-delayed view. Policy in [`GOVERNANCE.md`](./GOVERNANCE.md#contribute-to-access-policy-v01).
+- **Webhook subscriptions** — register an HTTPS endpoint to receive `benchmark.weekly_snapshot` and verify deliveries with HMAC-SHA256. Contract: [`WEBHOOKS.md`](./WEBHOOKS.md).
 
 For a step-by-step build guide (7 steps, the first takes ~20 minutes), see [`IMPLEMENTING.md`](./IMPLEMENTING.md).
 

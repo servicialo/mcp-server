@@ -14,7 +14,7 @@
     "@mdx-js/react": "^3.1.1",
     "@modelcontextprotocol/sdk": "^1.25.2",
     "@next/mdx": "^16.1.6",
-    "@prisma/client": ">=5 <6",
+    "@prisma/client": "5.13.0",
     "@vercel/analytics": "^1.6.1",
     "mcp-handler": "^1.0.7",
     "next": "14.2.35",
@@ -30,7 +30,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
-    "prisma": ">=5 <6",
+    "prisma": "5.13.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "yaml": "^2.8.2"

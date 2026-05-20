@@ -117,6 +117,10 @@ export class HttpAdapter implements ServicialoAdapter {
     if (this.orgId) {
       headers['X-Servicialo-Org'] = this.orgId;
     }
+    const nodeToken = process.env.SERVICIALO_NODE_TOKEN;
+    if (nodeToken) {
+      headers['X-Servicialo-Node-Token'] = nodeToken;
+    }
     return headers;
   }
 

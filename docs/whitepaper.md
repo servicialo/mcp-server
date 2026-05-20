@@ -41,7 +41,7 @@ Professional services represent a significant share of global economic activity,
 
 Servicialo proposes an open protocol, licensed under MIT, that defines the orchestration layer for professional service delivery. The protocol models each service through 8 canonical dimensions — identity, provider, client, schedule, location, lifecycle, evidence, and billing — and defines a lifecycle of 9 universal states that any service must traverse from request to final verification. Additionally, it defines the Service Order as the bilateral agreement that groups atomic services under agreed commercial conditions.
 
-The protocol includes first-class exception flows, a dispute resolution mechanism with algorithmic arbitration, a decision model for AI agents with explicit autonomy boundaries, an MCP (Model Context Protocol) server with 34 tools organized across 7 lifecycle phases, and full A2A (Agent-to-Agent) interoperability for inter-agent discovery. Servicialo is not a product: it is neutral protocol infrastructure that any platform can implement as a sovereign node.
+The protocol includes first-class exception flows, a dispute resolution mechanism with algorithmic arbitration, a decision model for AI agents with explicit autonomy boundaries, an MCP (Model Context Protocol) server with 37 tools organized across 7 lifecycle phases plus resource management, resolver administration, and network intelligence (anonymized market benchmarks under a contribute-to-access policy), and full A2A (Agent-to-Agent) interoperability for inter-agent discovery. Servicialo is not a product: it is neutral protocol infrastructure that any platform can implement as a sovereign node.
 
 ---
 
@@ -855,7 +855,7 @@ Everything needed to model a professional service from start to finish.
 - 7 fundamental principles
 - Proof of delivery with configurable evidence per vertical
 - Pre-agreed service contract
-- MCP server for AI agents (34 tools across 7 phases + resource management and resolver)
+- MCP server for AI agents (37 tools across 7 phases + resource management, resolver administration, and network-intelligence benchmarks)
 
 ### 17.2 Servicialo/Finance (In Design)
 
@@ -964,7 +964,7 @@ An agent starting from zero context follows this path to complete a booking:
 7. scheduling.check_availability({ service_id: "srv_rehab", date_from: "2026-04-01" })
    → returns available slots
 
-8. [Authenticate] → 34 tools available
+8. [Authenticate] → 37 tools available
 
 9. scheduling.book({ service_id: "srv_rehab", provider_id: "prov_111", ... })
    → session booked, lifecycle begins
@@ -982,10 +982,10 @@ Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling 
 
 | Mode | Available Tools | Requirements |
 |------|----------------|-------------|
-| **Discovery** | 9 public tools | No configuration |
-| **Authenticated** | 34 complete tools | API key + organization ID |
+| **Discovery** | 12 public tools | No configuration |
+| **Authenticated** | 37 complete tools | API key + organization ID |
 
-### 19.2 The 7 Phases and 34 Tools
+### 19.2 The 7 Phases and 37 Tools
 
 #### Phase 0: Resolve (3 public tools)
 

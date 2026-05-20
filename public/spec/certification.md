@@ -81,7 +81,7 @@ npx @servicialo/certification-suite \
 | Service Orders | Order lifecycle with computed ledger validation | 2 |
 | Resource scheduling | Tripartite availability check with buffer | 2 |
 | Evidence | Vertical-specific evidence recording and validation | 2 |
-| MCP tools | All 34 tools callable with correct input/output | 3 |
+| MCP tools | All 37 tools callable with correct input/output | 3 |
 | Resolver | Registration, heartbeat, endpoint update | 3 |
 | A2A | Agent card exposure, task submission and completion | 3 |
 

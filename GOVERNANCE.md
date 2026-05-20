@@ -85,6 +85,60 @@ The algorithms that aggregate and distribute network intelligence are open sourc
 
 ---
 
+## Contribute-to-access policy (v0.1)
+
+This is the operational policy that implements Principle #7 (collective intelligence as a common good) for the benchmarks API. It's deliberately small — there are no premium tiers, no pricing, no per-event credits. The only axis is *whether your node is contributing telemetry to the commons*.
+
+### Tiers
+
+| Tier | Identification | Contribution criterion | What you see |
+|------|---------------|-----------------------|--------------|
+| **0** | None (anonymous) | — | Benchmarks delayed by 90 days |
+| **1** | `X-Servicialo-Node-Token` valid, slug in `registry_entries` | Fewer than 50 operational events in the last 30 days | Benchmarks delayed by 90 days |
+| **2** | Same as tier 1 | ≥50 operational events in the last 30 days | Real-time benchmarks (up to "now") |
+
+There is no tier above 2. A high-volume contributor and a node that just barely crossed the threshold see the exact same data — that's principle #4 (symmetric benefit).
+
+### What counts as "an operational event"
+
+Any row in `telemetry_events` whose `org_fingerprint = SHA256(your_slug ‖ salt)`. The four event types defined in the [operational-event schema](./schema/telemetry/operational-event.schema.json):
+
+- `booking_created`
+- `service_completed`
+- `dispute_opened`
+- `payment_settled`
+
+A node emits these automatically when it uses `@servicialo/mcp-server`'s authenticated tools (`scheduling.book`, `delivery.checkout`, `payments.record_payment`, certain `lifecycle.transition` targets). Implementers using Path B (direct emission) can post events themselves.
+
+### How to identify your node
+
+1. Register your node (creates a row in `registry_entries` with an `ownership_token`)
+2. Set `SERVICIALO_NODE_TOKEN=<your ownership token>` in your MCP server deploy
+3. The token is sent in the `X-Servicialo-Node-Token` header on every market.* call
+
+The token is a long opaque string; it is not a password. Treat it like a webhook signing secret — store in env vars, never commit, rotate if leaked.
+
+### Honest disclosure in responses
+
+Every benchmark response includes an `access` block stating:
+
+- the tier the request was served under
+- the contribution score over the last 30 days
+- whether the time window was clamped (delayed)
+- a message describing how to upgrade if not on tier 2
+
+This is deliberate: a caller should never *discover* they were on a lower tier by comparing two responses. The contract is transparent.
+
+### Why no payment tier
+
+A "pay-for-data" tier would let a deep-pocketed implementer free-ride. The whole point of the commons is that the only currency is contribution. If a vertical needs benchmarks but no one contributes, the answer is to bootstrap contributors (e.g. give them the MCP server pre-configured), not to sell access to fewer contributors' data.
+
+### Future evolution
+
+The thresholds (50 events / 30 days / 90-day delay) are v0.1 numbers and may change as the network grows. Changes go through the RFC process. They will never become *more* restrictive without a deprecation period.
+
+---
+
 ## Decision-making
 
 ### Protocol changes

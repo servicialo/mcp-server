@@ -265,7 +265,7 @@ For the full cycle — schedule, verify delivery, collect payment:
 
 Credentials are obtained by each organization from their Servicialo-compatible platform.
 
-### The agent phases — 34 tools
+### The agent phases — 37 tools
 
 A well-designed agent follows this order:
 
@@ -280,6 +280,7 @@ A well-designed agent follows this order:
 | 6 | **Close** | Documentation and billing | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 | — | **Resources** | Physical spaces and equipment | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
 | — | **Resolver admin** | Portability and telemetry | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
+| — | **Network intelligence** | Anonymized market benchmarks | `market.list_segments` · `market.get_benchmark` |
 
 The protocol guarantees that any agent can complete the full cycle with any compatible implementation.
 
@@ -321,7 +322,7 @@ Everything needed to model a professional service from start to finish.
 
 For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
 
-Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (34 tools) · DNS resolution · A2A interoperability
+Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (37 tools) · discovery resolver (DNS-analog over HTTP) · A2A interoperability · network intelligence (k-anonymized benchmarks + contribute-to-access) · webhooks for push distribution
 
 ### Servicialo/Finance — `in design`
 

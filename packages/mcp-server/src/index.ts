@@ -9,6 +9,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createAdapter, type ServicialoAdapter } from './adapter.js';
 import { detectMode } from './mode.js';
+import { loadEmitterContext } from './telemetry/operational.js';
+import { dispatchOperationalTelemetry } from './telemetry/dispatch.js';
 import type { z } from 'zod';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,6 +25,7 @@ import { publicServicesTools } from './tools/public/services.js';
 import { resolveTools } from './tools/public/resolve.js';
 import { a2aTools } from './tools/public/a2a.js';
 import { docsQuickstartTools } from './tools/public/docs-quickstart.js';
+import { marketTools } from './tools/public/market.js';
 
 // --- Authenticated tools (Phases 2–6) ---
 import { entenderTools } from './tools/authenticated/entender.js';
@@ -49,6 +52,7 @@ const publicTools: Record<string, ToolDef> = {
   ...resolveTools as unknown as Record<string, ToolDef>,
   ...a2aTools as unknown as Record<string, ToolDef>,
   ...docsQuickstartTools as unknown as Record<string, ToolDef>,
+  ...marketTools as unknown as Record<string, ToolDef>,
 };
 
 // --- Authenticated tools (only in authenticated mode) ---
@@ -94,6 +98,8 @@ async function main() {
     '- trust_get_score — Obtener score de confianza de una organización',
     '- a2a_get_agent_card — Obtener Agent Card A2A para comunicación inter-agente',
     '- docs_quickstart — Guía de onboarding paso a paso',
+    '- market_list_segments — Listar segmentos (event_type × vertical × region) con benchmarks disponibles',
+    '- market_get_benchmark — Distribución de buckets de un segmento (price bands, lead times, outcomes, etc.)',
     '',
     'Para operaciones de **booking y gestión** (book, confirm, cancel, reschedule, delivery, payments, etc.)',
     'se requiere configurar las variables de entorno SERVICIALO_API_KEY y SERVICIALO_ORG_ID.',
@@ -124,6 +130,9 @@ async function main() {
     },
   );
 
+  // --- Operational telemetry context (read once at startup) ---
+  const emitterCtx = loadEmitterContext(pkg.version);
+
   // --- Register tools ---
   function registerTools(tools: Record<string, ToolDef>) {
     for (const [name, tool] of Object.entries(tools)) {
@@ -136,6 +145,8 @@ async function main() {
         async (args) => {
           try {
             const result = await tool.handler(adapter, args as Record<string, unknown>);
+            // Operational telemetry — fire-and-forget, never blocks the response
+            dispatchOperationalTelemetry(name, args as Record<string, unknown>, result, emitterCtx);
             return {
               content: [
                 {

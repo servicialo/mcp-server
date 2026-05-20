@@ -62,7 +62,7 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 ## Qué Hace Este MCP Server
 
-Este paquete expone el protocolo Servicialo como 34 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo resolución DNS), más herramientas de gestión de recursos y administración del resolver. Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
+Este paquete expone el protocolo Servicialo como 37 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo el resolver de descubrimiento — análogo a DNS, sobre HTTP), más herramientas de gestión de recursos, administración del resolver, e inteligencia de red (`market.list_segments`, `market.get_benchmark`). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
 
 ### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
 

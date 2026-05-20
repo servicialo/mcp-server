@@ -95,7 +95,15 @@ export async function GET(
     defaultOutputModes: ['text'],
     skills,
     authentication: {
-      schemes: [],
+      schemes: [
+        {
+          scheme: 'apiKey',
+          in: 'header',
+          name: 'X-Servicialo-API-Key',
+          description:
+            'Optional. If the organization has set SERVICIALO_A2A_API_KEY, this header is required for /a2a JSON-RPC requests. Anonymous access is permitted otherwise.',
+        },
+      ],
     },
     // Servicialo-specific extensions
     'x-servicialo': {

@@ -9,7 +9,7 @@ El protocolo Servicialo entra en **fase de estabilización** hacia 1.0. El prime
 - **RFC cohort (PR #13):** https://github.com/servicialo/mcp-server/pull/13
 - **Proceso 1.0 / Discusión:** https://github.com/servicialo/mcp-server/discussions/14
 
-Esta versión **no introduce cambios al protocolo** ni al surface area de las 34 tools MCP. Mantiene compatibilidad total con `0.9.9`. Hasta 1.0, los releases siguen siendo `0.9.x` patch.
+Esta versión **no introduce cambios al protocolo** ni al surface area de las 37 tools MCP. Mantiene compatibilidad total con `0.9.9`. Hasta 1.0, los releases siguen siendo `0.9.x` patch.
 
 ### Added
 - Identidad opcional del implementor en telemetría — los operadores pueden setear `SERVICIALO_IMPL_NAME`, `SERVICIALO_IMPL_URL`, `SERVICIALO_IMPL_CONTACT` para postular al estatus de *verified implementor*. Si no se setean, el nodo permanece completamente anónimo (sin cambio de comportamiento).

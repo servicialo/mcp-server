@@ -54,9 +54,14 @@ export class CoordinaloClient implements ServicialoAdapter {
   }
 
   private publicHeaders(): Record<string, string> {
-    return {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
+    const nodeToken = process.env.SERVICIALO_NODE_TOKEN;
+    if (nodeToken) {
+      headers['X-Servicialo-Node-Token'] = nodeToken;
+    }
+    return headers;
   }
 
   /**

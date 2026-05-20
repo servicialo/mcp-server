@@ -149,3 +149,26 @@ model Appointment {
   @@unique([providerId, start])
   @@schema("servicialo")
 }
+
+// ── A2A Task ──
+// Persistent state for A2A conversations.
+// One row per task; multiple tasks can share a contextId (a multi-turn conversation).
+
+model A2ATask {
+  id             String   @id @default(cuid())
+  contextId      String
+  organizationId String
+  state          String   @default("pending")  // pending | input-required | completed | canceled | failed
+  intent         String   @default("unknown")  // availability | booking | services | unknown
+  userText       String   @default("")
+  agentText      String   @default("")
+  bookingDraft   Json?
+  artifact       Json?
+  errorMessage   String   @default("")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([contextId])
+  @@index([organizationId, createdAt])
+  @@schema("servicialo")
+}

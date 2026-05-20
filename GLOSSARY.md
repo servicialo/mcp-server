@@ -66,3 +66,25 @@ para el cálculo del PdC.
 
 - **Coordinalo** — implementación de referencia en producción 
   (Mamá Pro, go-live 31 marzo 2026).
+
+---
+
+## 6. Inteligencia de red
+
+Términos que aparecen en `docs/benchmarks.md`, `docs/telemetry-operational.md`, `WEBHOOKS.md` y `GOVERNANCE.md`.
+
+| Término | Definición |
+|---------|------------|
+| **Evento operacional** | Una de las 4 emisiones bucketeadas que un nodo manda al registry: `booking_created`, `service_completed`, `dispute_opened`, `payment_settled`. Schema: [`schema/telemetry/operational-event.schema.json`](./schema/telemetry/operational-event.schema.json). |
+| **Bucketing** | Reemplazo de un valor numérico exacto por la banda categórica a la que pertenece (e.g. precio `$45.000` → `25-50k`; duración `47 min` → `30-60min`). Hecho por el emisor antes de mandar el evento. |
+| **org_fingerprint** | Identificador opaco de un nodo contribuyente. `SHA-256(slug ‖ salt)`. Estable per-nodo, no reversible. Usado para k-anonimato sin exponer el slug. |
+| **k-anonimato ≥ 5** | Regla de privacidad: un segmento se publica sólo si tiene ≥ 5 `org_fingerprint` distintos contribuyentes. Bajo eso, la respuesta es `insufficient_data`. |
+| **Segmento** | Tupla `(event_type, vertical, region)` sobre una ventana temporal. La unidad mínima de agregación. |
+| **Distribution-of-buckets** | El formato del benchmark publicado: `{ field: { bucket: { count, share } } }`. No es un percentil numérico — es la fracción de eventos en cada bucket. |
+| **Contribuir-para-acceder** | Política operativa del Principio #7. Nodos que emiten telemetría operacional ven en tiempo real; nodos que no, ven datos con 90 días de delay. Sin tier de pago. Detalles en [`GOVERNANCE.md`](./GOVERNANCE.md#contribute-to-access-policy-v01). |
+| **Tier 0** | Caller anónimo o sin `X-Servicialo-Node-Token` válido. Ventana clamped a `[now-180d, now-90d]`. |
+| **Tier 1** | Caller identificado pero con `< 50` eventos en los últimos 30 días. Misma ventana que tier 0. |
+| **Tier 2** | Caller identificado con `≥ 50` eventos en 30d. Ventana real-time hasta "ahora". |
+| **Weekly snapshot** | El payload del evento `benchmark.weekly_snapshot`. Calculado cada lunes 00:00 UTC, incluye todos los segmentos elegibles (k-anon ≥ 5) de la semana, ajustado al tier de cada suscriptor. |
+| **Subscription** | Fila en `webhook_subscriptions`. Vincula un `node_id` (vía `registry_entries.ownership_token`) a una URL HTTPS, un set de eventos, y un secret HMAC. |
+| **Delivery** | Fila en `webhook_deliveries`. Un intento de entregar un evento a una subscription. Estados: `pending → delivered | failed → abandoned`. |

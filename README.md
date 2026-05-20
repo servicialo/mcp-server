@@ -284,7 +284,7 @@ Para el ciclo completo — agendar, verificar entrega, cobrar:
 
 Las credenciales las obtiene cada organización desde la plataforma Servicialo-compatible que utilice.
 
-### Las fases del agente — 34 herramientas
+### Las fases del agente — 37 herramientas
 
 Un agente bien diseñado sigue este orden:
 
@@ -299,8 +299,9 @@ Un agente bien diseñado sigue este orden:
 | 6 | **Cerrar** | Documentación y cobro | `documentation.create` · `payments.create_sale` · `payments.record_payment` · `payments.get_status` |
 | — | **Recursos** | Espacios físicos y equipamiento | `resource.list` · `resource.get` · `resource.create` · `resource.update` · `resource.delete` · `resource.get_availability` |
 | — | **Resolver admin** | Portabilidad y telemetría | `resolve.register` · `resolve.update_endpoint` · `telemetry.heartbeat` |
+| — | **Inteligencia de red** | Benchmarks de mercado anonimizados | `market.list_segments` · `market.get_benchmark` |
 
-*El servidor envía telemetría anónima al arrancar para estadísticas del protocolo. Se puede desactivar con `SERVICIALO_TELEMETRY=false`.*
+*El servidor envía telemetría anónima al arrancar para estadísticas del protocolo. Se puede desactivar con `SERVICIALO_TELEMETRY=false`. Adicionalmente, los servidores autenticados emiten telemetría operacional bucketeada para alimentar los benchmarks de red — opt-out con `SERVICIALO_OPERATIONAL_TELEMETRY=false`. Ver [`docs/telemetry-operational.md`](./docs/telemetry-operational.md).*
 
 El protocolo garantiza que cualquier agente pueda completar el ciclo completo con cualquier implementación compatible.
 
@@ -315,6 +316,20 @@ El protocolo garantiza que cualquier agente pueda completar el ciclo completo co
 Servicialo soporta [A2A (Agent-to-Agent)](https://a2a-protocol.org/) como extensión opcional, permitiendo que agentes externos (Salesforce Agentforce, Google ADK, etc.) descubran y reserven servicios sin pasar por MCP.
 
 Guía completa: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
+
+### Inteligencia de red — benchmarks de mercado
+
+Cada nodo que ejecuta el MCP server autenticado emite eventos operacionales anonimizados (`booking_created`, `service_completed`, `dispute_opened`, `payment_settled`) con valores **bucketeados** (precios en bandas, duraciones en rangos, regiones a nivel país, fingerprint en lugar de slug). El registry agrega esos eventos y publica distribuciones por (vertical × región × evento) bajo dos reglas estrictas:
+
+- **k-anonimato ≥ 5** — una segmento se publica sólo si ≥ 5 organizaciones distintas contribuyeron data.
+- **Contribuir-para-acceder** — nodos que no aportan telemetría ven datos con 90 días de delay; nodos activos contribuyentes ven en tiempo real. Sin tier de pago.
+
+Dos formas de consumir:
+
+- **Pull** — `GET /api/benchmarks` y `GET /api/benchmarks/segments`, o las tools MCP `market.get_benchmark` / `market.list_segments`.
+- **Push** — suscribirse al evento `benchmark.weekly_snapshot` vía [Webhooks API](./WEBHOOKS.md). El registry dispara un snapshot cada lunes 00:00 UTC con HMAC-signed payload.
+
+Detalles: [`docs/benchmarks.md`](./docs/benchmarks.md) · [`docs/telemetry-operational.md`](./docs/telemetry-operational.md) · [`GOVERNANCE.md`](./GOVERNANCE.md#contribute-to-access-policy-v01) · [`WEBHOOKS.md`](./WEBHOOKS.md)
 
 ---
 
@@ -342,7 +357,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (34 herramientas) · resolución DNS · interoperabilidad A2A
+Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (37 herramientas) · resolver de descubrimiento (análogo a DNS, sobre HTTP) · interoperabilidad A2A · inteligencia de red (benchmarks bucketeados con k-anonimato ≥5 y contribuir-para-acceder) · webhooks para distribución push
 
 ### Servicialo/Finanzas — `en diseño`
 
