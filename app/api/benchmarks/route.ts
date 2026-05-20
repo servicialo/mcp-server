@@ -41,7 +41,7 @@ const QuerySchema = z.object({
   event_type: z.enum([
     'booking_created', 'service_completed', 'dispute_opened', 'payment_settled',
   ]),
-  vertical: z.string().regex(/^[a-z][a-z0-9_-]{1,30}$/),
+  vertical: z.string().regex(/^[a-z_][a-z0-9_-]{1,30}$/),
   region: z.string().regex(/^[A-Z]{2}$/),
   from: z.string().optional(),
   to: z.string().optional(),

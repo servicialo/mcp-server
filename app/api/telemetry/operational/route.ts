@@ -29,7 +29,7 @@ const RATE_LIMIT_PER_MIN = 120;
 
 // ─── Schemas (mirror operational-event.schema.json with Zod) ───
 
-const VerticalRe = /^[a-z][a-z0-9_-]{1,30}$/;
+const VerticalRe = /^[a-z_][a-z0-9_-]{1,30}$/;
 const RegionRe = /^[A-Z]{2}$/;
 
 const BookingCreatedPayload = z.object({
