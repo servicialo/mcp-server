@@ -43,6 +43,12 @@ _Target: Protocol v0.4_
 
 _Target: Protocol v0.5 – v0.8_
 
+- [ ] **Federated catalog discovery (search beyond taxonomy)** — today `registry.list_verticals` answers *what verticals exist*. It does not answer *which org offers physiotherapy*, because the registry only stores vertical declarations, not the per-service catalog of each node. To support natural-language search ("kinesio", "consulta de despido injusto"), the protocol needs:
+  1. A canonical, public way for nodes to expose their service catalog to the registry (either a sync endpoint that mirrors `services.list` into `registry_entries.metadata`, or a federated fan-out where the registry queries each node on demand).
+  2. Postgres full-text search (`tsvector` + GIN index) over the combined corpus, with the Spanish stemmer config so "kinesio → kinesiología" resolves.
+  3. Optional: pgvector embeddings for cross-lingual / paraphrase matching ("consulta de despido injusto" → labor-law orgs).
+  
+  Deferred until ecosystem reaches ≥2 active contributors with non-trivial catalogs — full-text against the current 3 stub rows would have ~zero useful coverage and would prematurely freeze a contract.
 - [ ] **Finance extension** — move billing and payment lifecycle from "design" to "stable" status with full schema support.
 - [ ] **Dispute resolution extension** — formalize the 3-phase dispute model into a stable, implementable specification.
 - [x] **Network Intelligence (phase 1)** — telemetry, benchmarks, gating and weekly snapshot are live. Phase 2 (cross-segment comparison, custom windows, implementer-emitted event relay at `/api/webhooks/emit`) is pending and unlocks when ecosystem reaches multiple active contributors.

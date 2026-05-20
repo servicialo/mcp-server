@@ -39,6 +39,7 @@ To be listed as a Servicialo-compatible implementation, your platform MUST satis
   2. The MCP server hooks `scheduling.book`, `delivery.checkout`, `lifecycle.transition`, and `payments.record_payment` to emit bucketed events automatically (POST to `https://servicialo.com/api/telemetry/operational`). Opt-out with `SERVICIALO_OPERATIONAL_TELEMETRY=false`.
   3. Once your node emits ≥ 50 events per 30 days you reach tier 2 and `market.get_benchmark` returns real-time data instead of the 90-day-delayed view. Policy in [`GOVERNANCE.md`](./GOVERNANCE.md#contribute-to-access-policy-v01).
 - **Webhook subscriptions** — register an HTTPS endpoint to receive `benchmark.weekly_snapshot` and verify deliveries with HMAC-SHA256. Contract: [`WEBHOOKS.md`](./WEBHOOKS.md).
+- **Catalog discoverability** — when you register, declare your verticals in `registry_entries.verticals` and keep your `services.list` endpoint public. The protocol exposes a network-wide taxonomy via `registry.list_verticals` / `registry.list_regions` / `registry.list_event_types` so cold-start agents can learn what exists. Full-text search across catalogs is a roadmap item (see ROADMAP.md "Federated catalog discovery") — once the second active implementer goes live, the protocol can wire in `tsvector` over service names so "kinesio" matches "kinesiología" without the agent having to guess.
 
 For a step-by-step build guide (7 steps, the first takes ~20 minutes), see [`IMPLEMENTING.md`](./IMPLEMENTING.md).
 
