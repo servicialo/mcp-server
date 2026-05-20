@@ -212,14 +212,19 @@ async function req(method, url, { token, body } = {}) {
   }
   void rotatedSecret;
 
-  // ── 9. /test scaffold returns 501 ──
-  console.log('\n[9] /test scaffold');
+  // ── 9. /test endpoint accepts the call and returns a delivery_id ──
+  // (Post step-4 the endpoint enqueues a real webhook.test event. The
+  //  subscriber URL in this script is example.com, which doesn't accept
+  //  the POST — but the contract here is "we got a delivery_id back",
+  //  not "the delivery succeeded". Use verify-webhooks-delivery.mjs to
+  //  cover real delivery.)
+  console.log('\n[9] /test enqueues real delivery');
   if (createdId) {
     const r = await req('POST', `${SUBS}/${createdId}/test`, { token: PRIMARY });
-    if (r.status === 501 && r.body?.error === 'not_implemented') {
-      ok('test_endpoint_returns_501');
+    if (r.status === 202 && r.body?.delivery_id) {
+      ok('test_endpoint_returns_delivery_id', `delivery_id=${r.body.delivery_id} status=${r.body.status}`);
     } else {
-      ko('test_endpoint_returns_501', JSON.stringify(r.body));
+      ko('test_endpoint_returns_delivery_id', JSON.stringify(r.body));
     }
   }
 

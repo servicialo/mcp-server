@@ -179,8 +179,9 @@ export async function updateSubscribedEvents(params: {
   if (!res.ok) {
     throw new Error(`updateSubscribedEvents failed: ${res.status} ${await res.text()}`);
   }
-  const rows = (await res.json()) as SubscriptionPublic[];
-  return rows[0] ?? null;
+  const rows = (await res.json()) as Array<SubscriptionPublic & { secret?: string }>;
+  if (!rows[0]) return null;
+  return omitSecret(rows[0]) as SubscriptionPublic;
 }
 
 export async function softDelete(params: {
@@ -248,8 +249,9 @@ export async function reactivate(params: {
     }),
   });
   if (!res.ok) return null;
-  const rows = (await res.json()) as SubscriptionPublic[];
-  return rows[0] ?? null;
+  const rows = (await res.json()) as Array<SubscriptionPublic & { secret?: string }>;
+  if (!rows[0]) return null;
+  return omitSecret(rows[0]) as SubscriptionPublic;
 }
 
 // ─── Helpers ───
