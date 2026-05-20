@@ -1,0 +1,57 @@
+name: Integrity checks
+
+# Runs the project's static safety net on every push and PR to main:
+#   - ESLint (root)
+#   - TypeScript --noEmit (root + mcp-server)
+#   - Vitest (mcp-server, unit tests including the bucketing helpers)
+#   - FINGERPRINT_SALT parity between lib/ and packages/mcp-server/
+#
+# Independent from publish-mcp-server.yml which only fires when the
+# package is bumped. This one catches regressions before they reach
+# production.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # --- Install both workspaces (the repo isn't a formal monorepo) ---
+
+      - name: Install root dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install mcp-server dependencies
+        working-directory: packages/mcp-server
+        run: npm install --no-audit --no-fund
+
+      # --- Static checks ---
+
+      - name: Lint (root)
+        run: npm run lint
+
+      - name: TypeScript check (root)
+        run: npx tsc --noEmit
+
+      - name: TypeScript check (mcp-server)
+        working-directory: packages/mcp-server
+        run: npx tsc --noEmit
+
+      - name: Vitest (mcp-server)
+        working-directory: packages/mcp-server
+        run: npm test
+
+      # --- Protocol-level guardrails ---
+
+      - name: FINGERPRINT_SALT parity
+        run: node scripts/verify-salt-parity.mjs
