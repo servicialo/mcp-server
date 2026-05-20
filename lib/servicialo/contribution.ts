@@ -24,6 +24,7 @@ const REGISTRY_URL = process.env.REGISTRY_SUPABASE_URL;
 const REGISTRY_KEY = process.env.REGISTRY_SUPABASE_SERVICE_KEY;
 
 // MUST match packages/mcp-server/src/telemetry/operational.ts FINGERPRINT_SALT.
+// Guardrail: `node scripts/verify-salt-parity.mjs` (also wired into CI).
 const FINGERPRINT_SALT = 'servicialo-op-v0.9';
 
 export const CONTRIBUTION_WINDOW_DAYS = 30;

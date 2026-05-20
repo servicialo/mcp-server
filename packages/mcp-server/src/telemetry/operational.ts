@@ -9,6 +9,10 @@
 
 import { createHash } from 'node:crypto';
 
+// MUST match lib/servicialo/contribution.ts FINGERPRINT_SALT (the backend
+// tier resolver). If these diverge, the backend computes a different
+// fingerprint than what nodes emit, and every contributor silently falls
+// to tier 0. Guardrail: `node scripts/verify-salt-parity.mjs`.
 const FINGERPRINT_SALT = 'servicialo-op-v0.9';
 const TELEMETRY_TIMEOUT_MS = 3000;
 
