@@ -5,6 +5,7 @@ name: Integrity checks
 #   - TypeScript --noEmit (root + mcp-server)
 #   - Vitest (mcp-server, unit tests including the bucketing helpers)
 #   - FINGERPRINT_SALT parity between lib/ and packages/mcp-server/
+#   - Import-extension convention (lib/app vs packages/mcp-server/src)
 #
 # Independent from publish-mcp-server.yml which only fires when the
 # package is bumped. This one catches regressions before they reach
@@ -55,3 +56,6 @@ jobs:
 
       - name: FINGERPRINT_SALT parity
         run: node scripts/verify-salt-parity.mjs
+
+      - name: Import-extension convention
+        run: node scripts/verify-import-extensions.mjs
