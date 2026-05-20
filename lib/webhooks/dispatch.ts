@@ -16,7 +16,7 @@
  * After 3 consecutive abandoned deliveries for a subscription → active=false.
  */
 
-import { buildEnvelope, buildHeaders, type WebhookEnvelope } from './signing.js';
+import { buildEnvelope, buildHeaders, type WebhookEnvelope } from './signing';
 
 const REGISTRY_URL = process.env.REGISTRY_SUPABASE_URL;
 const REGISTRY_KEY = process.env.REGISTRY_SUPABASE_SERVICE_KEY;
