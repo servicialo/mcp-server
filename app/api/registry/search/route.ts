@@ -29,7 +29,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { total: data.length, data },
-      { headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=60, s-maxage=120' } },
+      {
+        headers: {
+          ...CORS_HEADERS,
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=60, s-maxage=120',
+        },
+      },
     );
   } catch (error) {
     console.error('[registry/search] Error:', error);

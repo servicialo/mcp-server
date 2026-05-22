@@ -122,7 +122,11 @@ export async function GET() {
       },
       {
         status: 200,
-        headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=60' },
+        headers: {
+          ...CORS_HEADERS,
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, max-age=60',
+        },
       },
     );
   } catch (err) {

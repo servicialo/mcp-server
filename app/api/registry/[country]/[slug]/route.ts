@@ -28,7 +28,11 @@ export async function GET(
     const { ownership_token, ...publicEntry } = entry;
 
     return NextResponse.json(publicEntry, {
-      headers: { ...CORS_HEADERS, 'Cache-Control': 'public, max-age=60, s-maxage=120' },
+      headers: {
+        ...CORS_HEADERS,
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=60, s-maxage=120',
+      },
     });
   } catch (error) {
     console.error(`[registry/${country}/${slug}] GET error:`, error);
@@ -95,7 +99,12 @@ export async function PATCH(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { ownership_token, ...publicEntry } = updated;
 
-    return NextResponse.json(publicEntry, { headers: CORS_HEADERS });
+    return NextResponse.json(publicEntry, {
+      headers: {
+        ...CORS_HEADERS,
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       return NextResponse.json(
