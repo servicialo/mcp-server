@@ -2037,6 +2037,16 @@ components:
                   format: date-time
                 resource_id:
                   type: string
+                human_intent_confirmed:
+                  type: boolean
+                  default: false
+                  description: |
+                    OPTIONAL. When true, the caller asserts that a human user
+                    has reviewed and confirmed this booking intent before
+                    submission. When omitted or false, no such assertion is
+                    made. Caller-neutral vocabulary: the protocol records
+                    what the caller asserts; treatment of either case is
+                    implementer policy. See HTTP_PROFILE.md §6.2.1.
                 actor:
                   $ref: "#/components/schemas/Actor"
 

@@ -701,6 +701,7 @@ Book a new session. Creates the session in `requested` state.
 | `starts_at` | datetime | Yes | Session start time (ISO 8601). |
 | `resource_id` | string | No | Physical resource. REQUIRED if the service specifies `location.resource_id`. |
 | `actor` | Actor | Yes | Who performs the action. |
+| `human_intent_confirmed` | boolean | No | Caller asserts a human reviewed and confirmed this booking intent. Defaults to `false`. Caller-neutral vocabulary; see §6.2.1. |
 
 **Success Response**
 
@@ -715,6 +716,16 @@ Book a new session. Creates the session in `requested` state.
 | `409` | `CONFLICT` | Time slot is no longer available. |
 | `409` | `RESOURCE_UNAVAILABLE` | Physical resource is booked for this slot. |
 | `422` | `VALIDATION_ERROR` | Missing required fields. |
+
+#### 6.2.1 Implementer Considerations (non-normative)
+
+The `human_intent_confirmed` field is caller-neutral vocabulary: it records
+what the caller asserts, not what the implementer must do. Implementations
+that accept bookings without confirmed human intent are encouraged to apply
+abuse-mitigation measures appropriate to their deployment. The choice of
+mechanisms and thresholds — rate-limit windows, audit retention, identity
+probes, response shaping — is implementation policy and out of scope for
+this specification.
 
 ---
 
