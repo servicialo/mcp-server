@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { searchEntries } from '@/lib/registry-db';
 import { CORS_HEADERS } from '@/lib/registry-auth';
+import { normalizeVertical, isNoiseUserAgent, isIgnoredIp } from '@/lib/registry-normalize';
+import { recordSearchMiss } from '@/lib/registry-search-miss';
 
 /**
  * GET /api/registry/search?country=cl&vertical=kinesiologia&q=mama&locale=es
@@ -11,11 +14,17 @@ import { CORS_HEADERS } from '@/lib/registry-auth';
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const country = url.searchParams.get('country') ?? undefined;
-  const vertical = url.searchParams.get('vertical') ?? undefined;
+  const verticalRaw = url.searchParams.get('vertical') ?? undefined;
   const q = url.searchParams.get('q') ?? undefined;
   const locale = url.searchParams.get('locale') ?? undefined;
   const limitParam = url.searchParams.get('limit');
   const limit = limitParam ? Math.min(parseInt(limitParam, 10) || 20, 50) : 20;
+
+  // Normalize vertical at read-time to match write-time canonical form
+  // (Coordinalo writes are normalized; without this, ?vertical=Salud or
+  // ?vertical=Consultoría find nothing even when the offer exists, both
+  // breaking discovery and producing false misses for the logger).
+  const vertical = verticalRaw ? normalizeVertical(verticalRaw) : undefined;
 
   try {
     const entries = await searchEntries({ country, vertical, q, locale, limit });
@@ -26,6 +35,22 @@ export async function GET(request: NextRequest) {
       const { ownership_token, ...rest } = entry;
       return rest;
     });
+
+    if (data.length === 0) {
+      const ua = request.headers.get('user-agent');
+      const ip =
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+        request.headers.get('x-real-ip') ??
+        null;
+      if (!isNoiseUserAgent(ua) && !isIgnoredIp(ip)) {
+        waitUntil(
+          recordSearchMiss({
+            country: (country ?? '').toLowerCase().trim(),
+            vertical: vertical ?? '',
+          }),
+        );
+      }
+    }
 
     return NextResponse.json(
       { total: data.length, data },
