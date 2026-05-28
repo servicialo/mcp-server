@@ -425,7 +425,7 @@ def make_cover():
     meta = ParagraphStyle("CM", fontName="Body", fontSize=10.5, leading=15,
                           textColor=DARK_GRAY)
     els.append(Paragraph("Versi\u00f3n 0.6.0 \u2014 Marzo 2026", meta))
-    els.append(Paragraph("Licencia MIT", meta))
+    els.append(Paragraph("Licencia Apache 2.0", meta))
     els.append(Spacer(1, 16*mm))
 
     # Citation block

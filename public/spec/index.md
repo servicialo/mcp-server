@@ -103,4 +103,4 @@ HTTP made documents addressable. Servicialo makes services addressable. MCP and 
 
 ## License
 
-MIT — Use, implement, extend.
+Apache License 2.0 — Use, implement, extend.

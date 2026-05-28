@@ -1721,7 +1721,7 @@ The protocol version is independent from the MCP server package version.
 ### v0.7 (2026-03-04)
 
 - **Visibility.** Added `visibility` field (`public` | `unlisted` | `private`) to Service and Service Order. Controls discoverability — `public` services are indexed in catalogs, `unlisted` are accessible by direct ID, `private` are restricted to authorized parties.
-- **License.** MIT → Apache-2.0.
+- **License.** Set to Apache-2.0.
 
 ### v0.6 (2026-03-01)
 

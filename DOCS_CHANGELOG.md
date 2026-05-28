@@ -17,7 +17,7 @@ Servicialo is now positioned as **neutral infrastructure** — an open protocol,
 #### README.md
 - **Tagline**: "The open standard for services" → "The orchestration layer for the AI-agent service economy"
 - **Subtitle**: Rewritten to emphasize four protocol primitives (scheduling, identity, delivery verification, financial settlement)
-- **Tags**: `Open standard` → `Open protocol` · `Agent-native` · `MIT license`
+- **Tags**: `Open standard` → `Open protocol` · `Agent-native` · `Apache 2.0 license`
 - **Problem section**: Added collective intelligence framing; "common language" → "common protocol"
 - **Protocol primitives**: New section documenting the four coordination primitives with table
 - **Principles**: 7 → 8, added Principle 8 (collective intelligence as protocol commons, Waze parallel)

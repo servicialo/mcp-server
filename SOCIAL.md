@@ -31,7 +31,7 @@ github.com/servicialo/mcp-server
 
 4/ The network effect: every node contributes, every node benefits. Like Waze — each driver contributes GPS data, everyone navigates better. Collective intelligence is a protocol commons, not any company's asset.
 
-5/ MIT licensed. Neutral infrastructure. Reference implementation live in healthcare (Chile). The protocol works for any professional service vertical.
+5/ Apache 2.0 licensed. Neutral infrastructure. Reference implementation live in healthcare (Chile). The protocol works for any professional service vertical.
 
 Spec: servicialo.com
 Code: github.com/servicialo/mcp-server

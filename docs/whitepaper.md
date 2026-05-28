@@ -3,7 +3,7 @@ title: "Servicialo: The Destination Layer for Human Services in the Age of AI Ag
 version: "1.0.0"
 date: "2026-03"
 author: "Franco Danioni — Servicialo (servicialo.com)"
-license: "MIT"
+license: "Apache-2.0"
 keywords:
   - open protocol
   - professional services
@@ -39,7 +39,7 @@ Every day, millions of people in Latin America need a service — a therapist fo
 
 Professional services represent a significant share of global economic activity, but their coordination remains fragmented across incompatible vertical silos. A healthcare professional, a lawyer, a teacher, and a home repair technician face structurally identical problems — scheduling, confirming, delivering, documenting, billing, and verifying — yet each uses tools that model these processes in incompatible ways. This fragmentation worsens with the emergence of AI agents that need to discover, coordinate, and settle services programmatically, without a common vocabulary or interoperability guarantees.
 
-Servicialo proposes an open protocol, licensed under MIT, that defines the orchestration layer for professional service delivery. The protocol models each service through 8 canonical dimensions — identity, provider, client, schedule, location, lifecycle, evidence, and billing — and defines a lifecycle of 9 universal states that any service must traverse from request to final verification. Additionally, it defines the Service Order as the bilateral agreement that groups atomic services under agreed commercial conditions.
+Servicialo proposes an open protocol, licensed under Apache 2.0, that defines the orchestration layer for professional service delivery. The protocol models each service through 8 canonical dimensions — identity, provider, client, schedule, location, lifecycle, evidence, and billing — and defines a lifecycle of 9 universal states that any service must traverse from request to final verification. Additionally, it defines the Service Order as the bilateral agreement that groups atomic services under agreed commercial conditions.
 
 The protocol includes first-class exception flows, a dispute resolution mechanism with algorithmic arbitration, a decision model for AI agents with explicit autonomy boundaries, an MCP (Model Context Protocol) server with 37 tools organized across 7 lifecycle phases plus resource management, resolver administration, and network intelligence (anonymized market benchmarks under a contribute-to-access policy), and full A2A (Agent-to-Agent) interoperability for inter-agent discovery. Servicialo is not a product: it is neutral protocol infrastructure that any platform can implement as a sovereign node.
 
@@ -1109,7 +1109,7 @@ Data protection regulations in multiple jurisdictions converge on three requirem
 
 ### 20.3 The Economic Model
 
-Servicialo as a protocol is free (MIT license). It doesn't charge for use, transactions, or volume. Economic value is captured at the implementation layer — each node monetizes according to its particular business model: subscriptions, commissions, licenses, or consulting services.
+Servicialo as a protocol is free (Apache 2.0 license). It doesn't charge for use, transactions, or volume. Economic value is captured at the implementation layer — each node monetizes according to its particular business model: subscriptions, commissions, licenses, or consulting services.
 
 This model replicates the proven dynamic of successful protocols: HTTP is free, but web servers, CDNs, and hosting platforms generate value on top of it. SQL is free, but commercial database engines and managed services capture value at the implementation layer.
 
@@ -1508,7 +1508,7 @@ The protocol must be **indifferent to who implements it** — just as HTTP is in
 
 ## 26. How to Participate
 
-Servicialo is an open protocol under MIT license. There are three ways to participate:
+Servicialo is an open protocol under the Apache 2.0 license. There are three ways to participate:
 
 ### 26.1 Implementers
 
@@ -1560,7 +1560,7 @@ With 9 public tools available without authentication, an agent can immediately s
 
 ## License
 
-MIT — Use, implement, extend. Attribution is appreciated but not required.
+Apache License 2.0 — Use, implement, extend. Attribution is appreciated but not required.
 
 ---
 

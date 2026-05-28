@@ -116,7 +116,7 @@ The **MCP server** (`@servicialo/mcp-server`) is versioned independently.
 - **Visibility field** (`public` | `unlisted` | `private`) on Service and Service Order — controls discoverability in the network.
 
 ### Changed
-- License changed from MIT to Apache-2.0.
+- License set to Apache-2.0.
 
 ## [Protocol v0.3] - 2025-02-23
 
