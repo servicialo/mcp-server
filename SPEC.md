@@ -59,7 +59,7 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 
 > Implementations that require explicit confirmation after booking MAY use the state `pending_confirmation` between `requested` and `scheduled`. Agents MUST handle this as a valid state where valid transitions are `confirm` → `scheduled` or `cancel` → `cancelled`.
 
-**Rules:** Core states (1–6) are strictly ordered — no skipping. Financial extension states (7–9) are strictly ordered when implemented. Each transition records `from`, `to`, `at`, `by`, `method` (auto/manual/agent), and `metadata`. When `method = agent`, `mandate_id` is required.
+**Rules:** Core states (1–6) are strictly ordered — no skipping. Financial extension states (7–9) are strictly ordered when implemented. Each transition records `from`, `to`, `at`, `by`, `method` (auto/manual/agent), and `metadata`. When `method = agent`, `mandate_id` is required. **Conformance note (reference implementation, 2026-06):** the Delegated Agency model (scoped, revocable mandates) is specified and implemented as a service layer, but the reference implementation (Coordínalo) does not yet enforce mandate validation at the MCP tool boundary — agent access is currently gated by an organization-scoped API key. Boundary enforcement is on the roadmap; treat mandate scopes as advisory until then.
 
 ---
 
