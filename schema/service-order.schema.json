@@ -193,7 +193,7 @@
 
     "ledger": {
       "type": "object",
-      "description": "Computed from verified Services. Read-only — never manually entered. As atomic Services transition to 'verified', the system updates these fields automatically.",
+      "description": "Computed from verified Services. Read-only by contract — never manually entered; as atomic Services transition to 'verified', the system updates these fields automatically. Immutability is guaranteed by implementations that source these fields from an append-only event store (the reference implementation enforces append-only at the database layer for its service-event stream via no-update/no-delete triggers); derived projections are recomputed, not hand-edited.",
       "properties": {
         "services_verified": {
           "type": "integer",

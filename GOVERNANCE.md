@@ -73,15 +73,15 @@ Each implementation retains full ownership and control of its operational data. 
 
 ### 3. Anonymity by design
 
-Individual records never leave a node. Only aggregate metrics — computed locally before transmission — flow to the protocol layer. Minimum segment size of 5 organizations prevents re-identification.
+Individual records never leave a node. Only aggregate metrics — computed locally before transmission — flow to the protocol layer. Benchmark segments are suppressed below a minimum size of 5 contributing organizations (k-anonymity), enforced in the aggregation API, and raw operational events are not publicly readable — re-identification via the public data surface is closed. **Hardening in progress (2026-06):** the contributor fingerprint is still derived from a client-side salt; deriving it server-side from an authenticated node identity is on the roadmap. That is an integrity / anti-spoofing improvement, not a re-identification gap — stored fingerprints are not exposed through any public read path.
 
 ### 4. Symmetric benefit
 
-The contribute-to-access model ensures that no node can free-ride on the network. You receive benchmarks proportional to what you contribute. Larger contributors don't get privileged access — they get the same benchmarks as everyone else.
+The contribute-to-access model ensures that no node can free-ride on the network. You receive benchmarks proportional to what you contribute. Larger contributors don't get privileged access — they get the same benchmarks as everyone else. The tier resolver keys solely on contribution score; there is no implementation-specific branch in the published aggregation code, including for the reference implementation — this symmetry is auditable in source today. Operational neutrality (that the entity operating the registry cannot quietly privilege itself out-of-band) is not yet externally verifiable; it will be backed by a signed transparency log when a second independent implementation exists (roadmap).
 
 ### 5. Transparent aggregation
 
-The algorithms that aggregate and distribute network intelligence are open source and auditable. No black-box scoring. No hidden ranking. No preferential treatment.
+The algorithms that aggregate and distribute network intelligence are open source — the full aggregation, contribution-tier, and k-anonymity logic lives in this public repository. No black-box scoring. No hidden ranking. No preferential treatment. Note: "auditable" today means the source is open; binding the running service to a specific reviewed commit (reproducible build / deployed-commit attestation) is on the roadmap.
 
 ---
 
