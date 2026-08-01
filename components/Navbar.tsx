@@ -11,7 +11,9 @@ const sections = [
   { name: "Ciclo de vida", id: "ciclo" },
   { name: "Disputas", id: "resolucion" },
   { name: "Evidencia", id: "evidencia-vertical" },
+  { name: "Gradiente de certeza", id: "gradiente-certeza" },
   { name: "Principios", id: "principios" },
+  { name: "Ruta de adopción", id: "ruta-adopcion" },
   { name: "Módulos", id: "modulos" },
   { name: "Estándar", id: "estandar" },
   { name: "Por qué", id: "por-que" },
@@ -168,7 +170,7 @@ export function Navbar() {
       {/* Menú desplegable mobile */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          menuOpen ? "max-h-[32rem] border-t border-border" : "max-h-0"
+          menuOpen ? "max-h-[44rem] border-t border-border" : "max-h-0"
         }`}
       >
         <div className="max-w-content mx-auto px-4 py-3 flex flex-col gap-0.5">

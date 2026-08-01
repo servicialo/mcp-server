@@ -17,8 +17,10 @@ export function InclusionSection() {
         </div>
         <div className="text-[13px] text-text-body leading-[1.7]">
           Los datos estructurados de servicios — clientes recurrentes, tasas de asistencia, historial de pagos — son
-          mejor señal de solvencia que una liquidación de sueldo. Servicialo convierte esa operación invisible en
-          datos verificables: la rampa de acceso a la inclusión financiera.
+          mejor señal de solvencia que una liquidación de sueldo. Lo que la banca puede leer no es un historial de
+          agendamientos: es la Prueba de Servicio acumulada — entregas acreditadas, conciliadas contra pagos
+          efectivos. Servicialo convierte esa operación invisible en un expediente verificable: la rampa de acceso
+          a la inclusión financiera.
         </div>
       </div>
 
@@ -38,7 +40,7 @@ export function InclusionSection() {
             La señal
           </div>
           <div className="text-[13px] text-text-muted leading-[1.7]">
-            Contexto de servicio: sesiones recurrentes, tasa de cumplimiento, historial de cobros.
+            Prueba de Servicio acumulada: entregas acreditadas, tasa de cumplimiento, cobros conciliados.
             Mejor señal crediticia que un recibo de nómina.
           </div>
         </div>

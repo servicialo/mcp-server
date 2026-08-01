@@ -39,7 +39,7 @@ export function EvidenciaVerticalSection() {
       <SectionTitle
         tag="07 — Evidencia por vertical"
         title="Qué constituye prueba"
-        subtitle="Cada vertical define qué evidencia se necesita para que un algoritmo pueda resolver el 80% de las disputas sin intervención humana."
+        subtitle="Cada vertical define qué evidencia se necesita para producir una Prueba de Servicio acreditable. Resolver disputas sin intervención humana es un caso de uso — no el fin."
       />
 
       <div className="flex flex-col gap-2.5">
@@ -168,7 +168,7 @@ export function EvidenciaVerticalSection() {
         <div className="text-sm text-text-body leading-[1.8]">
           Un kinesiólogo y un electricista entregan servicios radicalmente distintos.
           Pedirle a ambos la misma evidencia no funciona. Definir evidencia por
-          vertical permite que el algoritmo resuelva disputas automáticamente: si la
+          vertical permite construir la prueba con criterios objetivos: si la
           ficha clínica está firmada, el servicio de salud se entregó. Si las fotos
           antes-después existen, la reparación del hogar se completó. Sin juicio
           subjetivo — solo verificación objetiva contra un contrato aceptado por

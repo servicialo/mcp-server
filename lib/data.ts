@@ -80,12 +80,40 @@ export const ANATOMY = [
 
 export const PRINCIPLES = [
   { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
-  { title: "La entrega debe ser verificable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes IA." },
+  { title: "La entrega debe ser verificable y liquidable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes IA. Y verificable no basta: la entrega debe ser liquidable contra esa verificación — el pago se concilia con la prueba, no con una declaración." },
   { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
   { title: "Un servicio es un producto legible por máquinas", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente IA puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano." },
   { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
   { title: "La inteligencia colectiva es un bien común", body: "Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos — como Waze, donde cada conductor contribuye y todos navegan mejor." },
+] as const;
+
+export const CERTAINTY_LEVELS = [
+  { level: "L1", name: "Verificación bilateral", desc: "Prestador y cliente atestiguan la entrega.", estado: "Verificando" },
+  { level: "L2", name: "+ Contexto en sitio", desc: "Suma registros de entrada y salida, duración real y ubicación.", estado: "Verificando" },
+  { level: "L3", name: "+ Riel del pagador", desc: "La evidencia se emite en el formato que el pagador exige.", estado: "Verificando" },
+  { level: "L4", name: "+ Cruce con liquidación", desc: "La prueba se concilia contra el pago efectivo.", estado: "Acreditable" },
+] as const;
+
+export const ADOPTION_PATH = [
+  {
+    step: "01",
+    actor: "Prestador",
+    title: "Acredita lo que entrega",
+    desc: "Cada prestación de su operación real genera una Prueba de Servicio como subproducto de trabajar, no como trabajo extra.",
+  },
+  {
+    step: "02",
+    actor: "Cliente",
+    title: "Respalda su reembolso",
+    desc: "Usa esa evidencia para sustentar reembolsos y reducir rechazos, sin pedirle permiso al pagador.",
+  },
+  {
+    step: "03",
+    actor: "Pagador",
+    title: "Recibe un expediente verificable",
+    desc: "Ve qué prestaciones ya llegan acreditadas y dónde se pierde dinero por documentación deficiente, sin cambiar su sistema.",
+  },
 ] as const;
 
 export const SCHEMA_YAML = `# ─────────────────────────────────────────────

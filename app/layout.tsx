@@ -29,11 +29,11 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Servicialo — El estándar abierto para servicios",
   description:
-    "Servicialo es el estándar abierto para crear, entregar y verificar servicios. Aprende a crear un servicio desde lo que ya tienes.",
+    "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
   openGraph: {
     title: "Servicialo — El estándar abierto para servicios",
     description:
-      "Servicialo es el estándar abierto para crear, entregar y verificar servicios. Aprende a crear un servicio desde lo que ya tienes.",
+      "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
     url: "https://servicialo.com",
     siteName: "Servicialo",
     locale: "es_CL",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Servicialo — El estándar abierto para servicios",
     description:
-      "El estándar abierto para crear, entregar y verificar servicios — para humanos y para agentes IA.",
+      "El estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
   },
   metadataBase: new URL("https://servicialo.com"),
 };
@@ -73,7 +73,7 @@ export default function RootLayout({
               "@type": "WebPage",
               name: "Servicialo — El estándar abierto para servicios",
               description:
-                "Servicialo es el estándar abierto para crear, entregar y verificar servicios.",
+                "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
               url: "https://servicialo.com",
               inLanguage: "es",
             }),

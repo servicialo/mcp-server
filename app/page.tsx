@@ -6,7 +6,9 @@ import { EntidadesSection } from "@/components/EntidadesSection";
 import { CicloSection } from "@/components/CicloSection";
 import { ResolucionSection } from "@/components/ResolucionSection";
 import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection";
+import { GradienteCertezaSection } from "@/components/GradienteCertezaSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
+import { RutaAdopcionSection } from "@/components/RutaAdopcionSection";
 import { ModulosSection } from "@/components/ModulosSection";
 import { EstandarSection } from "@/components/EstandarSection";
 import { PorQueSection } from "@/components/PorQueSection";
@@ -42,7 +44,13 @@ export default function Home() {
         <EvidenciaVerticalSection />
       </FadeIn>
       <FadeIn>
+        <GradienteCertezaSection />
+      </FadeIn>
+      <FadeIn>
         <PrincipiosSection />
+      </FadeIn>
+      <FadeIn>
+        <RutaAdopcionSection />
       </FadeIn>
       <FadeIn>
         <ModulosSection />
