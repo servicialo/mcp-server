@@ -4,6 +4,19 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-08-01 — intents.md 1.2.0: payloads verified against the reference implementation
+
+`public/spec/intents.md` claimed shapes the reference implementation (Coordinalo) never produced. Every request/response in the doc is now verified against the live implementation:
+
+- **`check_availability`** — real responses documented: single-day mode returns a bare result object (no `servicialo_version`/`organization`/`results` wrapper); range and next modes return a flat `slots` list with `service` and `timezone`. Slot `start`/`end` are **ISO 8601 UTC datetimes**, not local `HH:MM`. Mode precedence (`next` > `from` > `date`) and the no-param default (today) documented.
+- **`cancel_session` / `reschedule_session`** — `X-Org-Api-Key` authentication documented (REST section previously showed none); real request fields (`reason` optional, `cancelledBy` includes `system` and defaults to it; reschedule takes `scheduledAt` — `newScheduledAt` is accepted at the A2A layer only); real responses (`{sessionId, status, policy_applied}` / `{sessionId, status, scheduledAt, duration}` — reschedule updates the session **in place**, it does not cancel + recreate); real error catalog (`ALREADY_CANCELLED`, `SLOT_INVALID` family, 401).
+- **`book_session`** — `derived_state` documented as Spanish wire values (`solicitado`…`verificado`) mapping 1:1 to canonical states; real error codes (`OUTSIDE_PROVIDER_HOURS`, `SLOT_CONFLICT` message).
+- **`list_services`** — field nullability and types corrected (`price` serializes as a numeric string, `requirements` is an array); platform-level vs proxy-level errors separated.
+- **A2A transport** — response format documented (agent Message with text part + data part carrying `{intent, status, http_status, result}`), structured DataPart requests, JSON-RPC error codes, per-IP+org rate limit. Matches the reference implementation shipped 2026-08-01 (coordinalo `7dd73135`).
+- Autonomous agent flow example updated to the real shapes end-to-end.
+
+---
+
 ## 2026-08-01 — One coherent thesis: the open domain protocol for coordinating services
 
 Full communication refactor so the site, spec, and docs tell a single, technically defensible story.
