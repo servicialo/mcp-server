@@ -96,8 +96,10 @@ Terms used throughout this specification. See [Appendix A](#appendix-a-glossary)
 
 | Term | Definition |
 |------|------------|
-| **Service** | The atomic unit of professional service delivery, modeled across 8 dimensions. |
-| **Service Order** | A bilateral commercial agreement that groups one or more Services under a defined scope, pricing model, and payment schedule. |
+| **Service Delivery** | The executed atomic instance of a service — what actually happened, modeled across 8 dimensions. Its wire representation today is the `Service` object. |
+| **Service** (wire object) | The wire object that represents one Service Delivery instance. The name is retained for wire compatibility; as bare prose, "service" is the general domain term, not a fourth conceptual object. |
+| **Service Offer** | What an organization offers — a published catalog entry. |
+| **Service Order** | A bilateral commercial agreement that groups one or more deliveries under a defined scope, pricing model, and payment schedule. |
 | **ServiceMandate** | An explicit delegation of capability from a human principal to an AI agent. |
 | **Provider** | The professional or entity that delivers a service. |
 | **Client** | The beneficiary who receives a service. |
@@ -159,11 +161,21 @@ Aggregate, anonymous operational telemetry across network nodes. Each implementa
 
 ## 4. Core Entities
 
-The protocol is built around two objects and their relationship.
+The protocol is built around two objects and their relationship. The public
+ontology distinguishes three concepts unambiguously:
 
-**Service** is the atomic unit of delivery. It models a single instance of a professional service through the 8 dimensions defined in [Section 5](#5-the-8-dimensions-of-a-service). A Service MAY exist standalone or within a Service Order.
+```
+Service Offer      what is offered      (catalog entry)
+Service Order      what is agreed       (scope, parties, price, policies)
+Service Delivery   the executed atomic instance
+```
 
-**Service Order** is the commercial agreement that groups one or more Services under a defined scope, an agreed price, and a payment schedule. It is OPTIONAL — not every Service belongs to an Order.
+"Service" as a bare term refers to the domain generally — it is not a fourth
+conceptual object.
+
+**Service** (wire object) represents one **Service Delivery** instance: a single execution of a professional service, modeled through the 8 dimensions defined in [Section 5](#5-the-8-dimensions-of-a-service). The wire name `Service` is retained for compatibility — renaming it would break the published schema (`schema/service.schema.json`), tools, and existing consumers. A Service MAY exist standalone or within a Service Order.
+
+**Service Order** is the commercial agreement that groups one or more deliveries under a defined scope, an agreed price, and a payment schedule. It is OPTIONAL — not every delivery belongs to an Order.
 
 The key relationship: when a Service belongs to a Service Order, its `billing` dimension is **informative** (it records the economic value of the individual service unit) but **not transactional** (it does not generate an invoice). Invoicing is the exclusive responsibility of the Service Order, which triggers it according to its own payment schedule.
 
@@ -175,7 +187,7 @@ Organization
     ├── scope: what services, how many, what type
     ├── pricing: how value is calculated
     ├── payment_schedule: when money moves
-    └── Services (atomic units)
+    └── Services (delivery instances — wire objects)
         └── 8 dimensions each
 ```
 
@@ -568,16 +580,45 @@ A Service Order is a bilateral agreement to deliver a set of services under defi
 
 #### 8.2.5 Ledger (Read-Only)
 
-The ledger is entirely computed — it is NEVER manually entered. As atomic Services transition to `verified` state, the system automatically updates these fields.
+The ledger is a **computed projection**, never a manually editable balance. It is derived from three sources:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `ledger.services_verified` | integer | Count of services in `verified` state. |
-| `ledger.hours_consumed` | number | Total hours across verified services. |
-| `ledger.amount_consumed` | number | Value consumed at pricing rates. |
-| `ledger.amount_billed` | number | Total invoiced to date. |
-| `ledger.amount_collected` | number | Total payments received. |
-| `ledger.amount_remaining` | number | Authorized scope not yet consumed. |
+```
+Service Deliveries          (consumption: what was delivered, in what quantity)
++ Commercial Terms          (billing: pricing model + payment schedule of the Order)
++ Settlement Events         (collections: charges, payments, refunds, credits,
+                             chargebacks, reconciliations, write-offs)
+= Order Ledger
+```
+
+The three sources move independently:
+
+- **Consumption / accrual** is derived from deliveries, quantities, and consumption rules — the consumption fields advance as deliveries reach `verified`.
+- **Billing** is derived from the Order's commercial terms: `upfront`, `milestone`, `periodic`, `on_delivery`, `custom`, fixed-price, or free. Invoicing is NOT a function of verified deliveries alone — a prepaid or periodic Order invoices on its own schedule.
+- **Collections and balances** are derived from settlement events. A payment MAY be recorded before any delivery is accredited (`amount_collected > 0` with `services_verified = 0` is a valid ledger state).
+
+| Field | Type | Derived from | Description |
+|-------|------|--------------|-------------|
+| `ledger.services_verified` | integer | Deliveries | Count of deliveries in `verified` state. |
+| `ledger.hours_consumed` | number | Deliveries | Total hours across verified deliveries. |
+| `ledger.amount_consumed` | number | Deliveries × terms | Value consumed at pricing rates. |
+| `ledger.amount_billed` | number | Terms + settlement events | Total invoiced to date, per the Order's payment schedule. |
+| `ledger.amount_collected` | number | Settlement events | Total payments received. |
+| `ledger.amount_remaining` | number | Scope − consumption | Authorized scope not yet consumed. |
+
+Reference scenarios — all valid ledger states (non-normative). Each row shows the state the projection MUST be able to represent:
+
+| Scenario | services_verified | amount_billed | amount_collected |
+|---|---|---|---|
+| Prepayment before first delivery | 0 | > 0 (upfront) | > 0 |
+| Free service | ≥ 1 | 0 | 0 |
+| Partial payment | ≥ 1 | X | < X |
+| Multiple deliveries under one invoice | n | one invoice covering n | per payment received |
+| Partial delivery | counts per policy | adjusted proportionally | per settlement |
+| Later refund | unchanged (a refund does not un-happen a delivery) | unchanged | reduced by refund event |
+| Chargeback | unchanged | unchanged | reduced by chargeback event |
+| Periodic billing | advances with deliveries | advances per period, independent of individual deliveries | per payment received |
+
+Implementations that expose the ledger MUST source it from recorded events and recompute it — hand-editing ledger fields is out of contract. The reference implementation guarantees this with an append-only event store (see `schema/service-order.schema.json`).
 
 ### 8.3 Service Order Lifecycle
 
@@ -591,7 +632,7 @@ draft → proposed → negotiating → active → paused → completed
 | `draft` | Created but not sent. Equivalent to a draft quote. |
 | `proposed` | Sent to the client, awaiting acceptance. |
 | `negotiating` | Active negotiation of terms. |
-| `active` | Accepted and in execution. Verified Services feed the ledger. |
+| `active` | Accepted and in execution. Deliveries, commercial terms, and settlement events feed the ledger. |
 | `paused` | Temporarily suspended. |
 | `completed` | Scope fulfilled or term expired per defined condition. |
 | `cancelled` | Terminated before completion. |
@@ -896,7 +937,7 @@ This creates a dual audit path: the service lifecycle records *what happened*; t
 - **Creating a Service Order** (`order:write`): Requires a mandate from the organization.
 - **Proposing a Service Order** (`order:write`): Requires human confirmation regardless of mandate.
 - **Activating a Service Order** (`order:write`): Requires client acceptance — the organization's agent MUST NOT accept on behalf of the client.
-- **Ledger updates**: Automatic, triggered by service verification.
+- **Ledger updates**: Automatic — consumption fields on delivery verification; billing and collection fields on settlement events (§8.2.5). Never hand-edited.
 
 ---
 
@@ -931,7 +972,7 @@ The v0.8 update adds one requirement: **every agent action — whether autonomou
 | Service Order: `draft` → `proposed` | — | YES — human sends proposal. |
 | Service Order: `proposed` → `active` | — | YES — client acceptance required. |
 | Service Order: `active` → `paused` | — | YES — human decision. |
-| Service Order: ledger update | YES — automatic on service verified. | — |
+| Service Order: ledger update | YES — automatic on delivery verification and on settlement events. | — |
 | Service Order: payment trigger | YES — if trigger condition is deterministic. | If trigger requires judgment. |
 
 ### 11.2 The Ambiguity Rule
@@ -1213,6 +1254,8 @@ Implementations MUST support at least the post-service settlement mode. Prepayme
 ## 13. MCP Tool Interface
 
 Servicialo exposes its tools as a Model Context Protocol (MCP) server, enabling AI agents to discover and coordinate professional services natively.
+
+> **MCP is a binding, not the protocol.** The protocol is transport-independent (§1). This section documents one of its official bindings — the reference MCP binding — alongside the normative HTTP binding ([`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md), OpenAPI in [`spec/openapi.yaml`](./spec/openapi.yaml)) and the experimental A2A binding (§13.7). Conformance requires **at least one** machine-to-machine binding implementing the required Core profiles (§16) — a purely HTTP implementation is conformant without MCP. MCP is the RECOMMENDED binding for agentic integrations. Binding versions and maturity are registered in [`protocol/manifest.yaml`](./protocol/manifest.yaml) (`bindings`).
 
 ### 13.0 Phase 0 — DNS Resolution
 
@@ -1675,10 +1718,10 @@ An extension MUST NOT be presented as a stable, operative capability while its r
 
 Any platform can implement the Servicialo specification. To be listed as a compatible implementation, a platform MUST:
 
-1. Model services using the 8 dimensions (§5).
+1. Model services using the 8 dimensions (§5), respecting the identifiers, invariants, and required events of the Core objects.
 2. Implement the 6 core lifecycle states (requested through documented). Financial states (invoiced, collected, verified) are optional extensions (§6).
 3. Handle at least 3 exception flows (§7).
-4. Expose an API that an MCP server can connect to.
+4. Expose at least one machine-readable binding that implements the required Core profiles, and declare the supported profiles and versions through its manifest surface (`registry.manifest` / agent card). Official bindings: the normative HTTP binding ([`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md)), the reference MCP binding (§13), and A2A (§13.7); other bindings are permitted if they implement the same semantics. A purely HTTP implementation is conformant without MCP — MCP is the RECOMMENDED binding for agentic integrations, not a conformance condition.
 5. (OPTIONAL) Model Service Orders using the schema in §8.
 6. (OPTIONAL) Implement the Delegated Agency Model (§10).
 7. (OPTIONAL) Implement Provider Profiles (§12).
@@ -1732,9 +1775,9 @@ The protocol version is independent from the MCP server package version.
 | **Context** | The organizational or personal boundary of a ServiceMandate. Format: `{type}:{id}` (e.g., `org:clinic_a`, `personal:maria`). |
 | **Evidence** | A proof-of-delivery artifact. Types: `gps`, `signature`, `photo`, `document`, `duration`, `notes`. |
 | **Exception flow** | A defined protocol path for handling deviations from the happy path: no-shows, cancellations, disputes, rescheduling, partial delivery, resource conflicts. |
-| **Ledger** | The read-only, system-computed summary on a Service Order that tracks consumption vs. commitment. |
+| **Ledger** | The read-only projection on a Service Order, computed from deliveries, commercial terms, and settlement events (§8.2.5). Never a manually editable balance. |
 | **Mandate** | See ServiceMandate. |
-| **MCP** | Model Context Protocol. The interface through which AI agents interact with Servicialo tools. |
+| **MCP** | Model Context Protocol. One of the protocol's official bindings — the RECOMMENDED interface for AI agents, not a conformance requirement (§13, §16). |
 | **Origin** | The provenance of a ProviderAttribute: `declared` (self-reported), `verified` (third-party confirmed), or `inferred` (derived from operational data). |
 | **Payer** | The entity that pays for a service. MAY differ from the client (insurance, employer, guardian). |
 | **Principal** | The human or organization that issues a ServiceMandate. Authority always originates from a human. |
@@ -1744,7 +1787,7 @@ The protocol version is independent from the MCP server package version.
 | **Resource** | A physical entity (room, chair, equipment) required for service delivery. Has its own availability calendar. |
 | **Scope (mandate)** | A `resource:action` capability pair granted within a ServiceMandate. Additive, deny-by-default. |
 | **Scope (order)** | The set of services authorized under a Service Order (types, quantity limits, hour limits). |
-| **Service** | The atomic unit of professional service delivery, modeled across 8 dimensions. |
+| **Service** | Wire object representing one Service Delivery instance — the executed atomic instance, modeled across 8 dimensions. Name retained for wire compatibility (§4). |
 | **Service Order** | A bilateral commercial agreement grouping one or more Services under scope, pricing, and payment terms. |
 | **ServiceMandate** | A first-class protocol object representing the explicit delegation of capability from a human principal to an AI agent. |
 | **Transition** | A recorded state change in a lifecycle. Includes: `from`, `to`, `at`, `by`, `method`, and `metadata`. |
@@ -1755,6 +1798,13 @@ The protocol version is independent from the MCP server package version.
 ---
 
 ## Appendix B: Changelog
+
+### v0.10 — conceptual-coherence amendment (2026-08-01)
+
+- **§4 ontology disambiguation.** Public ontology fixed as Service Offer (what is offered) / Service Order (what is agreed) / Service Delivery (the executed atomic instance). Documented that the wire object `Service` represents one Service Delivery instance and keeps its name for wire compatibility — no schema, table, endpoint, or tool was renamed.
+- **§8.2.5 ledger as projection.** The Order ledger is now specified as a projection derived from deliveries + commercial terms + settlement events, with per-field derivation and reference scenarios (prepayment, free service, partial payment, multi-delivery invoice, partial delivery, refund, chargeback, periodic billing). Replaces the "computed from verified Services" framing, which could not represent prepayment or periodic billing. Wire fields unchanged.
+- **§13/§16 binding-neutral conformance.** Requirement 4 now reads "expose at least one machine-readable binding implementing the required Core profiles, declaring supported profiles and versions". A purely HTTP implementation is conformant without MCP; MCP is RECOMMENDED for agentic integrations. `protocol/manifest.yaml` `bindings` gained per-binding maturity.
+- **Proof of Service 0.2.0 (draft extension).** Three independent dimensions — certainty level (L1 asserted → L4 financially reconciled), dossier state (`draft`/`supported`/`accredited`/`disputed`/`revoked`, policy-based accreditation), settlement state (mirrors state-dimensions `financial`). Replaces the binary verifying/accreditable state that implicitly tied accreditation to L4 settlement cross-checking. No wire object existed, so no wire compatibility is affected.
 
 ### v0.10 (2026-08-01)
 

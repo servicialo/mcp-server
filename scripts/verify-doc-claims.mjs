@@ -17,6 +17,16 @@
  *      universales", "implement the 9 lifecycle states".
  *   5. docs/spec/ must contain nothing but the README.md relocation stub
  *      (the mirror was consolidated into public/spec/).
+ *   6. Forbidden stale claims from the 2026-08 conceptual-coherence pass:
+ *      ledger "computed from verified services" (it is a projection of
+ *      deliveries + commercial terms + settlement events), "full profile
+ *      coverage" (coverage derives from the manifest), and "API an MCP
+ *      server can connect to" as a conformance requirement (conformance is
+ *      binding-neutral; MCP is recommended, not required).
+ *   7. Manifest cross-checks: proof_of_service certainty keys and dossier
+ *      states must appear in public/spec/extensions/proof-of-service.md,
+ *      and proof_of_service.settlement_states must stay bit-exact with the
+ *      `financial` dimension of state-dimensions.md.
  *
  * Intentionally NOT scanned (historical records / archived snapshots):
  *   - CHANGELOG.md, DOCS_CHANGELOG.md (append-only history)
@@ -73,6 +83,7 @@ const DIRS = [
   { dir: 'components', exts: ['.tsx', '.ts'], skip: [] },
   { dir: 'lib', exts: ['.ts'], skip: [] },
   { dir: 'public/spec', exts: ['.md'], skip: [] },
+  { dir: 'schema', exts: ['.json'], skip: [] },
 ];
 
 // Allowlist: { file (repo-relative, /-separated), match (exact matched text) }
@@ -155,6 +166,21 @@ const RULES = [
     re: /implement (?:the )?9 lifecycle states/gi,
     bad: () => true,
   },
+  {
+    name: 'forbidden phrase (ledger = deliveries + commercial terms + settlement events, not verified services)',
+    re: /(?:computed|calculated|derived|calculad[oa]s?|derivad[oa]s?)\s+(?:autom[aá]ticamente\s+)?(?:from|desde)\s+(?:the\s+|los\s+)?(?:verified\s+services|servicios\s+verificados)/gi,
+    bad: () => true,
+  },
+  {
+    name: 'forbidden phrase (coverage derives from the manifest — never claim "full/complete profile coverage" by hand)',
+    re: /(?:full|complete)\s+(?:profile\s+)?coverage\s+of\s+(?:the\s+)?(?:protocol\s+)?profiles|cobertura\s+completa\s+de\s+(?:los\s+)?perfiles/gi,
+    bad: () => true,
+  },
+  {
+    name: 'forbidden phrase (conformance is binding-neutral — MCP is recommended, not required)',
+    re: /API\s+(?:that|the)\s+(?:an\s+)?\*{0,2}MCP\s+server\s+can\s+connect|API\s+conectable\s+(?:por|al)\s+(?:un\s+)?(?:servidor\s+)?MCP|API\s+a\s+la\s+que\s+un\s+\*{0,2}servidor\s+MCP\s+pueda\s+conectarse\*{0,2}|API\s+connectable\s+to\s+the\s+MCP\s+server/gi,
+    bad: () => true,
+  },
 ];
 
 const failures = [];
@@ -185,6 +211,36 @@ if (existsSync(docsSpec)) {
   if (extras.length > 0) {
     failures.push(
       `docs/spec/ must contain only the README.md relocation stub (spec is served from public/spec/); found: ${extras.join(', ')}`
+    );
+  }
+}
+
+// Guard: manifest proof_of_service model must stay in sync with the extension docs
+const pos = manifest.proof_of_service;
+if (!pos) {
+  failures.push('protocol/manifest.yaml: missing proof_of_service block (certainty levels, dossier states, settlement states)');
+} else {
+  const posDoc = readFileSync(join(repoRoot, 'public', 'spec', 'extensions', 'proof-of-service.md'), 'utf8');
+  for (const level of pos.certainty_levels ?? []) {
+    if (!posDoc.includes(`\`${level.key}\``)) {
+      failures.push(`proof-of-service.md: certainty key \`${level.key}\` (${level.id}, from manifest) not documented`);
+    }
+  }
+  for (const state of pos.dossier_states ?? []) {
+    if (!posDoc.includes(`\`${state}\``)) {
+      failures.push(`proof-of-service.md: dossier state \`${state}\` (from manifest) not documented`);
+    }
+  }
+
+  // settlement_states must be bit-exact with the `financial` dimension table
+  // of state-dimensions.md (each state appears as a leading `state` table cell).
+  const sdDoc = readFileSync(join(repoRoot, 'public', 'spec', 'extensions', 'state-dimensions.md'), 'utf8');
+  const financialSection = sdDoc.split('### 2.4')[1]?.split('### 2.5')[0] ?? '';
+  const financialStates = [...financialSection.matchAll(/^\| `([a-z_]+)` \|/gm)].map((m) => m[1]);
+  const manifestStates = pos.settlement_states ?? [];
+  if (JSON.stringify(financialStates) !== JSON.stringify(manifestStates)) {
+    failures.push(
+      `settlement_states drift: manifest [${manifestStates.join(', ')}] vs state-dimensions.md §2.4 financial [${financialStates.join(', ')}] — keep bit-exact`
     );
   }
 }

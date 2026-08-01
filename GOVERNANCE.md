@@ -174,7 +174,7 @@ Any platform can implement Servicialo. To be listed as a compatible implementati
 2. Implement the 6 core lifecycle states (the 3 financial states are optional extensions)
 3. Handle at least 3 of the 6 exception flows
 4. Adhere to the 7 core principles
-5. Expose an API connectable to the MCP server
+5. Expose at least one machine-to-machine binding implementing the Core profiles (HTTP, MCP, A2A, or an equivalent — a purely HTTP implementation is conformant without MCP)
 
 Implementations are sovereign nodes. They own their data, their user relationships, and their business model. The protocol ensures interoperability — it does not prescribe how implementations operate internally.
 

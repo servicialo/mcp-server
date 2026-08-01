@@ -58,9 +58,9 @@ function ObjectsBlock() {
     <Pre>
       <Line><span className={H}># Los objetos que estandariza el protocolo</span></Line>
       <Line>&nbsp;</Line>
-      <Line><span className={A}>Service Offer</span>          <span className={C}># lo que una organización ofrece — catálogo</span></Line>
-      <Line><span className={A}>Service Order</span>          <span className={C}># el acuerdo — alcance, partes, precio, políticas</span></Line>
-      <Line><span className={TREE}>└──</span> <span className={A}>Service</span>            <span className={C}># unidad atómica de entrega — 8 dimensiones</span></Line>
+      <Line><span className={A}>Service Offer</span>          <span className={C}># lo ofrecido — catálogo de la organización</span></Line>
+      <Line><span className={A}>Service Order</span>          <span className={C}># lo acordado — alcance, partes, precio, políticas</span></Line>
+      <Line><span className={TREE}>└──</span> <span className={A}>Service Delivery</span>   <span className={C}># la instancia atómica ejecutada — 8 dimensiones</span></Line>
       <Line>    <span className={TREE}>├──</span> <span className={K}>evidence_events:</span> <span className={T}>evidencia[]</span>  <span className={C}># confirmaciones, firmas, timestamps</span></Line>
       <Line>    <span className={TREE}>└──</span> <span className={K}>settlement_events:</span> <span className={T}>cobro[]</span>  <span className={C}># factura, pago, devolución, conciliación</span></Line>
       <Line>&nbsp;</Line>
@@ -72,15 +72,15 @@ function ObjectsBlock() {
 function LedgerBlock() {
   return (
     <Pre>
-      <Line><span className={H}># Libro mayor — calculado desde Servicios verificados</span></Line>
-      <Line><span className={H}># Nunca se edita manualmente</span></Line>
+      <Line><span className={H}># Libro mayor — proyección calculada, no un saldo editable</span></Line>
+      <Line><span className={H}># entregas + términos comerciales + eventos de liquidación</span></Line>
       <Line>&nbsp;</Line>
       <Line><span className={A}>ledger:</span>                          <span className={C}># solo lectura</span></Line>
-      <Line>  <span className={K}>servicios_verificados:</span> <span className={T}>entero</span>   <span className={C}># servicios en estado Verificado</span></Line>
-      <Line>  <span className={K}>horas_consumidas:</span> <span className={T}>número</span>       <span className={C}># total horas verificadas</span></Line>
-      <Line>  <span className={K}>monto_consumido:</span> <span className={T}>número</span>        <span className={C}># valor consumido a tarifa</span></Line>
-      <Line>  <span className={K}>monto_facturado:</span> <span className={T}>número</span>        <span className={C}># total facturado a la fecha</span></Line>
-      <Line>  <span className={K}>monto_cobrado:</span> <span className={T}>número</span>          <span className={C}># total pagos recibidos</span></Line>
+      <Line>  <span className={K}>servicios_verificados:</span> <span className={T}>entero</span>   <span className={C}># entregas en estado Verificado</span></Line>
+      <Line>  <span className={K}>horas_consumidas:</span> <span className={T}>número</span>       <span className={C}># consumo derivado de las entregas</span></Line>
+      <Line>  <span className={K}>monto_consumido:</span> <span className={T}>número</span>        <span className={C}># consumo valorizado a tarifa</span></Line>
+      <Line>  <span className={K}>monto_facturado:</span> <span className={T}>número</span>        <span className={C}># según términos comerciales de la Orden</span></Line>
+      <Line>  <span className={K}>monto_cobrado:</span> <span className={T}>número</span>          <span className={C}># eventos de liquidación: pagos recibidos</span></Line>
       <Line>  <span className={K}>monto_restante:</span> <span className={T}>número</span>         <span className={C}># alcance no consumido aún</span></Line>
     </Pre>
   );
@@ -99,9 +99,9 @@ export function ObjetosSection() {
 
       <blockquote className="border-l-[3px] border-l-accent pl-4 md:pl-6 py-1 mb-6">
         <p className="font-serif text-xl md:text-2xl text-text leading-[1.5]">
-          El Servicio es la unidad atómica de entrega. La Orden de Servicio es
-          el acuerdo que agrupa servicios bajo un alcance, un precio y un
-          esquema de pagos.
+          La Service Delivery es la instancia atómica ejecutada. La Orden de
+          Servicio es el acuerdo que agrupa entregas bajo un alcance, un
+          precio y un esquema de pagos.
         </p>
       </blockquote>
 
@@ -116,10 +116,15 @@ export function ObjetosSection() {
             <span className="text-white/55">Settlement</span> y{" "}
             <span className="text-white/55">Proof of Service</span> se expresan
             hoy a través del catálogo, la dimensión de cobro y una extensión en
-            borrador, respectivamente. Cuando un Servicio pertenece a una
-            Orden, su dimensión <span className="text-white/55">cobro</span> es
-            informativa — la facturación es responsabilidad exclusiva de la
-            Orden, según su propio esquema de pagos.
+            borrador, respectivamente. En el wire format actual, la Service
+            Delivery se representa con el objeto{" "}
+            <span className="text-white/55">Service</span> — el nombre se
+            conserva por compatibilidad. “Servicio” a secas es el término
+            general del dominio, no un cuarto objeto. Cuando una entrega
+            pertenece a una Orden, su dimensión{" "}
+            <span className="text-white/55">cobro</span> es informativa — la
+            facturación es responsabilidad exclusiva de la Orden, según su
+            propio esquema de pagos.
           </div>
         </div>
       </DarkCard>
@@ -149,8 +154,9 @@ export function ObjetosSection() {
       {/* Ledger */}
       <DarkCard label="Libro mayor computado" className="mb-4">
         <div className="font-mono text-[10px] text-white/40 -mt-2 mb-4">
-          El estado financiero de la Orden se calcula automáticamente desde los
-          servicios verificados
+          El ledger de la Orden se deriva de las entregas, los términos
+          comerciales y los eventos de liquidación asociados — un prepago
+          puede existir antes de cualquier entrega acreditada
         </div>
         <LedgerBlock />
       </DarkCard>

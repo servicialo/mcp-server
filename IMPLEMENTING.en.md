@@ -11,9 +11,9 @@ A step-by-step guide for building a Servicialo-compatible platform. You don't ne
 To be listed as a Servicialo implementation ([§16](./PROTOCOL.md#16-implementations)), your platform MUST:
 
 1. Model services using the **8 dimensions** (§5)
-2. Implement the **9 lifecycle states** (§6)
+2. Implement the **6 core lifecycle states** (§6) — the 3 financial states are optional
 3. Handle at least **3 exception flows** (§7)
-4. Expose an API that an **MCP server can connect to**
+4. Expose **at least one machine-to-machine binding** implementing the Core profiles, declaring supported profiles and versions — HTTP (normative), MCP (reference, recommended for agents), A2A, or an equivalent. A purely HTTP implementation is conformant without MCP
 
 Everything else — Service Orders, Delegated Agency, Provider Profiles, Network Intelligence — is optional.
 

@@ -15,7 +15,7 @@ Para aparecer como implementación de Servicialo ([§16](./PROTOCOL.md#16-implem
 1. Modelar servicios usando las **8 dimensiones** (§5)
 2. Implementar los **6 estados core del ciclo de vida** (§6) — los 3 financieros son opcionales
 3. Manejar al menos **3 flujos de excepción** (§7)
-4. Exponer una API a la que un **servidor MCP pueda conectarse**
+4. Exponer **al menos un binding máquina a máquina** que implemente los perfiles Core y declare perfiles y versiones soportados — HTTP (normativo), MCP (referencia, recomendado para agentes), A2A u otro equivalente. Una implementación puramente HTTP es conforme sin MCP
 
 Todo lo demás — Órdenes de Servicio, Agencia Delegada, Perfiles de Proveedor, Inteligencia de Red — es opcional.
 

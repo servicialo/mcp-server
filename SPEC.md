@@ -72,9 +72,11 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 
 ## 3. The Two Entities
 
-### Service (Atomic Unit)
+The public ontology distinguishes: **Service Offer** (what is offered) → **Service Order** (what is agreed) → **Service Delivery** (the executed atomic instance). "Service" as bare prose is the general domain term.
 
-The atomic unit of professional service delivery. Modeled across the 8 dimensions. May exist standalone or within a Service Order.
+### Service (Wire Object — one Service Delivery instance)
+
+The wire object that represents one Service Delivery instance — the executed atomic instance, modeled across the 8 dimensions. The wire name `Service` is retained for compatibility (PROTOCOL.md §4). May exist standalone or within a Service Order.
 
 ### Service Order (Commercial Agreement)
 
@@ -92,16 +94,18 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 
 ### Computed Ledger (read-only, on the Service Order)
 
-| Field | Meaning |
-|-------|---------|
-| `services_verified` | Count of services in `verified` state |
-| `hours_consumed` | Total hours across verified services |
-| `amount_consumed` | Value consumed at pricing model rates |
-| `amount_billed` | Total invoiced to date |
-| `amount_collected` | Total payments received |
-| `amount_remaining` | Authorized scope not yet consumed |
+The ledger is a computed projection, never a manually editable balance. It derives from three independent sources: **Service Deliveries** (consumption) + **Commercial Terms** (billing) + **Settlement Events** (collections). A payment may precede any accredited delivery — prepayment, periodic billing, and free orders are all valid ledger states (PROTOCOL.md §8.2.5).
 
-**Relationship (Principle 6):** Service Order = what was agreed. Atomic Service = what was delivered. The ledger bridges both.
+| Field | Derived from | Meaning |
+|-------|--------------|---------|
+| `services_verified` | Deliveries | Count of deliveries in `verified` state |
+| `hours_consumed` | Deliveries | Total hours across verified deliveries |
+| `amount_consumed` | Deliveries × terms | Value consumed at pricing model rates |
+| `amount_billed` | Terms + settlement events | Total invoiced to date, per the Order's payment schedule |
+| `amount_collected` | Settlement events | Total payments received |
+| `amount_remaining` | Scope − consumption | Authorized scope not yet consumed |
+
+**Relationship (Principle 6):** Service Order = what was agreed. Service Delivery = what was delivered. The ledger bridges both.
 
 ---
 
@@ -234,7 +238,7 @@ From PROTOCOL.md §16. To be listed as a compatible Servicialo implementation:
 | 1 | Model services using the **8 dimensions** | §5 | Yes |
 | 2 | Implement the **6 core lifecycle states** (requested through documented). Financial states (invoiced, collected, verified) are optional extensions. | §6 | Yes |
 | 3 | Handle **at least 3 exception flows** | §7 | Yes |
-| 4 | Expose an **API that an MCP server can connect to** | §13 | Yes |
+| 4 | Expose **at least one machine-readable binding** implementing the required Core profiles, declaring supported profiles and versions. HTTP (normative), MCP (reference, RECOMMENDED for agents), A2A, or an equivalent binding. A purely HTTP implementation is conformant without MCP | §13 + [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) | Yes |
 | 5 | Model Service Orders (§8 schema) | §8 | No |
 | 6 | Implement the Delegated Agency Model | §10 | No |
 | 7 | Implement Provider Profiles | §12 | No |
@@ -244,7 +248,7 @@ From PROTOCOL.md §16. To be listed as a compatible Servicialo implementation:
 
 ## 7. API Surface
 
-The MCP server connects to a backend via an adapter. The backend must expose endpoints covering these operations (inferred from tool definitions). HTTP routes are not prescribed by the protocol — each implementation chooses its own REST surface.
+One integration path — not the only one — is connecting the reference MCP server to your backend via an adapter; alternatively, implement the operations directly through the HTTP binding. Either way, the backend must expose endpoints covering these operations (inferred from tool definitions). HTTP routes are not prescribed by the protocol — each implementation chooses its own REST surface.
 
 ### Discovery (public, no auth)
 

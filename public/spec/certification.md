@@ -14,6 +14,12 @@ certification program **planned for the future**.
 > The automated certification suite described at the end of this document is
 > a roadmap item — it does not exist yet, and no weekly re-testing runs today.
 
+> **Binding-neutral.** Core conformance (Level 1) requires at least one
+> machine-readable binding implementing the required profiles — HTTP, MCP,
+> A2A, or an equivalent. A purely HTTP implementation is conformant without
+> MCP; exposing an MCP server is part of Level 3 (network participation) and
+> the RECOMMENDED path for agentic integrations.
+
 ## Conformance Levels
 
 ### Level 1 — Core

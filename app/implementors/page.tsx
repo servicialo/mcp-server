@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { getVerifiedImplementors } from "@/lib/telemetry-stats";
 import type { VerifiedImplementor } from "@/lib/telemetry-stats";
 import { PageHeader } from "@/components/PageHeader";
+import { MaturityBadge } from "@/components/MaturityBadge";
 import { TierBadge, type ImplementationTier } from "@/components/TierBadge";
 import { Footer } from "@/components/Footer";
-import { IMPLEMENTATIONS } from "@/lib/manifest";
+import { IMPLEMENTATIONS, MANIFEST, PROFILES } from "@/lib/manifest";
 
 export const revalidate = 60;
 
@@ -93,16 +94,41 @@ function ImplementorCard({ impl }: { impl: VerifiedImplementor }) {
           </span>
         )}
         {impl.node_count > 1 && (
-          <span>{impl.node_count} instalaciones</span>
+          <span>{impl.node_count} hosts únicos</span>
         )}
       </div>
     </div>
   );
 }
 
+/**
+ * Per-profile coverage of the reference implementation, derived entirely from
+ * protocol/manifest.yaml: implemented operations vs. specified-but-
+ * unimplemented operations. Never hand-written — "Completa" only appears
+ * when the manifest lists no pending operation for the profile.
+ */
+function profileCoverage() {
+  return PROFILES.map((p) => {
+    const implemented = MANIFEST.tools.filter((t) => t.profile === p.id).length;
+    const pending = MANIFEST.specified_unimplemented_tools.filter(
+      (t) => t.profile === p.id
+    ).length;
+    return {
+      id: p.id,
+      name: p.name,
+      status: p.status,
+      implemented,
+      total: implemented + pending,
+      complete: pending === 0,
+    };
+  });
+}
+
 export default async function ImplementorsPage() {
   const implementors = await getVerifiedImplementors();
   const coordinalo = IMPLEMENTATIONS.find((i) => i.id === "coordinalo");
+  const coverage = profileCoverage();
+  const stableComplete = coverage.filter((c) => c.status === "stable" && c.complete);
 
   return (
     <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-12 pb-24">
@@ -131,49 +157,98 @@ export default async function ImplementorsPage() {
         </div>
       </section>
 
-      {/* Implementors grid */}
-      {implementors.length > 0 ? (
+      {/* Reference implementation — always listed, coverage derived from the manifest */}
+      <section className="mb-14">
+        <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+          Implementación de referencia
+        </h2>
+        <div className="rounded-xl border border-border p-6 bg-surface mb-4">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <h3 className="font-serif text-lg text-text leading-tight">
+              <a
+                href={coordinalo?.url ?? "https://coordinalo.com"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent transition-colors"
+              >
+                Coordinalo
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline ml-1 opacity-40">
+                  <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
+            </h3>
+            <TierBadge tier="referencia" />
+          </div>
+          <p className="text-[13px] text-text-muted leading-relaxed mb-3">
+            Coordinalo es la implementación de referencia de Servicialo, en
+            producción desde {coordinalo?.since ?? "2026-03-31"} (vertical
+            salud). Implementa completo el núcleo estable (
+            {stableComplete.map((c) => c.name).join(", ")}) y ofrece cobertura
+            parcial o experimental de los perfiles adicionales, según su
+            manifest de conformidad.
+          </p>
+          <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-muted">
+            <span className="inline-flex items-center gap-1">
+              <span className="text-base leading-none">{countryFlag('CL')}</span>
+              Chile
+            </span>
+          </div>
+        </div>
+
+        {/* Coverage matrix — derived from protocol/manifest.yaml */}
+        <div className="rounded-xl border border-border overflow-hidden">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-border bg-surface-alt">
+                <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Perfil</th>
+                <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Estado</th>
+                <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Cobertura</th>
+                <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Verificación</th>
+              </tr>
+            </thead>
+            <tbody>
+              {coverage.map((c) => (
+                <tr key={c.id} className="border-b border-border last:border-b-0">
+                  <td className="px-4 py-2.5 font-mono text-xs text-text">{c.name}</td>
+                  <td className="px-4 py-2.5"><MaturityBadge maturity={c.status} /></td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-text-muted">
+                    {c.complete
+                      ? `Completa — ${c.implemented}/${c.total} operaciones`
+                      : `Parcial — ${c.implemented} de ${c.total} operaciones`}
+                  </td>
+                  <td className="px-4 py-2.5 font-mono text-xs text-text-muted">Manual</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-[12px] text-text-dim leading-[1.6]">
+          La matriz se deriva de{" "}
+          <a
+            href="https://github.com/servicialo/mcp-server/blob/main/protocol/manifest.yaml"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline"
+          >
+            protocol/manifest.yaml
+          </a>{" "}
+          (operaciones implementadas vs. especificadas) — no se edita a mano.
+          Conformance: {coordinalo?.conformance ?? "revisión manual; suite automatizada en el roadmap"}
+        </p>
+      </section>
+
+      {/* Telemetry-verified implementors, when any exist */}
+      {implementors.length > 0 && (
         <section className="mb-14">
+          <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+            Implementaciones verificadas
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {implementors.map((impl) => (
               <ImplementorCard key={impl.impl_name} impl={impl} />
             ))}
-          </div>
-        </section>
-      ) : (
-        <section className="mb-14">
-          {/* Coordinalo is always listed as the reference implementation */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
-            <div className="rounded-xl border border-border p-6 bg-surface">
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <h3 className="font-serif text-lg text-text leading-tight">
-                  <a
-                    href={coordinalo?.url ?? "https://coordinalo.com"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-accent transition-colors"
-                  >
-                    Coordinalo
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline ml-1 opacity-40">
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </a>
-                </h3>
-                <TierBadge tier="referencia" />
-              </div>
-              <p className="text-[13px] text-text-muted leading-relaxed mb-3">
-                Vertical salud. Cobertura completa de perfiles del protocolo. En
-                producción desde {coordinalo?.since ?? "2026-03-31"}.
-              </p>
-              <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-muted">
-                <span className="inline-flex items-center gap-1">
-                  <span className="text-base leading-none">{countryFlag('CL')}</span>
-                  Chile
-                </span>
-              </div>
-            </div>
           </div>
         </section>
       )}
