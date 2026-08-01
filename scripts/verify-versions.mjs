@@ -8,6 +8,8 @@
  *   - SPEC.md source-of-truth line    (Source of truth: PROTOCOL.md vX)
  *   - CHANGELOG.md newest entry       (## [Protocol vX])
  *   - spec/HTTP_PROFILE.md header     (| **Protocol Version** | X |)
+ *   - IMPLEMENTING.md header          (**Versión del protocolo:** X)
+ *   - IMPLEMENTING.en.md header       (**Protocol version:** X)
  *
  * The MCP package version lives in bindings.mcp.package_version and must
  * match packages/mcp-server/package.json and server.json (both spots).
@@ -57,6 +59,8 @@ check('PROTOCOL.md header', extract('PROTOCOL.md', new RegExp(String.raw`\|\s*\*
 check('SPEC.md source line', extract('SPEC.md', new RegExp(String.raw`Source of truth:.*?PROTOCOL\.md.*?v${SEMVERISH}`)), V);
 check('CHANGELOG.md newest', extract('CHANGELOG.md', new RegExp(String.raw`^## \[Protocol v${SEMVERISH}\]`, 'm')), V);
 check('spec/HTTP_PROFILE.md', extract('spec/HTTP_PROFILE.md', new RegExp(String.raw`\|\s*\*\*Protocol Version\*\*\s*\|\s*${SEMVERISH}\s*\|`)), V);
+check('IMPLEMENTING.md header', extract('IMPLEMENTING.md', new RegExp(String.raw`\*\*Versión del protocolo:\*\*\s*${SEMVERISH}`)), V);
+check('IMPLEMENTING.en.md header', extract('IMPLEMENTING.en.md', new RegExp(String.raw`\*\*Protocol version:\*\*\s*${SEMVERISH}`)), V);
 
 // Package version surfaces
 const pkg = JSON.parse(read('packages/mcp-server/package.json'));

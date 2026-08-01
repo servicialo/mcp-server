@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getEntry, updateEntry, AuthError } from '@/lib/registry-db';
+import { getEntry, updateEntry, AuthError, PROFILE_IDS } from '@/lib/registry-db';
 import { getOwnershipToken, CORS_HEADERS } from '@/lib/registry-auth';
 
 type Params = { params: Promise<{ country: string; slug: string }> };
@@ -47,7 +47,10 @@ export async function GET(
  * PATCH /api/registry/{country}/{slug}
  *
  * Update a registry entry. Requires ownership token in Authorization header.
- * Body: { endpointUrl?, displayName?, verticals?, metadata? }
+ * Body: { endpointUrl?, displayName?, verticals?, metadata?, discoverable?, supportedProfiles? }
+ *
+ * reviewStatus and conformanceLevel are NOT owner-updatable — they are
+ * assigned by the Servicialo review process.
  */
 export async function PATCH(
   request: NextRequest,
@@ -79,6 +82,22 @@ export async function PATCH(
   if (Array.isArray(body.verticals)) updateData.verticals = body.verticals;
   if (body.metadata && typeof body.metadata === 'object') updateData.metadata = body.metadata;
   if (typeof body.discoverable === 'boolean') updateData.discoverable = body.discoverable;
+  if (body.supportedProfiles !== undefined) {
+    if (!Array.isArray(body.supportedProfiles) || body.supportedProfiles.some((p) => typeof p !== 'string')) {
+      return NextResponse.json(
+        { error: 'Invalid field: supportedProfiles must be an array of strings' },
+        { status: 400, headers: CORS_HEADERS },
+      );
+    }
+    const unknown = body.supportedProfiles.filter((p) => !(PROFILE_IDS as readonly string[]).includes(p));
+    if (unknown.length > 0) {
+      return NextResponse.json(
+        { error: `Unknown profile id(s): ${unknown.join(', ')}. Valid: ${PROFILE_IDS.join(', ')}` },
+        { status: 400, headers: CORS_HEADERS },
+      );
+    }
+    updateData.supported_profiles = body.supportedProfiles;
+  }
 
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json(

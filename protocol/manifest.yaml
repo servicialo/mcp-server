@@ -110,7 +110,7 @@ bindings:
   mcp:
     maturity: stable             # reference binding, in production (Coordinalo)
     package: "@servicialo/mcp-server"
-    package_version: "0.9.12"    # verify-versions.mjs compares with package.json + server.json
+    package_version: "0.9.13"    # verify-versions.mjs compares with package.json + server.json
     transports: [stdio, streamable-http]
     remote: https://servicialo.com/api/mcp
   a2a:
@@ -271,4 +271,4 @@ implementations:
     status: live
     url: https://coordinalo.com
     since: "2026-03-31"
-    conformance: "Manual review (2026-06). Automated certification suite: roadmap."
+    conformance: "CORE — manual review (2026-06). Automated certification suite: roadmap."

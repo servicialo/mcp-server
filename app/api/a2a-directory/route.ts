@@ -22,7 +22,13 @@ export async function GET(request: NextRequest) {
       const skills: string[] = ['discovery'];
       const metadata = entry.metadata as Record<string, unknown>;
       if ((metadata?.service_count as number) > 0) skills.push('catalog');
-      if (entry.is_verified) skills.push('scheduling', 'booking');
+      // Skill announcement composes two orthogonal facts: what the node
+      // declares (supported_profiles) and whether the listing passed manual
+      // review (review_status). The old is_verified coupled both in one bit.
+      const reviewed = entry.review_status === 'reviewed';
+      const profiles = entry.supported_profiles ?? [];
+      if (reviewed && profiles.includes('coordination')) skills.push('scheduling');
+      if (reviewed && profiles.includes('ordering')) skills.push('booking');
 
       return {
         name: entry.display_name,

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { createEntry, ConflictError } from '@/lib/registry-db';
+import { createEntry, ConflictError, PROFILE_IDS } from '@/lib/registry-db';
 import { requireApiKey, CORS_HEADERS } from '@/lib/registry-auth';
 import { validateSlug, validateCountry, validateUrl } from '@/lib/servicialo/validation';
 
@@ -17,6 +17,7 @@ import { validateSlug, validateCountry, validateUrl } from '@/lib/servicialo/val
  *   implementer: "coordinalo",
  *   verticals?: ["kinesiologia"],
  *   locale?: "es",
+ *   supportedProfiles?: ["discovery", "coordination"],   // manifest profile ids, self-declared
  *   metadata?: { service_count, provider_count, description, location, logo_url }
  * }
  */
@@ -70,6 +71,26 @@ export async function POST(request: NextRequest) {
     ? body.verticals.filter((v): v is string => typeof v === 'string')
     : [];
 
+  // supported_profiles is a closed vocabulary (manifest profile ids) —
+  // unknown ids are a 400, not a silent drop.
+  let supportedProfiles: string[] = [];
+  if (body.supportedProfiles !== undefined) {
+    if (!Array.isArray(body.supportedProfiles) || body.supportedProfiles.some((p) => typeof p !== 'string')) {
+      return NextResponse.json(
+        { error: 'Invalid field: supportedProfiles must be an array of strings' },
+        { status: 400, headers: CORS_HEADERS },
+      );
+    }
+    const unknown = body.supportedProfiles.filter((p) => !(PROFILE_IDS as readonly string[]).includes(p));
+    if (unknown.length > 0) {
+      return NextResponse.json(
+        { error: `Unknown profile id(s): ${unknown.join(', ')}. Valid: ${PROFILE_IDS.join(', ')}` },
+        { status: 400, headers: CORS_HEADERS },
+      );
+    }
+    supportedProfiles = body.supportedProfiles as string[];
+  }
+
   const metadata = body.metadata && typeof body.metadata === 'object'
     ? body.metadata as Record<string, unknown>
     : {};
@@ -83,6 +104,7 @@ export async function POST(request: NextRequest) {
       implementer: body.implementer as string,
       verticals,
       locale: typeof body.locale === 'string' ? body.locale : 'es',
+      supported_profiles: supportedProfiles,
       metadata,
     });
 
@@ -94,7 +116,11 @@ export async function POST(request: NextRequest) {
         endpointUrl: entry.endpoint_url,
         implementer: entry.implementer,
         ownershipToken: entry.ownership_token,
+        // isVerified is a deprecated alias of reviewStatus === 'reviewed'.
         isVerified: entry.is_verified,
+        reviewStatus: entry.review_status,
+        conformanceLevel: entry.conformance_level,
+        supportedProfiles: entry.supported_profiles,
       },
       { status: 201, headers: CORS_HEADERS },
     );

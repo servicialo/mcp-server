@@ -1,19 +1,28 @@
 /**
- * Servicialo Conformance Test Suite
+ * Servicialo HTTP Binding Compatibility Suite
  *
- * Verifies that any implementation exposing SERVICIALO_BASE_URL
- * complies with the Servicialo protocol (HTTP_PROFILE.md).
+ * Verifies that an implementation exposing SERVICIALO_BASE_URL is
+ * compatible with the HTTP binding (spec/HTTP_PROFILE.md): the expected
+ * endpoints exist and respond with plausible statuses and shapes across
+ * lifecycle phases 0–6.
+ *
+ * What this suite does NOT do: certify protocol conformance. Conformance
+ * (levels CORE / FULL) covers the normative requirements — 8-dimension
+ * modeling, strict lifecycle ordering, exception flows, schema validity —
+ * and is assessed today by manual review against the requirement matrix in
+ * public/spec/certification.md. The label CONFORMANT is reserved for that
+ * assessment; this suite reports HTTP-COMPATIBLE at best.
  *
  * Usage:
  *   SERVICIALO_BASE_URL=https://your-backend.com \
  *   SERVICIALO_API_KEY=your_api_key \
  *   SERVICIALO_ORG_ID=your_org_slug \
- *   npm run test:conformance --prefix packages/mcp-server
+ *   npm run test:http-compat --prefix packages/mcp-server
  *
  * Results:
- *   CONFORMANT     — phases 0–4 pass (required for listing)
- *   PARTIAL        — some phases pass
- *   NON-CONFORMANT — no phases pass
+ *   HTTP-COMPATIBLE — phases 0–4 pass (required to request a listing)
+ *   PARTIAL         — some phases pass
+ *   NOT-COMPATIBLE  — no phases pass
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -651,7 +660,7 @@ afterAll(() => {
   ];
 
   console.log('\n' + '='.repeat(60));
-  console.log('  SERVICIALO CONFORMANCE TEST REPORT');
+  console.log('  SERVICIALO HTTP COMPATIBILITY REPORT');
   console.log('='.repeat(60));
   console.log(`  Target: ${BASE_URL}`);
   console.log(`  Org:    ${ORG_ID ?? '(none)'}`);
@@ -683,28 +692,31 @@ afterAll(() => {
   const coverage = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
   console.log(`  Tests:    ${totalPassed}/${totalTests} passed (${coverage}%)`);
 
-  // Conformance level
+  // HTTP compatibility level (NOT protocol conformance — see certification.md)
   const requiredPhases = ['phase-0', 'phase-1', 'phase-2', 'phase-3', 'phase-4'];
   const requiredPassed = requiredPhases.every((p) => phasePassed.includes(p));
 
   let level: string;
   if (requiredPassed) {
-    level = 'CONFORMANT';
+    level = 'HTTP-COMPATIBLE';
   } else if (phasePassed.length > 0) {
     level = 'PARTIAL';
   } else {
-    level = 'NON-CONFORMANT';
+    level = 'NOT-COMPATIBLE';
   }
 
   console.log(`  Phases:   ${phasePassed.length}/${phases.length} passed`);
   console.log(`  Result:   ${level}`);
 
-  if (level === 'CONFORMANT') {
-    console.log('\n  ✓ This implementation meets Servicialo conformance requirements.');
-    console.log('    Phases 5–6 are optional in v0.9 but required for regulated verticals.');
+  if (level === 'HTTP-COMPATIBLE') {
+    console.log('\n  ✓ This implementation exposes a compatible HTTP binding surface.');
+    console.log('    Phases 5–6 are optional in v0.10 but required for regulated verticals.');
+    console.log('    Note: this suite verifies HTTP binding compatibility only.');
+    console.log('    Protocol conformance (CORE / FULL) is assessed against the');
+    console.log('    requirement matrix in public/spec/certification.md.');
   } else if (level === 'PARTIAL') {
     console.log(`\n  Failing phases: ${phaseFailed.join(', ')}`);
-    console.log('  Fix failing phases 0–4 to reach CONFORMANT status.');
+    console.log('  Fix failing phases 0–4 to reach HTTP-COMPATIBLE status.');
   } else {
     console.log('\n  No phases passed. Review HTTP_PROFILE.md for endpoint requirements.');
   }

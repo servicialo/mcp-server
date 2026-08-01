@@ -29,6 +29,22 @@ function restUrl(path: string) {
 
 // ─── Types ───
 
+/**
+ * Capability profile ids (protocol/manifest.yaml `profiles`). Closed
+ * vocabulary — `supported_profiles` values must come from this list.
+ */
+export const PROFILE_IDS = [
+  'discovery',
+  'ordering',
+  'coordination',
+  'delivery',
+  'evidence',
+  'settlement',
+  'network',
+] as const;
+
+export type ProfileId = (typeof PROFILE_IDS)[number];
+
 export interface RegistryEntry {
   id: string;
   country: string;
@@ -38,7 +54,18 @@ export interface RegistryEntry {
   implementer: string;
   verticals: string[];
   locale: string;
+  /**
+   * DEPRECATED: equals review_status === 'reviewed'. Kept for wire
+   * compatibility. Do not use for capability gating — use
+   * supported_profiles (+ review_status) instead.
+   */
   is_verified: boolean;
+  /** Manual listing review by the Servicialo team. */
+  review_status: 'unreviewed' | 'reviewed';
+  /** Conformance level per public/spec/certification.md. Assigned by review. */
+  conformance_level: 'unverified' | 'core' | 'full';
+  /** Self-declared capability profiles (PROFILE_IDS). */
+  supported_profiles: string[];
   discoverable: boolean;
   ownership_token: string;
   last_heartbeat: string | null;
@@ -134,6 +161,7 @@ export async function createEntry(data: {
   implementer: string;
   verticals?: string[];
   locale?: string;
+  supported_profiles?: string[];
   metadata?: Record<string, unknown>;
 }): Promise<RegistryEntry> {
   const res = await fetch(restUrl('registry_entries'), {
@@ -148,6 +176,9 @@ export async function createEntry(data: {
       verticals: data.verticals ?? [],
       locale: data.locale ?? 'es',
       discoverable: false, // Orgs must explicitly opt in
+      // Self-declared; review_status/conformance_level stay at their
+      // defaults ('unreviewed'/'unverified') until the team reviews.
+      supported_profiles: data.supported_profiles ?? [],
       metadata: data.metadata ?? {},
     }),
   });
@@ -171,7 +202,9 @@ export async function updateEntry(
   country: string,
   slug: string,
   ownershipToken: string,
-  data: Partial<Pick<RegistryEntry, 'endpoint_url' | 'display_name' | 'verticals' | 'metadata' | 'discoverable'>>,
+  // supported_profiles is self-declared and owner-updatable; review_status
+  // and conformance_level are NOT — they are assigned by the review process.
+  data: Partial<Pick<RegistryEntry, 'endpoint_url' | 'display_name' | 'verticals' | 'metadata' | 'discoverable' | 'supported_profiles'>>,
 ): Promise<RegistryEntry | null> {
   // First verify ownership
   const entry = await getEntry(country, slug);

@@ -2,7 +2,7 @@
 
 A step-by-step guide for building a Servicialo-compatible platform. You don't need to implement everything — just the core that makes your service data interoperable.
 
-> **Protocol version:** 0.8 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
+> **Protocol version:** 0.10 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
 
 ---
 
@@ -326,7 +326,7 @@ For a complete walkthrough with request/response examples, see [`examples/minima
 
 The MCP server is the bridge between AI agents and your API. You have two options:
 
-**Option A: Use the reference MCP server** and configure it to point at your API:
+**Option A: Use the reference MCP server** with the `http` adapter, pointed at your backend:
 
 ```json
 {
@@ -335,8 +335,9 @@ The MCP server is the bridge between AI agents and your API. You have two option
       "command": "npx",
       "args": ["-y", "@servicialo/mcp-server"],
       "env": {
+        "SERVICIALO_ADAPTER": "http",
+        "SERVICIALO_BASE_URL": "https://your-backend.com",
         "SERVICIALO_API_KEY": "your_api_key",
-        "SERVICIALO_API_BASE": "https://your-api.com/v1",
         "SERVICIALO_ORG_ID": "your_org_id"
       }
     }
@@ -344,7 +345,7 @@ The MCP server is the bridge between AI agents and your API. You have two option
 }
 ```
 
-[SPEC GAP] The reference MCP server (`@servicialo/mcp-server`) currently targets the Coordinalo API. To use it with a different backend, you'd need to implement the same API contract or fork the server. A pluggable adapter layer is not yet specified.
+The reference server ships a pluggable adapter layer (`SERVICIALO_ADAPTER`): `coordinalo` (default, Coordinalo-style backend) and `http`, which translates every tool handler to the canonical `/v1/*` endpoints of [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md). If your backend exposes the HTTP profile, no fork or modification is needed — see [Step 8](#step-8--verify-http-compatibility).
 
 **Option B: Build your own MCP server** that wraps your API. The `@modelcontextprotocol/sdk` package handles the MCP protocol — you just implement the tool handlers:
 
@@ -421,15 +422,16 @@ npx ajv-cli validate -s schema/service.schema.json -d your-service.json
 
 ### Get listed
 
-Once your implementation passes the checklist:
+The listing process is single and defined in [IMPLEMENTORS.md](./IMPLEMENTORS.md):
 
-1. [Open an issue](https://github.com/servicialo/mcp-server/issues) with:
-   - Your platform name and vertical
-   - Coverage: dimensions / states / exception flows
-   - API endpoint or MCP server package
-2. A maintainer will verify and add you to the [Implementations table](./README.md#implementations).
+1. Run the HTTP compatibility suite (Step 8) and save the output.
+2. Open a **PR** adding your row to the IMPLEMENTORS.md table, including the
+   suite output and evidence for the checklist above (dimensions / states /
+   exception flows).
+3. The team reviews against the [conformance matrix](./public/spec/certification.md)
+   and assigns a CORE or FULL level before merging.
 
-**Done when:** Your implementation passes all 7 checks and is listed in the README.
+**Done when:** Your implementation passes all 7 checks and your IMPLEMENTORS.md PR is merged.
 
 ---
 
@@ -456,20 +458,28 @@ These are not required for compliance but are defined in the spec:
 
 ---
 
-## Step 8 — Verify conformance
+## Step 8 — Verify HTTP compatibility
 
 Before requesting a listing in the official registry, verify that your implementation
-passes the conformance suite:
+passes the HTTP compatibility suite:
 
 ```bash
 SERVICIALO_BASE_URL=https://your-backend.com \
 SERVICIALO_API_KEY=your_api_key \
 SERVICIALO_ORG_ID=your_org_id \
-npm run test:conformance --prefix packages/mcp-server
+npm run test:http-compat --prefix packages/mcp-server
 ```
 
-A `CONFORMANT` implementation covers phases 0–4 (Resolve, Discover, Understand,
-Commit, Manage). Phases 5–6 (Verify, Close) are optional in v0.9 but required for
+An `HTTP-COMPATIBLE` implementation covers phases 0–4 (Resolve, Discover, Understand,
+Commit, Manage). Phases 5–6 (Verify, Close) are optional in v0.10 but required for
 listing in regulated verticals (health, legal).
 
-Save the test output — you will need it when opening the PR in [IMPLEMENTORS.md](./IMPLEMENTORS.md).
+**What this suite certifies and what it does not:** it verifies that your HTTP
+surface exposes the [HTTP profile](./spec/HTTP_PROFILE.md) endpoints and that they
+respond with plausible shapes. It does **not** certify protocol conformance: the
+normative requirements (8 dimensions, strict lifecycle ordering, exception flows,
+schema validity) are verified by manual review against the
+[requirement → verification matrix](./public/spec/certification.md#requirement--verification-matrix),
+which assigns the **CORE** or **FULL** level.
+
+Save the suite output — you will need it when opening the PR in [IMPLEMENTORS.md](./IMPLEMENTORS.md).

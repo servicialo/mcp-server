@@ -2,7 +2,7 @@
 
 Guía paso a paso para construir una plataforma compatible con Servicialo. No necesitas implementar todo — solo el core que hace tus datos de servicio interoperables.
 
-> **Versión del protocolo:** 0.9 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
+> **Versión del protocolo:** 0.10 · **Spec:** [`PROTOCOL.md`](./PROTOCOL.md) · **Schema:** [`schema/service.schema.json`](./schema/service.schema.json)
 >
 > **[Read in English](./IMPLEMENTING.en.md)**
 
@@ -344,7 +344,7 @@ Para un walkthrough completo con ejemplos de request/response, ver [`examples/mi
 
 El servidor MCP es el puente entre agentes AI y tu API. Tienes dos opciones:
 
-**Opción A: Usar el servidor MCP de referencia** y configurarlo para apuntar a tu API:
+**Opción A: Usar el servidor MCP de referencia** con el adapter `http`, apuntándolo a tu backend:
 
 ```json
 {
@@ -353,8 +353,9 @@ El servidor MCP es el puente entre agentes AI y tu API. Tienes dos opciones:
       "command": "npx",
       "args": ["-y", "@servicialo/mcp-server"],
       "env": {
+        "SERVICIALO_ADAPTER": "http",
+        "SERVICIALO_BASE_URL": "https://tu-backend.com",
         "SERVICIALO_API_KEY": "tu_api_key",
-        "SERVICIALO_API_BASE": "https://tu-api.com/v1",
         "SERVICIALO_ORG_ID": "tu_org_id"
       }
     }
@@ -362,7 +363,7 @@ El servidor MCP es el puente entre agentes AI y tu API. Tienes dos opciones:
 }
 ```
 
-[SPEC GAP] El servidor MCP de referencia (`@servicialo/mcp-server`) actualmente apunta a la API de Coordinalo. Para usarlo con otro backend, necesitarías implementar el mismo contrato de API o hacer un fork del servidor. Una capa de adaptadores pluggable aún no está especificada.
+El servidor de referencia tiene una capa de adapters pluggable (`SERVICIALO_ADAPTER`): `coordinalo` (default, backend estilo Coordinalo) y `http`, que traduce todos los tool handlers a los endpoints canónicos `/v1/*` de [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md). Si tu backend expone el HTTP profile, no necesitas fork ni modificaciones — ver [Conectar el MCP server a tu implementación](#conectar-el-mcp-server-a-tu-implementación).
 
 **Opción B: Construir tu propio servidor MCP** que envuelva tu API. El paquete `@modelcontextprotocol/sdk` maneja el protocolo MCP — tú solo implementas los handlers de herramientas:
 
@@ -441,15 +442,16 @@ npx ajv-cli validate -s schema/service.schema.json -d tu-servicio.json
 
 ### Aparecer en el listado
 
-Una vez que tu implementación pasa el checklist:
+El proceso de listing es único y está definido en [IMPLEMENTORS.md](./IMPLEMENTORS.md):
 
-1. [Abre un issue](https://github.com/servicialo/mcp-server/issues) con:
-   - Nombre de tu plataforma y vertical
-   - Cobertura: dimensiones / estados / flujos de excepción
-   - Endpoint de API o paquete de servidor MCP
-2. Un maintainer verificará y te agregará a la [tabla de Implementaciones](./README.md#implementations).
+1. Corre la suite de compatibilidad HTTP (Paso 8) y guarda el output.
+2. Abre un **PR** que agregue tu fila a la tabla de IMPLEMENTORS.md, incluyendo
+   el output de la suite y evidencia del checklist de arriba (dimensiones /
+   estados / flujos de excepción).
+3. El equipo revisa contra la [matriz de conformance](./public/spec/certification.md)
+   y asigna nivel CORE o FULL antes de mergear.
 
-**Listo cuando:** Tu implementación pasa las 7 verificaciones y aparece en el README.
+**Listo cuando:** Tu implementación pasa las 7 verificaciones y tu PR a IMPLEMENTORS.md fue mergeado.
 
 ---
 
@@ -480,23 +482,31 @@ canónicos de tu implementación. No necesitas modificar el package.
 
 ---
 
-## Paso 8 — Verificar conformance
+## Paso 8 — Verificar compatibilidad HTTP
 
 Antes de solicitar el listing en el registro oficial, verifica que tu implementación
-pasa el suite de conformance:
+pasa la suite de compatibilidad HTTP:
 
 ```bash
 SERVICIALO_BASE_URL=https://tu-backend.com \
 SERVICIALO_API_KEY=tu_api_key \
 SERVICIALO_ORG_ID=tu_org_id \
-npm run test:conformance --prefix packages/mcp-server
+npm run test:http-compat --prefix packages/mcp-server
 ```
 
-Una implementación `CONFORMANT` cubre las fases 0–4 (Resolver, Descubrir, Entender,
-Comprometer, Gestionar). Las fases 5–6 (Verificar, Cerrar) son opcionales en v0.9
-pero requeridas para listing en verticales regulados (salud, legal).
+Una implementación `HTTP-COMPATIBLE` cubre las fases 0–4 (Resolver, Descubrir,
+Entender, Comprometer, Gestionar). Las fases 5–6 (Verificar, Cerrar) son opcionales
+en v0.10 pero requeridas para listing en verticales regulados (salud, legal).
 
-Guarda el output del test — lo necesitarás al abrir el PR en [IMPLEMENTORS.md](./IMPLEMENTORS.md).
+**Qué certifica esta suite y qué no:** verifica que tu superficie HTTP expone los
+endpoints del [HTTP profile](./spec/HTTP_PROFILE.md) y que responden con formas
+plausibles. **No** certifica conformance del protocolo: los requisitos normativos
+(8 dimensiones, orden estricto del ciclo de vida, flujos de excepción, validez de
+schema) se verifican por revisión manual contra la
+[matriz requisito → prueba](./public/spec/certification.md#requirement--verification-matrix),
+que asigna el nivel **CORE** o **FULL**.
+
+Guarda el output de la suite — lo necesitarás al abrir el PR en [IMPLEMENTORS.md](./IMPLEMENTORS.md).
 
 ---
 

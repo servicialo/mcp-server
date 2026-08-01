@@ -32,7 +32,7 @@ What's already shipped:
 
 _Target: Protocol v0.10 (current) → v1.0_
 
-- [ ] **Conformance test suite** — portable tests any implementation can run to verify protocol compliance (separate from MCP server unit tests).
+- [ ] **Conformance test suite** — portable tests any implementation can run to verify protocol compliance (separate from MCP server unit tests). What ships today is the **HTTP compatibility suite** (`test:http-compat`, portable, runs against any `SERVICIALO_BASE_URL`): it verifies the HTTP binding surface, not the normative requirements. The conformance suite proper (schema validity, invalid-transition rejection, exception flows — the manual-review column of the [matrix](./public/spec/certification.md#requirement--verification-matrix)) remains open.
 - [ ] **Expand evidence verticals** — add at least 2 new verticals beyond Health, Home, Legal, and Education (community-proposed). Consulting was added (1 of 2).
 - [ ] **MCP server hardening** — improve error handling, input validation, and edge-case coverage.
 - [x] **OpenAPI specification** — published as [`spec/openapi.yaml`](./spec/openapi.yaml), the formal API description for the HTTP endpoints consumed by the MCP server.
@@ -52,10 +52,10 @@ _Target: Protocol v0.5 – v0.8_
 - [ ] **Finance extension** — move billing and payment lifecycle from "design" to "stable" status with full schema support.
 - [ ] **Dispute resolution extension** — formalize the 3-phase dispute model into a stable, implementable specification.
 - [x] **Network Intelligence (phase 1)** — telemetry, benchmarks, gating and weekly snapshot are live. Phase 2 (cross-segment comparison, custom windows, implementer-emitted event relay at `/api/webhooks/emit`) is pending and unlocks when ecosystem reaches multiple active contributors.
-- [ ] **Multi-implementation interoperability** — define and test cross-platform compatibility between independent Servicialo implementations.
+- [ ] **Multi-implementation interoperability** — define and test cross-platform compatibility between independent Servicialo implementations. The test harness is ready ([`scripts/verify-interop.mjs`](./scripts/verify-interop.mjs): manifest parity, registry co-discovery, services/availability wire parity, lifecycle vocabulary vs spec enum, agent cards — one agent codepath against two backends). Execution blocked on the second backend existing; until it runs against a real node B, this item stays open.
 - [ ] **Agent SDK / client libraries** — reference libraries (TypeScript, Python) for building Servicialo-aware AI agents.
 - [x] **Webhook / event specification** — [`WEBHOOKS.md`](./WEBHOOKS.md) v0.2 defines registry-emitted events and the subscription contract. Implementer-emitted events (`service.state_changed`, `payment.received`, etc.) are spec-only — the registry relay is a phase-2 item.
-- [ ] **Tiers de conformance: CORE vs FULL** — hoy un implementador puede ser CONFORMANT sin cubrir las fases 5–6 (delivery + cierre financiero), porque están marcadas como opcionales en v0.9. A medida que la red crezca, necesitaremos distinguir: CORE (fases 0–4: discovery, scheduling, lifecycle) vs FULL (fases 0–6: + delivery evidence + financial close). Esto afecta la tabla de IMPLEMENTORS.md, el conformance test suite, y potencialmente el `trust_score` del protocolo.
+- [x] **Tiers de conformance: CORE vs FULL** — definidos en [certification.md](./public/spec/certification.md): CORE (requisitos 1–5), FULL (1–10), NETWORK (opcional), con matriz requisito → prueba que declara qué verifica la suite automatizada y qué queda en revisión manual. La tabla de IMPLEMENTORS.md ya reporta el nivel. Pendiente (cubierto por "Conformance test suite" arriba): que el nivel sea un veredicto automatizado y su eventual efecto en `trust_score`.
 - [ ] **Governance expansion** — establish a contributors group and formalize the RFC review process with multiple reviewers.
 
 ## Long Term — Standard Maturity

@@ -4,10 +4,10 @@
 
 ## Cómo listar tu implementación
 
-1. Corre el conformance test suite contra tu backend (ver [IMPLEMENTING.md paso 8](./IMPLEMENTING.md#paso-8--verificar-conformance)).
+1. Corre la suite de compatibilidad HTTP contra tu backend (ver [IMPLEMENTING.md paso 8](./IMPLEMENTING.md#paso-8--verificar-compatibilidad-http)). El resultado esperado es `HTTP-COMPATIBLE` — eso verifica el binding HTTP, no la conformance completa.
 2. Abre un PR que agregue tu fila a la tabla de abajo.
-3. Incluye en la descripción del PR el output completo del conformance test.
-4. El equipo de Servicialo revisa la cobertura de fases y mergea si es ≥ CONFORMANT.
+3. Incluye en la descripción del PR el output completo de la suite y evidencia de los requisitos normativos (checklist de IMPLEMENTING.md paso 7).
+4. El equipo de Servicialo revisa contra la [matriz requisito → prueba](./public/spec/certification.md#requirement--verification-matrix), asigna nivel **CORE** o **FULL**, y mergea si el nivel es ≥ CORE.
 
 Las implementaciones listadas son verificadas — no aceptamos auto-declaraciones
 sin evidencia de conformance. **La verificación es manual hoy** (revisión del
@@ -76,7 +76,7 @@ When you pass these, open a PR adding your platform to the table below.
 
 | Plataforma | Vertical | Cobertura de perfiles | Conformance | Estado |
 |------------|----------|----------------------|:-----------:|:------:|
-| [**Coordinalo**](https://coordinalo.com) | Healthcare | Core estable completo (Discovery, Coordination, Delivery); Evidence completo (candidate); Ordering parcial (`service_orders.*` y `mandates.*` especificadas sin implementar); Settlement y Network experimentales — ver [`protocol/manifest.yaml`](./protocol/manifest.yaml) | Revisión manual (2026-06) | Live |
+| [**Coordinalo**](https://coordinalo.com) | Healthcare | Core estable completo (Discovery, Coordination, Delivery); Evidence completo (candidate); Ordering parcial (`service_orders.*` y `mandates.*` especificadas sin implementar); Settlement y Network experimentales — ver [`protocol/manifest.yaml`](./protocol/manifest.yaml) | CORE — revisión manual (2026-06) | Live |
 
 ## What the second implementor gets
 

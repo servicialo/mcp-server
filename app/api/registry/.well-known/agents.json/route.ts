@@ -20,7 +20,11 @@ export async function GET() {
       country: entry.country,
       url: `${entry.endpoint_url}/${entry.slug}/a2a`,
       agentCard: `${entry.endpoint_url}/${entry.slug}/.well-known/agent.json`,
+      // is_verified is a deprecated alias of review_status === 'reviewed'.
       is_verified: entry.is_verified,
+      review_status: entry.review_status,
+      conformance_level: entry.conformance_level,
+      supported_profiles: entry.supported_profiles ?? [],
       last_heartbeat: entry.last_heartbeat,
     }));
 
