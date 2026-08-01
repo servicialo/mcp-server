@@ -31,26 +31,42 @@ export function QueEsSection() {
   return (
     <section id="que-es" className="mb-16">
       <SectionTitle
-        tag="01 — Definición"
-        title="¿Qué significa coordinar un servicio?"
-        subtitle="Agendar, confirmar, verificar, resolver excepciones, cobrar."
+        tag="01 — Qué es"
+        title="¿Qué es Servicialo?"
+        subtitle="Un protocolo de dominio: define qué significa coordinar un servicio, con independencia de la plataforma o el transporte."
       />
 
-      {/* Definición — blockquote */}
+      {/* Definición canónica — blockquote */}
       <blockquote className="border-l-[3px] border-l-accent pl-4 md:pl-6 py-1 mb-6">
         <p className="font-serif text-xl md:text-2xl text-text leading-[1.5]">
-          Coordinar un servicio es garantizar que lo prometido ocurra
-          — y tener un protocolo claro cuando no ocurre.
+          Servicialo es el protocolo abierto de dominio para coordinar
+          servicios. Define objetos y eventos legibles por máquinas para que
+          plataformas, personas y agentes puedan publicar una oferta,
+          establecer una Orden de Servicio, coordinar una entrega, registrar
+          evidencia de lo ocurrido y conectar esa entrega con su facturación y
+          liquidación.
         </p>
       </blockquote>
 
-      {/* Explicación */}
+      <p className="text-sm md:text-[15px] text-text-body leading-[1.8] mb-4">
+        El protocolo separa explícitamente <strong>lo acordado</strong>,{" "}
+        <strong>lo entregado</strong>, <strong>la evidencia disponible</strong>{" "}
+        y <strong>los movimientos financieros</strong>. Cada elemento conserva
+        su propio ciclo de vida. Una Prueba de Servicio es el expediente
+        verificable que vincula esos elementos: no reemplaza el juicio sobre la
+        calidad ni declara automáticamente la verdad del mundo — registra las
+        afirmaciones, evidencias, atestaciones y niveles de certeza asociados a
+        una entrega.
+      </p>
       <p className="text-sm md:text-[15px] text-text-body leading-[1.8] mb-8 md:mb-10">
-        Un servicio no se almacena, no se devuelve y no deja rastro
-        automático de que ocurrió. Coordinar implica cubrir ese vacío:
-        agendar la cita, confirmar asistencia, registrar evidencia de
-        entrega, resolver lo que falla y cerrar el cobro. Es un problema
-        operacional — y necesita un estándar operacional.
+        Coordinar un servicio es <strong>establecer el compromiso, facilitar
+        su ejecución y registrar qué ocurrió</strong> — y tener un protocolo
+        claro cuando algo falla. Servicialo es independiente del transporte:
+        puede exponerse mediante HTTP, MCP, A2A u otros bindings compatibles.{" "}
+        <a href="https://coordinalo.com" className="text-accent hover:underline">
+          Coordínalo
+        </a>{" "}
+        es la implementación de referencia del protocolo — no el protocolo.
       </p>
 
       {/* Comparación 2 columnas */}

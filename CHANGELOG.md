@@ -13,6 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Ships in `@servicialo/mcp-server` v0.9.11+ (package CHANGELOG covers v0.9.11 = code surface, v0.9.12 = docs sync).
 
+### Amended 2026-08-01 — Communication & manifest unification
+
+- **`protocol/manifest.yaml`** — new single source of truth for protocol version, tool surface (40 = 15 public + 25 authenticated), state machines, capability profiles, bindings, extension registry, and implementations. Enforced by three new CI guardrails: `scripts/verify-manifest-tools.mjs`, `scripts/verify-versions.mjs`, `scripts/verify-doc-claims.mjs`.
+- **Version unification** — `PROTOCOL.md` header bumped to 0.10 (this entry had shipped without bumping it); `SPEC.md`, `spec/HTTP_PROFILE.md`, `spec/openapi.yaml`, `server.json` (0.9.12), site and README tables aligned. Resolver wire values (`X-Servicialo-Version: 1.0`) documented as the resolver API version, distinct from the protocol version.
+- **PROTOCOL.md §6.0** — happy-path milestones vs. orthogonal dimensions: the protocol establishes no total order between delivery, evidence, acceptance, and settlement. Errata: §6.3.1 referenced a nonexistent `delivered` state (now `completed`); the v0.8 changelog claimed `mandates.*` tools shipped (they are specified but unimplemented).
+- **New draft extensions** — `state-dimensions` (orthogonal per-dimension state machines) and `proof-of-service` (the verifiable dossier), published under `public/spec/extensions/` and registered in PROTOCOL.md §15.6 with the maturity scale.
+- **Spec mirror consolidated** — `docs/spec/` removed (drifted copy); `public/spec/` is the single served tree. `intents.md` replaced by the newer A2A intent payloads document; `certification.md` rewritten to describe the real process (manual review today, automated suite as roadmap).
+- **Claim honesty across docs and site** — "9 universal/mandatory states" → 6 core + 3 optional financial with the 9-milestone happy path as a view; "80% of disputes resolved automatically" → design goal of the Disputes extension (in design); tool counts unified at 40/15/25; network metrics labeled as MCP-server installations, not adopted implementations; site rebuilt around the protocol thesis with `/extensions` and `/vision` pages separating specified, experimental, in-design, and aspirational content.
+
 Closes the two protocol-level promises: discovery-and-routing (Promise 1) and network intelligence (Promise 2). Both are now functionally complete.
 
 ### Added — A2A endpoint

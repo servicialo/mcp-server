@@ -3,6 +3,11 @@ import createMDX from "@next/mdx";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
+  webpack: (config) => {
+    // protocol/manifest.yaml is imported as raw source and parsed in lib/manifest.ts
+    config.module.rules.push({ test: /\.ya?ml$/, type: "asset/source" });
+    return config;
+  },
   async redirects() {
     return [
       {

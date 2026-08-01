@@ -47,7 +47,7 @@ Servicialo defines four coordination primitives. Together they cover the complet
 
 | Primitive | What it solves | Protocol surface |
 |-----------|---------------|------------------|
-| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 9 lifecycle states, 6 exception flows, 3-variable scheduler |
+| **Schedule coordination** | Multi-party availability intersection (provider, client, resource) with exception handling | 6+3 lifecycle, 6 exception flows, 3-variable scheduler |
 | **Identity verification** | Provider credentials, trust scores, client-payer separation | Provider credentials, trust_score, payer_id separation |
 | **Financial settlement** | Billing, invoicing, collection, and revenue sharing with dispute resolution | billing dimension, Service Order ledger, payment_schedule |
 | **Demand signals** | Aggregate, anonymous operational telemetry across network nodes | Telemetry Extension (contribute-to-access model) |
@@ -83,7 +83,7 @@ Every professional service — from a physiotherapy session to a tax audit — i
 | **3** | **Who receives** | The client — with payer explicitly separated | Patient (insurer pays), employee (company pays) |
 | **4** | **When** | Agreed time window | 2026-02-10 from 10:00 to 10:45 |
 | **5** | **Where** | Physical or virtual location, with optional `resource_id` linking to a physical Resource (3.5b: room, box, chair, equipment) | Clinic room 3, home visit, video call |
-| **6** | **Lifecycle** | Current position in the 9 lifecycle states | Collected → next: Verified |
+| **6** | **Lifecycle** | Current position across the state dimensions (delivery, evidence, acceptance, settlement) | Completed · evidence recorded · payment pending |
 | **7** | **Evidence** | How delivery is proven | GPS + duration + client signature |
 | **8** | **Billing** | Financial settlement, independent from lifecycle | $35 USD · collected · prepaid package |
 
@@ -91,12 +91,12 @@ Every professional service — from a physiotherapy session to a tax audit — i
 
 ---
 
-## The 9 universal states
+## The lifecycle: 6 core states + 3 optional financial states
 
-Whether it's a massage or an audit, every service transitions through the same lifecycle:
+The protocol defines independent states to observe the full cycle of a coordination. The 9 milestones below are the **happy path** — the most common operational route, not a single mandatory sequence. The first 6 are required; the 3 financial states are an optional extension. Delivery, evidence, acceptance, and settlement evolve independently ([PROTOCOL.md §6.0](./PROTOCOL.md)):
 
 ```
-Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
+Requested → Scheduled → Confirmed → In Progress → Completed → Documented → (optional) Invoiced → Collected → Verified
 ```
 
 | # | State | What happens |
@@ -160,7 +160,7 @@ The same structure works across any vertical:
 
 ## Evidence by vertical
 
-Each vertical defines what constitutes proof that the service occurred — with no ambiguity, so an algorithm can resolve 80% of disputes without human intervention:
+Each vertical defines what constitutes proof that the service occurred — with no ambiguity, so an accreditable Proof of Service can be produced from objective, pre-agreed criteria:
 
 <details>
 <summary><b>Healthcare</b> — 4 evidence types</summary>
@@ -218,9 +218,9 @@ Each vertical defines what constitutes proof that the service occurred — with 
 
 ---
 
-## Dispute resolution
+## Dispute resolution — extension in design
 
-When there is disagreement, the mechanism does not depend on goodwill, does not require a centralized judge, and an AI agent can execute it with the same confidence as a human:
+The disputes module (`Servicialo/Disputes`) is **in design** — the flow below describes the target design, not an operative capability:
 
 **1. Opening** — Either party opens a dispute within the defined window. Billing is frozen automatically.
 
@@ -228,7 +228,7 @@ When there is disagreement, the mechanism does not depend on goodwill, does not 
 
 **3. Resolution** — If provider wins: Collected → Verified. If client wins: Cancelled with balance restored.
 
-> **80/20.** 80% of disputes are resolved automatically by comparing evidence against contract. No human intervention, no discretion, no delay. The remaining 20% escalate to peer arbitrators from the same professional vertical who vote within 48 hours.
+> **Design goal:** automate the resolution of cases whose evidence satisfies rules agreed in advance in the contract. Cases the evidence cannot resolve would escalate to human review; peer arbitration within a vertical is a research direction, not a deployed mechanism.
 
 ---
 
@@ -303,8 +303,8 @@ Full guide: [`docs/a2a-interoperability.md`](./docs/a2a-interoperability.md)
 
 | # | Principle | |
 |:-:|-----------|---|
-| 1 | **Every service has a lifecycle** | Whether it's a massage or an audit. The 9 states are universal. |
-| 2 | **Delivery must be verifiable** | If you can't prove the service happened, it didn't happen. The protocol defines what constitutes valid evidence so humans and AI agents can trust it. |
+| 1 | **Every service has a lifecycle** | Whether it's a massage or an audit. The protocol defines independent states to observe the full cycle: delivery, evidence, acceptance, and settlement. |
+| 2 | **Delivery must be verifiable** | Without sufficient evidence, a delivery cannot be considered accredited at the required certainty level. The protocol defines what constitutes valid evidence so humans and AI agents can trust it. |
 | 3 | **The payer is not always the client** | In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer. |
 | 4 | **Exceptions are the rule** | No-shows, cancellations, rescheduling, disputes. A well-designed service defines what happens when things don't go as planned. |
 | 5 | **A service is a machine-readable product** | It has a name, price, duration, requirements, and expected outcome. Defined this way, any AI agent can discover, coordinate, and close it with the same confidence as a human. |
@@ -323,7 +323,7 @@ Everything needed to model a professional service from start to finish.
 
 For any platform where two parties make a delivery commitment and need a verifiable account of what happened — from a psychology practice to a cleaning company with multiple accounts, teams, and high staff turnover.
 
-Includes: 8 dimensions · 9 lifecycle states · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (37 tools) · discovery resolver (DNS-analog over HTTP) · A2A interoperability · network intelligence (k-anonymized benchmarks + contribute-to-access) · webhooks for push distribution
+Includes: 8 dimensions · 6+3 lifecycle (6 core states + 3 optional financial) · 6 exception flows · 7 core principles · resource management · service orders · proof of delivery · MCP protocol (40 tools) · discovery resolver (DNS-analog over HTTP) · A2A interoperability · network intelligence (k-anonymized benchmarks + contribute-to-access) · webhooks for push distribution
 
 ### Servicialo/Finance — `in design`
 
@@ -333,7 +333,7 @@ For platforms that intermediate payments between clients and providers, or that 
 
 ### Servicialo/Disputes — `in design`
 
-Formal resolution with algorithmic arbitration (~80%) and peer arbitration from the same vertical (~20%).
+Formal dispute resolution. Design goal: automate cases whose evidence satisfies pre-agreed rules; peer arbitration within a vertical is a research direction.
 
 For platforms with enough volume or where the amount per service makes disputes economically relevant.
 
@@ -381,7 +381,7 @@ service:
       lng: number
 
   lifecycle:
-    current_state: enum[9]              # The 9 universal states
+    current_state: enum                 # 6 core + 3 optional financial + exceptions
     transitions: transition[]
     exceptions: exception[]
 
@@ -406,17 +406,17 @@ service:
 
 ## Implementations
 
-Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 9 states, handle at least 3 of the 6 exception flows, adhere to the 7 core principles, and expose an API connectable to the MCP server.
+Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 6 core states (the 3 financial states are optional), handle at least 3 of the 6 exception flows, adhere to the 7 core principles, and expose an API connectable to the MCP server. Verification is manual today (PR + team review); an automated certification suite is on the roadmap.
 
 | Platform | Vertical | Coverage | Status |
 |----------|----------|----------|:------:|
-| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensions · 9/9 states · 6/6 exceptions · 7/7 principles | Live |
+| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensions · full 6+3 lifecycle · 6/6 exceptions · 7/7 principles | Live |
 
 > Building for professional services? [Open an issue](https://github.com/servicialo/mcp-server/issues) to list your implementation.
 
 ### For implementers
 
-Step-by-step guide to build a compatible platform from scratch — 7 steps, first one takes 20 minutes.
+Step-by-step guide to build a compatible platform from scratch — 8 steps, first one takes 20 minutes.
 Start here: [`IMPLEMENTING.md`](./IMPLEMENTING.md) ([English](./IMPLEMENTING.en.md))
 
 ---
@@ -440,8 +440,8 @@ servicialo/
 
 |  | Version | Status |
 |---|---------|--------|
-| Protocol | 0.9 | Stable |
-| @servicialo/mcp-server | 0.9.7 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.10 | Draft |
+| @servicialo/mcp-server | 0.9.12 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 

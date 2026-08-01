@@ -1,20 +1,46 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getVerifiedImplementors } from "@/lib/telemetry-stats";
 import type { VerifiedImplementor } from "@/lib/telemetry-stats";
+import { PageHeader } from "@/components/PageHeader";
+import { TierBadge, type ImplementationTier } from "@/components/TierBadge";
+import { Footer } from "@/components/Footer";
+import { IMPLEMENTATIONS } from "@/lib/manifest";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Verified Implementors — Servicialo",
+  title: "Implementadores — Servicialo",
   description:
-    "Organizations and platforms that have implemented the Servicialo protocol and been verified by the community.",
+    "Implementaciones del protocolo Servicialo: referencia, compatible, verificada, independiente y experimental. La verificación es manual hoy; la suite automatizada de conformance es parte del roadmap.",
   openGraph: {
-    title: "Verified Implementors — Servicialo",
+    title: "Implementadores — Servicialo",
     description:
-      "Verified implementations of the Servicialo open protocol for professional service orchestration.",
+      "Implementaciones del protocolo abierto Servicialo y sus niveles: referencia, compatible, verificada, independiente y experimental.",
   },
 };
+
+const NIVELES: { tier: ImplementationTier; def: string }[] = [
+  {
+    tier: "referencia",
+    def: "Define el comportamiento canónico del protocolo (Coordinalo).",
+  },
+  {
+    tier: "compatible",
+    def: "Implementa los perfiles core; declarada por su autor con evidencia de conformance.",
+  },
+  {
+    tier: "verificada",
+    def: "Revisada manualmente por el equipo contra la checklist de conformance.",
+  },
+  {
+    tier: "independiente",
+    def: "Código propio, no derivado de la implementación de referencia.",
+  },
+  {
+    tier: "experimental",
+    def: "En desarrollo o con cobertura parcial.",
+  },
+];
 
 /** Country code to flag emoji. */
 function countryFlag(code: string): string {
@@ -24,18 +50,6 @@ function countryFlag(code: string): string {
   return String.fromCodePoint(
     base + upper.charCodeAt(0),
     base + upper.charCodeAt(1),
-  );
-}
-
-function VerifiedBadge() {
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-mono text-[10px] font-semibold uppercase tracking-wide">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-        <polyline points="22 4 12 14.01 9 11.01" />
-      </svg>
-      Verified
-    </span>
   );
 }
 
@@ -64,8 +78,12 @@ function ImplementorCard({ impl }: { impl: VerifiedImplementor }) {
             )}
           </h3>
         </div>
-        <VerifiedBadge />
+        <TierBadge tier="verificada" />
       </div>
+
+      <p className="text-[12px] text-text-dim leading-relaxed mb-3">
+        Verificación manual del equipo de Servicialo.
+      </p>
 
       <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-muted">
         {impl.country_code && impl.country_name && (
@@ -75,7 +93,7 @@ function ImplementorCard({ impl }: { impl: VerifiedImplementor }) {
           </span>
         )}
         {impl.node_count > 1 && (
-          <span>{impl.node_count} nodes</span>
+          <span>{impl.node_count} instalaciones</span>
         )}
       </div>
     </div>
@@ -84,36 +102,36 @@ function ImplementorCard({ impl }: { impl: VerifiedImplementor }) {
 
 export default async function ImplementorsPage() {
   const implementors = await getVerifiedImplementors();
+  const coordinalo = IMPLEMENTATIONS.find((i) => i.id === "coordinalo");
 
   return (
     <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-12 pb-24">
-      {/* Back link */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 font-mono text-[11px] text-text-muted hover:text-accent transition-colors mb-8"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        Volver al inicio
-      </Link>
+      <PageHeader
+        tag="Implementadores"
+        title="Implementaciones del protocolo"
+        subtitle="Distinguimos entre implementación de referencia, compatible, verificada, independiente y experimental. La verificación es manual hoy; una suite de conformance automatizada es parte del roadmap."
+      />
 
-      {/* Header */}
-      <section className="mb-14 md:mb-20">
-        <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
-          Verified implementations
+      {/* Niveles de implementación */}
+      <section className="mb-14">
+        <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+          Niveles de implementación
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {NIVELES.map((n) => (
+            <div key={n.tier} className="rounded-xl border border-border p-5 bg-surface">
+              <div className="mb-2.5">
+                <TierBadge tier={n.tier} />
+              </div>
+              <p className="text-[13px] text-text-muted leading-[1.6]">
+                {n.def}
+              </p>
+            </div>
+          ))}
         </div>
-        <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
-          Implementors
-        </h1>
-        <p className="text-[15px] md:text-lg text-text-muted leading-[1.7] max-w-[600px]">
-          Organizations and platforms that have implemented the Servicialo
-          protocol and been verified by the community. Anonymous nodes are
-          never listed here.
-        </p>
       </section>
 
-      {/* Verified implementors grid */}
+      {/* Implementors grid */}
       {implementors.length > 0 ? (
         <section className="mb-14">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -130,7 +148,7 @@ export default async function ImplementorsPage() {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <h3 className="font-serif text-lg text-text leading-tight">
                   <a
-                    href="https://coordinalo.com"
+                    href={coordinalo?.url ?? "https://coordinalo.com"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-accent transition-colors"
@@ -143,10 +161,11 @@ export default async function ImplementorsPage() {
                     </svg>
                   </a>
                 </h3>
-                <VerifiedBadge />
+                <TierBadge tier="referencia" />
               </div>
               <p className="text-[13px] text-text-muted leading-relaxed mb-3">
-                Reference implementation. Healthcare vertical. Full protocol coverage (phases 0-6).
+                Vertical salud. Cobertura completa de perfiles del protocolo. En
+                producción desde {coordinalo?.since ?? "2026-03-31"}.
               </p>
               <div className="flex flex-wrap gap-3 font-mono text-[11px] text-text-muted">
                 <span className="inline-flex items-center gap-1">
@@ -159,14 +178,16 @@ export default async function ImplementorsPage() {
         </section>
       )}
 
-      {/* How to get verified */}
+      {/* Cómo verificarse */}
       <section className="mb-14">
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-          Join as a verified implementor
+          Cómo verificarse
         </h2>
         <div className="rounded-xl border border-border p-6 bg-surface space-y-4">
           <p className="text-[14px] text-text-body leading-relaxed">
-            Any node operator can optionally identify their implementation by setting three environment variables in their MCP server:
+            Cualquier operador de una instalación puede, opcionalmente,
+            identificar su implementación configurando tres variables de entorno
+            en su servidor MCP:
           </p>
           <pre className="font-mono text-xs bg-dark text-white rounded-lg p-4 overflow-x-auto">
 {`SERVICIALO_IMPL_NAME="MyClinic Platform"
@@ -175,21 +196,31 @@ SERVICIALO_IMPL_CONTACT="admin@myclinic.com"`}
           </pre>
           <div className="space-y-2 text-[13px] text-text-muted leading-relaxed">
             <p>
-              <strong className="text-text">1. Set the env vars</strong> — your next telemetry ping will include the identity fields. Your contact email is hashed (SHA-256) before storage and never displayed publicly.
+              <strong className="text-text">1. Configura las variables</strong>{" "}
+              — el siguiente reporte de telemetría incluirá los campos de
+              identidad. El email de contacto se almacena hasheado (SHA-256) y
+              nunca se muestra públicamente.
             </p>
             <p>
-              <strong className="text-text">2. Automatic review request</strong> — when a new implementation name appears, the Servicialo team is notified for manual review.
+              <strong className="text-text">2. Revisión manual</strong> — cuando
+              aparece un nuevo nombre de implementación en la telemetría, el
+              equipo recibe una notificación y revisa manualmente. La
+              verificación es manual hoy — la suite automatizada de conformance
+              es un objetivo del roadmap, no una capacidad actual.
             </p>
             <p>
-              <strong className="text-text">3. Verification</strong> — once verified, your implementation appears on this page with a verified badge. If not set, your node remains fully anonymous.
+              <strong className="text-text">3. Verificación</strong> — una vez
+              verificada, tu implementación aparece en esta página con su nivel.
+              Si no configuras las variables, tu instalación permanece
+              completamente anónima.
             </p>
           </div>
           <p className="text-[12px] text-text-dim leading-relaxed">
-            For the full implementation guide, see{" "}
+            La guía completa de implementación está en{" "}
             <a href="https://github.com/servicialo/mcp-server/blob/main/IMPLEMENTING.md" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
               IMPLEMENTING.md
             </a>
-            {" "}and{" "}
+            {" "}y{" "}
             <a href="https://github.com/servicialo/mcp-server/blob/main/IMPLEMENTORS.md" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
               IMPLEMENTORS.md
             </a>.
@@ -198,12 +229,14 @@ SERVICIALO_IMPL_CONTACT="admin@myclinic.com"`}
       </section>
 
       {/* Footer note */}
-      <p className="font-mono text-[10px] text-text-dim leading-relaxed">
-        Verification is manual and reviewed by the Servicialo team. Only nodes
-        that have passed conformance testing and provide a valid contact are
-        eligible. Self-declarations without evidence of conformance are not
-        accepted.
+      <p className="font-mono text-[10px] text-text-dim leading-relaxed mb-14">
+        La verificación es manual: el equipo de Servicialo revisa cada
+        implementación contra la checklist de conformance y exige un contacto
+        válido. Las autodeclaraciones sin evidencia de conformance no se
+        aceptan. Las instalaciones anónimas nunca se listan aquí.
       </p>
+
+      <Footer />
     </div>
   );
 }

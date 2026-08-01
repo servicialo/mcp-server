@@ -1,24 +1,28 @@
 # Servicialo
 
-> Open protocol for AI agents that coordinate professional services.
+> Servicialo is the open domain protocol for coordinating services. It standardizes the relationship between what was agreed, what was delivered, the available evidence, and the settlement — so people, platforms, and AI agents can operate services with shared semantics.
 
-Servicialo is the missing protocol layer for AI agents that need to discover, book, verify delivery, and settle professional services. Think HTTP for service coordination: any agent, any platform, one protocol.
+MCP and A2A define how agents connect. Servicialo defines what it means to coordinate a service. The protocol is transport-independent: MCP, HTTP, and A2A are bindings. Coordinalo (https://coordinalo.com) is the reference implementation — not the protocol itself.
 
-The protocol models every service through 8 dimensions, 9 lifecycle states, 6 exception flows, and 7 fundamental principles — universal across verticals (health, legal, education, home services).
+The protocol models every service through 8 dimensions and a 6+3 lifecycle (6 core states required, 3 financial states optional), with 6 exception flows. The 9-milestone sequence below is the happy-path view; delivery, evidence, acceptance, and settlement have no total order across them — each retains its own lifecycle:
 
-Lifecycle: Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Charged → Verified
+Happy path: Requested → Scheduled → Confirmed → In Progress → Completed → Documented → (optional) Invoiced → Collected → Verified
+
+A Proof of Service is the verifiable dossier linking agreement, delivery, evidence, and settlement for one delivery. It records claims, evidence, attestations, and certainty levels — it does not automatically declare world-truth, and payment is not a prerequisite for accrediting a delivery. (Draft extension: https://spec.servicialo.com/extensions/proof-of-service.md)
+
+Machine-readable protocol surface (version, tools, state machines, extensions): https://github.com/servicialo/mcp-server/blob/main/protocol/manifest.yaml
 
 ## Quickstart
 
-1. Install: `npx -y @servicialo/mcp-server` (discovery mode — 10 public tools, no credentials)
+1. Install: `npx -y @servicialo/mcp-server` (discovery mode — 15 public tools, no credentials)
 2. Sign up: https://coordinalo.com/signup
 3. Get credentials: In Coordinalo → Settings → Servicialo → Generate MCP credentials (SERVICIALO_ORG_ID, SERVICIALO_API_KEY)
 4. Configure MCP client: add env vars SERVICIALO_API_KEY and SERVICIALO_ORG_ID to your MCP server config
-5. Publish: In Coordinalo → Settings → Servicialo → Publish (your org appears on servicialo.com/network)
+5. Publish: In Coordinalo → Settings → Servicialo → Publish (your org becomes resolvable via the registry API)
 
-## MCP Tools (35 total)
+## MCP Tools (40 total)
 
-### Public tools (10) — always available, no credentials
+### Public tools (15) — always available, no credentials
 
 - docs.quickstart: Get the complete getting-started guide as structured JSON
 - resolve.lookup: Resolve orgSlug to endpoints and trust level
@@ -27,9 +31,14 @@ Lifecycle: Requested → Scheduled → Confirmed → In Progress → Completed �
 - registry.search: Search organizations by vertical, location, country
 - registry.get_organization: Get public organization details (services, providers, booking config)
 - registry.manifest: Get server manifest (protocol version, capabilities, org metadata)
+- registry.list_verticals: List verticals present in the registry (cold-start discovery)
+- registry.list_regions: List regions present in the registry (cold-start discovery)
+- registry.list_event_types: Catalog of operational telemetry event types
 - services.list: List catalog of services for an organization
 - scheduling.check_availability: Query availability (3-variable scheduler: provider ∧ client ∧ resource)
 - a2a.get_agent_card: Get A2A Agent Card for inter-agent discovery
+- market.list_segments: List benchmark segments (vertical × region × scale) with sample sizes
+- market.get_benchmark: Aggregate operational benchmarks for a segment (k-anonymity ≥ 5)
 
 ### Authenticated tools (25) — require SERVICIALO_API_KEY + SERVICIALO_ORG_ID
 
@@ -50,14 +59,16 @@ Phase 4 — Lifecycle:
 
 Phase 5 — Verify Delivery:
 - delivery.checkin: Check-in with GPS + timestamp → in_progress state
-- delivery.checkout: Check-out with GPS + timestamp → delivered state (duration auto-calculated)
+- delivery.checkout: Check-out with GPS + timestamp → completion recorded (duration auto-calculated)
 - delivery.record_evidence: Record evidence (gps, signature, photo, document, duration, notes)
 
 Phase 6 — Close:
 - documentation.create: Generate service record → documented state
-- payments.create_sale: Create charge for documented service → charged state
+- payments.create_sale: Create charge for documented service (billing dimension)
 - payments.record_payment: Record payment against sale
 - payments.get_status: Get payment status (sale or account)
+
+Note: the reference implementation's lifecycle.transition enum exposes `delivered`/`charged` in place of the canonical `completed`/`invoiced`+`collected` (known divergence, tracked in protocol/manifest.yaml).
 
 Resource Management:
 - resource.list: List physical resources (rooms, boxes, chairs, equipment)
@@ -72,10 +83,19 @@ Resolver Administration:
 - resolve.update_endpoint: Update registered endpoints (portability between backends)
 - telemetry.heartbeat: Send heartbeat to resolver indicating node is active
 
+## Status honesty
+
+- Available today: MCP server (40 tools), HTTP profile, A2A agent cards, registry/resolver, evidence schemas (5 verticals), reference implementation (Coordinalo, healthcare, live).
+- Experimental: settlement extension, delegated agency (mandate scopes are advisory — not enforced at the MCP tool boundary yet), network intelligence (read-side benchmarks live), webhooks.
+- In design (draft): disputes, state-dimensions, proof-of-service.
+- The network is optional: an implementation is fully conformant without registering in the resolver or sharing any data with the network. Network page metrics count MCP-server installations reporting telemetry — not adopted implementations.
+
 ## Links
 
-- Network (live organizations): https://servicialo.com/network
+- Network telemetry (MCP-server installations): https://servicialo.com/network
+- Implementors: https://servicialo.com/implementors
 - Sign up: https://coordinalo.com/signup
 - npm: https://npmjs.com/package/@servicialo/mcp-server
-- Protocol spec: https://servicialo.com
-- GitHub: https://github.com/servicialo/protocol
+- Protocol site: https://servicialo.com
+- Spec pages: https://spec.servicialo.com
+- GitHub: https://github.com/servicialo/mcp-server

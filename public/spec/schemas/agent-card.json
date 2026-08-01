@@ -34,9 +34,10 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["requested", "scheduled", "confirmed", "in_progress", "completed", "documented", "invoiced", "charged", "verified"]
+            "enum": ["requested", "scheduled", "confirmed", "in_progress", "completed", "documented", "invoiced", "collected", "charged", "verified"],
+            "$comment": "Canonical enum per schema/service.schema.json uses `collected`; `charged` is accepted for compatibility with the reference implementation's divergent lifecycle.transition enum (see protocol/manifest.yaml). minItems 6 = the core states; financial states are optional extensions."
           },
-          "minItems": 9
+          "minItems": 6
         },
         "exception_flows": {
           "type": "array",

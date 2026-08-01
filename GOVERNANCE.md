@@ -171,7 +171,7 @@ The goal is decentralized governance that matches the decentralized nature of th
 Any platform can implement Servicialo. To be listed as a compatible implementation:
 
 1. Model services using the 8 dimensions
-2. Implement the 9 lifecycle states
+2. Implement the 6 core lifecycle states (the 3 financial states are optional extensions)
 3. Handle at least 3 of the 6 exception flows
 4. Adhere to the 7 core principles
 5. Expose an API connectable to the MCP server

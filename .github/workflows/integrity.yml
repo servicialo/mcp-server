@@ -7,6 +7,9 @@ name: Integrity checks
 #   - FINGERPRINT_SALT parity between lib/ and packages/mcp-server/
 #   - Import-extension convention (lib/app vs packages/mcp-server/src)
 #   - serverInstructions / public tools parity
+#   - protocol/manifest.yaml ↔ tool source parity
+#   - Version unification (manifest ↔ PROTOCOL/SPEC/CHANGELOG/package/server.json)
+#   - Documentation claims (tool counts, state claims) vs manifest
 #
 # Independent from publish-mcp-server.yml which only fires when the
 # package is bumped. This one catches regressions before they reach
@@ -63,3 +66,12 @@ jobs:
 
       - name: serverInstructions / public tools parity
         run: node scripts/verify-server-instructions.mjs
+
+      - name: Manifest / tools parity
+        run: node scripts/verify-manifest-tools.mjs
+
+      - name: Version unification
+        run: node scripts/verify-versions.mjs
+
+      - name: Documentation claims
+        run: node scripts/verify-doc-claims.mjs

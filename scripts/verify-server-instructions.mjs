@@ -17,9 +17,10 @@
  * Exit code 0 = consistent, 1 = drift detected.
  */
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative } from 'node:path';
+import { collectToolNames } from './lib/tool-keys.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..');
@@ -27,27 +28,8 @@ const repoRoot = join(__dirname, '..');
 const PUBLIC_TOOLS_DIR = join(repoRoot, 'packages', 'mcp-server', 'src', 'tools', 'public');
 const INDEX_TS = join(repoRoot, 'packages', 'mcp-server', 'src', 'index.ts');
 
-/** Tool keys are declared as  '<dotted.name>': {  inside an `export const ...Tools = {` block. */
-const TOOL_KEY_RE = /^\s+['"]([a-z][a-z0-9]*\.[a-z0-9_]+)['"]\s*:\s*\{/gm;
-
 function collectPublicToolNames() {
-  const names = new Set();
-  let files;
-  try {
-    files = readdirSync(PUBLIC_TOOLS_DIR);
-  } catch (err) {
-    console.error(`FAIL  could not read ${PUBLIC_TOOLS_DIR}: ${err.message}`);
-    process.exit(1);
-  }
-  for (const file of files) {
-    if (!file.endsWith('.ts') || file.endsWith('.d.ts')) continue;
-    const body = readFileSync(join(PUBLIC_TOOLS_DIR, file), 'utf8');
-    let m;
-    while ((m = TOOL_KEY_RE.exec(body)) !== null) {
-      names.add(m[1]);
-    }
-  }
-  return names;
+  return collectToolNames(PUBLIC_TOOLS_DIR);
 }
 
 function collectInstructionsTaglines() {

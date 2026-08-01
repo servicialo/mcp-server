@@ -1,7 +1,10 @@
 # Servicialo Protocol — Quick Spec
 
 > Self-contained reference for developers and AI agents evaluating or implementing the protocol.
-> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.9. Last synced: 2026-04-11.
+> Source of truth: [`PROTOCOL.md`](./PROTOCOL.md) v0.10. Last synced: 2026-08-01.
+> Machine-readable surface (version, tools, state machines, extensions): [`protocol/manifest.yaml`](./protocol/manifest.yaml).
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHOULD", "SHOULD NOT", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
 ---
 
@@ -25,6 +28,8 @@ A **Resource** (physical space/equipment) is a first-class entity with `capacity
 ---
 
 ## 2. The 6+3 Lifecycle States
+
+**Orthogonal dimensions.** The sequence below is the wire encoding of the *happy path* — each milestone bundles progress across delivery, evidence, acceptance, and settlement. The protocol does not establish a total order across those four concerns: a delivery can be completed before, after, or without settlement; evidence can become sufficient before or after invoicing; payment is not a prerequisite for accrediting a delivery (PROTOCOL.md §6.0). The [state-dimensions extension](https://spec.servicialo.com/extensions/state-dimensions.md) (Draft) formalizes the orthogonal projection.
 
 ### Core Lifecycle (REQUIRED — states 1–6)
 
@@ -53,7 +58,9 @@ Requested → Scheduled → Confirmed → In Progress → Completed → Document
 
 ### Verification Deadline
 
-> After transitioning to `delivered`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `delivered`.
+> After transitioning to `completed`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `completed`.
+>
+> Note: the reference implementation's `lifecycle.transition` enum exposes `delivered`/`charged` in place of `completed`/`invoiced`+`collected` (Coordinalo upstream compatibility) — a known divergence, tracked in `protocol/manifest.yaml`.
 
 ### Optional State: `pending_confirmation`
 
@@ -115,9 +122,9 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 
 ## 5. MCP Tools by Phase
 
-40 tools implemented in `@servicialo/mcp-server`. 15 public (no auth) + 25 authenticated (API key + org ID). New public tools since v0.8: `a2a.get_agent_card`, `market.list_segments`, `market.get_benchmark`, `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types`.
+40 tools implemented in `@servicialo/mcp-server`. 15 public (no auth) + 25 authenticated (API key + org ID). New public tools since v0.8: `a2a.get_agent_card`, `docs.quickstart`, `market.list_segments`, `market.get_benchmark`, `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types`. The canonical tool registry is `protocol/manifest.yaml` (CI-enforced against the source).
 
-### Phase 0 — Resolver (3 public tools)
+### Phase 0 — Resolver (public)
 
 > "DNS" in the section title and elsewhere is used by analogy. The resolver is an HTTP service backed by Postgres with a trust score — not literal DNS records. The metaphor captures *what it does* (slug → endpoint lookup) not *how* it does it.
 
@@ -127,16 +134,32 @@ A quote IS a Service Order in `draft` or `proposed` state — no separate quote 
 | `resolve.search` | Search global resolver by country and vertical | No |
 | `trust.get_score` | Trust score (0–100), level, last activity | No |
 
-### Phase 1 — Discovery (6 public tools)
+### Phase 1 — Discovery (public)
 
 | Tool | Description | Auth |
 |------|-------------|------|
 | `registry.search` | Search organizations by vertical, location, country | No |
 | `registry.get_organization` | Public details: services, providers, booking config | No |
 | `registry.manifest` | Server manifest: capabilities, protocol version, metadata | No |
+| `registry.list_verticals` | Verticals present in the registry (cold-start discovery) | No |
+| `registry.list_regions` | Regions present in the registry (cold-start discovery) | No |
+| `registry.list_event_types` | Catalog of operational telemetry event types | No |
 | `scheduling.check_availability` | Available slots (3-variable: provider ∧ client ∧ resource) | No |
 | `services.list` | Public service catalog of an organization | No |
 | `a2a.get_agent_card` | A2A Agent Card for inter-agent discovery | No |
+
+### Network Intelligence (public)
+
+| Tool | Description | Auth |
+|------|-------------|------|
+| `market.list_segments` | Benchmark segments (vertical × region × scale) with sample sizes | No |
+| `market.get_benchmark` | Aggregate operational benchmarks for a segment (k-anonymity ≥ 5) | No |
+
+### Docs (public)
+
+| Tool | Description | Auth |
+|------|-------------|------|
+| `docs.quickstart` | Machine-readable quickstart for agents integrating the protocol | No |
 
 ### Phase 2 — Understand (2 tools)
 
@@ -233,6 +256,12 @@ The MCP server connects to a backend via an adapter. The backend must expose end
 | Check availability | `service_id`, `provider_id`?, `resource_id`?, `date_from`, `date_to` | Available time slots with confidence scores |
 | List services | `org_id` | Service catalog |
 | Get A2A agent card | `org_id` | A2A Agent Card JSON |
+| List verticals | — | Verticals present in the registry |
+| List regions | — | Regions present in the registry |
+| List event types | — | Operational telemetry event-type catalog |
+| List benchmark segments | `vertical`?, `region`? | Segments with sample sizes |
+| Get benchmark | `segment` | Aggregate metrics (k-anonymity ≥ 5) |
+| Get quickstart | — | Machine-readable integration quickstart |
 
 ### DNS Resolution (public, no auth)
 

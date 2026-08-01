@@ -2,10 +2,11 @@ openapi: 3.1.0
 info:
   title: Servicialo HTTP API
   description: |
-    Canonical HTTP binding for the Servicialo protocol v0.8.
+    Canonical HTTP binding for the Servicialo protocol v0.10.
     Maps MCP tools to REST endpoints with exact semantic parity.
     See HTTP_PROFILE.md for the full specification.
   version: 1.0.0
+  x-servicialo-protocol-version: "0.10"
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
@@ -70,7 +71,7 @@ paths:
                   type: server
                   id: servicialo
                   attributes:
-                    protocol_version: "0.8"
+                    protocol_version: "0.10"
                     profile_version: "1.0.0"
                     compliance: extended
                     capabilities:
@@ -1578,8 +1579,8 @@ components:
       required: true
       schema:
         type: string
-        enum: ["0.8"]
-      description: Protocol version.
+        enum: ["1.0"]
+      description: Resolver API version (wire value — independent of the protocol document version, which is declared in protocol/manifest.yaml).
 
     Accept:
       name: Accept

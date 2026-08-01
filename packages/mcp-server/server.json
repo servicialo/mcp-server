@@ -2,13 +2,13 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.servicialo/mcp-server",
   "title": "Servicialo MCP Server",
-  "description": "Open protocol for booking and scheduling professional services via AI agents",
+  "description": "Reference MCP server for Servicialo — the open domain protocol for coordinating services (agreement, delivery, evidence, settlement)",
   "repository": {
-    "url": "https://github.com/servicialo/servicialo",
+    "url": "https://github.com/servicialo/mcp-server",
     "source": "github",
     "subfolder": "packages/mcp-server"
   },
-  "version": "0.9.10",
+  "version": "0.9.12",
   "remotes": [
     {
       "type": "streamable-http",
@@ -19,12 +19,12 @@
     {
       "registryType": "npm",
       "identifier": "@servicialo/mcp-server",
-      "version": "0.9.10",
+      "version": "0.9.12",
       "transport": {
         "type": "stdio",
         "env": {
           "SERVICIALO_API_KEY": {
-            "description": "API key for authenticated tools (booking, lifecycle, payments). Optional — 10 public discovery tools work without it.",
+            "description": "API key for authenticated tools (booking, lifecycle, payments). Optional — 15 public discovery tools work without it.",
             "required": false
           },
           "SERVICIALO_ORG_ID": {

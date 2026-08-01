@@ -29,7 +29,7 @@ The Servicialo protocol is entering its **stabilization phase**. The first forma
 | RFC-002 — Prepayment & Client Credit Balance | Draft / Open for Comment |
 | RFC-003 — Refunds & Credit Notes (Forward-Only Ledger) | Draft / Open for Comment |
 | RFC-004 — PII / PHI Classification Framework | Draft / Open for Comment |
-| Stable Core declaration (8 dimensions · 9 states · 6 flows · 7 principles) with backwards-compatibility guarantees | Pending |
+| Stable Core declaration (8 dimensions · 6+3 lifecycle · 6 flows · 7 principles) with backwards-compatibility guarantees | Pending |
 | ≥ 3 independent implementations in production | In progress |
 
 ## The Problem
@@ -52,7 +52,7 @@ Servicialo is an **open protocol**, not a platform. It defines how professional 
 
 The relationship is like HTTP to Apache, or SMTP to Gmail: Servicialo defines the rules, implementations bring them to life.
 
-The protocol models every service across **8 dimensions**, **9 lifecycle states**, **6 exception flows**, and **7 core principles** that are universal across verticals — healthcare, legal, education, home services:
+The protocol models every service across **8 dimensions**, a **6+3 lifecycle** (6 core states + 3 optional financial states), **6 exception flows**, and **7 core principles** that are universal across verticals — healthcare, legal, education, home services:
 
 ```
 Requested → Scheduled → Confirmed → In Progress → Completed → Documented → Invoiced → Collected → Verified
@@ -64,7 +64,7 @@ Any service, in any vertical, follows this sequence. Vertical-specific logic liv
 
 This package exposes the Servicialo protocol as 40 MCP tools organized by the **7 lifecycle phases** (0–6, including the discovery resolver — analog to DNS, over HTTP), plus resource management, resolver administration, **network intelligence** (`market.*`), and **cold-start discovery** (`registry.list_*` for the agent to learn the taxonomy without prior knowledge). An agent doesn't call endpoints by database entity — it follows the natural flow of coordinating a service.
 
-### Phase 0 — DNS Resolution (3 public tools, no auth required)
+### Phase 0 — DNS Resolution (3 tools, no auth)
 
 | Tool | Description |
 |---|---|
@@ -72,7 +72,7 @@ This package exposes the Servicialo protocol as 40 MCP tools organized by the **
 | `resolve.search` | Search organizations registered in the global resolver by country and vertical |
 | `trust.get_score` | Get trust score for an organization (score 0-100, level, last activity) |
 
-### Phase 1 — Discovery (6 public tools, no auth required)
+### Phase 1 — Discovery (6 tools, no auth)
 
 | Tool | Description |
 |---|---|
@@ -143,7 +143,7 @@ This package exposes the Servicialo protocol as 40 MCP tools organized by the **
 | `resolve.update_endpoint` | Update registered endpoints (portability between backends) | `resolve:write` |
 | `telemetry.heartbeat` | Send heartbeat to the resolver indicating the node is active | `telemetry:write` |
 
-### Network Intelligence (2 public tools, no auth required)
+### Network Intelligence (2 tools, no auth)
 
 Anonymized market benchmarks over operational telemetry contributed by network nodes. **Contribute-to-access** policy (k-anonymity ≥ 5):
 
@@ -152,7 +152,7 @@ Anonymized market benchmarks over operational telemetry contributed by network n
 | `market.list_segments` | List segments `(event_type × vertical × region)` with available data (filtered by k-anon ≥ 5 distinct contributors) |
 | `market.get_benchmark` | Get the bucket distribution of a segment (e.g. share of each `price_band` for `payment_settled` in `health/CL`). Tier 0/1 sees 90-day-delayed data; tier 2 (≥ 50 events in 30 days) sees real-time |
 
-### Cold-start Discovery (3 public tools, no auth required)
+### Cold-start Discovery (3 tools, no auth)
 
 The agent doesn't need to know the protocol taxonomy in advance. Start here when arriving without context:
 
@@ -161,6 +161,12 @@ The agent doesn't need to know the protocol taxonomy in advance. Start here when
 | `registry.list_verticals` | Verticals present in the network (declared by nodes + observed in telemetry over 30d) |
 | `registry.list_regions` | Countries/regions (ISO 3166-1 alpha-2) with activity in the network |
 | `registry.list_event_types` | Catalog of the 4 operational telemetry event types + their `payload_fields` |
+
+### Documentation (1 tool, no auth)
+
+| Tool | Description |
+|---|---|
+| `docs.quickstart` | Get the 5 quickstart steps as structured JSON — agent onboarding without prior context |
 
 ## Installation & Quickstart
 
@@ -446,7 +452,7 @@ The full Servicialo protocol specification is available at:
 - **Current stable version:** 0.9
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
 
-The spec covers the 8 dimensions, 9 lifecycle states, 6 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), 7 core principles, the two-entity architecture (atomic Service + Service Order), the Delegated Agency Model, DNS resolution, and A2A interoperability.
+The spec covers the 8 dimensions, the 6+3 lifecycle, 6 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), 7 core principles, the two-entity architecture (atomic Service + Service Order), the Delegated Agency Model, DNS resolution, and A2A interoperability.
 
 ## Reference Implementation
 

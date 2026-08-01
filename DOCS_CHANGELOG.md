@@ -4,6 +4,22 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-08-01 — One coherent thesis: the open domain protocol for coordinating services
+
+Full communication refactor so the site, spec, and docs tell a single, technically defensible story.
+
+### Canonical thesis
+> Servicialo es el protocolo abierto de dominio para coordinar servicios. Estandariza la relación entre compromiso, entrega, evidencia y liquidación. Coordínalo es la implementación de referencia. MCP/HTTP/A2A son bindings. La red es opcional.
+
+### Structural changes
+- **`protocol/manifest.yaml`** — single source of truth (version, tools, states, profiles, bindings, extensions, implementations) + 3 CI guardrails. The site now derives every count/version from it via `lib/manifest.ts`.
+- **Site IA** — home rebuilt to answer: qué es → problema → objetos → modelo (diagrama Offer→Order→Delivery→Evidence/Settlement→Proof) → Prueba de Servicio → ciclo → principios → agentes → estado actual → participar. New `/extensions` (maturity-labeled) and `/vision` (aspirational content, explicitly non-normative) pages. `/network` and `/implementors` rewritten in Spanish with honest framing. `/whitepaper` reduced to an archived-snapshot page.
+- **States** — "9 estados universales" retired everywhere; replaced by 6 core + 3 optional financial, with the 9 milestones as the happy-path view and the no-total-order rule (PROTOCOL.md §6.0, state-dimensions draft extension).
+- **Claims honesty** — 80/20 disputes → design goal of an in-design extension; "certificación automatizada" → manual review today, suite as roadmap; "Nodes" → installations; `mandates.*` tools delisted (specified, unimplemented); "Nexo"/`prueba_de_entrega` removed (Proof of Service specified as a draft extension instead); tool counts unified at 40 = 15 + 25; versions unified at protocol 0.10 / package 0.9.12.
+- **Known stale artifacts (intentionally untouched):** whitepaper PDFs (v0.9 snapshot, bannered), `packages/mcp-server/.smithery/shttp/manifest.json` (Smithery build artifact, 0.6.0-era), `distribution/registries.yaml` historical entries.
+
+---
+
 ## 2026-03-06 — Messaging overhaul: neutral protocol positioning
 
 ### Positioning change

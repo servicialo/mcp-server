@@ -1,0 +1,227 @@
+# ============================================================================
+# protocol/manifest.yaml — Single source of truth for the Servicialo protocol
+# surface.
+#
+# Consumed by:
+#   - lib/manifest.ts            (site: versions, tool lists, extensions)
+#   - scripts/verify-manifest-tools.mjs   (CI: manifest ↔ code parity)
+#   - scripts/verify-versions.mjs         (CI: version unification)
+#   - scripts/verify-doc-claims.mjs       (CI: doc claims vs derived counts)
+#
+# Rules:
+#   - Counts are NEVER stored here. They are derived from the `tools` list.
+#   - Wire values (resolver X-Servicialo-Version, FINGERPRINT_SALT) are
+#     documented here but MUST NOT be changed to match the protocol version.
+# ============================================================================
+manifest_version: 1
+
+protocol:
+  name: Servicialo
+  version: "0.10"          # verify-versions.mjs compares against PROTOCOL.md / SPEC.md / CHANGELOG.md
+  status: draft            # draft | stable
+  spec: PROTOCOL.md
+  quick_ref: SPEC.md
+  canonical_url: https://servicialo.com/spec
+  spec_host: https://spec.servicialo.com
+  repository: https://github.com/servicialo/mcp-server
+  license: Apache-2.0
+
+# ── Canonical objects ────────────────────────────────────────────────────────
+# schema: path to a JSON Schema, or `narrative` when the concept is specified
+# in prose only (no wire object yet).
+objects:
+  - id: service_offer
+    name: Service Offer
+    schema: narrative
+    defined_in: PROTOCOL.md#5-the-8-dimensions
+    surfaced_by: [services.list]
+    note: Published catalog entry — what an organization offers.
+  - id: service
+    name: Service (atomic delivery unit)
+    schema: schema/service.schema.json
+  - id: service_order
+    name: Service Order
+    schema: schema/service-order.schema.json
+    note: The agreement between parties — scope, parties, price, policies, validity.
+  - id: service_delivery
+    name: Service Delivery
+    schema: narrative
+    defined_in: PROTOCOL.md#6-lifecycle
+    note: A concrete execution instance — today expressed as session + proof dimension.
+  - id: evidence_event
+    name: Evidence Event
+    schema: schema/evidence/base.schema.json
+    vertical_schemas:
+      - schema/evidence/health.schema.json
+      - schema/evidence/home.schema.json
+      - schema/evidence/legal.schema.json
+      - schema/evidence/education.schema.json
+      - schema/evidence/consulting.schema.json
+  - id: settlement_event
+    name: Settlement Event
+    schema: narrative
+    defined_in: PROTOCOL.md#128-payment-model
+    note: Today expressed as billing.* dimension + payments.* tools.
+  - id: service_mandate
+    name: ServiceMandate
+    schema: schema/service-mandate.schema.json
+  - id: proof_of_service
+    name: Proof of Service
+    schema: narrative
+    status: draft
+    defined_in: public/spec/extensions/proof-of-service.md
+    note: Verifiable dossier linking agreement, delivery, evidence and settlement. No wire object yet.
+
+# ── Capability profiles ──────────────────────────────────────────────────────
+# status: stable | candidate | experimental
+profiles:
+  - { id: discovery,    name: Discovery,    status: stable }
+  - { id: ordering,     name: Ordering,     status: experimental }   # service_orders.* specified, not implemented
+  - { id: coordination, name: Coordination, status: stable }
+  - { id: delivery,     name: Delivery,     status: stable }
+  - { id: evidence,     name: Evidence,     status: candidate }
+  - { id: settlement,   name: Settlement,   status: experimental }
+  - { id: network,      name: Network,      status: experimental }
+
+# ── Bindings (the protocol is transport-independent) ─────────────────────────
+bindings:
+  mcp:
+    package: "@servicialo/mcp-server"
+    package_version: "0.9.12"    # verify-versions.mjs compares with package.json + server.json
+    transports: [stdio, streamable-http]
+    remote: https://servicialo.com/api/mcp
+  http:
+    profile: spec/HTTP_PROFILE.md
+    profile_version: "1.0.0"     # version of the HTTP binding document, not the protocol
+    resolver_api_version: "1.0"  # wire value of X-Servicialo-Version (lib/servicialo/response.ts) — DO NOT change
+    openapi: spec/openapi.yaml
+  a2a:
+    version: "0.3"
+    agent_card: /.well-known/agent.json
+    endpoint: "POST /{orgSlug}/a2a"
+
+# ── Tools (ground truth mirror of packages/mcp-server/src/tools) ─────────────
+# tier: public | authenticated
+# phase: "0"–"6" | resource | resolver_admin | network | docs
+tools:
+  - { name: resolve.lookup,                tier: public,        phase: "0",            profile: discovery }
+  - { name: resolve.search,                tier: public,        phase: "0",            profile: discovery }
+  - { name: trust.get_score,               tier: public,        phase: "0",            profile: discovery }
+  - { name: registry.search,               tier: public,        phase: "1",            profile: discovery }
+  - { name: registry.get_organization,     tier: public,        phase: "1",            profile: discovery }
+  - { name: registry.manifest,             tier: public,        phase: "1",            profile: discovery }
+  - { name: registry.list_verticals,       tier: public,        phase: "1",            profile: discovery }
+  - { name: registry.list_regions,         tier: public,        phase: "1",            profile: discovery }
+  - { name: registry.list_event_types,     tier: public,        phase: "1",            profile: discovery }
+  - { name: services.list,                 tier: public,        phase: "1",            profile: discovery }
+  - { name: scheduling.check_availability, tier: public,        phase: "1",            profile: coordination }
+  - { name: a2a.get_agent_card,            tier: public,        phase: "1",            profile: discovery }
+  - { name: docs.quickstart,               tier: public,        phase: docs,           profile: discovery }
+  - { name: market.list_segments,          tier: public,        phase: network,        profile: network }
+  - { name: market.get_benchmark,          tier: public,        phase: network,        profile: network }
+  - { name: service.get,                   tier: authenticated, phase: "2",            profile: coordination }
+  - { name: contract.get,                  tier: authenticated, phase: "2",            profile: ordering }
+  - { name: clients.get_or_create,         tier: authenticated, phase: "3",            profile: ordering }
+  - { name: scheduling.book,               tier: authenticated, phase: "3",            profile: ordering }
+  - { name: scheduling.confirm,            tier: authenticated, phase: "3",            profile: ordering }
+  - { name: lifecycle.get_state,           tier: authenticated, phase: "4",            profile: coordination }
+  - { name: lifecycle.transition,          tier: authenticated, phase: "4",            profile: coordination }
+  - { name: scheduling.reschedule,         tier: authenticated, phase: "4",            profile: coordination }
+  - { name: scheduling.cancel,             tier: authenticated, phase: "4",            profile: coordination }
+  - { name: delivery.checkin,              tier: authenticated, phase: "5",            profile: delivery }
+  - { name: delivery.checkout,             tier: authenticated, phase: "5",            profile: delivery }
+  - { name: delivery.record_evidence,      tier: authenticated, phase: "5",            profile: evidence }
+  - { name: documentation.create,          tier: authenticated, phase: "6",            profile: evidence }
+  - { name: payments.create_sale,          tier: authenticated, phase: "6",            profile: settlement }
+  - { name: payments.record_payment,       tier: authenticated, phase: "6",            profile: settlement }
+  - { name: payments.get_status,           tier: authenticated, phase: "6",            profile: settlement }
+  - { name: resource.list,                 tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resource.get,                  tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resource.create,               tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resource.update,               tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resource.delete,               tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resource.get_availability,     tier: authenticated, phase: resource,       profile: coordination }
+  - { name: resolve.register,              tier: authenticated, phase: resolver_admin, profile: network }
+  - { name: resolve.update_endpoint,       tier: authenticated, phase: resolver_admin, profile: network }
+  - { name: telemetry.heartbeat,           tier: authenticated, phase: resolver_admin, profile: network }
+
+# Specified in PROTOCOL.md §13.2 and spec/HTTP_PROFILE.md §10–§11 but NOT
+# implemented in the reference MCP server. verify-manifest-tools.mjs fails if
+# any of these appears in code (it must then be promoted to `tools`).
+specified_unimplemented_tools:
+  - { name: service_orders.list,       profile: ordering }
+  - { name: service_orders.get,        profile: ordering }
+  - { name: service_orders.create,     profile: ordering }
+  - { name: service_orders.propose,    profile: ordering }
+  - { name: service_orders.activate,   profile: ordering }
+  - { name: service_orders.get_ledger, profile: ordering }
+  - { name: mandates.list,             profile: ordering }
+  - { name: mandates.get,              profile: ordering }
+  - { name: mandates.suspend,          profile: ordering }
+
+# ── State machines ───────────────────────────────────────────────────────────
+state_machines:
+  service_lifecycle:
+    schema: schema/service.schema.json
+    states: [requested, scheduled, confirmed, in_progress, completed, documented,
+             invoiced, collected, verified, cancelled, disputed, reassigning,
+             rescheduling, partial]
+    happy_path: [requested, scheduled, confirmed, in_progress, completed,
+                 documented, invoiced, collected, verified]
+    required: [requested, scheduled, confirmed, in_progress, completed, documented]
+    optional_financial: [invoiced, collected, verified]
+    exception: [cancelled, disputed, reassigning, rescheduling, partial]
+    reference_implementation_divergence:
+      tool: lifecycle.transition
+      file: packages/mcp-server/src/tools/authenticated/lifecycle.ts
+      enum: [scheduled, confirmed, in_progress, delivered, documented, charged,
+             verified, cancelled]
+      note: >
+        Uses `delivered`/`charged` instead of `completed`/`invoiced`+`collected`
+        for compatibility with the Coordinalo upstream API. Known divergence —
+        do not change without a coordinated migration.
+  billing_status:
+    schema: schema/service.schema.json
+    states: [pending, charged, invoiced, paid, disputed]
+  service_order:
+    schema: schema/service-order.schema.json
+    states: [draft, proposed, negotiating, active, paused, completed, cancelled]
+  dimensions:
+    extension: state-dimensions
+    doc: public/spec/extensions/state-dimensions.md
+    note: >
+      The protocol does not impose a total order across fulfillment, evidence,
+      acceptance and settlement. The state-dimensions extension (draft)
+      formalizes the orthogonal projection.
+
+# ── Extensions registry ──────────────────────────────────────────────────────
+# maturity: draft | experimental | candidate | stable | deprecated
+extensions:
+  - { id: evidence-profiles,    name: Evidence Profiles,    maturity: candidate,
+      doc: schema/evidence/base.schema.json }
+  - { id: settlement,           name: Settlement,           maturity: experimental,
+      doc: PROTOCOL.md#128-payment-model }
+  - { id: disputes,             name: Disputes,             maturity: draft,
+      doc: null }
+  - { id: delegated-agency,     name: Delegated Agency,     maturity: experimental,
+      doc: spec/delegated-agency-model.md,
+      note: "Mandate scopes are advisory in the reference implementation — not enforced at the MCP tool boundary." }
+  - { id: network-intelligence, name: Network Intelligence, maturity: experimental,
+      doc: PROTOCOL.md#14-network-intelligence }
+  - { id: state-dimensions,     name: State Dimensions,     maturity: draft,
+      doc: public/spec/extensions/state-dimensions.md }
+  - { id: proof-of-service,     name: Proof of Service,     maturity: draft,
+      doc: public/spec/extensions/proof-of-service.md }
+  - { id: webhooks,             name: Webhooks,             maturity: experimental,
+      doc: WEBHOOKS.md }
+
+# ── Implementations ──────────────────────────────────────────────────────────
+implementations:
+  - id: coordinalo
+    name: Coordinalo
+    role: reference
+    vertical: health
+    status: live
+    url: https://coordinalo.com
+    since: "2026-03-31"
+    conformance: "Manual review (2026-06). Automated certification suite: roadmap."

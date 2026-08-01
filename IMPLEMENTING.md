@@ -13,7 +13,7 @@ Guía paso a paso para construir una plataforma compatible con Servicialo. No ne
 Para aparecer como implementación de Servicialo ([§16](./PROTOCOL.md#16-implementations)), tu plataforma DEBE:
 
 1. Modelar servicios usando las **8 dimensiones** (§5)
-2. Implementar los **9 estados del ciclo de vida** (§6)
+2. Implementar los **6 estados core del ciclo de vida** (§6) — los 3 financieros son opcionales
 3. Manejar al menos **3 flujos de excepción** (§7)
 4. Exponer una API a la que un **servidor MCP pueda conectarse**
 
@@ -116,9 +116,9 @@ interface Service {
 
 ---
 
-## Paso 2: Implementar los 9 Estados del Ciclo de Vida
+## Paso 2: Implementar los 6+3 Estados del Ciclo de Vida
 
-Los 9 estados son estrictamente ordenados. No se pueden saltar (§6.1).
+Los estados son estrictamente ordenados. No se pueden saltar (§6.1). Los primeros 6 (`requested` → `documented`) son el core obligatorio; los estados 7–9 (`invoiced`, `collected`, `verified`) son extensiones financieras opcionales — impleméntalos si tu plataforma cubre el cierre financiero.
 
 ```
 requested → scheduled → confirmed → in_progress → completed → documented → invoiced → collected → verified
@@ -336,7 +336,7 @@ Expón endpoints HTTP que cubran las fases de agente del §13. La Fase 0 (resolu
 
 Para un walkthrough completo con ejemplos de request/response, ver [`examples/minimal-implementation.md`](./examples/minimal-implementation.md) ([English](./examples/minimal-implementation.en.md)).
 
-**Listo cuando:** Un cliente HTTP puede crear un servicio, avanzarlo por los 9 estados, y disparar cada uno de tus 3 flujos de excepción.
+**Listo cuando:** Un cliente HTTP puede crear un servicio, avanzarlo por los 6 estados core (más los financieros si los implementas), y disparar cada uno de tus 3 flujos de excepción.
 
 ---
 
@@ -425,7 +425,7 @@ Tu implementación DEBE almacenar evidencia de forma inmutable — una vez regis
 | # | Requisito | Ref. spec | Verificar |
 |---|-----------|-----------|-----------|
 | 1 | El servicio tiene las 8 dimensiones | §5 | Validar contra `schema/service.schema.json` |
-| 2 | Los 9 estados están implementados | §6 | Crear un servicio y avanzarlo por los 9 estados |
+| 2 | Los 6 estados core están implementados | §6 | Crear un servicio y avanzarlo por los 6 estados core (los financieros son opcionales) |
 | 3 | Los estados son estrictamente ordenados (sin saltos) | §6.1 | Intentar una transición inválida — debe fallar |
 | 4 | Cada transición registra `from`, `to`, `at`, `by` | §6.1 | Inspeccionar el array de transiciones después de un ciclo completo |
 | 5 | 3+ flujos de excepción funcionan | §7 | Disparar cada uno y verificar la máquina de estados |

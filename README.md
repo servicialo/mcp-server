@@ -64,7 +64,7 @@ Servicialo define cuatro primitivas de coordinación. Juntas cubren la cadena de
 
 | Primitiva | Qué resuelve | Superficie del protocolo |
 |-----------|-------------|--------------------------|
-| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | 9 estados del ciclo de vida, 6 flujos de excepción, scheduler de 3 variables |
+| **Coordinación de agenda** | Intersección de disponibilidad multi-parte (proveedor, cliente, recurso) con manejo de excepciones | Ciclo de vida 6+3, 6 flujos de excepción, scheduler de 3 variables |
 | **Verificación de identidad** | Credenciales del proveedor, puntaje de confianza, separación cliente-pagador | Credenciales del proveedor, trust_score, separación payer_id |
 | **Liquidación financiera** | Facturación, cobranza, liquidación y revenue sharing con resolución de disputas | Dimensión de cobro, ledger de Orden de Servicio, payment_schedule |
 | **Señales de demanda** | Telemetría operacional anónima y agregada entre nodos de la red | Extensión de Telemetría (modelo contribuir-para-acceder) |
@@ -100,7 +100,7 @@ Todo servicio profesional — desde una sesión de kinesiología hasta una audit
 | **3** | **Quién recibe** | El cliente — con pagador separado explícitamente | Paciente (paga FONASA), empleado (paga empresa) |
 | **4** | **Cuándo** | Ventana temporal acordada | 2026-02-10 de 10:00 a 10:45 |
 | **5** | **Dónde** | Ubicación física o virtual, con `resource_id` opcional que referencia un Recurso físico (3.5b: sala, box, sillón, equipamiento) | Sala 3 de clínica, domicilio, videollamada |
-| **6** | **Ciclo** | Posición actual en los 9 estados del ciclo de vida | Cobrado → próximo: Verificado |
+| **6** | **Ciclo** | Posición actual en las dimensiones de estado (entrega, evidencia, aceptación, liquidación) | Completado · evidencia registrada · cobro pendiente |
 | **7** | **Evidencia** | Cómo se prueba que el servicio ocurrió | GPS + duración + firma del cliente |
 | **8** | **Cobro** | Liquidación financiera, independiente del ciclo | $35.000 CLP · cobrado · paquete prepago |
 
@@ -108,12 +108,12 @@ Todo servicio profesional — desde una sesión de kinesiología hasta una audit
 
 ---
 
-## Los 9 estados universales
+## El ciclo de vida: 6 estados core + 3 financieros opcionales
 
-No importa si es un masaje o una auditoría. Todo servicio transiciona por el mismo ciclo de vida:
+El protocolo define estados independientes para observar el ciclo completo de una coordinación. Los 9 hitos siguientes son el **camino feliz** — la ruta operativa más común, no una secuencia única obligatoria. Los 6 primeros son requeridos; los 3 financieros son una extensión opcional. Entrega, evidencia, aceptación y liquidación evolucionan de manera independiente ([PROTOCOL.md §6.0](./PROTOCOL.md)):
 
 ```
-Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
+Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → (opcional) Facturado → Cobrado → Verificado
 ```
 
 | # | Estado | Qué ocurre |
@@ -177,7 +177,7 @@ La misma estructura funciona para cualquier vertical:
 
 ## Evidencia por vertical
 
-Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin ambigüedad — para que un algoritmo pueda resolver el 80% de las disputas sin intervención humana:
+Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin ambigüedad — para producir una Prueba de Servicio acreditable con criterios objetivos previamente acordados:
 
 <details>
 <summary><b>Salud</b> — 4 tipos de evidencia</summary>
@@ -235,9 +235,9 @@ Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin amb
 
 ---
 
-## Resolución de disputas
+## Resolución de disputas — extensión en diseño
 
-Cuando hay desacuerdo, el mecanismo no depende de buena voluntad, no requiere un juez centralizado, y un agente AI puede ejecutarlo con la misma confianza que un humano:
+El módulo de disputas (`Servicialo/Disputas`) está **en diseño** — el flujo siguiente describe el diseño objetivo, no una capacidad operativa:
 
 **1. Apertura** — Cualquier parte abre disputa dentro del plazo definido. Se congela el cobro automáticamente.
 
@@ -245,7 +245,7 @@ Cuando hay desacuerdo, el mecanismo no depende de buena voluntad, no requiere un
 
 **3. Resolución** — Si proveedor gana: Cobrado → Verificado. Si cliente gana: Cancelado con balance restaurado.
 
-> **80/20.** El 80% de las disputas se resuelven automáticamente comparando evidencia contra contrato. Sin intervención humana, sin discrecionalidad, sin demora. El 20% restante escala a árbitros del mismo vertical profesional que votan en 48 horas.
+> **Objetivo de diseño:** automatizar la resolución de los casos cuya evidencia satisface reglas previamente acordadas en el contrato. Los casos que la evidencia no resuelve escalarían a revisión humana; el arbitraje por pares del mismo vertical es una línea de investigación, no un mecanismo desplegado.
 
 ---
 
@@ -338,8 +338,8 @@ Detalles: [`docs/benchmarks.md`](./docs/benchmarks.md) · [`docs/telemetry-opera
 
 | # | Principio | |
 |:-:|-----------|---|
-| 1 | **Todo servicio tiene un ciclo** | No importa si es un masaje o una auditoría. Los 9 estados son universales. |
-| 2 | **La entrega debe ser verificable** | Si no puedes probar que el servicio ocurrió, no ocurrió. El protocolo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
+| 1 | **Todo servicio tiene un ciclo** | No importa si es un masaje o una auditoría. El protocolo define estados independientes para observar el ciclo completo: entrega, evidencia, aceptación y liquidación. |
+| 2 | **La entrega debe ser verificable** | Sin evidencia suficiente, una entrega no puede considerarse acreditada con el nivel de certeza requerido. El protocolo define qué constituye evidencia válida para que humanos y agentes AI puedan confiar en ella. |
 | 3 | **El pagador no siempre es el cliente** | En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador. |
 | 4 | **Las excepciones son la regla** | Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando las cosas no salen según el plan. |
 | 5 | **Un servicio es un producto legible por máquinas** | Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente AI puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano. |
@@ -358,7 +358,7 @@ Todo lo necesario para modelar un servicio profesional de principio a fin.
 
 Para cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza con múltiples cuentas, equipos y personal.
 
-Incluye: 8 dimensiones · 9 estados del ciclo de vida · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (40 herramientas) · resolver de descubrimiento (análogo a DNS, sobre HTTP) · interoperabilidad A2A · inteligencia de red (benchmarks bucketeados con k-anonimato ≥5 y contribuir-para-acceder) · webhooks para distribución push · descubrimiento de taxonomía sin conocimiento previo (cold-start)
+Incluye: 8 dimensiones · ciclo de vida 6+3 (6 estados core + 3 financieros opcionales) · 6 flujos de excepción · 7 principios fundamentales · gestión de recursos · órdenes de servicio · prueba de entrega · protocolo MCP (40 herramientas) · resolver de descubrimiento (análogo a DNS, sobre HTTP) · interoperabilidad A2A · inteligencia de red (benchmarks bucketeados con k-anonimato ≥5 y contribuir-para-acceder) · webhooks para distribución push · descubrimiento de taxonomía sin conocimiento previo (cold-start)
 
 ### Servicialo/Finanzas — `en diseño`
 
@@ -368,7 +368,7 @@ Para plataformas que intermedian pagos entre clientes y profesionales, o que cob
 
 ### Servicialo/Disputas — `en diseño`
 
-Resolución formal con arbitraje algorítmico (~80%) y por pares del mismo vertical (~20%).
+Resolución formal de disputas. Objetivo de diseño: automatizar los casos cuya evidencia satisface reglas previamente acordadas; el arbitraje por pares del mismo vertical es una línea de investigación.
 
 Para plataformas con volumen suficiente o donde el monto por servicio hace que las disputas sean económicamente relevantes.
 
@@ -423,7 +423,7 @@ orden_de_servicio:
         recurso_id: texto        # Opcional — referencia a recurso físico
 
       ciclo_de_vida:
-        estado_actual: enum[9]   # Los 9 estados universales
+        estado_actual: enum      # 6 core + 3 financieros opcionales + excepciones
         transiciones: transición[]
         excepciones: excepción[]
 
@@ -457,23 +457,23 @@ orden_de_servicio:
 
 ## Implementaciones
 
-Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 9 estados, manejar al menos 3 de los 6 flujos de excepción, adherir a los 7 principios fundamentales y exponer una API conectable al MCP server.
+Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 6 estados core (los 3 financieros son opcionales), manejar al menos 3 de los 6 flujos de excepción, adherir a los 7 principios fundamentales y exponer una API conectable al MCP server. La verificación es manual hoy (PR + revisión del equipo); la suite automatizada de certificación es parte del roadmap.
 
 | Plataforma | Vertical | Cobertura | Estado |
 |------------|----------|-----------|:------:|
-| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensiones · 9/9 estados · 6/6 excepciones · 7/7 principios | Live |
+| [**Coordinalo**](https://coordinalo.com) | Healthcare | 8/8 dimensiones · ciclo 6+3 completo · 6/6 excepciones · 7/7 principios | Live |
 
-> Coordinalo es la implementación de referencia. El segundo nodo es una oportunidad abierta — ver [`IMPLEMENTORS.md`](./IMPLEMENTORS.md).
+> Coordinalo es la implementación de referencia — no el protocolo. El segundo nodo es una oportunidad abierta — ver [`IMPLEMENTORS.md`](./IMPLEMENTORS.md).
 
 ### Para implementadores
 
-Guía paso a paso para construir una plataforma compatible desde cero — 7 pasos, el primero toma 20 minutos.
+Guía paso a paso para construir una plataforma compatible desde cero — 8 pasos, el primero toma 20 minutos.
 Empezar aquí: [`IMPLEMENTING.md`](./IMPLEMENTING.md) ([English](./IMPLEMENTING.en.md))
 
 Referencias adicionales:
 - [`schema/evidence/`](./schema/evidence/) — Schemas de evidencia por vertical (salud, hogar, legal, educación, consultoría)
 - [`ERRORS.md`](./ERRORS.md) — Códigos de error del protocolo
-- [`WEBHOOKS.md`](./WEBHOOKS.md) — Notificaciones asíncronas de cambios de estado (borrador)
+- [`WEBHOOKS.md`](./WEBHOOKS.md) — Notificaciones asíncronas de cambios de estado (v0.2 — eventos del registry estables)
 
 ---
 
@@ -498,10 +498,12 @@ servicialo/
 │   ├── service.schema.json
 │   ├── service-order.schema.json
 │   └── ...
+├── protocol/
+│   └── manifest.yaml     # Fuente única de verdad: versión, tools, estados, extensiones
 ├── SPEC.md               # Quick spec — referencia autocontenida para evaluadores
 ├── PROTOCOL.md           # Especificación completa
 ├── ERRORS.md             # Códigos de error del protocolo
-├── WEBHOOKS.md           # Especificación de webhooks (borrador)
+├── WEBHOOKS.md           # Especificación de webhooks (v0.2)
 ├── IMPLEMENTORS.md       # Guía para construir una implementación
 ├── GOVERNANCE.md         # Gobernanza de red y política de datos
 └── README.md
@@ -509,16 +511,16 @@ servicialo/
 
 |  | Versión | Estado |
 |---|---------|--------|
-| Protocol | 0.9 | Estable |
-| @servicialo/mcp-server | 0.8.0 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| Protocol | 0.10 | Draft |
+| @servicialo/mcp-server | 0.9.12 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 
 ## Ecosystem
 
-- [Network explorer](https://servicialo.com/network) — live nodes implementing the protocol
-- [awesome-servicialo](https://github.com/servicialo/awesome-servicialo) — curated list of integrations, clients, and tools
-- Using Servicialo? [Add your implementation](https://github.com/servicialo/awesome-servicialo/issues/new)
+- [Telemetría de red](https://servicialo.com/network) — instalaciones del MCP server reportadas por telemetría (no equivale a implementaciones adoptadas)
+- [Implementadores](https://servicialo.com/implementors) — implementaciones verificadas del protocolo
+- Using Servicialo? [Open an issue](https://github.com/servicialo/mcp-server/issues/new) to get listed
 
 ---
 

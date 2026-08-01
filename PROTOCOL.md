@@ -4,11 +4,11 @@
 
 | | |
 |---|---|
-| **Version** | 0.9 |
-| **Date** | 2026-03-20 |
+| **Version** | 0.10 |
+| **Date** | 2026-08-01 |
 | **Status** | Draft |
 | **License** | Apache-2.0 |
-| **Canonical URL** | `https://servicialo.com/spec/v0.9` |
+| **Canonical URL** | `https://servicialo.com/spec/v0.10` |
 | **Schemas** | `https://servicialo.com/schema/` |
 
 ---
@@ -29,6 +29,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 4.  [Core Entities](#4-core-entities)
 5.  [The 8 Dimensions of a Service](#5-the-8-dimensions-of-a-service)
 6.  [The 6 + 3 Universal States](#6-the-6--3-universal-states)
+    - 6.0 [Happy-Path Milestones and Orthogonal Dimensions](#60-happy-path-milestones-and-orthogonal-dimensions)
 7.  [Exception Flows](#7-exception-flows)
 8.  [Service Order](#8-service-order)
 9.  [Principles](#9-principles)
@@ -40,15 +41,17 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
     - 13.0 [Phase 0 — DNS Resolution](#130-phase-0--dns-resolution)
     - 13.7 [A2A Interoperability](#137-a2a-interoperability)
     - 13.8 [MCP Streamable HTTP Transport](#138-mcp-streamable-http-transport)
+    - 13.9 [Network Intelligence Tools](#139-network-intelligence-tools)
 14. [Network Intelligence](#14-network-intelligence)
 15. [Extensibility](#15-extensibility)
+    - 15.6 [Registered Extensions](#156-registered-extensions)
 16. [Implementations](#16-implementations)
 17. [Contributing & Versioning](#17-contributing--versioning)
 
 **Appendices**
 
 - [A. Glossary (extended)](#appendix-a-glossary)
-- [B. Changelog v0.6 → v0.7 → v0.8 → v0.9](#appendix-b-changelog)
+- [B. Changelog v0.6 → v0.7 → v0.8 → v0.9 → v0.10](#appendix-b-changelog)
 - [C. Scope Reference](#appendix-c-scope-reference)
 - [D. Attribute Key Reference](#appendix-d-attribute-key-reference)
 
@@ -175,6 +178,8 @@ Organization
     └── Services (atomic units)
         └── 8 dimensions each
 ```
+
+*Proof of Service (draft concept).* The dossier that links what was agreed, what was delivered, the available evidence, and the settlement position for one delivery is specified as a draft extension — see [proof-of-service](./public/spec/extensions/proof-of-service.md) and the extension registry (§15.6). No wire object exists in the core protocol today; everything the dossier links is already derivable from the entities above.
 
 ---
 
@@ -333,6 +338,18 @@ Financial settlement for the service. Billing has its own status independent fro
 
 Every service passes through the same core lifecycle. The 6 core states are the minimum required for an AI agent to verify with certainty that a service was requested, delivered, and documented. The 3 financial extension states are OPTIONAL — implementations MAY bundle them into the session lifecycle or manage them independently.
 
+### 6.0 Happy-Path Milestones and Orthogonal Dimensions
+
+The lifecycle sequence below is the wire encoding of the **happy path**: the most common operational route through a coordination. Each successive milestone bundles progress across several independent concerns — delivery, evidence, acceptance, and settlement — into a single convenient marker.
+
+The bundling is convenient; it is not semantics. **The protocol does not establish a total order between delivery completion, evidence, acceptance, and settlement.** Real coordinations include prepayment, free services, monthly invoicing, multiple deliveries under one order, milestone payments, acceptance before payment, payers distinct from beneficiaries, refunds, chargebacks, and partial or failed deliveries — in all of them, the four concerns advance independently:
+
+- A delivery MAY be completed before, after, or without any settlement event (the `billing.*` dimension, §5.8, already carries its own status track).
+- Evidence MAY become sufficient before or after invoicing.
+- The settlement position never determines the existence of a delivery: a refund does not un-happen a delivery, and payment is not a prerequisite for accrediting one.
+
+Ordering rules in this section (§6.1) apply **within** the lifecycle sequence an implementation exposes. An implementation MAY present a linear experience to its users; interoperability is evaluated per dimension. The [state-dimensions extension](https://spec.servicialo.com/extensions/state-dimensions.md) (Draft, §15.6) formalizes the full orthogonal projection of these milestones into independent `fulfillment` / `evidence` / `acceptance` / `financial` state machines.
+
 ### Core Lifecycle (REQUIRED — states 1–6)
 
 ```
@@ -390,7 +407,9 @@ Verification is the closure of the cycle, not a step in the middle. The client c
 
 ### 6.3.1 Verification Deadline
 
-After transitioning to `delivered`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `delivered`.
+After transitioning to `completed`, implementations MUST set a `verification_deadline` (ISO 8601 timestamp). The default deadline is 12 hours from delivery. Acceptable range: [1 hour, 72 hours]. If no client action (verify or dispute) occurs before the deadline, the implementation MUST auto-transition to `verified` with `method: "auto"` in the transition record. `lifecycle.get_state` MUST include `verification_deadline` when current state is `completed`.
+
+> Note: earlier revisions of this section referenced a `delivered` state that does not exist in the canonical enum (§6). The reference implementation's `lifecycle.transition` tool still exposes `delivered`/`charged` in place of `completed`/`invoiced`+`collected` for compatibility with the Coordinalo upstream API — a known divergence, tracked in `protocol/manifest.yaml` under `state_machines.service_lifecycle.reference_implementation_divergence`.
 
 ### 6.4 Revenue Recognition
 
@@ -1248,15 +1267,19 @@ MCP servers that proxy to an upstream backend MUST forward 429 responses and `Re
 
 ### 13.1 Discovery Mode (No Credentials)
 
-Four public tools are available without authentication. These tools do not require a ServiceMandate.
+Fifteen public tools are available without authentication; none of them requires a ServiceMandate. The public surface spans the resolver tools (§13.0: `resolve.lookup`, `resolve.search`, `trust.get_score`), the discovery tools below, the A2A card (§13.7: `a2a.get_agent_card`), and the Network Intelligence read tools (§13.9: `market.list_segments`, `market.get_benchmark`).
 
 | Tool | Description | Required Scopes |
 |------|-------------|-----------------|
 | `registry.search` | Search organizations by vertical and location. | None. |
 | `registry.get_organization` | Public details of an organization. | None. |
 | `registry.manifest` | Server manifest: capabilities, protocol version, organization metadata. | None. |
+| `registry.list_verticals` | Enumerate verticals present in the registry (cold-start discovery). | None. |
+| `registry.list_regions` | Enumerate regions present in the registry (cold-start discovery). | None. |
+| `registry.list_event_types` | Catalog of operational telemetry event types. | None. |
 | `scheduling.check_availability` | Check available time slots. | None. |
 | `services.list` | Public service catalog. | None. |
+| `docs.quickstart` | Machine-readable quickstart for agents integrating the protocol. | None. |
 
 #### 13.1.1 `scheduling.check_availability` — Availability Modes
 
@@ -1399,7 +1422,7 @@ When `submitted_by_type` is `agent` or `human_with_agent_assistance`, `agent_id`
 | `payments.record_payment` | Record a payment. | `payment:write`. |
 | `payments.get_status` | Get payment status. | `payment:read`. |
 
-> **Note:** The following tool groups (§13.2.6 and §13.2.7) extend the core 37 tools defined in Phases 0–6, Resource Management, Resolver Admin, and Network Intelligence (`market.*`). They are OPTIONAL per §6 (Minimum Implementation Requirements) and are not included in the base tool count. Implementations that support Service Orders (§8) SHOULD expose §13.2.6 tools; implementations that support the Delegated Agency Model (§10) SHOULD expose §13.2.7 tools.
+> **Note:** The following tool groups (§13.2.6 and §13.2.7) extend the core 40 tools (15 public + 25 authenticated) defined in Phases 0–6, Resource Management, Resolver Admin, and Network Intelligence (`market.*`). They are OPTIONAL per §6 (Minimum Implementation Requirements) and are not included in the base tool count. Neither group is implemented in the reference MCP server today (`specified_unimplemented_tools` in `protocol/manifest.yaml`). Implementations that support Service Orders (§8) SHOULD expose §13.2.6 tools; implementations that support the Delegated Agency Model (§10) SHOULD expose §13.2.7 tools.
 
 #### 13.2.6 Service Order Tools
 
@@ -1553,11 +1576,20 @@ Both transports expose identical tool sets and follow the same access model (§2
 
 **HTTP contract reference:** [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) defines the canonical REST endpoints. [`spec/openapi.yaml`](./spec/openapi.yaml) provides the OpenAPI 3.1 specification.
 
+### 13.9 Network Intelligence Tools
+
+Two public read tools expose the aggregated benchmarks of §14. They require no authentication; access tiers are governed by the contribute-to-access model (§14.2).
+
+| Tool | Description | Required Scopes |
+|------|-------------|-----------------|
+| `market.list_segments` | List benchmark segments (vertical × region × scale) with sample sizes. | None. |
+| `market.get_benchmark` | Aggregate operational benchmarks for a segment (k-anonymity ≥ 5 enforced). | None. |
+
 ---
 
 ## 14. Network Intelligence
 
-> **Status:** Design phase. Not yet implemented.
+> **Status:** Partially implemented. The read-side benchmark tools (`market.list_segments`, `market.get_benchmark`, §13.9) are live; the contribute-to-access accrual model is in progress. This entire capability is OPTIONAL (§16, requirement 8) — an implementation is conformant without ever contributing to or reading from the network.
 
 ### 14.1 The Network Effect
 
@@ -1610,6 +1642,33 @@ When extending the protocol:
 - OPTIONAL fields MAY be added in minor version increments.
 - Implementations MUST ignore unrecognized fields rather than rejecting them.
 
+### 15.6 Registered Extensions
+
+Capabilities beyond the core are defined as extensions with an explicit maturity level:
+
+| Maturity | Meaning |
+|---|---|
+| `draft` | Design proposal. May change or be withdrawn. Not required for conformance. |
+| `experimental` | Implemented at least partially; interface unstable. |
+| `candidate` | Interface stable; awaiting adoption by more than one implementation. |
+| `stable` | Frozen interface; breaking changes require a major protocol version. |
+| `deprecated` | Scheduled for removal; do not adopt. |
+
+The extension registry lives in [`protocol/manifest.yaml`](./protocol/manifest.yaml) and currently contains:
+
+| Extension | Maturity | Specification |
+|---|---|---|
+| Evidence Profiles | candidate | [`schema/evidence/base.schema.json`](./schema/evidence/base.schema.json) + vertical schemas |
+| Settlement | experimental | §12.8 Payment Model |
+| Disputes | draft | Design phase — no specification document yet |
+| Delegated Agency | experimental | [`spec/delegated-agency-model.md`](./spec/delegated-agency-model.md) — mandate scopes are advisory in the reference implementation |
+| Network Intelligence | experimental | §14 |
+| State Dimensions | draft | [`public/spec/extensions/state-dimensions.md`](./public/spec/extensions/state-dimensions.md) |
+| Proof of Service | draft | [`public/spec/extensions/proof-of-service.md`](./public/spec/extensions/proof-of-service.md) |
+| Webhooks | experimental | [`WEBHOOKS.md`](./WEBHOOKS.md) |
+
+An extension MUST NOT be presented as a stable, operative capability while its registered maturity is `draft` or `experimental`.
+
 ---
 
 ## 16. Implementations
@@ -1627,9 +1686,13 @@ Any platform can implement the Servicialo specification. To be listed as a compa
 
 ### Reference Implementation
 
-| Platform | Vertical | Status |
-|----------|----------|--------|
-| Coordinalo | Healthcare | Live |
+| Platform | Vertical | Status | Conformance |
+|----------|----------|--------|-------------|
+| Coordinalo | Healthcare | Live | Manual review (2026-06). An automated certification suite is on the roadmap. |
+
+> Conformance note: the Delegated Agency Model (§10) is specified, but the reference implementation (Coordínalo) does not yet enforce mandate validation at the MCP tool boundary — agent access is controlled by the organization API key alone. Treat mandate scopes as advisory until enforcement ships.
+
+Listing works by pull request and manual review today (see [IMPLEMENTORS.md](./IMPLEMENTORS.md)). There is no automated certification suite yet; describing one as operative would be inaccurate.
 
 ---
 
@@ -1692,6 +1755,18 @@ The protocol version is independent from the MCP server package version.
 ---
 
 ## Appendix B: Changelog
+
+### v0.10 (2026-08-01)
+
+- **Version unification.** The document header now matches the version declared in `CHANGELOG.md` (the v0.10 registry/demand-signal work of 2026-05-20 shipped without bumping this header). `protocol/manifest.yaml` introduced as the single source of truth for version, tool surface, state machines, and the extension registry — enforced by CI (`verify-manifest-tools`, `verify-versions`, `verify-doc-claims`).
+- **§6.0 Happy-Path Milestones and Orthogonal Dimensions.** The lifecycle sequence is now explicitly framed as the wire encoding of the happy path. The protocol does not establish a total order between delivery, evidence, acceptance, and settlement; each dimension retains its own lifecycle. The `state-dimensions` draft extension formalizes the orthogonal projection.
+- **Errata §6.3.1.** The Verification Deadline rule referenced a `delivered` state that does not exist in the canonical enum; corrected to `completed`, with the reference implementation's `delivered`/`charged` divergence documented.
+- **§13 tool tables completed.** §13.1 now lists the full public surface (15 tools, including `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types`, `docs.quickstart`); new §13.9 documents the public `market.*` tools. The core tool count is 40 (15 public + 25 authenticated).
+- **§14 status corrected.** Network Intelligence is partially implemented (read-side benchmarks live), and explicitly OPTIONAL.
+- **§15.6 Registered Extensions.** Maturity scale (draft/experimental/candidate/stable/deprecated) and the extension registry table.
+- **§16 conformance honesty.** Listing is by pull request and manual review today; the automated certification suite is roadmap. Mandate enforcement remains advisory in the reference implementation.
+- **New draft extensions.** `state-dimensions` and `proof-of-service` published under `public/spec/extensions/`.
+- **Erratum on the v0.8 entry below.** That entry stated that 3 mandate management tools (`mandates.list`, `mandates.get`, `mandates.suspend`) were added to the MCP server. They are specified (§13.2.7) but were never implemented in the reference server; they are tracked as `specified_unimplemented_tools` in `protocol/manifest.yaml`.
 
 ### v0.9 (2026-03-20)
 
@@ -1771,9 +1846,15 @@ Protocol-defined scopes. All scopes follow the `{resource}:{action}` pattern.
 | `registry.search` | None (public). |
 | `registry.get_organization` | None (public). |
 | `registry.manifest` | None (public). |
+| `registry.list_verticals` | None (public). |
+| `registry.list_regions` | None (public). |
+| `registry.list_event_types` | None (public). |
 | `scheduling.check_availability` | None (public). |
 | `services.list` | None (public). |
 | `a2a.get_agent_card` | None (public). |
+| `docs.quickstart` | None (public). |
+| `market.list_segments` | None (public). |
+| `market.get_benchmark` | None (public). |
 | `service.get` | `service:read`. |
 | `contract.get` | `service:read` or `order:read`. |
 | `clients.get_or_create` | `patient:write`. |

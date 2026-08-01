@@ -27,8 +27,8 @@ authentication:
 
 MCP server that lets AI agents operate professional service businesses through a standardized protocol. Two modes:
 
-- **Discovery mode** (no auth): 12 public tools — discovery resolver (DNS-analog), search organizations, check availability, list services, A2A discovery, market benchmarks
-- **Authenticated mode** (API key + org ID): 37 tools total across 7 lifecycle phases (0–6) plus resource management, resolver administration, and network-intelligence (`market.list_segments`, `market.get_benchmark`)
+- **Discovery mode** (no auth): 15 public tools — discovery resolver (DNS-analog), search organizations, check availability, list services, A2A discovery, market benchmarks
+- **Authenticated mode** (API key + org ID): 40 tools total across 7 lifecycle phases (0–6) plus resource management, resolver administration, and network-intelligence (`market.list_segments`, `market.get_benchmark`)
 
 ## Lifecycle Phases
 

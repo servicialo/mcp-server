@@ -20,7 +20,7 @@
           "response_body": {
             "servicialo_version": "1.0",
             "organization": {
-              "name": "Mama Pro",
+              "name": "Clinica Demo",
               "slug": "clinica-demo"
             },
             "services": [
@@ -58,7 +58,7 @@
           }
         }
       ],
-      "agent_response": "En Mama Pro tienen tres opciones de kinesiologia:\n1. Kinesiologia de Piso Pelvico - $46.000 CLP, 60 min, a domicilio\n2. Kinesiologia Musculoesqueletica - $40.000 CLP, 60 min, a domicilio\n3. Kinesiologia Online - $30.000 CLP, 60 min, remoto\n\nCual necesitas para tu hijo?"
+      "agent_response": "En Clinica Demo tienen tres opciones de kinesiologia:\n1. Kinesiologia de Piso Pelvico - $46.000 CLP, 60 min, a domicilio\n2. Kinesiologia Musculoesqueletica - $40.000 CLP, 60 min, a domicilio\n3. Kinesiologia Online - $30.000 CLP, 60 min, remoto\n\nCual necesitas para tu hijo?"
     },
     {
       "turn": 2,
@@ -74,7 +74,7 @@
           "response_body": {
             "servicialo_version": "1.0",
             "organization": {
-              "name": "Mama Pro",
+              "name": "Clinica Demo",
               "slug": "clinica-demo"
             },
             "results": [

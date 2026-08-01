@@ -3,32 +3,26 @@
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 
+// Anchors del home (scroll-spy solo aplica en "/")
 const sections = [
-  { name: "Definición", id: "que-es" },
-  { name: "Origen", id: "origen" },
-  { name: "Anatomía", id: "anatomia" },
-  { name: "Entidades", id: "entidades" },
+  { name: "Qué es", id: "que-es" },
+  { name: "El problema", id: "problema" },
+  { name: "Objetos", id: "objetos" },
+  { name: "El modelo", id: "modelo" },
+  { name: "Prueba de Servicio", id: "prueba-de-servicio" },
   { name: "Ciclo de vida", id: "ciclo" },
-  { name: "Disputas", id: "resolucion" },
-  { name: "Evidencia", id: "evidencia-vertical" },
-  { name: "Gradiente de certeza", id: "gradiente-certeza" },
   { name: "Principios", id: "principios" },
-  { name: "Ruta de adopción", id: "ruta-adopcion" },
-  { name: "Módulos", id: "modulos" },
-  { name: "Estándar", id: "estandar" },
-  { name: "Por qué", id: "por-que" },
-  { name: "Servidor MCP", id: "mcp-server" },
+  { name: "Bindings y agentes", id: "mcp-server" },
+  { name: "Estado actual", id: "estado-actual" },
+  { name: "Participa", id: "participar" },
 ];
 
-// Desktop: only key entry points to keep navbar balanced
-const desktopSections = [
-  { name: "Definición", id: "que-es" },
-  { name: "Principios", id: "principios" },
-  { name: "Módulos", id: "modulos" },
-  { name: "Estándar", id: "estandar" },
-  { name: "Servidor MCP", id: "mcp-server" },
-  { name: "Red", id: "_network", href: "/network" },
-  { name: "Implementors", id: "_implementors", href: "/implementors" },
+const routes = [
+  { name: "Spec", href: "/spec" },
+  { name: "Extensiones", href: "/extensions" },
+  { name: "Red", href: "/network" },
+  { name: "Implementadores", href: "/implementors" },
+  { name: "Visión", href: "/vision" },
 ];
 
 export function Navbar() {
@@ -39,6 +33,7 @@ export function Navbar() {
     const els = sections
       .map((s) => document.getElementById(s.id))
       .filter(Boolean) as HTMLElement[];
+    if (els.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -65,9 +60,19 @@ export function Navbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleClick = (id: string) => {
+  const handleAnchorClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    id: string
+  ) => {
     setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    // En el home, scroll suave; en otras páginas, dejar que navegue a /#id
+    if (window.location.pathname === "/") {
+      const el = document.getElementById(id);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }
   };
 
   return (
@@ -82,37 +87,26 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-0.5">
-          {desktopSections.map((section) => {
-            if ("href" in section && section.href) {
-              return (
-                <a
-                  key={section.id}
-                  href={section.href}
-                  className="font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 border-transparent text-text-muted hover:text-accent"
-                >
-                  {section.name}
-                </a>
-              );
-            }
-            // Map intermediate sections to their parent nav item
-            const isActive =
-              activeId === section.id ||
-              (section.id === "que-es" &&
-                ["que-es", "origen", "anatomia", "entidades", "ciclo", "resolucion", "evidencia-vertical"].includes(activeId ?? ""));
-            return (
-              <button
-                key={section.id}
-                onClick={() => handleClick(section.id)}
-                className={`font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 ${
-                  isActive
-                    ? "text-accent border-accent"
-                    : "text-text-muted hover:text-accent border-transparent"
-                }`}
-              >
-                {section.name}
-              </button>
-            );
-          })}
+          <a
+            href="/#que-es"
+            onClick={(e) => handleAnchorClick(e, "que-es")}
+            className={`font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 ${
+              activeId
+                ? "text-accent border-accent"
+                : "text-text-muted hover:text-accent border-transparent"
+            }`}
+          >
+            Protocolo
+          </a>
+          {routes.map((route) => (
+            <a
+              key={route.href}
+              href={route.href}
+              className="font-mono text-[11px] px-2.5 py-2 whitespace-nowrap transition-colors border-b-2 border-transparent text-text-muted hover:text-accent"
+            >
+              {route.name}
+            </a>
+          ))}
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
             <a
               href="https://github.com/servicialo/mcp-server"
@@ -170,14 +164,15 @@ export function Navbar() {
       {/* Menú desplegable mobile */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ${
-          menuOpen ? "max-h-[44rem] border-t border-border" : "max-h-0"
+          menuOpen ? "max-h-[48rem] border-t border-border" : "max-h-0"
         }`}
       >
         <div className="max-w-content mx-auto px-4 py-3 flex flex-col gap-0.5">
           {sections.map((section) => (
-            <button
+            <a
               key={section.id}
-              onClick={() => handleClick(section.id)}
+              href={`/#${section.id}`}
+              onClick={(e) => handleAnchorClick(e, section.id)}
               className={`font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors ${
                 activeId === section.id
                   ? "text-accent bg-accent-soft"
@@ -185,22 +180,19 @@ export function Navbar() {
               }`}
             >
               {section.name}
-            </button>
+            </a>
           ))}
-          <a
-            href="/network"
-            onClick={() => setMenuOpen(false)}
-            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
-          >
-            Red
-          </a>
-          <a
-            href="/implementors"
-            onClick={() => setMenuOpen(false)}
-            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
-          >
-            Implementors
-          </a>
+          <div className="my-1 border-t border-border" />
+          {routes.map((route) => (
+            <a
+              key={route.href}
+              href={route.href}
+              onClick={() => setMenuOpen(false)}
+              className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
+            >
+              {route.name}
+            </a>
+          ))}
         </div>
       </div>
     </nav>

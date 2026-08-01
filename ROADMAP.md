@@ -10,9 +10,9 @@ This roadmap reflects the current direction of the **Servicialo open protocol** 
 
 What's already shipped:
 
-- [x] **Core specification** — 8 dimensions, 9 universal states, 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
+- [x] **Core specification** — 8 dimensions, 6 core + 3 optional financial states (the 9-milestone sequence is the happy-path view), 6 exception flows, 7 principles ([PROTOCOL.md](./PROTOCOL.md)).
 - [x] **JSON Schemas** — `service.schema.json` and `service-order.schema.json` with lifecycle states, exception types, and evidence definitions (`schema/`).
-- [x] **MCP server** — `@servicialo/mcp-server` published on npm. 37 tools across 7 lifecycle phases (0–6), plus resource management, resolver administration, and network-intelligence (`market.list_segments`, `market.get_benchmark`).
+- [x] **MCP server** — `@servicialo/mcp-server` published on npm. 40 tools (15 public + 25 authenticated) across 7 lifecycle phases (0–6), plus resource management, resolver administration, and network-intelligence (`market.list_segments`, `market.get_benchmark`).
 - [x] **A2A v0.3 endpoint** — `POST /{orgSlug}/a2a` (JSON-RPC) with `message/send`, `tasks/get`, `tasks/cancel`. Multi-turn booking conversation via persisted `A2ATask`.
 - [x] **Operational telemetry** — anonymized, bucketed events (`booking_created`, `service_completed`, `dispute_opened`, `payment_settled`) emitted by the MCP server, persisted in the registry's `telemetry_events` table. Schema: [`schema/telemetry/operational-event.schema.json`](./schema/telemetry/operational-event.schema.json).
 - [x] **Benchmarks API** — `/api/benchmarks` + `/api/benchmarks/segments` with k-anonymity ≥ 5 enforced at query time. Distribution-of-buckets format (categorical, not numeric).
@@ -22,7 +22,7 @@ What's already shipped:
 - [x] **Website** — servicialo.com live with full protocol narrative (Next.js 14, Tailwind v3).
 - [x] **Agent examples** — two complete multi-turn conversations: kinesiology session and home repair (`examples/`).
 - [x] **Governance** — CONTRIBUTING.md with RFC process, SECURITY.md, CODE_OF_CONDUCT.md, CHANGELOG.md, issue/PR templates, CI/CD auto-publish to npm.
-- [x] **Evidence verticals** — 4 defined: Health, Home, Legal, Education.
+- [x] **Evidence verticals** — 5 defined: Health, Home, Legal, Education, Consulting.
 - [x] **Layered architecture** — Core (stable), Finance (design), Disputes (design).
 - [x] **Governance** — GOVERNANCE.md with network narrative, data governance principles, and protocol neutrality framework.
 
@@ -30,14 +30,14 @@ What's already shipped:
 
 ## Short Term — Solidify the Foundation
 
-_Target: Protocol v0.4_
+_Target: Protocol v0.10 (current) → v1.0_
 
 - [ ] **Conformance test suite** — portable tests any implementation can run to verify protocol compliance (separate from MCP server unit tests).
-- [ ] **Expand evidence verticals** — add at least 2 new verticals beyond Health, Home, Legal, and Education (community-proposed).
+- [ ] **Expand evidence verticals** — add at least 2 new verticals beyond Health, Home, Legal, and Education (community-proposed). Consulting was added (1 of 2).
 - [ ] **MCP server hardening** — improve error handling, input validation, and edge-case coverage.
-- [ ] **OpenAPI specification** — publish a formal API description for the HTTP endpoints consumed by the MCP server.
-- [ ] **Multilingual documentation** — English translation of the core specification (PROTOCOL.md and README).
-- [ ] **Página /protocolo en el sitio** — ruta dedicada con la especificación técnica formal, schema interactivo, y diagrama de estados.
+- [x] **OpenAPI specification** — published as [`spec/openapi.yaml`](./spec/openapi.yaml), the formal API description for the HTTP endpoints consumed by the MCP server.
+- [x] **Multilingual documentation** — English translation of the core specification (PROTOCOL.md is in English; README.en.md exists).
+- [x] **Página /protocolo en el sitio** — existe [servicialo.com/spec](https://servicialo.com/spec) con la especificación técnica formal.
 
 ## Mid Term — Grow the Ecosystem
 
@@ -62,9 +62,9 @@ _Target: Protocol v0.5 – v0.8_
 
 _Target: Protocol v1.0_
 
-- [ ] **Protocol v1.0** — declare Core (8 dimensions, 9 states, 6 exception flows, 7 principles) as stable with backwards-compatibility guarantees.
+- [ ] **Protocol v1.0** — declare Core (8 dimensions, 6 core + 3 optional financial states, 6 exception flows, 7 principles) as stable with backwards-compatibility guarantees.
 - [ ] **Formal governance body** — transition from single-maintainer to a multi-stakeholder steering committee (see [GOVERNANCE.md](./GOVERNANCE.md)).
-- [ ] **Certification program** — optional conformance certification for platforms implementing Servicialo.
+- [ ] **Certification program** — optional conformance certification for platforms implementing Servicialo (verification is manual today — see [IMPLEMENTORS.md](./IMPLEMENTORS.md)).
 - [ ] **Industry adoption** — at least 3 independent implementations beyond [Coordinalo](https://coordinalo.com).
 - [ ] **Localization** — specification available in Spanish, English, and Portuguese; tooling supports i18n service metadata.
 

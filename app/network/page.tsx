@@ -1,21 +1,49 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getNetworkStats } from "@/lib/telemetry-stats";
 import type { CountryEntry } from "@/lib/telemetry-stats";
 import { WorldMap } from "@/components/WorldMap";
+import { PageHeader } from "@/components/PageHeader";
+import { Footer } from "@/components/Footer";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Network Stats — Servicialo",
+  title: "Red — Servicialo",
   description:
-    "Live statistics from the Servicialo protocol network: active nodes, version adoption, and daily activity.",
+    "Telemetría anónima y agregada de instalaciones del servidor MCP de Servicialo. La red es opcional.",
   openGraph: {
-    title: "Network Stats — Servicialo",
+    title: "Red — Servicialo",
     description:
-      "Live statistics from the Servicialo protocol network.",
+      "Telemetría anónima y agregada de instalaciones del servidor MCP de Servicialo. La red es opcional.",
   },
 };
+
+const DEFINICIONES: { termino: string; def: React.ReactNode }[] = [
+  {
+    termino: "Instalación",
+    def: "Un node_id del servidor MCP que reportó telemetría. Puede ser una instancia efímera — por ejemplo, un desarrollador probando con npx.",
+  },
+  {
+    termino: "Nodo activo",
+    def: "Una instalación con actividad reciente (últimas 24 horas o últimos 7 días).",
+  },
+  {
+    termino: "Organización operando",
+    def: "Una organización registrada en el resolver que sirve tráfico real.",
+  },
+  {
+    termino: "Implementación conforme",
+    def: (
+      <>
+        Una plataforma verificada, listada en{" "}
+        <a href="/implementors" className="text-accent hover:underline">
+          /implementors
+        </a>
+        .
+      </>
+    ),
+  },
+];
 
 export default async function NetworkPage() {
   const stats = await getNetworkStats();
@@ -24,59 +52,56 @@ export default async function NetworkPage() {
 
   return (
     <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-12 pb-24">
-      {/* Back link */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 font-mono text-[11px] text-text-muted hover:text-accent transition-colors mb-8"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        Volver al inicio
-      </Link>
+      <PageHeader
+        tag="Telemetría del protocolo"
+        title="La red"
+        subtitle="Telemetría anónima y agregada de instalaciones del servidor MCP. La red es opcional: el protocolo funciona sin ella, y una implementación es conforme sin registrarse ni compartir datos."
+      />
 
-      {/* Header */}
-      <section className="mb-14 md:mb-20">
-        <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
-          Protocol telemetry
+      {/* Qué mide esta página */}
+      <section className="mb-14">
+        <div className="bg-surface border border-border rounded-[14px] p-5">
+          <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-4">
+            Qué mide esta página
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+            {DEFINICIONES.map((d) => (
+              <div key={d.termino}>
+                <div className="font-mono text-[11px] font-semibold text-text mb-1">
+                  {d.termino}
+                </div>
+                <p className="text-[13px] text-text-muted leading-[1.6]">
+                  {d.def}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 pt-4 border-t border-border text-[12px] text-text-dim leading-[1.6]">
+            Hoy existe una implementación en producción (Coordinalo). Las
+            instalaciones no son adopción operacional.
+          </p>
         </div>
-        <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
-          Network Stats
-        </h1>
-        <p className="text-[15px] md:text-lg text-text-muted leading-[1.7] max-w-[600px]">
-          Anonymous, aggregate telemetry from MCP server nodes running the
-          Servicialo protocol. Updated every 60 seconds.
-        </p>
       </section>
 
       {/* KPI cards */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-14">
         <KpiCard
-          label="Nodes"
+          label="Instalaciones"
           value={stats.totalInstances.toLocaleString()}
           subtitle={stats.uniqueHosts < stats.totalInstances
-            ? `${stats.uniqueHosts} unique hosts`
+            ? `${stats.uniqueHosts} hosts únicos`
             : undefined}
-          tooltip="Unique node IDs registered. 'Unique hosts' deduplicates by network fingerprint — a more conservative count that filters ephemeral containers."
+          tooltip="node_id únicos que reportaron telemetría. Incluye instancias efímeras (contenedores, pruebas con npx). 'Hosts únicos' deduplica por huella de red y es el conteo más conservador."
         />
-        <KpiCard label="Unique hosts" value={String(stats.uniqueHosts)} tooltip="Deduplicated by cryptographic fingerprint (SHA-256 of request metadata). More conservative than node count — filters container restarts and ephemeral IDs." />
-        <KpiCard label="Active (24 h)" value={String(stats.uniqueNodes24h)} />
-        <KpiCard label="Active (7 d)" value={String(stats.uniqueNodes7d)} />
+        <KpiCard label="Hosts únicos" value={String(stats.uniqueHosts)} tooltip="Deduplicados por huella criptográfica (SHA-256 de metadatos de la petición). Más conservador que el conteo de instalaciones — filtra reinicios de contenedores e IDs efímeros." />
+        <KpiCard label="Activas (24 h)" value={String(stats.uniqueNodes24h)} tooltip="Instalaciones con actividad en las últimas 24 horas." />
+        <KpiCard label="Activas (7 d)" value={String(stats.uniqueNodes7d)} tooltip="Instalaciones con actividad en los últimos 7 días." />
       </section>
 
       {/* World map — always visible */}
       <section className="mb-14">
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-          Nodes by country
+          Instalaciones por país
         </h2>
 
         <div className="mb-6">
@@ -127,9 +152,9 @@ export default async function NetworkPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border bg-surface-alt">
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Country</th>
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continent</th>
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Nodes</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">País</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continente</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Instalaciones</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium w-[120px]"></th>
                 </tr>
               </thead>
@@ -147,7 +172,7 @@ export default async function NetworkPage() {
       {stats.versionBreakdown.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Version adoption
+            Adopción de versiones (paquete npm)
           </h2>
           <div className="space-y-2">
             {stats.versionBreakdown.map((v) => {
@@ -177,7 +202,7 @@ export default async function NetworkPage() {
       {stats.dailyChart.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Daily unique nodes (last 30 days)
+            Instalaciones únicas diarias (30 días)
           </h2>
           <div className="flex items-end gap-[2px] h-40">
             {stats.dailyChart.map((d) => {
@@ -210,19 +235,24 @@ export default async function NetworkPage() {
       {/* Empty state */}
       {stats.totalInstances === 0 && stats.uniqueNodes24h === 0 && stats.dailyChart.length === 0 && (
         <div className="text-center py-20 text-text-muted text-sm">
-          No telemetry data yet. Nodes report in when they initialize.
+          Aún no hay datos de telemetría. Las instalaciones reportan al
+          inicializarse.
         </div>
       )}
 
-      {/* Footer note */}
-      <p className="font-mono text-[10px] text-text-dim leading-relaxed">
-        Telemetry is anonymous and opt-in. Each MCP server node reports on
-        initialization: event type, protocol version, and a random node ID.
-        Nodes are deduplicated by cryptographic fingerprint (SHA-256 of
-        request metadata) to prevent inflation from ephemeral containers.
-        Rate-limited to 3 registrations per origin per hour. Country is
-        resolved server-side — no city, region, or IP address is ever stored.
+      {/* Privacy footnote */}
+      <p className="font-mono text-[10px] text-text-dim leading-relaxed mb-14">
+        La telemetría es anónima y opcional. Cada instalación del servidor MCP
+        reporta al inicializarse: tipo de evento, versión del protocolo y un
+        node_id aleatorio. Las instalaciones se deduplican por huella
+        criptográfica (SHA-256 de metadatos de la petición) para evitar
+        inflación por contenedores efímeros. Límite de 3 registros por origen
+        por hora. El país se resuelve del lado del servidor — nunca se almacena
+        ciudad, región ni dirección IP. Una instalación que no reporta
+        telemetría sigue siendo plenamente conforme.
       </p>
+
+      <Footer />
     </div>
   );
 }

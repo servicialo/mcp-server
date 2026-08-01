@@ -21,6 +21,8 @@ keywords:
 
 # Servicialo: The Destination Layer for Human Services in the Age of AI Agents
 
+> **Archived snapshot — Protocol v0.9 (March 2026).** This document reflects the protocol at that cut and is not updated. Figures such as tool counts and state framing are historical. For the current surface see [servicialo.com/spec](https://servicialo.com/spec) and [`protocol/manifest.yaml`](https://github.com/servicialo/mcp-server/blob/main/protocol/manifest.yaml).
+
 **Version 1.0.0 — March 2026**
 
 > **APA Citation:**

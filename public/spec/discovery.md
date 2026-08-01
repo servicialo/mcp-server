@@ -129,7 +129,7 @@ Step 3: Fetch organization agent card
 
 Step 4: Connect to MCP server
   Connect to MCP endpoint from agent card
-  → 9 public tools available without authentication
+  → 15 public tools available without authentication
 
 Step 5: Discover and book
   Use MCP tools to search, check availability, and book

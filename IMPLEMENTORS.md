@@ -1,6 +1,6 @@
 # Implementing Servicialo
 
-> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, 9 states, exception flows, all 40 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
+> **Start here:** Read [`SPEC.md`](./SPEC.md) first — a self-contained quick reference covering the 8 dimensions, the 6+3 lifecycle states, exception flows, all 40 MCP tools, and minimum requirements. Then come back here for the step-by-step build guide.
 
 ## Cómo listar tu implementación
 
@@ -10,7 +10,9 @@
 4. El equipo de Servicialo revisa la cobertura de fases y mergea si es ≥ CONFORMANT.
 
 Las implementaciones listadas son verificadas — no aceptamos auto-declaraciones
-sin evidencia de conformance.
+sin evidencia de conformance. **La verificación es manual hoy** (revisión del
+equipo sobre el PR); una suite de certificación automatizada y ejecutada
+periódicamente es parte del roadmap, no una capacidad actual.
 
 ---
 
@@ -25,7 +27,7 @@ To be listed as a Servicialo-compatible implementation, your platform MUST satis
 | # | Requirement | Spec reference | What it means |
 |:-:|-------------|:--------------:|---------------|
 | 1 | **Model services using the 8 dimensions** | §5 | Every service has: identity (what), provider (who delivers), client (who receives), schedule (when), location (where), lifecycle (cycle), evidence (proof), billing (settlement). Your data model must capture all 8. |
-| 2 | **Implement the 9 lifecycle states** | §6 | `requested → scheduled → confirmed → in_progress → completed → documented → invoiced → collected → verified`. Transitions must be strictly ordered — no skipping states. Each transition records `from`, `to`, `at`, `by`. |
+| 2 | **Implement the 6 core lifecycle states** | §6 | `requested → scheduled → confirmed → in_progress → completed → documented`. The 3 financial states (`invoiced → collected → verified`) are OPTIONAL extensions — you may bundle them into the session lifecycle or manage them independently. Transitions within your implemented sequence are strictly ordered and each records `from`, `to`, `at`, `by`. Delivery, evidence, acceptance and settlement have no total order across them (§6.0). |
 | 3 | **Handle at least 3 exception flows** | §7 | Pick 3 of: cancellation, client no-show, provider no-show, rescheduling, quality dispute, partial delivery. The easiest starting set is cancellation + client no-show + rescheduling. |
 | 4 | **Expose an API the MCP server can connect to** | §13 | Minimum 6 endpoints: `services.list`, `scheduling.check_availability`, `scheduling.book`, `scheduling.confirm`, `lifecycle.transition`, `delivery.checkin`. The MCP server translates these into tool calls for AI agents. |
 
@@ -41,7 +43,7 @@ To be listed as a Servicialo-compatible implementation, your platform MUST satis
 - **Webhook subscriptions** — register an HTTPS endpoint to receive `benchmark.weekly_snapshot` and verify deliveries with HMAC-SHA256. Contract: [`WEBHOOKS.md`](./WEBHOOKS.md).
 - **Catalog discoverability** — when you register, declare your verticals in `registry_entries.verticals` and keep your `services.list` endpoint public. The protocol exposes a network-wide taxonomy via `registry.list_verticals` / `registry.list_regions` / `registry.list_event_types` so cold-start agents can learn what exists. Full-text search across catalogs is a roadmap item (see ROADMAP.md "Federated catalog discovery") — once the second active implementer goes live, the protocol can wire in `tsvector` over service names so "kinesio" matches "kinesiología" without the agent having to guess.
 
-For a step-by-step build guide (7 steps, the first takes ~20 minutes), see [`IMPLEMENTING.md`](./IMPLEMENTING.md).
+For a step-by-step build guide (8 steps, the first takes ~20 minutes), see [`IMPLEMENTING.md`](./IMPLEMENTING.md).
 
 ## Effort estimate
 
@@ -50,7 +52,7 @@ This is calibrated for a team that already has a working service platform (appoi
 | Area | Effort | What's involved |
 |------|:------:|-----------------|
 | **8 dimensions** | Low | Data model mapping. You likely already have most fields — the work is ensuring all 8 are present and named consistently. Validate against `schema/service.schema.json`. |
-| **9 lifecycle states** | Low–Medium | An ordered enum with transition rules. If you already have appointment statuses, it's a mapping exercise. The key constraint is strict ordering — no skipping from `requested` to `in_progress`. |
+| **6+3 lifecycle states** | Low–Medium | An ordered enum with transition rules. If you already have appointment statuses, it's a mapping exercise. The key constraint is strict ordering within your implemented sequence — no skipping from `requested` to `in_progress`. Financial states are optional. |
 | **3 exception flows** | Medium | State machine branching. Cancellation is straightforward (pre-delivery → cancelled with policy). No-show requires a detection trigger and penalty logic. Rescheduling requires finding a new compatible slot while preserving provider/resource. |
 | **MCP-connectable API** | Medium–High | 6 REST endpoints that the MCP server can call. The protocol defines the contract; you implement the logic. The hardest part is `scheduling.check_availability` (multi-party intersection: provider × client × resource). |
 | **Service Orders** | Medium | A parent object that groups services under scope + pricing + payment schedule, with a computed ledger. If you already have packages or plans, it's an evolution of that concept. |
@@ -62,7 +64,7 @@ This is calibrated for a team that already has a working service platform (appoi
 Checklist:
 
 - [ ] Services validate against [`schema/service.schema.json`](./schema/service.schema.json)
-- [ ] Create a service and advance it through all 9 states — each transition records `from`, `to`, `at`, `by`
+- [ ] Create a service and advance it through the 6 core states (plus the financial states if you implement them) — each transition records `from`, `to`, `at`, `by`
 - [ ] Attempt an invalid transition (e.g. `requested → in_progress`) — it must fail
 - [ ] Trigger at least 3 exception flows and verify the state machine handles them
 - [ ] Connect the MCP server to your API and execute a discovery query (`services.list` or `scheduling.check_availability`)

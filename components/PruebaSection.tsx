@@ -1,28 +1,38 @@
 import { SectionTitle } from "./SectionTitle";
+import { MaturityBadge } from "./MaturityBadge";
 import { CERTAINTY_LEVELS } from "@/lib/data";
 
-export function GradienteCertezaSection() {
+export function PruebaSection() {
   return (
-    <section id="gradiente-certeza" className="mb-16">
+    <section id="prueba-de-servicio" className="mb-16">
+      {/* Anchor de compatibilidad con la IA anterior */}
+      <span id="gradiente-certeza" className="block scroll-mt-20" aria-hidden="true" />
       <SectionTitle
-        tag="Gradiente de certeza"
-        title="Cuánto vale una Prueba de Servicio"
-        subtitle="La Prueba de Servicio no es binaria: es una gradiente de cuatro niveles acumulativos. El pagador define el nivel de certeza que exige para priorizar, auditar o liquidar una prestación."
+        tag="05 — Prueba de Servicio"
+        title="El expediente verificable"
+        subtitle="Una Prueba de Servicio vincula lo acordado, lo entregado, la evidencia disponible y la situación de liquidación de una entrega."
       />
 
       <div className="bg-surface rounded-xl py-4 px-5 border-l-[3px] border-l-accent mb-6">
         <div className="font-serif text-lg md:text-[20px] text-text leading-[1.4]">
-          La Prueba de Servicio es el vínculo verificable entre lo entregado y
-          lo liquidado.
+          La Prueba de Servicio no declara mágicamente la verdad del mundo ni
+          garantiza por sí sola la calidad del resultado.
         </div>
         <div className="text-[13px] text-text-muted leading-[1.7] mt-2.5">
-          Las redes de pago no procesan compras: poseen el vínculo confiable
-          entre quien autoriza y quien liquida, con disputa y garantía encima.
-          Servicialo ocupa el rol análogo en la mitad del problema que esas
-          redes no cubren — la entrega. Hoy el pagador liquida contra una
-          declaración. Con Servicialo, liquida contra una Prueba de Servicio
-          del nivel de certeza que él mismo defina.
+          Registra afirmaciones, evidencia, atestaciones y niveles de certeza.
+          Puede acreditar la entrega aunque el pago ocurra después — la
+          liquidación está vinculada al expediente, pero no determina la
+          existencia de la entrega. Hoy el pagador liquida contra una
+          declaración; con Servicialo, liquida contra un expediente del nivel
+          de certeza que él mismo defina.
         </div>
+      </div>
+
+      <div className="flex items-center gap-2 mb-3">
+        <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em]">
+          Gradiente de certeza
+        </div>
+        <MaturityBadge maturity="draft" />
       </div>
 
       <div className="flex flex-col gap-2.5">
@@ -59,25 +69,27 @@ export function GradienteCertezaSection() {
 
       <div className="mt-6 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
-          Regla de honestidad
+          Regla de presentación
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
           La Prueba de Servicio nunca se muestra desnuda. Cualquier componente
           que la represente muestra a la vez su nivel (L1–L4) y su estado
-          (Verificando o Acreditable). No es una convención de estilo: es una
-          restricción de diseño del estándar. Un componente que permite mostrar
-          la prueba sin su nivel está mal hecho.
+          (Verificando o Acreditable). Mostrar la prueba sin su nivel
+          tergiversa el expediente.
         </div>
       </div>
 
       <div className="mt-4 text-[12px] text-text-muted leading-[1.7]">
-        En la especificación, a la Prueba de Servicio técnicamente la llamamos
-        el Nexo: el objeto que enlaza la prestación entregada con su
-        liquidación. En el esquema, su instancia es el campo{" "}
-        <code className="font-mono text-[11px] bg-surface-alt px-1.5 py-0.5 rounded">
-          prueba_de_entrega
-        </code>
-        .
+        La Prueba de Servicio está especificada como{" "}
+        <a
+          href="/extensions#proof-of-service"
+          className="text-accent hover:underline"
+        >
+          extensión en borrador
+        </a>{" "}
+        — todavía no existe como objeto wire del Core; todo lo que el
+        expediente vincula ya es derivable de los objetos actuales del
+        protocolo.
       </div>
     </section>
   );

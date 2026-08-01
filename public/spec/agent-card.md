@@ -46,7 +46,7 @@ See [schemas/agent-card.json](./schemas/agent-card.json) for the formal JSON Sch
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `lifecycle_states` | string[] | Yes | Implemented lifecycle states (minimum 9) |
+| `lifecycle_states` | string[] | Yes | Implemented lifecycle states (minimum: the 6 core states; the 3 financial states are optional extensions) |
 | `exception_flows` | string[] | Yes | Implemented exception flows (minimum 3) |
 | `evidence_types` | string[] | Yes | Supported evidence types |
 | `service_orders` | boolean | No | Whether Service Orders are supported |
@@ -118,7 +118,7 @@ See [schemas/agent-card.json](./schemas/agent-card.json) for the formal JSON Sch
   "capabilities": {
     "lifecycle_states": [
       "requested", "scheduled", "confirmed", "in_progress",
-      "completed", "documented", "invoiced", "charged", "verified"
+      "completed", "documented", "invoiced", "collected", "verified"
     ],
     "exception_flows": [
       "cancellation", "no_show", "rescheduling", "dispute", "partial_delivery"
@@ -164,8 +164,8 @@ See [schemas/agent-card.json](./schemas/agent-card.json) for the formal JSON Sch
       "patient:read", "patient:write", "evidence:read", "evidence:write",
       "payment:read", "payment:write", "document:read", "document:write"
     ],
-    "public_tools_count": 9,
-    "authenticated_tools_count": 34
+    "public_tools_count": 15,
+    "authenticated_tools_count": 25
   }
 }
 ```

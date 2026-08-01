@@ -1,5 +1,7 @@
 # Servicialo — Auditoría de Implementación
 
+> **Stale (v0.6-era audit, kept as historical record).** Do not cite — current state: protocol v0.10, 40 tools.
+
 ## Auditoría v0.3 → v0.6.0
 
 ### Convergencias (el spec adoptó nuestras decisiones)

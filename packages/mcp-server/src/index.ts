@@ -184,7 +184,7 @@ async function main() {
     // Register authenticated tools only when credentials are present
     registerTools(authenticatedTools);
   }
-  // Discovery mode: only the 9 public tools are exposed
+  // Discovery mode: only the public tools are exposed (see protocol/manifest.yaml)
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

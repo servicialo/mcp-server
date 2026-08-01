@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { SectionTitle } from "./SectionTitle";
-import { LIFECYCLE_STATES } from "@/lib/data";
+import { MaturityBadge } from "./MaturityBadge";
+import { HAPPY_PATH_MILESTONES } from "@/lib/data";
 
 const EXCEPTIONS = [
   {
@@ -45,21 +46,21 @@ const EXCEPTIONS = [
 
 export function CicloSection() {
   const [active, setActive] = useState(0);
-  const state = LIFECYCLE_STATES[active];
+  const state = HAPPY_PATH_MILESTONES[active];
 
   return (
     <section id="ciclo" className="mb-16">
       <SectionTitle
-        tag="05 — Ciclo de vida"
-        title="9 estados universales"
-        subtitle="Todo servicio — desde una consulta médica hasta una reparación del hogar — pasa por el mismo ciclo."
+        tag="06 — Ciclo de vida"
+        title="El camino feliz en 9 hitos"
+        subtitle="La vista más común de una coordinación completa. Debajo de los hitos, los estados son dimensiones independientes: entrega, evidencia, aceptación y liquidación no siguen un orden total."
       />
 
       {/* Stepper interactivo del ciclo de vida */}
       <div className="bg-dark rounded-2xl p-4 md:p-7 text-white">
         {/* Indicadores — grid en mobile, línea en desktop */}
         <div className="grid grid-cols-5 gap-2 md:flex md:items-center md:gap-0 mb-6">
-          {LIFECYCLE_STATES.map((s, i) => (
+          {HAPPY_PATH_MILESTONES.map((s, i) => (
             <div key={s.id} className="flex items-center justify-center md:justify-start shrink-0">
               <button
                 onClick={() => setActive(i)}
@@ -73,7 +74,7 @@ export function CicloSection() {
               >
                 {i < active ? "✓" : s.icon}
               </button>
-              {i < LIFECYCLE_STATES.length - 1 && (
+              {i < HAPPY_PATH_MILESTONES.length - 1 && (
                 <div
                   className={`hidden md:block w-6 h-0.5 transition-colors duration-300 ${
                     i < active ? "bg-green/40" : "bg-[#333]"
@@ -87,7 +88,8 @@ export function CicloSection() {
         {/* Detalle del estado activo */}
         <div>
           <div className="font-mono text-[11px] text-accent uppercase tracking-[0.1em] mb-1.5">
-            Estado {active + 1} de {LIFECYCLE_STATES.length}
+            Hito {active + 1} de {HAPPY_PATH_MILESTONES.length}
+            {active >= 6 ? " — extensión financiera opcional" : ""}
           </div>
           <div className="font-serif text-2xl md:text-[28px] text-white mb-2.5">
             {state.label}
@@ -112,11 +114,11 @@ export function CicloSection() {
           </button>
           <button
             onClick={() =>
-              setActive(Math.min(LIFECYCLE_STATES.length - 1, active + 1))
+              setActive(Math.min(HAPPY_PATH_MILESTONES.length - 1, active + 1))
             }
-            disabled={active === LIFECYCLE_STATES.length - 1}
+            disabled={active === HAPPY_PATH_MILESTONES.length - 1}
             className={`font-mono text-xs py-2 px-4 rounded-lg border-none text-white transition-colors ${
-              active === LIFECYCLE_STATES.length - 1
+              active === HAPPY_PATH_MILESTONES.length - 1
                 ? "bg-[#333] cursor-default"
                 : "bg-accent cursor-pointer hover:bg-accent-dark"
             }`}
@@ -126,22 +128,32 @@ export function CicloSection() {
         </div>
       </div>
 
-      {/* ¿Por qué 9 estados? */}
+      {/* Dimensiones ortogonales */}
       <div className="mt-5 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
-        <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
-          ¿Por qué 9 estados?
+        <div className="flex items-center gap-2 mb-3">
+          <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em]">
+            Dimensiones ortogonales
+          </div>
+          <MaturityBadge maturity="draft" label="extensión draft" />
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
-          Menos estados pierden información crítica — sin separar
-          &quot;Completado&quot; de &quot;Documentado&quot;, no puedes distinguir
+          Cada hito separa información que importa — sin distinguir
+          &quot;Completado&quot; de &quot;Documentado&quot; no puedes separar
           &quot;el proveedor dice que ocurrió&quot; de &quot;la evidencia está
-          registrada&quot;. Sin separar &quot;Facturado&quot; de
-          &quot;Cobrado&quot;, no puedes saber si el pago fue efectivamente
-          recibido. Sin separar &quot;Cobrado&quot; de &quot;Verificado&quot;,
-          no puedes saber si el cliente aceptó el resultado. 9 es el mínimo
-          viable para que un agente IA pueda verificar con certeza que un
-          servicio fue solicitado, entregado, documentado, facturado, cobrado y
-          verificado.
+          registrada&quot;. Pero estos hitos representan un camino operativo
+          común, no una máquina de estados única obligatoria: los 6 primeros
+          son requeridos, los 3 financieros son opcionales, y{" "}
+          <strong>entrega, evidencia, aceptación y liquidación evolucionan de
+          manera independiente</strong> — prepago, servicios gratuitos,
+          facturación mensual y reembolsos rompen la secuencia sin romper el
+          protocolo. La extensión{" "}
+          <a
+            href="/extensions#state-dimensions"
+            className="text-accent hover:underline"
+          >
+            state-dimensions
+          </a>{" "}
+          (en borrador) formaliza esta separación.
         </div>
       </div>
 

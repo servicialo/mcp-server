@@ -5,7 +5,7 @@ export function AnatomiaSection() {
   return (
     <section id="anatomia" className="mb-16">
       <SectionTitle
-        tag="03 — Anatomía"
+        tag="Anatomía del Servicio"
         title="Las 8 dimensiones de un servicio"
         subtitle="Para que un agente IA pueda coordinar un servicio, necesita entender estas 8 dimensiones. Para que un humano pueda diseñar un buen servicio, también."
       />

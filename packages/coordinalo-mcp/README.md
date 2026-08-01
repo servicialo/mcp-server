@@ -42,7 +42,7 @@ Production endpoint: `https://coordinalo.com/api/mcp` (Streamable HTTP transport
 
 ## Protocol
 
-Coordinalo implements the [Servicialo protocol](https://servicialo.com) (v0.6) — 8 dimensions, 9 lifecycle states, 6 exception states, 7 design principles. See the [whitepaper](https://servicialo.com/docs/servicialo-whitepaper.pdf) for the full specification.
+Coordinalo implements the [Servicialo protocol](https://servicialo.com) — 8 dimensions, a 6+3 lifecycle (6 core + 3 optional financial states), 6 exception flows, 7 design principles. See [servicialo.com/spec](https://servicialo.com/spec) for the current specification.
 
 ## License
 

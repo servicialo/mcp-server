@@ -37,7 +37,7 @@ export function EvidenciaVerticalSection() {
   return (
     <section id="evidencia-vertical" className="mb-16">
       <SectionTitle
-        tag="07 — Evidencia por vertical"
+        tag="Evidence Profiles — Evidencia por vertical"
         title="Qué constituye prueba"
         subtitle="Cada vertical define qué evidencia se necesita para producir una Prueba de Servicio acreditable. Resolver disputas sin intervención humana es un caso de uso — no el fin."
       />
@@ -147,7 +147,7 @@ export function EvidenciaVerticalSection() {
                     <div
                       className={`font-mono text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 ${colors.text}`}
                     >
-                      Regla de resolución algorítmica
+                      Regla de acreditación (ejemplo)
                     </div>
                     <div className="text-[13px] text-text-body leading-[1.7]">
                       {vertical.resolution_rule}

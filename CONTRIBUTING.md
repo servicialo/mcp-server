@@ -12,22 +12,22 @@ Changes to the core protocol: the 8 dimensions, the 9 lifecycle states, the 6 ex
 
 ### New Evidence Verticals
 
-Proposals to define what constitutes valid evidence for a new service vertical beyond the current set (health, home, legal, education). Use the [New Vertical issue template](https://github.com/servicialo/mcp-server/issues/new?template=new-vertical.yml).
+Proposals to define what constitutes valid evidence for a new service vertical beyond the current set (health, home, legal, education). Use the [Feature Request template](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md) and prefix the issue title with `[Vertical]`.
 
 ### MCP Server Improvements
 
-Bug fixes, new features, or improvements to the `@servicialo/mcp-server` package. Use the [Bug Report template](https://github.com/servicialo/mcp-server/issues/new?template=bug-report.yml) for bugs or open a general issue for feature proposals.
+Bug fixes, new features, or improvements to the `@servicialo/mcp-server` package. Use the [Bug Report template](https://github.com/servicialo/mcp-server/issues/new?template=bug_report.md) for bugs or the [Feature Request template](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md) for feature proposals.
 
 ### Documentation and Website
 
-Improvements to servicialo.com content, protocol documentation, or examples. Use the [Documentation template](https://github.com/servicialo/mcp-server/issues/new?template=documentation.yml).
+Improvements to servicialo.com content, protocol documentation, or examples. Use the [Feature Request template](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md) and prefix the issue title with `[Docs]`.
 
 ## RFC Process
 
 Changes to the protocol require a structured proposal:
 
-1. **Open an Issue** using the [RFC: Standard Proposal](https://github.com/servicialo/mcp-server/issues/new?template=rfc-standard-proposal.yml) template.
-2. **Title format**: `RFC-XXXX: [Descriptive title]`
+1. **Open an Issue** using the [Feature Request template](https://github.com/servicialo/mcp-server/issues/new?template=feature_request.md), prefixing the issue title with `[RFC]`.
+2. **Title format**: `[RFC] RFC-XXXX: [Descriptive title]`
 3. **Required sections** in the issue:
    - **Motivation** — What problem does this solve?
    - **Proposal** — The concrete change being proposed.

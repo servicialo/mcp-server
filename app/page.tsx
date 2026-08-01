@@ -1,20 +1,15 @@
 import { HeroSection } from "@/components/HeroSection";
 import { QueEsSection } from "@/components/QueEsSection";
-import { OrigenSection } from "@/components/OrigenSection";
+import { ProblemaSection } from "@/components/ProblemaSection";
+import { ObjetosSection } from "@/components/ObjetosSection";
 import { AnatomiaSection } from "@/components/AnatomiaSection";
-import { EntidadesSection } from "@/components/EntidadesSection";
+import { ModeloSection } from "@/components/ModeloSection";
+import { PruebaSection } from "@/components/PruebaSection";
 import { CicloSection } from "@/components/CicloSection";
-import { ResolucionSection } from "@/components/ResolucionSection";
-import { EvidenciaVerticalSection } from "@/components/EvidenciaVerticalSection";
-import { GradienteCertezaSection } from "@/components/GradienteCertezaSection";
 import { PrincipiosSection } from "@/components/PrincipiosSection";
-import { RutaAdopcionSection } from "@/components/RutaAdopcionSection";
-import { ModulosSection } from "@/components/ModulosSection";
-import { EstandarSection } from "@/components/EstandarSection";
-import { PorQueSection } from "@/components/PorQueSection";
-import { ConectateSection } from "@/components/ConectateSection";
-import { GobernanzaSection } from "@/components/GobernanzaSection";
-import { InclusionSection } from "@/components/InclusionSection";
+import { AgentesSection } from "@/components/AgentesSection";
+import { EstadoActualSection } from "@/components/EstadoActualSection";
+import { ParticiparSection } from "@/components/ParticiparSection";
 import { Footer } from "@/components/Footer";
 import { FadeIn } from "@/components/FadeIn";
 
@@ -26,49 +21,34 @@ export default function Home() {
         <QueEsSection />
       </FadeIn>
       <FadeIn>
-        <OrigenSection />
+        <ProblemaSection />
+      </FadeIn>
+      <FadeIn>
+        <ObjetosSection />
       </FadeIn>
       <FadeIn>
         <AnatomiaSection />
       </FadeIn>
       <FadeIn>
-        <EntidadesSection />
+        <ModeloSection />
+      </FadeIn>
+      <FadeIn>
+        <PruebaSection />
       </FadeIn>
       <FadeIn>
         <CicloSection />
       </FadeIn>
       <FadeIn>
-        <ResolucionSection />
-      </FadeIn>
-      <FadeIn>
-        <EvidenciaVerticalSection />
-      </FadeIn>
-      <FadeIn>
-        <GradienteCertezaSection />
-      </FadeIn>
-      <FadeIn>
         <PrincipiosSection />
       </FadeIn>
       <FadeIn>
-        <RutaAdopcionSection />
+        <AgentesSection />
       </FadeIn>
       <FadeIn>
-        <ModulosSection />
+        <EstadoActualSection />
       </FadeIn>
       <FadeIn>
-        <EstandarSection />
-      </FadeIn>
-      <FadeIn>
-        <PorQueSection />
-      </FadeIn>
-      <FadeIn>
-        <ConectateSection />
-      </FadeIn>
-      <FadeIn>
-        <GobernanzaSection />
-      </FadeIn>
-      <FadeIn>
-        <InclusionSection />
+        <ParticiparSection />
       </FadeIn>
       <FadeIn>
         <Footer />

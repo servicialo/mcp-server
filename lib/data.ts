@@ -1,70 +1,21 @@
-export const SERVICE_ORIGINS = [
-  {
-    id: "asset",
-    emoji: "\u{1F3E0}",
-    title: "Desde un Activo",
-    subtitle: "Tienes algo que otros necesitan",
-    color: "blue",
-    desc: "Un activo es cualquier recurso que posees y que puede generar valor para otros. No necesitas hacer nada nuevo — solo facilitar acceso.",
-    examples: [
-      { asset: "Un departamento vacío", service: "Hospedaje temporal", ref: "Airbnb nació así" },
-      { asset: "Un auto que usas 4hrs/día", service: "Transporte bajo demanda", ref: "Uber nació así" },
-      { asset: "Una cocina comercial", service: "Cocina fantasma para terceros", ref: "" },
-      { asset: "Equipamiento médico", service: "Arriendo de box clínico por hora", ref: "" },
-      { asset: "Un terreno", service: "Estacionamiento por hora", ref: "" },
-      { asset: "Una bodega", service: "Almacenamiento bajo demanda", ref: "" },
-    ],
-    keyQuestion: "¿Qué tienes que otros necesitan temporalmente?",
-    formula: "Activo subutilizado + Acceso facilitado = Servicio",
-  },
-  {
-    id: "advantage",
-    emoji: "\u{1F3AF}",
-    title: "Desde una Ventaja",
-    subtitle: "Sabes algo que otros no",
-    color: "purple",
-    desc: "Una ventaja es conocimiento, experiencia, red de contactos o habilidad que te da una posición privilegiada. El servicio emerge cuando transfieres esa ventaja a otros.",
-    examples: [
-      { asset: "Experiencia en tributación", service: "Asesoría tributaria", ref: "" },
-      { asset: "Red de contactos en industria X", service: "Búsqueda de talento / reclutamiento", ref: "" },
-      { asset: "Certificación en kinesiología", service: "Rehabilitación deportiva", ref: "" },
-      { asset: "Dominio de un idioma", service: "Traducción / interpretación", ref: "" },
-      { asset: "Experiencia en marketing digital", service: "Consultoría de crecimiento", ref: "" },
-      { asset: "Conocimiento regulatorio", service: "Cumplimiento normativo como servicio", ref: "" },
-    ],
-    keyQuestion: "¿Qué sabes hacer que otros pagarían por aprender o delegar?",
-    formula: "Conocimiento diferencial + Aplicación práctica = Servicio",
-  },
-  {
-    id: "time",
-    emoji: "\u{23F1}\u{FE0F}",
-    title: "Desde tu Tiempo",
-    subtitle: "Puedes hacer lo que otros no quieren o no pueden",
-    color: "green",
-    desc: "El servicio más básico y universal: intercambiar tu tiempo y esfuerzo por valor. No necesitas un activo especial ni conocimiento diferencial — solo disponibilidad y voluntad.",
-    examples: [
-      { asset: "Horas disponibles + fuerza física", service: "Mudanzas / fletes", ref: "" },
-      { asset: "Tiempo + atención al detalle", service: "Limpieza profesional", ref: "" },
-      { asset: "Tiempo + habilidad manual", service: "Mantenimiento del hogar", ref: "" },
-      { asset: "Tiempo + paciencia", service: "Cuidado de adultos mayores", ref: "" },
-      { asset: "Tiempo + presencia", service: "Paseo de mascotas", ref: "" },
-      { asset: "Horas nocturnas disponibles", service: "Seguridad / vigilancia", ref: "" },
-    ],
-    keyQuestion: "¿Qué tiempo tienes que otros necesitan?",
-    formula: "Tiempo disponible + Tarea que otros evitan = Servicio",
-  },
-] as const;
+/**
+ * Copy compartido del sitio. Los números y versiones NO viven aquí:
+ * se derivan de protocol/manifest.yaml vía lib/manifest.ts.
+ */
 
-export const LIFECYCLE_STATES = [
+// Los 9 hitos del camino feliz — la vista operativa más común del ciclo.
+// Los estados canónicos y la regla de dimensiones ortogonales viven en el
+// manifest (state_machines) y en PROTOCOL.md §6.0.
+export const HAPPY_PATH_MILESTONES = [
   { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente IA define qué necesita, cuándo y dónde." },
   { id: "scheduled", label: "Agendado", icon: "2", desc: "Fecha, hora y proveedor asignados. Se bloquea el horario en los calendarios de ambas partes." },
   { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes confirmaron el compromiso. Recordatorios programados. Prerrequisitos verificados." },
   { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado." },
   { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica." },
   { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical." },
-  { id: "invoiced", label: "Facturado", icon: "7", desc: "Documento tributario emitido. Boleta o factura generada según la normativa local." },
-  { id: "collected", label: "Cobrado", icon: "8", desc: "Pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso de aseguradora recibido." },
-  { id: "verified", label: "Verificado", icon: "9", desc: "El cliente confirma que el servicio ocurrió y fue cobrado correctamente, o se auto-verifica tras la ventana de silencio. Cierre del ciclo." },
+  { id: "invoiced", label: "Facturado", icon: "7", desc: "Opcional — documento tributario emitido. Boleta o factura generada según la normativa local." },
+  { id: "collected", label: "Cobrado", icon: "8", desc: "Opcional — pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso recibido." },
+  { id: "verified", label: "Verificado", icon: "9", desc: "Opcional — el cliente confirma, o se auto-verifica tras la ventana de silencio. Cierre del camino feliz." },
 ] as const;
 
 export const ANATOMY = [
@@ -73,19 +24,19 @@ export const ANATOMY = [
   { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
   { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
   { field: "Dónde", desc: "Ubicación física o virtual, incluyendo el recurso físico cuando aplica", example: "Clínica / Box 3 / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición actual en los 9 estados del ciclo de vida", example: "Cobrado → próximo: Verificado" },
+  { field: "Ciclo", desc: "Posición en las dimensiones de estado: entrega, evidencia, aceptación y liquidación — cada una con ciclo propio", example: "Completado · evidencia registrada · cobro pendiente" },
   { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
   { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
 ] as const;
 
 export const PRINCIPLES = [
-  { title: "Todo servicio tiene un ciclo", body: "No importa si es un masaje o una auditoría. Los 9 estados del ciclo de vida son universales para cualquier servicio." },
-  { title: "La entrega debe ser verificable y liquidable", body: "Si no puedes probar que el servicio ocurrió, no ocurrió. El estándar define qué constituye evidencia válida para humanos y agentes IA. Y verificable no basta: la entrega debe ser liquidable contra esa verificación — el pago se concilia con la prueba, no con una declaración." },
-  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El estándar separa explícitamente al cliente del pagador." },
+  { title: "Todo servicio tiene un ciclo observable", body: "No importa si es un masaje o una auditoría. El protocolo define estados independientes para observar el ciclo completo: entrega, evidencia, aceptación y liquidación — cada dimensión con su propio ciclo de vida, sin un orden total entre ellas." },
+  { title: "La entrega debe ser verificable y liquidable", body: "Sin evidencia suficiente, una entrega no puede considerarse acreditada con el nivel de certeza requerido. El protocolo define qué constituye evidencia válida para humanos y agentes IA. Y verificable no basta: la liquidación se concilia con la prueba, no con una declaración." },
+  { title: "El pagador no siempre es el cliente", body: "En salud paga la aseguradora. En corporativo la empresa. En educación el apoderado. El protocolo separa explícitamente al cliente del pagador." },
   { title: "Las excepciones son la regla", body: "Inasistencias, cancelaciones, reagendamientos, disputas. Un servicio bien diseñado define qué pasa cuando algo falla." },
   { title: "Un servicio es un producto legible por máquinas", body: "Tiene nombre, precio, duración, requisitos y resultado esperado. Definido así, cualquier agente IA puede descubrirlo, coordinarlo y cerrarlo con la misma confianza que un humano." },
   { title: "El acuerdo es separado de la entrega", body: "La Orden de Servicio define lo acordado. Los servicios atómicos definen lo entregado. Son objetos distintos con ciclos de vida distintos." },
-  { title: "La inteligencia colectiva es un bien común", body: "Cada nodo que implementa el protocolo contribuye datos operacionales. La inteligencia agregada mejora a todos — como Waze, donde cada conductor contribuye y todos navegan mejor." },
+  { title: "El protocolo separa lo acordado, lo entregado, la evidencia y el dinero", body: "Cuatro elementos explícitos, cada uno con su propio ciclo. Una Prueba de Servicio es el expediente que los vincula — no una declaración de que todo salió bien." },
 ] as const;
 
 export const CERTAINTY_LEVELS = [
@@ -116,79 +67,6 @@ export const ADOPTION_PATH = [
   },
 ] as const;
 
-export const SCHEMA_YAML = `# ─────────────────────────────────────────────
-# SERVICIALO v0.9
-# Dos entidades: Orden + Servicios atómicos
-# ─────────────────────────────────────────────
-
-orden_de_servicio:
-  id: texto                      # Identificador único
-  alcance: texto                 # Qué se acuerda entregar
-  precio: número                 # Precio total acordado
-  esquema_pagos: texto           # prepago | por_sesión | mensual
-  currency: texto                # ISO 4217
-
-  servicios[]:                   # Cada servicio atómico — 8 dimensiones
-
-    servicio:
-      id: texto
-      orden_de_servicio_id: texto  # Referencia a la Orden padre
-      tipo: texto                # Categoría del servicio
-      vertical: texto            # salud | legal | hogar | educación | ...
-      nombre: texto              # Nombre legible
-      duración_minutos: entero
-      visibilidad: texto         # public | unlisted | private
-
-      proveedor:
-        id: texto
-        credenciales: texto[]    # Certificaciones requeridas
-        puntaje_confianza: número  # 0-100 calculado por historial
-        organización_id: texto
-
-      cliente:
-        id: texto
-        pagador_id: texto        # Puede diferir del cliente
-
-      agenda:
-        solicitado_en: fecha_hora
-        agendado_para: fecha_hora
-        duración_esperada: minutos
-
-      ubicación:
-        tipo: presencial | virtual | domicilio
-        dirección: texto
-        recurso_id: texto        # Opcional — referencia a recurso físico
-
-      ciclo_de_vida:
-        estado_actual: enum[9]   # Los 9 estados universales
-        transiciones: transición[]
-        excepciones: excepción[]
-
-      prueba_de_entrega:
-        entrada: fecha_hora
-        salida: fecha_hora
-        duración_real: minutos
-        evidencia: evidencia[]   # GPS, firma, fotos, documentos
-
-      cobro:
-        orden_de_servicio_id: texto  # Referencia a la Orden padre
-        monto:
-          valor: número
-          moneda: texto          # ISO 4217
-        pagador: referencia
-        estado: pendiente | cobrado | facturado | pagado | disputado
-        cobrado_en: fecha_hora
-        documento_tributario: referencia  # Boleta/factura si se emitió
-
-      mandato:                   # Delegación explícita a agente IA
-        mandato_id: texto        # UUID único
-        principal_id: texto      # Humano u organización
-        agente_id: texto         # Agente que recibe la delegación
-        alcances: texto[]        # resource:action (e.g. schedule:write)
-        estado: activo | expirado | revocado | suspendido
-
-# Ledger computado desde servicios verificados — nunca editable`;
-
 export const EVIDENCE_BY_VERTICAL = [
   {
     vertical: "salud",
@@ -201,7 +79,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "clinical_record", label: "Ficha clínica firmada", desc: "Registro clínico firmado por profesional y paciente", auto: false },
       { type: "treatment_plan", label: "Adherencia al plan", desc: "Lista de verificación del plan de tratamiento ejecutado", auto: false },
     ],
-    resolution_rule: "Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes, servicio entregado. Si falta ficha o firma, escalar.",
+    resolution_rule: "Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes, la entrega se acredita. Si falta ficha o firma, escalar.",
   },
   {
     vertical: "hogar",
@@ -214,7 +92,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "checklist", label: "Lista de verificación", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
       { type: "client_signature", label: "Firma del cliente", desc: "Firma digital del cliente confirmando recepción", auto: false },
     ],
-    resolution_rule: "Si fotos antes/después existen con metadatos válidos y lista de verificación completa, servicio entregado. Si falta firma del cliente, escalar.",
+    resolution_rule: "Si fotos antes/después existen con metadatos válidos y lista de verificación completa, la entrega se acredita. Si falta firma del cliente, escalar.",
   },
   {
     vertical: "legal",
@@ -226,7 +104,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "document_delivery", label: "Entrega de documentos", desc: "Confirmación de entrega de documentos generados", auto: false },
       { type: "billing_hours", label: "Registro de horas", desc: "Registro de horas facturables con descripción de actividades", auto: false },
     ],
-    resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, servicio entregado. Si horas exceden lo acordado sin justificación, escalar.",
+    resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, la entrega se acredita. Si horas exceden lo acordado sin justificación, escalar.",
   },
   {
     vertical: "educación",
@@ -238,7 +116,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "material_delivery", label: "Entrega de material", desc: "Material o tareas entregadas al alumno", auto: false },
       { type: "evaluation", label: "Registro de evaluación", desc: "Evaluación o retroalimentación de la sesión", auto: false },
     ],
-    resolution_rule: "Si asistencia registrada y material entregado, servicio entregado. Si falta evaluación y contrato la requiere, escalar.",
+    resolution_rule: "Si asistencia registrada y material entregado, la entrega se acredita. Si falta evaluación y contrato la requiere, escalar.",
   },
 ] as const;
 
@@ -254,7 +132,7 @@ export const DISPUTE_RESOLUTION_FLOW = [
     step: 2,
     id: "revision_evidencia",
     label: "Revisión de evidencia",
-    desc: "Se solicita evidencia adicional de ambas partes. Admin o arbitraje evalúa.",
+    desc: "Se solicita evidencia adicional de ambas partes. Se compara contra lo acordado en el contrato.",
     actor: "sistema | admin",
   },
   {
@@ -266,51 +144,100 @@ export const DISPUTE_RESOLUTION_FLOW = [
   },
 ] as const;
 
-export const MODULES = [
-  {
-    id: "core",
-    name: "Servicialo Core",
-    status: "estable" as const,
-    statusColor: "green" as const,
-    desc: "Todo lo que necesitas para modelar un servicio profesional de principio a fin. Ciclo de vida completo, las 8 dimensiones del servicio, flujos de excepción, prueba de entrega, cobro y órdenes de servicio.",
-    audience: "Cualquier plataforma donde dos partes toman un compromiso de entrega y necesitan una cuenta verificable de lo que ocurrió — desde una sociedad de psicólogos hasta una empresa de limpieza de oficinas con múltiples cuentas, equipos y personal con alta rotación.",
-    includes: [
-      "Ciclo de vida (9 estados universales)",
-      "8 dimensiones del servicio",
-      "Órdenes de servicio (acuerdo comercial + libro mayor computado)",
-      "Flujos de excepción (cancelación, inasistencia, reagendamiento, disputa)",
-      "Prueba de entrega con evidencia por vertical",
-      "Protocolo MCP para agentes IA (35 herramientas)",
+// Copy en español por extensión del protocolo. La madurez, el orden y los
+// docs canónicos vienen del manifest (EXTENSIONS) — esto es solo prosa.
+export const EXTENSIONS_COPY: Record<
+  string,
+  { tagline: string; defines: string[]; status: string }
+> = {
+  "evidence-profiles": {
+    tagline: "Qué constituye evidencia válida de una entrega, por vertical.",
+    defines: [
+      "Envelope común de evidencia (tipo, actor, método, sensibilidad)",
+      "Perfiles por vertical: salud, hogar, legal, educación, consultoría",
+      "Niveles de certeza acumulativos (L1–L4) de una Prueba de Servicio",
     ],
+    status: "Schemas publicados y usados por la implementación de referencia. Los niveles de certeza son parte del borrador Proof of Service.",
   },
-  {
-    id: "finanzas",
-    name: "Servicialo/Finanzas",
-    status: "en diseño" as const,
-    statusColor: "accent" as const,
-    desc: "Distribución de pagos entre las partes involucradas. Define cómo se reparte el ingreso entre profesional, organización e infraestructura — con reglas claras de liquidación.",
-    audience: "Plataformas que intermedian pagos entre clientes y profesionales, o que cobran comisiones y arriendo de infraestructura.",
-    includes: [
-      "Distribución de pagos a tres destinatarios",
-      "Tipos: porcentaje | monto_fijo | mixto",
-      "Momentos de liquidación: por_sesión | mensual | al_cierre",
-      "Concepto de infraestructura (box, equipamiento, sala)",
+  settlement: {
+    tagline: "Distribución de pagos entre profesional, organización e infraestructura.",
+    defines: [
+      "Track de estado financiero independiente del ciclo de entrega",
+      "Distribución a múltiples destinatarios (porcentaje | monto fijo | mixto)",
+      "Momentos de liquidación: por sesión | mensual | al cierre",
     ],
+    status: "El track billing.* y las tools payments.* están implementados; la distribución multi-destinatario está en diseño.",
   },
-  {
-    id: "disputas",
-    name: "Servicialo/Disputas",
-    status: "en diseño" as const,
-    statusColor: "accent" as const,
-    desc: "Resolución formal de disputas con arbitraje algorítmico y por pares. Define el flujo completo desde apertura hasta resolución final, con evidencia válida por vertical.",
-    audience: "Plataformas con volumen suficiente para justificar arbitraje estructurado — o donde el monto por servicio hace que las disputas sean económicamente relevantes.",
-    includes: [
-      "Flujo de disputa estructurado",
-      "Resolución algorítmica (~80% de los casos)",
-      "Arbitraje por pares del mismo vertical",
-      "Evidencia válida definida por vertical",
+  disputes: {
+    tagline: "Resolución formal de desacuerdos sobre una entrega.",
+    defines: [
+      "Flujo estructurado: apertura → revisión de evidencia → resolución",
+      "Congelamiento automático del cobro durante la disputa",
+      "Contrato pre-acordado como criterio de resolución",
     ],
+    status: "En diseño. Objetivo: automatizar la resolución de casos cuya evidencia satisface reglas previamente acordadas. El arbitraje por pares es una línea de investigación (ver /vision).",
   },
+  "delegated-agency": {
+    tagline: "Delegación explícita, acotada y revocable de un humano a un agente IA.",
+    defines: [
+      "ServiceMandate: principal, agente, alcances, vigencia, revocación",
+      "Scopes por recurso y acción (schedule:write, payment:read, …)",
+      "Registro de auditoría de acciones de agentes",
+    ],
+    status: "Especificada e implementada como capa de servicio; los scopes son advisory en la implementación de referencia (no se validan aún en el boundary MCP).",
+  },
+  "network-intelligence": {
+    tagline: "Benchmarks operacionales agregados y anónimos entre nodos.",
+    defines: [
+      "Eventos operacionales bucketeados (sin datos individuales)",
+      "k-anonimato ≥ 5 organizaciones por segmento",
+      "Modelo contribuir-para-acceder",
+    ],
+    status: "Lado de lectura implementado (market.list_segments, market.get_benchmark); el modelo de acumulación de contribución está en progreso. Opcional: el protocolo funciona sin la red.",
+  },
+  "state-dimensions": {
+    tagline: "Máquinas de estado ortogonales: entrega, evidencia, aceptación y liquidación.",
+    defines: [
+      "Cinco enums por dimensión (fulfillment, evidence, acceptance, financial, order)",
+      "Regla de no-orden-total entre dimensiones",
+      "Mapeo desde los enums wire actuales (aditivo, sin breaking changes)",
+    ],
+    status: "Borrador. Formaliza la semántica que el Core ya enuncia en PROTOCOL.md §6.0.",
+  },
+  "proof-of-service": {
+    tagline: "El expediente verificable que vincula lo acordado, lo entregado, la evidencia y la liquidación.",
+    defines: [
+      "Composición del expediente a partir de objetos existentes del Core",
+      "Gradiente de certeza L1–L4 con estados Verificando / Acreditable",
+      "Regla de presentación: la prueba nunca se muestra sin su nivel y estado",
+    ],
+    status: "Borrador. No existe objeto wire todavía — el documento especifica el compuesto objetivo, derivable de los objetos actuales.",
+  },
+  webhooks: {
+    tagline: "Notificaciones push de eventos del registry y de benchmarks.",
+    defines: [
+      "Suscripciones con verificación HMAC-SHA256",
+      "Reintentos con backoff y desactivación automática",
+      "Eventos: registry y snapshot semanal de benchmarks",
+    ],
+    status: "v0.2 — eventos del registry estables; superficie en expansión.",
+  },
+};
+
+// Superficie HTTP propia de servicialo.com (resolver + proxy de descubrimiento).
+// El protocolo NO prescribe rutas HTTP: el binding normativo es spec/HTTP_PROFILE.md.
+export const OWN_HTTP_SURFACE = [
+  { method: "GET", path: "/api/servicialo/manifest", desc: "Manifest del resolver: capacidades, endpoints, bindings" },
+  { method: "GET", path: "/api/servicialo/registry", desc: "Organizaciones descubribles" },
+  { method: "GET", path: "/api/servicialo/resolve/{country}/{org}", desc: "Resolución slug → endpoint + nivel de confianza" },
+  { method: "POST", path: "/api/servicialo/resolve/register", desc: "Alta de organización en el resolver" },
+  { method: "GET", path: "/api/servicialo/{org}/services", desc: "Catálogo de servicios (proxy al endpoint registrado)" },
+  { method: "GET", path: "/api/servicialo/{org}/availability", desc: "Disponibilidad (proxy al endpoint registrado)" },
+  { method: "POST", path: "/api/servicialo/{org}/book", desc: "Booking (proxy al endpoint registrado)" },
+  { method: "POST", path: "/api/servicialo/{org}/a2a", desc: "JSON-RPC A2A: message/send, tasks/get, tasks/cancel" },
+  { method: "GET", path: "/api/registry/search", desc: "Búsqueda en el registry canónico" },
+  { method: "GET", path: "/api/registry/{verticals|regions|event_types}", desc: "Descubrimiento cold-start de taxonomía" },
+  { method: "GET", path: "/api/benchmarks", desc: "Benchmarks agregados (k-anonimato ≥ 5)" },
 ] as const;
 
 export const GENESIS_SKILLS = [
@@ -356,56 +283,11 @@ export const GENESIS_SKILLS = [
   },
 ] as const;
 
-export const REST_ENDPOINTS = {
-  discovery: {
-    label: "Discovery",
-    endpoints: [
-      { method: "GET", path: "/api/servicialo/manifest", desc: "Declaración de capacidades" },
-      { method: "GET", path: "/api/servicialo/registry", desc: "Registro público de orgs", params: "vertical, location" },
-      { method: "GET", path: "/api/servicialo/{org}/manifest", desc: "Manifest de org con servicios" },
-      { method: "GET", path: "/api/servicialo/{org}/services", desc: "Catálogo de servicios" },
-    ],
-  },
-  booking: {
-    label: "Booking & Availability",
-    endpoints: [
-      { method: "GET", path: "/api/servicialo/{org}/availability", desc: "Slots disponibles", params: "serviceId, date (single-day, next-N, ventana)" },
-      { method: "POST", path: "/api/servicialo/{org}/book", desc: "Booking atómico (Venta + Orden + Session)" },
-      { method: "POST", path: "/api/servicialo/{org}/checkout", desc: "Crear PaymentIntent para prepago" },
-      { method: "GET", path: "/api/servicialo/{org}/checkout/{id}", desc: "Estado del pago" },
-    ],
-  },
-  appointments: {
-    label: "Gestión de citas",
-    endpoints: [
-      { method: "GET", path: "/api/servicialo/{org}/bookings", desc: "Lookup de citas por email", params: "email, status (upcoming|past|all)" },
-    ],
-  },
-  lifecycle: {
-    label: "Ciclo de vida",
-    endpoints: [
-      { method: "GET", path: "/api/servicialo/{org}/sessions/{id}", desc: "Estado de sesión" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/confirm", desc: "Confirmar asistencia" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/start", desc: "Iniciar sesión" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/complete", desc: "Completar sesión" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/deliver", desc: "Registrar entrega" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/cancel", desc: "Cancelar" },
-      { method: "POST", path: "/api/servicialo/{org}/sessions/{id}/reschedule", desc: "Reagendar" },
-    ],
-  },
-  orders: {
-    label: "Órdenes",
-    endpoints: [
-      { method: "GET", path: "/api/servicialo/{org}/orders/{id}", desc: "Orden con ledger computado" },
-    ],
-  },
-} as const;
-
 export const CONTRATO_FIELDS = [
   { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "registro_entrada + registro_salida + ficha_clinica_firmada" },
-  { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de Entregado", example: "48 horas" },
-  { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "0% si >24h, 50% si 2-24h, 100% si <2h" },
-  { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "Cliente: cobra 100%. Proveedor: reasignación + penalidad" },
-  { field: "arbitraje", desc: "Configuración del arbitraje por pares si aplica", example: "1 árbitro si monto < $50, 3 si >= $50" },
-  { field: "monto_máximo_disputa", desc: "Monto máximo que puede disputarse sin escalamiento externo", example: "$500 USD equivalente" },
+  { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de la entrega", example: "48 horas" },
+  { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "p. ej.: 0% si >24h, 50% si 2-24h, 100% si <2h — política ilustrativa; cada implementación define la suya" },
+  { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "p. ej.: cliente ausente → se cobra según política; proveedor ausente → reasignación + penalidad" },
+  { field: "arbitraje", desc: "Configuración del arbitraje si aplica (extensión Disputas, en diseño)", example: "p. ej.: 1 árbitro si monto < $50, 3 si >= $50" },
+  { field: "monto_máximo_disputa", desc: "Monto máximo que puede disputarse sin escalamiento externo", example: "p. ej.: $500 USD equivalente" },
 ] as const;

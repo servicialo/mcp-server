@@ -26,14 +26,16 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
+const SITE_TITLE = "Servicialo — El protocolo abierto para coordinar servicios";
+const SITE_DESCRIPTION =
+  "Servicialo es el protocolo abierto de dominio para coordinar servicios: conecta lo acordado, lo entregado, la evidencia y la liquidación mediante una semántica común para personas, plataformas y agentes. Cada entrega puede acreditarse con una Prueba de Servicio: el expediente verificable que vincula esos elementos.";
+
 export const metadata: Metadata = {
-  title: "Servicialo — El estándar abierto para servicios",
-  description:
-    "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Servicialo — El estándar abierto para servicios",
-    description:
-      "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: "https://servicialo.com",
     siteName: "Servicialo",
     locale: "es_CL",
@@ -41,9 +43,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Servicialo — El estándar abierto para servicios",
-    description:
-      "El estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   metadataBase: new URL("https://servicialo.com"),
 };
@@ -57,6 +58,7 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${inter.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -71,9 +73,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebPage",
-              name: "Servicialo — El estándar abierto para servicios",
+              name: "Servicialo — El protocolo abierto para coordinar servicios",
               description:
-                "Servicialo es el estándar abierto que convierte cada servicio entregado en una Prueba de Servicio: el vínculo verificable entre lo entregado y lo liquidado.",
+                "Servicialo es el protocolo abierto de dominio para coordinar servicios: conecta lo acordado, lo entregado, la evidencia y la liquidación mediante una semántica común para personas, plataformas y agentes.",
               url: "https://servicialo.com",
               inLanguage: "es",
             }),

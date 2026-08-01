@@ -20,7 +20,7 @@ El protocolo Servicialo entra en **fase de estabilización**. El primer cohort f
 | RFC-002 — Prepayment & Client Credit Balance | Draft / Open for Comment |
 | RFC-003 — Refunds & Credit Notes (Forward-Only Ledger) | Draft / Open for Comment |
 | RFC-004 — PII / PHI Classification Framework | Draft / Open for Comment |
-| Declaración de Core estable (8 dimensiones · 9 estados · 6 flujos · 7 principios) con garantías de backwards-compat | Pendiente |
+| Declaración de Core estable (8 dimensiones · ciclo 6+3 · 6 flujos · 7 principios) con garantías de backwards-compat | Pendiente |
 | ≥ 3 implementaciones independientes en producción | En progreso |
 
 ## Arquitectura
@@ -52,7 +52,7 @@ Servicialo es un **protocolo abierto**, no una plataforma. Define cómo los serv
 
 La relación es como HTTP con Apache, o SMTP con Gmail: Servicialo define las reglas, las implementaciones les dan vida.
 
-El protocolo modela cada servicio a través de **8 dimensiones**, **9 estados del ciclo de vida**, **6 flujos de excepción** y **7 principios fundamentales** — universales entre verticales (salud, legal, educación, servicios domiciliarios):
+El protocolo modela cada servicio a través de **8 dimensiones**, **un ciclo de vida 6+3** (6 estados core + 3 financieros opcionales), **6 flujos de excepción** y **7 principios fundamentales** — universales entre verticales (salud, legal, educación, servicios domiciliarios):
 
 ```
 Solicitado → Agendado → Confirmado → En Curso → Completado → Documentado → Facturado → Cobrado → Verificado
@@ -64,7 +64,7 @@ Cualquier servicio, en cualquier vertical, sigue esta secuencia. La lógica espe
 
 Este paquete expone el protocolo Servicialo como 40 herramientas MCP organizadas por las **7 fases** del ciclo de vida de un servicio (0–6, incluyendo el resolver de descubrimiento — análogo a DNS, sobre HTTP), más gestión de recursos, administración del resolver, **inteligencia de red** (`market.*`) y **descubrimiento cold-start** (`registry.list_*` para conocer la taxonomía sin saberla previamente). Un agente no llama endpoints por entidad de base de datos — sigue el flujo natural de coordinar un servicio.
 
-### Fase 0 — Resolución DNS (3 herramientas públicas, sin autenticación)
+### Fase 0 — Resolución DNS (3 herramientas, sin auth)
 
 | Herramienta | Descripción |
 |---|---|
@@ -72,7 +72,7 @@ Este paquete expone el protocolo Servicialo como 40 herramientas MCP organizadas
 | `resolve.search` | Buscar organizaciones registradas por país y vertical en el resolver global |
 | `trust.get_score` | Obtener puntaje de confianza de una organización (score 0-100, nivel, última actividad) |
 
-### Fase 1 — Descubrimiento (6 herramientas públicas, sin autenticación)
+### Fase 1 — Descubrimiento (6 herramientas, sin auth)
 
 | Herramienta | Descripción |
 |---|---|
@@ -143,7 +143,7 @@ Este paquete expone el protocolo Servicialo como 40 herramientas MCP organizadas
 | `resolve.update_endpoint` | Actualizar endpoints registrados (portabilidad entre backends) | `resolve:write` |
 | `telemetry.heartbeat` | Enviar heartbeat al resolver indicando que el nodo está activo | `telemetry:write` |
 
-### Inteligencia de Red (2 herramientas públicas, sin autenticación)
+### Inteligencia de Red (2 herramientas, sin auth)
 
 Benchmarks de mercado anonimizados sobre la telemetría operacional contribuida por los nodos. Política **contribuir-para-acceder** (k-anonimato ≥ 5):
 
@@ -152,7 +152,7 @@ Benchmarks de mercado anonimizados sobre la telemetría operacional contribuida 
 | `market.list_segments` | Listar segmentos `(event_type × vertical × region)` con datos disponibles (filtra por k-anon ≥ 5 distintos contribuidores) |
 | `market.get_benchmark` | Obtener la distribución de buckets de un segmento (p. ej. share de cada `price_band` para `payment_settled` en `health/CL`). Tier 0/1 ven datos con 90 días de delay; tier 2 (≥ 50 eventos en 30 días) ven real-time |
 
-### Discovery de Taxonomía (3 herramientas públicas, sin autenticación)
+### Discovery de Taxonomía (3 herramientas, sin auth)
 
 Cold-start: el agente no necesita conocer la taxonomía del protocolo de antemano. Empezar acá si llega sin contexto:
 
@@ -161,6 +161,12 @@ Cold-start: el agente no necesita conocer la taxonomía del protocolo de anteman
 | `registry.list_verticals` | Verticals presentes en la red (declarados + observados en telemetría 30d) |
 | `registry.list_regions` | Países/regiones ISO 3166-1 alpha-2 con actividad en la red |
 | `registry.list_event_types` | Catálogo de los 4 tipos de eventos de telemetría operacional + sus `payload_fields` |
+
+### Documentación (1 herramienta, sin auth)
+
+| Herramienta | Descripción |
+|---|---|
+| `docs.quickstart` | Obtener los 5 pasos del quickstart como JSON estructurado — onboarding de agentes sin contexto previo |
 
 ## Quickstart — 5 pasos para estar en la red
 
@@ -462,7 +468,7 @@ La especificación completa del protocolo Servicialo está disponible en:
 - **Versión estable actual:** 0.9
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json), [`resolution.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/resolution.schema.json), [`servicialo-config.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/servicialo-config.schema.json)
 
-La spec cubre las 8 dimensiones del servicio, 9 estados de ciclo de vida, 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
+La spec cubre las 8 dimensiones del servicio, el ciclo de vida 6+3, 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.
 
 ## Implementación de Referencia
 

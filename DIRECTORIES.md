@@ -24,5 +24,5 @@ Estado de registro y visibilidad en directorios de MCP servers.
 - **Smithery publish**: para Coordinalo usar el flujo de external URL en https://smithery.ai/new
 - **mcp.so**: registro manual, llenar formulario con npm package name y descripción
 - **Endpoint HTTP**: ambos servers exponen Streamable HTTP transport:
-  - Servicialo: `https://servicialo.com/api/mcp` (protocolo, 20 tools)
-  - Coordinalo: `https://coordinalo.com/api/mcp` (implementación, 41 tools)
+  - Servicialo: `https://servicialo.com/api/mcp` (protocolo, 40 tools)
+  - Coordinalo: `https://coordinalo.com/api/mcp` (implementación, MCP server de Coordinalo)

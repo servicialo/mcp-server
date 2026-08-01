@@ -98,9 +98,9 @@ interface Service {
 
 ---
 
-## Step 2: Implement the 9 Lifecycle States
+## Step 2: Implement the 6+3 Lifecycle States
 
-The 9 states are strictly ordered. No skipping (§6.1).
+The states are strictly ordered. No skipping (§6.1). The first 6 (`requested` → `documented`) are the required core; states 7–9 (`invoiced`, `collected`, `verified`) are optional financial extensions — implement them if your platform covers financial close.
 
 ```
 requested → scheduled → confirmed → in_progress → completed → documented → invoiced → collected → verified
@@ -318,7 +318,7 @@ Expose HTTP endpoints that cover the 6 agent phases from §13. At minimum, you n
 
 For a complete walkthrough with request/response examples, see [`examples/minimal-implementation.md`](./examples/minimal-implementation.md).
 
-**Done when:** An HTTP client can create a service, advance it through all 9 states, and trigger each of your 3 exception flows.
+**Done when:** An HTTP client can create a service, advance it through the 6 core states (plus the financial states if you implement them), and trigger each of your 3 exception flows.
 
 ---
 
@@ -405,7 +405,7 @@ Your implementation MUST store evidence immutably — once recorded, evidence ca
 | # | Requirement | Spec reference | Check |
 |---|-------------|---------------|-------|
 | 1 | Service has all 8 dimensions | §5 | Validate against `schema/service.schema.json` |
-| 2 | All 9 states are implemented | §6 | Create a service and advance it through all 9 states |
+| 2 | The 6 core states are implemented | §6 | Create a service and advance it through the 6 core states (financial states optional) |
 | 3 | States are strictly ordered (no skipping) | §6.1 | Attempt an invalid transition — it should fail |
 | 4 | Every transition records `from`, `to`, `at`, `by` | §6.1 | Inspect the transitions array after a full cycle |
 | 5 | 3+ exception flows work | §7 | Trigger each one and verify the state machine |
@@ -453,3 +453,23 @@ These are not required for compliance but are defined in the spec:
 - **Working example:** [`examples/minimal-implementation.md`](./examples/minimal-implementation.md)
 - **Reference MCP server:** [`packages/mcp-server/`](./packages/mcp-server/)
 - **Reference implementation:** [Coordinalo](https://coordinalo.com) (healthcare vertical)
+
+---
+
+## Step 8 — Verify conformance
+
+Before requesting a listing in the official registry, verify that your implementation
+passes the conformance suite:
+
+```bash
+SERVICIALO_BASE_URL=https://your-backend.com \
+SERVICIALO_API_KEY=your_api_key \
+SERVICIALO_ORG_ID=your_org_id \
+npm run test:conformance --prefix packages/mcp-server
+```
+
+A `CONFORMANT` implementation covers phases 0–4 (Resolve, Discover, Understand,
+Commit, Manage). Phases 5–6 (Verify, Close) are optional in v0.9 but required for
+listing in regulated verticals (health, legal).
+
+Save the test output — you will need it when opening the PR in [IMPLEMENTORS.md](./IMPLEMENTORS.md).

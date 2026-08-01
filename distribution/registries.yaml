@@ -1,3 +1,8 @@
+# ── CURRENT FACTS (sync with protocol/manifest.yaml before submitting anywhere) ──
+# Protocol: v0.10 (Draft) · Package: @servicialo/mcp-server 0.9.12
+# Tools: 40 = 15 public + 25 authenticated
+# Do NOT advertise a Python SDK until python-sdk/ actually ships (submodule is empty).
+# Historical `last_entry` blocks below record what was actually submitted — do not rewrite them.
 registries:
   - id: punkpeye-awesome-mcp
     name: punkpeye/awesome-mcp-servers

@@ -48,17 +48,18 @@ organización sobre la misma red.
 
 ---
 
-## 4. Medida de capacidad (PdC)
+## 4. Medida de capacidad (PdS)
 
 - **RC — Recursos Coordinados**: cantidad de recursos 
   (profesionales, sedes, agentes, canales) que participaron 
   al menos en un SC durante el período. Componente de la 
-  Prueba de Coordinación: `PdC = f(SC, CC, RC)`.
+  Prueba de Servicio (anteriormente "Prueba de 
+  Coordinación"): `PdS = f(SC, CC, RC)`.
 
 RC y RAC refieren a la misma realidad operativa (recursos 
 activos) observada desde ángulos distintos: RAC es unidad de 
 billing de infraestructura; RC es medida de capacidad activa 
-para el cálculo del PdC.
+para el cálculo del PdS.
 
 ---
 

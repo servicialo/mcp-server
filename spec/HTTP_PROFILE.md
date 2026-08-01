@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | **Profile Version** | 1.0.0 |
-| **Protocol Version** | 0.8 |
-| **Date** | 2026-03-15 |
+| **Protocol Version** | 0.10 |
+| **Date** | 2026-08-01 |
 | **Status** | Draft |
 | **License** | Apache-2.0 |
 
@@ -1405,6 +1405,8 @@ Get payment status for a specific sale or a client's full account.
 
 These endpoints manage bilateral commercial agreements (protocol §8).
 
+> **Specified, not implemented.** No `service_orders.*` tool exists in the reference MCP server (`@servicialo/mcp-server`) today. These operations are tracked as `specified_unimplemented_tools` in `protocol/manifest.yaml`.
+
 ---
 
 ### 10.1 `service_orders.list`
@@ -1626,6 +1628,8 @@ Get the real-time computed ledger for a service order.
 ## 11. Mandate Management
 
 These endpoints manage ServiceMandate objects (protocol §10).
+
+> **Specified, not implemented.** No `mandates.*` tool exists in the reference MCP server (`@servicialo/mcp-server`) today, and mandate scopes are advisory in the reference implementation (not enforced at the MCP tool boundary). Tracked as `specified_unimplemented_tools` in `protocol/manifest.yaml`.
 
 ---
 
