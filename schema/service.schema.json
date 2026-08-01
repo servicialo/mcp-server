@@ -145,13 +145,13 @@
 
     "lifecycle": {
       "type": "object",
-      "description": "Dimension 6 — Current position in the 9 universal states.",
+      "description": "Dimension 6 — Current position in the lifecycle: 6 core states + 3 optional financial states (PROTOCOL.md §6).",
       "required": ["current_state"],
       "properties": {
         "current_state": {
           "type": "string",
           "enum": ["requested", "scheduled", "confirmed", "in_progress", "completed", "documented", "invoiced", "collected", "verified", "cancelled", "disputed", "reassigning", "rescheduling", "partial"],
-          "description": "Current lifecycle state. The 9 universal states plus exception states."
+          "description": "Current lifecycle state. The 6 core states + 3 optional financial states (PROTOCOL.md §6), plus exception states."
         },
         "transitions": {
           "type": "array",

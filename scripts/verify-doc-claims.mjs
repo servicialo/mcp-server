@@ -14,7 +14,8 @@
  *   3. Any "<N> tools/herramientas" where N is a historical wrong total
  *      (8, 9, 10, 12, 20, 23, 34, 35, 37, 41) → fail.
  *   4. Forbidden phrases: "9 estados universales", "nueve estados
- *      universales", "implement the 9 lifecycle states".
+ *      universales", "9 universal states", "implement the 9 lifecycle
+ *      states".
  *   5. docs/spec/ must contain nothing but the README.md relocation stub
  *      (the mirror was consolidated into public/spec/).
  *   6. Forbidden stale claims from the 2026-08 conceptual-coherence pass:
@@ -158,7 +159,7 @@ const RULES = [
   },
   {
     name: 'forbidden phrase (states are 6 core + 3 optional, dimensions are orthogonal)',
-    re: /(?:9|nueve)\s+(?:estados|states)\s+universal(?:es)?/gi,
+    re: /(?:9|nueve)\s+(?:universal\s+states|(?:estados|states)\s+universal(?:es)?)/gi,
     bad: () => true,
   },
   {
