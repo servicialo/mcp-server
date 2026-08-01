@@ -44,7 +44,26 @@ export interface ManifestObject {
   defined_in?: string;
   surfaced_by?: string[];
   vertical_schemas?: string[];
+  /** Conceptual object this wire object represents (e.g. service → service_delivery). */
+  represents?: string;
+  /** Wire object that carries this conceptual object (e.g. service_delivery → service). */
+  wire_object?: string;
   note?: string;
+}
+
+export type BindingMaturity = "stable" | "candidate" | "experimental";
+
+export interface CertaintyLevel {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface ProofOfServiceModel {
+  doc: string;
+  certainty_levels: CertaintyLevel[];
+  dossier_states: string[];
+  settlement_states: string[];
 }
 
 export interface ManifestImplementation {
@@ -90,18 +109,21 @@ export interface Manifest {
   profiles: ManifestProfile[];
   bindings: {
     mcp: {
+      maturity: BindingMaturity;
       package: string;
       package_version: string;
       transports: string[];
       remote: string;
     };
     http: {
+      maturity: BindingMaturity;
       profile: string;
       profile_version: string;
       resolver_api_version: string;
       openapi: string;
     };
     a2a: {
+      maturity: BindingMaturity;
       version: string;
       agent_card: string;
       endpoint: string;
@@ -115,6 +137,7 @@ export interface Manifest {
     service_order: { schema: string; states: string[] };
     dimensions: { extension: string; doc: string; note: string };
   };
+  proof_of_service: ProofOfServiceModel;
   extensions: ManifestExtension[];
   implementations: ManifestImplementation[];
 }
@@ -134,6 +157,8 @@ export const LIFECYCLE = MANIFEST.state_machines.service_lifecycle;
 export const EXTENSIONS = MANIFEST.extensions;
 export const PROFILES = MANIFEST.profiles;
 export const IMPLEMENTATIONS = MANIFEST.implementations;
+export const PROOF_OF_SERVICE = MANIFEST.proof_of_service;
+export const BINDINGS = MANIFEST.bindings;
 
 export function toolsByTier(tier: ToolTier): ManifestTool[] {
   return MANIFEST.tools.filter((t) => t.tier === tier);

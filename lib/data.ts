@@ -3,6 +3,8 @@
  * se derivan de protocol/manifest.yaml vía lib/manifest.ts.
  */
 
+import { PROOF_OF_SERVICE } from "./manifest";
+
 // Los 9 hitos del camino feliz — la vista operativa más común del ciclo.
 // Los estados canónicos y la regla de dimensiones ortogonales viven en el
 // manifest (state_machines) y en PROTOCOL.md §6.0.
@@ -39,12 +41,66 @@ export const PRINCIPLES = [
   { title: "El protocolo separa lo acordado, lo entregado, la evidencia y el dinero", body: "Cuatro elementos explícitos, cada uno con su propio ciclo. Una Prueba de Servicio es el expediente que los vincula — no una declaración de que todo salió bien." },
 ] as const;
 
-export const CERTAINTY_LEVELS = [
-  { level: "L1", name: "Verificación bilateral", desc: "Prestador y cliente atestiguan la entrega.", estado: "Verificando" },
-  { level: "L2", name: "+ Contexto en sitio", desc: "Suma registros de entrada y salida, duración real y ubicación.", estado: "Verificando" },
-  { level: "L3", name: "+ Riel del pagador", desc: "La evidencia se emite en el formato que el pagador exige.", estado: "Verificando" },
-  { level: "L4", name: "+ Cruce con liquidación", desc: "La prueba se concilia contra el pago efectivo.", estado: "Acreditable" },
-] as const;
+// ── Prueba de Servicio: tres dimensiones relacionadas pero independientes ──
+// Los ids, keys y estados canónicos viven en protocol/manifest.yaml
+// (proof_of_service). Aquí solo vive el copy en español, keyed por `key`.
+
+const CERTAINTY_COPY: Record<string, { name: string; desc: string }> = {
+  asserted: {
+    name: "Afirmado",
+    desc: "Una parte afirma que la entrega ocurrió. La declaración queda registrada, sin corroboración aún.",
+  },
+  bilateral: {
+    name: "Atestación bilateral",
+    desc: "Proveedor y receptor presentan atestaciones compatibles sobre la misma entrega.",
+  },
+  operationally_supported: {
+    name: "Respaldo operacional",
+    desc: "Existe evidencia operacional adicional: registros de entrada y salida, duración real, ubicación o canal, documentos firmados.",
+  },
+  financially_reconciled: {
+    name: "Conciliación financiera",
+    desc: "Además, existe conciliación con eventos financieros relacionados. Suma evidencia — no vuelve la entrega “más verdadera” ni prueba por sí sola la calidad o el alcance entregado.",
+  },
+};
+
+export const CERTAINTY_LEVELS = PROOF_OF_SERVICE.certainty_levels.map((l) => ({
+  level: l.id,
+  key: l.key,
+  name: CERTAINTY_COPY[l.key]?.name ?? l.name,
+  desc: CERTAINTY_COPY[l.key]?.desc ?? "",
+}));
+
+const DOSSIER_COPY: Record<string, { name: string; desc: string; exception?: boolean }> = {
+  draft: { name: "Borrador", desc: "El expediente se está componiendo: afirmaciones y evidencia en recolección." },
+  supported: { name: "Respaldado", desc: "La evidencia registrada respalda la entrega; aún no se evalúa contra una política." },
+  accredited: { name: "Acreditado", desc: "La evidencia satisface la política de acreditación aplicable. Puede ocurrir en L1, L2, L3 o L4 — con o sin pago." },
+  disputed: { name: "Disputado", desc: "Una parte disputa la entrega o su evidencia.", exception: true },
+  revoked: { name: "Revocado", desc: "La acreditación fue retirada tras nueva evidencia o resolución.", exception: true },
+};
+
+export const DOSSIER_STATES = PROOF_OF_SERVICE.dossier_states.map((s) => ({
+  id: s,
+  name: DOSSIER_COPY[s]?.name ?? s,
+  desc: DOSSIER_COPY[s]?.desc ?? "",
+  exception: DOSSIER_COPY[s]?.exception ?? false,
+}));
+
+const SETTLEMENT_COPY: Record<string, string> = {
+  not_required: "sin liquidación (entrega gratuita o interna)",
+  pending: "liquidación esperada, aún sin facturar",
+  invoiced: "factura o cargo emitido",
+  partially_paid: "pago parcial recibido",
+  paid: "pagado en su totalidad",
+  refunded: "pago devuelto",
+  charged_back: "pago revertido por el riel del pagador",
+  written_off: "liquidación abandonada o condonada",
+};
+
+export const SETTLEMENT_STATES = PROOF_OF_SERVICE.settlement_states.map((s) => ({
+  id: s,
+  desc: SETTLEMENT_COPY[s] ?? "",
+}));
 
 export const ADOPTION_PATH = [
   {
@@ -208,8 +264,8 @@ export const EXTENSIONS_COPY: Record<
     tagline: "El expediente verificable que vincula lo acordado, lo entregado, la evidencia y la liquidación.",
     defines: [
       "Composición del expediente a partir de objetos existentes del Core",
-      "Gradiente de certeza L1–L4 con estados Verificando / Acreditable",
-      "Regla de presentación: la prueba nunca se muestra sin su nivel y estado",
+      "Tres dimensiones independientes: nivel de certeza (L1–L4), estado del expediente (acreditación por política) y estado de liquidación",
+      "Regla de presentación: la prueba nunca se muestra sin su nivel de certeza y su estado de expediente",
     ],
     status: "Borrador. No existe objeto wire todavía — el documento especifica el compuesto objetivo, derivable de los objetos actuales.",
   },

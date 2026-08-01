@@ -193,32 +193,32 @@
 
     "ledger": {
       "type": "object",
-      "description": "Computed from verified Services. Read-only by contract — never manually entered; as atomic Services transition to 'verified', the system updates these fields automatically. Immutability is guaranteed by implementations that source these fields from an append-only event store (the reference implementation enforces append-only at the database layer for its service-event stream via no-update/no-delete triggers); derived projections are recomputed, not hand-edited.",
+      "description": "Computed projection, never a manually editable balance. Derived from three sources: Service Deliveries (consumption fields advance as deliveries reach 'verified'), the Order's Commercial Terms (billing fields follow the payment schedule — upfront, milestone, periodic, on_delivery, custom, fixed or free), and Settlement Events (collection fields follow charges, payments, refunds, chargebacks, write-offs). The sources move independently: a payment MAY be recorded before any delivery is accredited (amount_collected > 0 with services_verified = 0 is a valid state). Immutability is guaranteed by implementations that source these fields from an append-only event store (the reference implementation enforces append-only at the database layer for its service-event stream via no-update/no-delete triggers); derived projections are recomputed, not hand-edited.",
       "properties": {
         "services_verified": {
           "type": "integer",
           "minimum": 0,
-          "description": "Count of services in 'verified' state."
+          "description": "Count of deliveries in 'verified' state. Derived from Service Deliveries."
         },
         "hours_consumed": {
           "type": "number",
           "minimum": 0,
-          "description": "Total hours across verified services."
+          "description": "Total hours across verified deliveries. Derived from Service Deliveries."
         },
         "amount_consumed": {
           "type": "number",
           "minimum": 0,
-          "description": "Value consumed at pricing rates."
+          "description": "Value consumed at pricing rates. Derived from deliveries valued at the Order's commercial terms."
         },
         "amount_billed": {
           "type": "number",
           "minimum": 0,
-          "description": "Total invoiced to date."
+          "description": "Total invoiced to date, per the Order's payment schedule — not a function of verified deliveries alone (prepaid and periodic Orders invoice on their own schedule)."
         },
         "amount_collected": {
           "type": "number",
           "minimum": 0,
-          "description": "Total payments received."
+          "description": "Total payments received. Derived from settlement events; may be > 0 before any delivery is verified (prepayment)."
         },
         "amount_remaining": {
           "type": "number",

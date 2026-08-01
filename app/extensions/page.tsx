@@ -158,11 +158,18 @@ export default function ExtensionsPage() {
                           </span>
                           <span className="text-text">{l.name}</span>
                           <span className="text-text-dim hidden md:inline">— {l.desc}</span>
-                          <span className={`ml-auto font-mono text-[10px] uppercase px-2 py-0.5 rounded-full shrink-0 ${l.estado === "Acreditable" ? "bg-green/15 text-green" : "bg-surface-alt text-text-dim"}`}>
-                            {l.estado}
-                          </span>
                         </div>
                       ))}
+                    </div>
+                    <div className="mt-3 text-[12px] text-text-muted leading-[1.6]">
+                      El nivel describe la evidencia disponible; la
+                      acreditación es una dimensión aparte, definida por
+                      política — una entrega puede acreditarse en cualquier
+                      nivel, con o sin pago. Ver{" "}
+                      <a href="/#prueba-de-servicio" className="text-accent hover:underline">
+                        Prueba de Servicio
+                      </a>
+                      .
                     </div>
                   </div>
                 </div>

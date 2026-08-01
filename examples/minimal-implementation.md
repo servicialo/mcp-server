@@ -837,13 +837,13 @@ Resultado: rescheduling → scheduled (con nueva hora)
 | Requisito | Spec § | Estado | Cómo |
 |-----------|--------|--------|------|
 | 8 dimensiones modeladas | §5 | Hecho | Catálogo de servicios + objeto de reserva |
-| 9 estados del ciclo de vida | §6 | Hecho | Máquina de estados con orden estricto |
+| 6 estados core del ciclo (+3 financieros opcionales) | §6 | Hecho | Máquina de estados con orden estricto |
 | Transiciones registradas | §6.1 | Hecho | `from`, `to`, `at`, `by`, `method` en cada transición |
 | Sin salto de estados | §6.1 | Hecho | `validateTransition()` rechaza saltos inválidos |
 | Flujo de cancelación | §7.3 | Hecho | Cualquier pre-entrega → cancelled |
 | No-show del cliente | §7.1 | Hecho | confirmed → cancelled (no_show) |
 | Reagendamiento | §7.5 | Hecho | scheduled/confirmed → rescheduling → scheduled |
-| API conectable a MCP | §13 | Hecho | 6 endpoints mapeados a herramientas MCP |
+| Binding máquina a máquina (este ejemplo usa MCP; HTTP puro también es conforme) | §13 | Hecho | 6 endpoints mapeados a herramientas MCP |
 | Evidencia registrada | §5.7 | Hecho | GPS check-in almacenado en `proof.evidence` |
 
 ---

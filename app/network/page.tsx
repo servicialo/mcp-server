@@ -20,22 +20,31 @@ export const metadata: Metadata = {
 
 const DEFINICIONES: { termino: string; def: React.ReactNode }[] = [
   {
-    termino: "Instalación",
-    def: "Un node_id del servidor MCP que reportó telemetría. Puede ser una instancia efímera — por ejemplo, un desarrollador probando con npx.",
+    termino: "Inicialización registrada",
+    def: "Evento de telemetría recibido cuando el software se inicializa. Se cuenta por node_id único; puede ser una instancia efímera — por ejemplo, un desarrollador probando con npx.",
+  },
+  {
+    termino: "Host único",
+    def: "Máquina o entorno técnico único detectado, deduplicado por huella criptográfica de red. El conteo más conservador — filtra reinicios de contenedores e IDs efímeros.",
   },
   {
     termino: "Nodo activo",
-    def: "Una instalación con actividad reciente (últimas 24 horas o últimos 7 días).",
+    def: "Un host que reportó actividad dentro de una ventana determinada (últimas 24 horas o últimos 7 días).",
   },
   {
     termino: "Organización operando",
-    def: "Una organización registrada en el resolver que sirve tráfico real.",
+    def: "Una organización que procesa coordinaciones reales mediante Servicialo, registrada en el resolver.",
+  },
+  {
+    termino: "Implementación independiente",
+    def: "Un producto o sistema distinto de Coordinalo que implementa el protocolo. Hoy: ninguna verificada.",
   },
   {
     termino: "Implementación conforme",
     def: (
       <>
-        Una plataforma verificada, listada en{" "}
+        Una implementación que declaró perfiles, superó la revisión de
+        conformance vigente (manual hoy) y está listada en{" "}
         <a href="/implementors" className="text-accent hover:underline">
           /implementors
         </a>
@@ -86,22 +95,20 @@ export default async function NetworkPage() {
       {/* KPI cards */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-14">
         <KpiCard
-          label="Instalaciones"
+          label="Inicializaciones registradas"
           value={stats.totalInstances.toLocaleString()}
-          subtitle={stats.uniqueHosts < stats.totalInstances
-            ? `${stats.uniqueHosts} hosts únicos`
-            : undefined}
-          tooltip="node_id únicos que reportaron telemetría. Incluye instancias efímeras (contenedores, pruebas con npx). 'Hosts únicos' deduplica por huella de red y es el conteo más conservador."
+          subtitle="node_id únicos · acumulado histórico"
+          tooltip="node_id únicos que reportaron un evento de inicialización. Incluye instancias efímeras (contenedores, pruebas con npx). 'Hosts únicos' deduplica por huella de red y es el conteo más conservador."
         />
-        <KpiCard label="Hosts únicos" value={String(stats.uniqueHosts)} tooltip="Deduplicados por huella criptográfica (SHA-256 de metadatos de la petición). Más conservador que el conteo de instalaciones — filtra reinicios de contenedores e IDs efímeros." />
-        <KpiCard label="Activas (24 h)" value={String(stats.uniqueNodes24h)} tooltip="Instalaciones con actividad en las últimas 24 horas." />
-        <KpiCard label="Activas (7 d)" value={String(stats.uniqueNodes7d)} tooltip="Instalaciones con actividad en los últimos 7 días." />
+        <KpiCard label="Hosts únicos" value={String(stats.uniqueHosts)} subtitle="acumulado histórico" tooltip="Máquinas o entornos únicos, deduplicados por huella criptográfica (SHA-256 de metadatos de la petición). Más conservador que el conteo de inicializaciones — filtra reinicios de contenedores e IDs efímeros." />
+        <KpiCard label="Nodos activos (24 h)" value={String(stats.uniqueNodes24h)} tooltip="Hosts únicos con actividad en las últimas 24 horas." />
+        <KpiCard label="Nodos activos (7 d)" value={String(stats.uniqueNodes7d)} tooltip="Hosts únicos con actividad en los últimos 7 días." />
       </section>
 
       {/* World map — always visible */}
       <section className="mb-14">
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-          Instalaciones por país
+          Hosts únicos por país
         </h2>
 
         <div className="mb-6">
@@ -154,7 +161,7 @@ export default async function NetworkPage() {
                 <tr className="border-b border-border bg-surface-alt">
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">País</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium">Continente</th>
-                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Instalaciones</th>
+                  <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium text-right">Hosts únicos</th>
                   <th className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] px-4 py-2.5 font-medium w-[120px]"></th>
                 </tr>
               </thead>
@@ -172,11 +179,11 @@ export default async function NetworkPage() {
       {stats.versionBreakdown.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Adopción de versiones (paquete npm)
+            Versiones del paquete npm (hosts únicos por versión)
           </h2>
           <div className="space-y-2">
             {stats.versionBreakdown.map((v) => {
-              const pct = stats.totalInstances > 0 ? Math.round((v.count / stats.totalInstances) * 100) : 0;
+              const pct = stats.uniqueHosts > 0 ? Math.round((v.count / stats.uniqueHosts) * 100) : 0;
               return (
                 <div key={v.version} className="flex items-center gap-3">
                   <span className="font-mono text-xs text-text-muted w-20 shrink-0">
@@ -202,7 +209,7 @@ export default async function NetworkPage() {
       {stats.dailyChart.length > 0 && (
         <section className="mb-14">
           <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
-            Instalaciones únicas diarias (30 días)
+            Hosts únicos diarios (30 días)
           </h2>
           <div className="flex items-end gap-[2px] h-40">
             {stats.dailyChart.map((d) => {

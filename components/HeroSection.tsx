@@ -2,7 +2,7 @@ import { getNetworkStats } from "@/lib/telemetry-stats";
 
 export async function HeroSection() {
   const stats = await getNetworkStats();
-  const installCount = stats.uniqueHosts;
+  const hostCount = stats.uniqueHosts;
   const countryCount = stats.countryBreakdown.length;
 
   return (
@@ -28,9 +28,10 @@ export async function HeroSection() {
         <span>◆ Independiente del transporte</span>
         <span>◆ Legible por máquinas</span>
       </div>
-      {installCount > 0 && (
+      {hostCount > 0 && (
         <a
           href="/network"
+          title="Hosts únicos del servidor MCP detectados por telemetría — no equivale a adopción operacional"
           className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full border border-border bg-surface-alt hover:border-accent transition-colors group"
         >
           <span className="relative flex h-2 w-2">
@@ -38,7 +39,7 @@ export async function HeroSection() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="font-mono text-[11px] text-text-muted group-hover:text-accent transition-colors">
-            {installCount} instalaciones en {countryCount}{" "}
+            {hostCount} hosts únicos detectados en {countryCount}{" "}
             {countryCount === 1 ? "país" : "países"}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim group-hover:text-accent transition-colors">

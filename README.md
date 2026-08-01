@@ -161,7 +161,7 @@ Organización
         └── 8 dimensiones cada uno
 ```
 
-> **El Servicio** es la unidad atómica de entrega — lo que realmente ocurrió. **La Orden de Servicio** es el acuerdo comercial que agrupa servicios bajo un alcance, un precio y un esquema de pagos.
+> **La Service Delivery** es la instancia atómica ejecutada — lo que realmente ocurrió. En el wire format actual se representa con el objeto **Service** (nombre conservado por compatibilidad). **La Orden de Servicio** es el acuerdo comercial que agrupa entregas bajo un alcance, un precio y un esquema de pagos. "Servicio" a secas es el término general del dominio, no un cuarto objeto.
 
 Cuando un Servicio pertenece a una Orden, su dimensión de cobro es **informativa** — registra el valor económico, pero no genera factura. La facturación es responsabilidad exclusiva de la Orden.
 
@@ -450,14 +450,15 @@ orden_de_servicio:
         alcances: texto[]        # resource:action (e.g. schedule:write)
         estado: activo | expirado | revocado | suspendido
 
-# Ledger computado desde servicios verificados — nunca editable
+# Ledger: proyección calculada desde entregas + términos comerciales +
+# eventos de liquidación — nunca un saldo editable a mano
 ```
 
 ---
 
 ## Implementaciones
 
-Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 6 estados core (los 3 financieros son opcionales), manejar al menos 3 de los 6 flujos de excepción, adherir a los 7 principios fundamentales y exponer una API conectable al MCP server. La verificación es manual hoy (PR + revisión del equipo); la suite automatizada de certificación es parte del roadmap.
+Cualquier plataforma puede implementar Servicialo. Para ser listada debe modelar las 8 dimensiones, implementar los 6 estados core (los 3 financieros son opcionales), manejar al menos 3 de los 6 flujos de excepción, adherir a los 7 principios fundamentales y exponer al menos un binding máquina a máquina que implemente los perfiles Core (HTTP, MCP, A2A u otro equivalente — una implementación puramente HTTP es conforme sin MCP; MCP es la vía recomendada para agentes). La verificación es manual hoy (PR + revisión del equipo); la suite automatizada de certificación es parte del roadmap.
 
 | Plataforma | Vertical | Cobertura | Estado |
 |------------|----------|-----------|:------:|

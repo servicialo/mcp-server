@@ -140,11 +140,11 @@ Organization
     ├── scope                     what services, how many, what type
     ├── pricing                   how value is calculated
     ├── payment schedule          when money moves
-    └── Services                 ← atomic delivery units
+    └── Services                 ← delivery instances (wire objects)
         └── 8 dimensions each
 ```
 
-> **The Service** is the atomic unit of delivery — what actually happened. **The Service Order** is the commercial agreement that groups services under a scope, pricing model, and payment schedule.
+> **The Service Delivery** is the executed atomic instance — what actually happened. In the current wire format it is represented by the **Service** object (name retained for compatibility). **The Service Order** is the commercial agreement that groups deliveries under a scope, pricing model, and payment schedule. "Service" as bare prose is the general domain term, not a fourth object.
 
 When a Service belongs to an Order, its billing dimension is **informational** — it records the economic value, but does not generate an invoice. Invoicing is the exclusive responsibility of the Order.
 
@@ -406,7 +406,7 @@ service:
 
 ## Implementations
 
-Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 6 core states (the 3 financial states are optional), handle at least 3 of the 6 exception flows, adhere to the 7 core principles, and expose an API connectable to the MCP server. Verification is manual today (PR + team review); an automated certification suite is on the roadmap.
+Any platform can implement Servicialo. To be listed it must model the 8 dimensions, implement the 6 core states (the 3 financial states are optional), handle at least 3 of the 6 exception flows, adhere to the 7 core principles, and expose at least one machine-to-machine binding implementing the Core profiles (HTTP, MCP, A2A, or an equivalent — a purely HTTP implementation is conformant without MCP; MCP is the recommended path for agents). Verification is manual today (PR + team review); an automated certification suite is on the roadmap.
 
 | Platform | Vertical | Coverage | Status |
 |----------|----------|----------|:------:|

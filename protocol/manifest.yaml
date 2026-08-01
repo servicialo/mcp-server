@@ -37,8 +37,15 @@ objects:
     surfaced_by: [services.list]
     note: Published catalog entry — what an organization offers.
   - id: service
-    name: Service (atomic delivery unit)
+    name: Service (wire object)
     schema: schema/service.schema.json
+    represents: service_delivery
+    note: >
+      In the current wire format, `Service` represents one Service Delivery
+      instance (the executed atomic instance, modeled across 8 dimensions).
+      The name is retained for wire compatibility — renaming would break
+      schemas, tools and consumers. "Service"/"servicio" as bare prose is the
+      general domain term, not a fourth conceptual object.
   - id: service_order
     name: Service Order
     schema: schema/service-order.schema.json
@@ -47,7 +54,11 @@ objects:
     name: Service Delivery
     schema: narrative
     defined_in: PROTOCOL.md#6-lifecycle
-    note: A concrete execution instance — today expressed as session + proof dimension.
+    wire_object: service
+    note: >
+      The executed atomic instance — the conceptual name of the delivery unit.
+      Its wire representation today is the `Service` object
+      (schema/service.schema.json); the wire name is kept for compatibility.
   - id: evidence_event
     name: Evidence Event
     schema: schema/evidence/base.schema.json
@@ -84,18 +95,26 @@ profiles:
   - { id: network,      name: Network,      status: experimental }
 
 # ── Bindings (the protocol is transport-independent) ─────────────────────────
+# Conformance requires AT LEAST ONE machine-to-machine binding implementing
+# the required Core profiles. No specific binding is mandatory: a pure-HTTP
+# implementation is conformant without MCP. MCP is the RECOMMENDED binding
+# for agentic integrations, not a conformance condition.
+# maturity: stable | candidate | experimental
 bindings:
-  mcp:
-    package: "@servicialo/mcp-server"
-    package_version: "0.9.12"    # verify-versions.mjs compares with package.json + server.json
-    transports: [stdio, streamable-http]
-    remote: https://servicialo.com/api/mcp
   http:
+    maturity: stable             # normative machine-to-machine binding
     profile: spec/HTTP_PROFILE.md
     profile_version: "1.0.0"     # version of the HTTP binding document, not the protocol
     resolver_api_version: "1.0"  # wire value of X-Servicialo-Version (lib/servicialo/response.ts) — DO NOT change
     openapi: spec/openapi.yaml
+  mcp:
+    maturity: stable             # reference binding, in production (Coordinalo)
+    package: "@servicialo/mcp-server"
+    package_version: "0.9.12"    # verify-versions.mjs compares with package.json + server.json
+    transports: [stdio, streamable-http]
+    remote: https://servicialo.com/api/mcp
   a2a:
+    maturity: experimental       # partial surface: discovery + booking intents, not the full tool surface
     version: "0.3"
     agent_card: /.well-known/agent.json
     endpoint: "POST /{orgSlug}/a2a"
@@ -193,6 +212,34 @@ state_machines:
       The protocol does not impose a total order across fulfillment, evidence,
       acceptance and settlement. The state-dimensions extension (draft)
       formalizes the orthogonal projection.
+
+# ── Proof of Service model (draft extension) ─────────────────────────────────
+# Single source of truth for the three related-but-independent dimensions of
+# a Proof of Service dossier. Consumed by lib/data.ts (site copy) and
+# cross-checked by scripts/verify-doc-claims.mjs against the extension doc.
+#
+#   certainty  — what evidence and corroboration exist (L1–L4, cumulative).
+#                L4 does NOT mean "more true": it means additional financial
+#                evidence exists. A free delivery can reach sufficient
+#                certainty without L4; a reconciled payment does not by
+#                itself prove quality or delivered scope.
+#   dossier    — whether the evidence satisfies an applicable accreditation
+#                policy. A dossier can be accredited at L1, L2, L3 or L4,
+#                depending on the policy (accreditation_policy → evidence
+#                requirements, required attestations, minimum certainty
+#                level, exceptions).
+#   settlement — the financial position. Mirrors the `financial` dimension
+#                of the state-dimensions extension (kept bit-exact).
+proof_of_service:
+  doc: public/spec/extensions/proof-of-service.md
+  certainty_levels:
+    - { id: L1, key: asserted,                name: Asserted }
+    - { id: L2, key: bilateral,               name: Bilateral attestation }
+    - { id: L3, key: operationally_supported, name: Operationally supported }
+    - { id: L4, key: financially_reconciled,  name: Financially reconciled }
+  dossier_states: [draft, supported, accredited, disputed, revoked]
+  settlement_states: [not_required, pending, invoiced, partially_paid, paid,
+                      refunded, charged_back, written_off]
 
 # ── Extensions registry ──────────────────────────────────────────────────────
 # maturity: draft | experimental | candidate | stable | deprecated

@@ -20,9 +20,9 @@ const REPO = MANIFEST.protocol.repository;
 
 const OBJECTS_ES: Record<string, string> = {
   service_offer: "Lo que una organización ofrece: tipo, descripción, requisitos, duración estimada, condiciones indicativas.",
-  service: "La unidad atómica de entrega, modelada en 8 dimensiones. Puede existir sola o dentro de una Orden.",
+  service: "Objeto wire que representa una instancia de Service Delivery, modelada en 8 dimensiones. El nombre se conserva por compatibilidad. Puede existir sola o dentro de una Orden.",
   service_order: "El acuerdo entre las partes: alcance, cliente, beneficiario, proveedor, pagador, precio, políticas, vigencia, esquema de pagos.",
-  service_delivery: "Una instancia concreta de ejecución: qué se entregó, quién, a quién, cuándo, dónde o por qué canal, con qué resultado.",
+  service_delivery: "La instancia atómica ejecutada: qué se entregó, quién, a quién, cuándo, dónde o por qué canal, con qué resultado. En el wire actual se representa con el objeto Service.",
   evidence_event: "Registros y atestaciones que respaldan afirmaciones sobre una entrega: confirmaciones, documentos, firmas, timestamps.",
   settlement_event: "Movimientos financieros asociados: factura, cargo, pago, devolución, contracargo, conciliación.",
   service_mandate: "Delegación explícita, acotada y revocable de un principal humano a un agente IA.",
@@ -69,7 +69,7 @@ const CONFORMANCE = [
   { n: 1, req: "Modelar servicios con las 8 dimensiones", ref: "§5", mandatory: true },
   { n: 2, req: "Implementar los 6 estados core del ciclo (requested → documented). Los 3 financieros son extensiones opcionales", ref: "§6", mandatory: true },
   { n: 3, req: "Manejar al menos 3 flujos de excepción", ref: "§7", mandatory: true },
-  { n: 4, req: "Exponer un API conectable por un servidor MCP", ref: "§13", mandatory: true },
+  { n: 4, req: "Exponer al menos un binding máquina a máquina que implemente los perfiles Core requeridos y declare perfiles y versiones soportados — HTTP, MCP, A2A u otro equivalente. Una implementación puramente HTTP es conforme sin MCP", ref: "§13 + HTTP_PROFILE", mandatory: true },
   { n: 5, req: "Modelar Órdenes de Servicio", ref: "§8", mandatory: false },
   { n: 6, req: "Implementar el modelo de agencia delegada", ref: "§10", mandatory: false },
   { n: 7, req: "Implementar perfiles de proveedor", ref: "§12", mandatory: false },
@@ -438,30 +438,19 @@ export default function SpecPage() {
         id="bindings"
         num="§7 — Bindings"
         title="Independencia del transporte"
-        subtitle="Servicialo define la semántica; los bindings definen cómo se expone. Los tres bindings actuales son equivalentes en semántica."
+        subtitle="Servicialo define la semántica; los bindings definen cómo se expone. La conformidad exige al menos un binding máquina a máquina que implemente los perfiles Core — ninguno en particular. MCP es la vía recomendada para integraciones agénticas, no una condición para usar el protocolo."
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="bg-surface rounded-[14px] border border-border p-4">
-            <div className="font-mono text-[13px] font-semibold text-text mb-1.5">MCP</div>
-            <div className="text-[13px] text-text-muted leading-[1.7] mb-2">
-              Servidor {MANIFEST.bindings.mcp.package} (v{PACKAGE_VERSION}),
-              transportes {MANIFEST.bindings.mcp.transports.join(" y ")}.
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="font-mono text-[13px] font-semibold text-text">HTTP</span>
+              <MaturityBadge maturity={MANIFEST.bindings.http.maturity} />
             </div>
-            <a
-              href="https://www.npmjs.com/package/@servicialo/mcp-server"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-[11px] text-accent hover:underline"
-            >
-              npm →
-            </a>
-          </div>
-          <div className="bg-surface rounded-[14px] border border-border p-4">
-            <div className="font-mono text-[13px] font-semibold text-text mb-1.5">HTTP</div>
             <div className="text-[13px] text-text-muted leading-[1.7] mb-2">
-              Perfil REST normativo (v{MANIFEST.bindings.http.profile_version}) +
-              OpenAPI 3.1. El protocolo no prescribe rutas: cada implementación
-              elige su superficie.
+              Binding normativo para acceso máquina a máquina: perfil REST
+              (v{MANIFEST.bindings.http.profile_version}) + OpenAPI 3.1. El
+              protocolo no prescribe rutas: cada implementación elige su
+              superficie. Suficiente por sí solo para la conformidad Core.
             </div>
             <a
               href={`${REPO}/blob/main/${MANIFEST.bindings.http.profile}`}
@@ -473,10 +462,35 @@ export default function SpecPage() {
             </a>
           </div>
           <div className="bg-surface rounded-[14px] border border-border p-4">
-            <div className="font-mono text-[13px] font-semibold text-text mb-1.5">A2A</div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="font-mono text-[13px] font-semibold text-text">MCP</span>
+              <MaturityBadge maturity={MANIFEST.bindings.mcp.maturity} />
+            </div>
             <div className="text-[13px] text-text-muted leading-[1.7] mb-2">
-              Agent Cards en {MANIFEST.bindings.a2a.agent_card} y endpoint
-              JSON-RPC ({MANIFEST.bindings.a2a.endpoint}). A2A v{MANIFEST.bindings.a2a.version}.
+              Binding oficial que expone los perfiles como tools y resources
+              MCP: {MANIFEST.bindings.mcp.package} (v{PACKAGE_VERSION}),
+              transportes {MANIFEST.bindings.mcp.transports.join(" y ")}.
+              Recomendado para agentes; opcional para la conformidad.
+            </div>
+            <a
+              href="https://www.npmjs.com/package/@servicialo/mcp-server"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[11px] text-accent hover:underline"
+            >
+              npm →
+            </a>
+          </div>
+          <div className="bg-surface rounded-[14px] border border-border p-4">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="font-mono text-[13px] font-semibold text-text">A2A</span>
+              <MaturityBadge maturity={MANIFEST.bindings.a2a.maturity} />
+            </div>
+            <div className="text-[13px] text-text-muted leading-[1.7] mb-2">
+              Binding oficial de interoperabilidad entre agentes: Agent Cards
+              en {MANIFEST.bindings.a2a.agent_card} y endpoint JSON-RPC
+              ({MANIFEST.bindings.a2a.endpoint}). A2A v{MANIFEST.bindings.a2a.version}.
+              Superficie parcial: descubrimiento e intents de booking.
             </div>
             <a
               href="https://spec.servicialo.com/intents.md"
@@ -489,7 +503,9 @@ export default function SpecPage() {
           </div>
         </div>
         <div className="mt-3 text-[12px] text-text-dim leading-[1.6]">
-          El header wire <code className="font-mono">X-Servicialo-Version: {MANIFEST.bindings.http.resolver_api_version}</code>{" "}
+          Otros bindings son permitidos si implementan la semántica y los
+          requisitos de conformidad. El header wire{" "}
+          <code className="font-mono">X-Servicialo-Version: {MANIFEST.bindings.http.resolver_api_version}</code>{" "}
           versiona el API del resolver — es independiente de la versión del
           documento del protocolo (v{PROTOCOL_VERSION}).
         </div>
