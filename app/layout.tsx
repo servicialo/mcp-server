@@ -26,9 +26,9 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-const SITE_TITLE = "Servicialo — El protocolo abierto para coordinar servicios";
+const SITE_TITLE = "Servicialo — Protocolo abierto para servicios";
 const SITE_DESCRIPTION =
-  "Servicialo es el protocolo abierto de dominio para coordinar servicios: conecta lo acordado, lo entregado, la evidencia y la liquidación mediante una semántica común para personas, plataformas y agentes. Cada entrega puede acreditarse con una Prueba de Servicio: el expediente verificable que vincula esos elementos.";
+  "Servicialo es un protocolo abierto que define una semántica común para servicios: conecta lo ofrecido, lo acordado, lo entregado, la evidencia de la entrega y su liquidación, para que plataformas, sistemas y agentes operen servicios con un lenguaje compartido. Coordinalo es la implementación de referencia.";
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -73,9 +73,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebPage",
-              name: "Servicialo — El protocolo abierto para coordinar servicios",
+              name: "Servicialo — Protocolo abierto para servicios",
               description:
-                "Servicialo es el protocolo abierto de dominio para coordinar servicios: conecta lo acordado, lo entregado, la evidencia y la liquidación mediante una semántica común para personas, plataformas y agentes.",
+                "Servicialo es un protocolo abierto que define una semántica común para servicios: conecta lo ofrecido, lo acordado, lo entregado, la evidencia de la entrega y su liquidación, para que plataformas, sistemas y agentes operen servicios con un lenguaje compartido.",
               url: "https://servicialo.com",
               inLanguage: "es",
             }),

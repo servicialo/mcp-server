@@ -1,12 +1,13 @@
 import { SectionTitle } from "./SectionTitle";
 import { StatusMatrix, type StatusColumn } from "./StatusMatrix";
-import { EXTENSIONS, PACKAGE_VERSION, TOOL_COUNTS } from "@/lib/manifest";
+import { EXTENSIONS, MANIFEST, PACKAGE_VERSION, TOOL_COUNTS } from "@/lib/manifest";
+import { EXTENSIONS_COPY } from "@/lib/data";
 
 export function EstadoActualSection() {
   const byMaturity = (maturities: string[]) =>
     EXTENSIONS.filter((e) => maturities.includes(e.maturity)).map((e) => ({
       label: e.name,
-      sublabel: e.note ? "con salvedades documentadas" : undefined,
+      sublabel: EXTENSIONS_COPY[e.id]?.tagline,
       href: `/extensions#${e.id}`,
     }));
 
@@ -17,22 +18,30 @@ export function EstadoActualSection() {
       badge: "available",
       items: [
         {
+          label: "Especificación y modelo principal",
+          sublabel: `PROTOCOL.md v${MANIFEST.protocol.version} (borrador) + JSON Schemas`,
+          href: "/spec",
+        },
+        {
           label: `Servidor MCP (${TOOL_COUNTS.total} tools)`,
           sublabel: `@servicialo/mcp-server v${PACKAGE_VERSION}`,
           href: "https://www.npmjs.com/package/@servicialo/mcp-server",
         },
         { label: "Perfil HTTP + OpenAPI", sublabel: "binding REST normativo", href: "https://github.com/servicialo/mcp-server/blob/main/spec/HTTP_PROFILE.md" },
-        { label: "A2A Agent Cards", sublabel: "descubrimiento entre agentes" },
         { label: "Registry + resolver global", sublabel: "descubrimiento y portabilidad" },
-        { label: "Schemas de evidencia (5 verticales)", href: "/extensions#evidence-profiles" },
         { label: "Coordinalo (referencia, salud)", sublabel: "en producción", href: "https://coordinalo.com" },
       ],
     },
     {
       key: "experimental",
-      title: "Experimental",
+      title: "Experimental · candidata",
       badge: "experimental",
       items: [
+        {
+          label: "Binding A2A",
+          sublabel: "descubrimiento e intents de booking",
+          href: "/spec#bindings",
+        },
         ...byMaturity(["experimental", "candidate"]),
       ],
     },
@@ -58,7 +67,7 @@ export function EstadoActualSection() {
   return (
     <section id="estado-actual" className="mb-16">
       <SectionTitle
-        tag="09 — Estado actual"
+        tag="04 — Estado actual"
         title="Qué existe hoy"
         subtitle="Distinguimos explícitamente lo disponible de lo experimental, lo que está en diseño y lo aspiracional. Las hipótesis no se presentan como resultados."
       />
