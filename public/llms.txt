@@ -1,6 +1,6 @@
 # Servicialo
 
-> Servicialo is the open domain protocol for coordinating services. It standardizes the relationship between what was agreed, what was delivered, the available evidence, and the settlement — so people, platforms, and AI agents can operate services with shared semantics.
+> Servicialo is an open protocol that defines a common semantics for services. It represents and connects what is offered, what was agreed, what was delivered, the evidence of delivery, and its settlement — so people, platforms, and AI agents can operate services with a shared language.
 
 MCP and A2A define how agents connect. Servicialo defines what it means to coordinate a service. The protocol is transport-independent: MCP, HTTP, and A2A are bindings. Coordinalo (https://coordinalo.com) is the reference implementation — not the protocol itself.
 

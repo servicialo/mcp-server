@@ -8,8 +8,7 @@ export function Footer() {
           servicialo<span className="text-accent">.com</span>
         </div>
         <div className="text-xs text-text-dim mt-1">
-          El protocolo abierto para coordinar servicios — v{PROTOCOL_VERSION}{" "}
-          (draft)
+          Protocolo abierto para servicios — v{PROTOCOL_VERSION} (borrador)
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-4 font-mono text-[11px] text-text-dim">

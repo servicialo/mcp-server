@@ -4,8 +4,10 @@ import type { VerifiedImplementor } from "@/lib/telemetry-stats";
 import { PageHeader } from "@/components/PageHeader";
 import { MaturityBadge } from "@/components/MaturityBadge";
 import { TierBadge, type ImplementationTier } from "@/components/TierBadge";
+import { DarkCard } from "@/components/DarkCard";
 import { Footer } from "@/components/Footer";
-import { IMPLEMENTATIONS, MANIFEST, PROFILES } from "@/lib/manifest";
+import { IMPLEMENTATIONS, MANIFEST, PROFILES, TOOL_COUNTS } from "@/lib/manifest";
+import { OWN_HTTP_SURFACE } from "@/lib/data";
 
 export const revalidate = 60;
 
@@ -301,6 +303,99 @@ SERVICIALO_IMPL_CONTACT="admin@myclinic.com"`}
             </a>.
           </p>
         </div>
+      </section>
+
+      {/* Conectar un agente — no requiere implementar el protocolo */}
+      <section id="agentes" className="mb-14 scroll-mt-20">
+        <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
+          Conectar un agente
+        </h2>
+        <p className="text-[14px] text-text-body leading-relaxed mb-4">
+          No necesitas implementar el protocolo para usarlo: un agente puede
+          conectarse a cualquier implementación existente mediante el binding
+          MCP de referencia o el perfil HTTP.
+        </p>
+
+        <DarkCard label="Modo descubrimiento" className="mb-3">
+          <div className="font-mono text-[10px] text-white/40 -mt-2 mb-4">
+            Sin credenciales — {TOOL_COUNTS.public} herramientas públicas:
+            buscar organizaciones, listar servicios, consultar disponibilidad
+          </div>
+          <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
+            <div><span className="text-[#5C6370]">{"// Sin credenciales — modo descubrimiento"}</span></div>
+            <div><span className="text-[#98C379]">npx -y @servicialo/mcp-server</span></div>
+          </pre>
+        </DarkCard>
+
+        <DarkCard label="Modo autenticado" className="mb-3">
+          <div className="font-mono text-[10px] text-white/40 -mt-2 mb-4">
+            Con credenciales — {TOOL_COUNTS.total} herramientas en total:
+            agendar, registrar entrega y evidencia, consultar cobros
+          </div>
+          <pre className="font-mono text-[10px] md:text-xs leading-[2] m-0 overflow-x-auto">
+            <div><span className="text-[#5C6370]">{"// Configuración en un cliente MCP (p. ej. Claude Desktop)"}</span></div>
+            <div>{"{"}</div>
+            <div>  <span className="text-[#7EC8E3]">&quot;mcpServers&quot;</span>: {"{"}</div>
+            <div>    <span className="text-[#7EC8E3]">&quot;servicialo&quot;</span>: {"{"}</div>
+            <div>      <span className="text-[#7EC8E3]">&quot;command&quot;</span>: <span className="text-[#98C379]">&quot;npx&quot;</span>,</div>
+            <div>      <span className="text-[#7EC8E3]">&quot;args&quot;</span>: [<span className="text-[#98C379]">&quot;-y&quot;</span>, <span className="text-[#98C379]">&quot;@servicialo/mcp-server&quot;</span>],</div>
+            <div>      <span className="text-[#7EC8E3]">&quot;env&quot;</span>: {"{"}</div>
+            <div>        <span className="text-[#7EC8E3]">&quot;SERVICIALO_API_KEY&quot;</span>: <span className="text-[#98C379]">&quot;tu_api_key&quot;</span>,</div>
+            <div>        <span className="text-[#7EC8E3]">&quot;SERVICIALO_ORG_ID&quot;</span>:  <span className="text-[#98C379]">&quot;tu_org_id&quot;</span></div>
+            <div>      {"}"}</div>
+            <div>    {"}"}</div>
+            <div>  {"}"}</div>
+            <div>{"}"}</div>
+          </pre>
+          <div className="mt-3 font-mono text-[10px] text-white/35 leading-relaxed">
+            Las credenciales las obtiene cada organización desde la plataforma
+            Servicialo-compatible que utilice.
+          </div>
+        </DarkCard>
+
+        <DarkCard label="Superficie HTTP de servicialo.com" className="mb-3">
+          <div className="font-mono text-[10px] text-white/40 -mt-2 mb-5">
+            Resolver + descubrimiento. El protocolo no prescribe rutas HTTP —
+            el binding normativo es spec/HTTP_PROFILE.md
+          </div>
+          <div className="grid gap-1.5">
+            {OWN_HTTP_SURFACE.map((ep) => (
+              <div key={ep.path + ep.method} className="flex items-baseline gap-2">
+                <span
+                  className={`font-mono text-[9px] font-semibold px-1.5 py-0.5 rounded shrink-0 ${
+                    ep.method === "GET"
+                      ? "text-[#98C379] bg-[#98C379]/10"
+                      : "text-[#E5C07B] bg-[#E5C07B]/10"
+                  }`}
+                >
+                  {ep.method}
+                </span>
+                <span className="font-mono text-[10px] md:text-[11px] text-white/60 shrink-0">
+                  {ep.path}
+                </span>
+                <span className="font-mono text-[10px] text-white/30 leading-relaxed hidden md:inline">
+                  {ep.desc}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 pt-5 border-t border-white/10 flex flex-wrap gap-4">
+            <a
+              href="https://github.com/servicialo/mcp-server/blob/main/spec/HTTP_PROFILE.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
+            >
+              Perfil HTTP normativo (spec/HTTP_PROFILE.md) &rarr;
+            </a>
+            <a
+              href="/spec#tools"
+              className="font-mono text-[10px] text-white/40 hover:text-white/70 transition-colors"
+            >
+              Lista completa de tools &rarr;
+            </a>
+          </div>
+        </DarkCard>
       </section>
 
       {/* Footer note */}

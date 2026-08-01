@@ -8,7 +8,9 @@ import {
   CERTAINTY_LEVELS,
   CONTRATO_FIELDS,
   DISPUTE_RESOLUTION_FLOW,
+  DOSSIER_STATES,
   EXTENSIONS_COPY,
+  SETTLEMENT_STATES,
 } from "@/lib/data";
 
 export const metadata: Metadata = {
@@ -166,7 +168,7 @@ export default function ExtensionsPage() {
                       acreditación es una dimensión aparte, definida por
                       política — una entrega puede acreditarse en cualquier
                       nivel, con o sin pago. Ver{" "}
-                      <a href="/#prueba-de-servicio" className="text-accent hover:underline">
+                      <a href="#proof-of-service" className="text-accent hover:underline">
                         Prueba de Servicio
                       </a>
                       .
@@ -236,6 +238,100 @@ export default function ExtensionsPage() {
                   <a href="/network" className="text-accent hover:underline">/network</a>.
                   La red es opcional: una implementación es conforme sin
                   contribuir ni leer datos de la red.
+                </div>
+              )}
+
+              {ext.id === "proof-of-service" && (
+                <div className="mt-6 grid grid-cols-1 gap-3">
+                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                    <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
+                      B · Estado del expediente — acreditación según política
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mb-3">
+                      {DOSSIER_STATES.map((s) => (
+                        <div
+                          key={s.id}
+                          className={`rounded-[12px] py-3 px-4 border ${
+                            s.id === "accredited" ? "border-green/40" : "border-border-light"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span
+                              className={`font-mono text-[11px] font-semibold ${
+                                s.id === "accredited"
+                                  ? "text-green"
+                                  : s.exception
+                                    ? "text-text-dim"
+                                    : "text-accent"
+                              }`}
+                            >
+                              {s.id}
+                            </span>
+                            <span className="font-serif text-[15px] text-text">{s.name}</span>
+                          </div>
+                          <div className="text-[12px] text-text-muted leading-[1.6]">
+                            {s.desc}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="text-[12px] text-text-muted leading-[1.7]">
+                      La acreditación depende de una política
+                      (accreditation_policy: evidencia y atestaciones
+                      requeridas, nivel mínimo de certeza, excepciones). Una
+                      Prueba de Servicio puede quedar acreditada en L1, L2, L3
+                      o L4 — el pago no es prerrequisito de la acreditación.
+                      El nivel de certeza (dimensión A) se describe arriba, en
+                      el{" "}
+                      <a href="#evidence-profiles" className="text-accent hover:underline">
+                        gradiente de certeza
+                      </a>
+                      .
+                    </div>
+                  </div>
+
+                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                    <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
+                      C · Estado de liquidación — los movimientos financieros
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {SETTLEMENT_STATES.map((s) => (
+                        <span
+                          key={s.id}
+                          title={s.desc}
+                          className="font-mono text-[11px] text-text-body bg-surface-alt border border-border rounded-full px-3 py-1.5 cursor-help"
+                        >
+                          {s.id}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-[12px] text-text-muted leading-[1.7]">
+                      La liquidación corre en su propio ciclo — puede ocurrir
+                      antes, después o nunca respecto de la entrega. Un pago
+                      conciliado no prueba por sí solo la calidad ni el alcance
+                      entregado, y una devolución no des-hace la entrega. Los
+                      estados son los de la dimensión{" "}
+                      <code className="font-mono text-[11px]">financial</code>{" "}
+                      de la extensión{" "}
+                      <a href="#state-dimensions" className="text-accent hover:underline">
+                        state-dimensions
+                      </a>
+                      .
+                    </div>
+                  </div>
+
+                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                    <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
+                      Regla de presentación
+                    </div>
+                    <div className="text-[13px] text-text-body leading-[1.8]">
+                      La Prueba de Servicio nunca se muestra desnuda: cualquier
+                      componente que la represente muestra a la vez su nivel de
+                      certeza (L1–L4) y su estado de expediente. Presentar la
+                      liquidación como si fuera la certeza sugiere que más pago
+                      equivale a más verdad.
+                    </div>
+                  </div>
                 </div>
               )}
             </section>

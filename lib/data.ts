@@ -5,32 +5,7 @@
 
 import { PROOF_OF_SERVICE } from "./manifest";
 
-// Los 9 hitos del camino feliz — la vista operativa más común del ciclo.
-// Los estados canónicos y la regla de dimensiones ortogonales viven en el
-// manifest (state_machines) y en PROTOCOL.md §6.0.
-export const HAPPY_PATH_MILESTONES = [
-  { id: "requested", label: "Solicitado", icon: "1", desc: "El cliente o su agente IA define qué necesita, cuándo y dónde." },
-  { id: "scheduled", label: "Agendado", icon: "2", desc: "Fecha, hora y proveedor asignados. Se bloquea el horario en los calendarios de ambas partes." },
-  { id: "confirmed", label: "Confirmado", icon: "3", desc: "Ambas partes confirmaron el compromiso. Recordatorios programados. Prerrequisitos verificados." },
-  { id: "in_progress", label: "En Curso", icon: "4", desc: "Sesión en progreso. Registro de entrada detectado. El servicio está siendo entregado." },
-  { id: "completed", label: "Completado", icon: "5", desc: "Sesión terminó. Hecho operacional. Evidencia capturada: duración real, notas, fotos si aplica." },
-  { id: "documented", label: "Documentado", icon: "6", desc: "Evidencia registrada. Ficha clínica, reporte de trabajo, minuta — según la vertical." },
-  { id: "invoiced", label: "Facturado", icon: "7", desc: "Opcional — documento tributario emitido. Boleta o factura generada según la normativa local." },
-  { id: "collected", label: "Cobrado", icon: "8", desc: "Opcional — pago recibido y confirmado. Saldo prepago debitado, transferencia acreditada o reembolso recibido." },
-  { id: "verified", label: "Verificado", icon: "9", desc: "Opcional — el cliente confirma, o se auto-verifica tras la ventana de silencio. Cierre del camino feliz." },
-] as const;
-
-export const ANATOMY = [
-  { field: "Qué", desc: "La actividad o resultado que se entrega", example: "Sesión de kinesiología / Reparación eléctrica / Consulta legal" },
-  { field: "Quién entrega", desc: "El proveedor del servicio", example: "Kinesiólogo certificado / Electricista SEC / Abogado tributario" },
-  { field: "Quién recibe", desc: "El cliente beneficiario, con pagador separado explícitamente", example: "Paciente (paga FONASA) / Empleado (paga empresa)" },
-  { field: "Cuándo", desc: "Ventana temporal acordada", example: "2026-02-10 de 10:00 a 10:45" },
-  { field: "Dónde", desc: "Ubicación física o virtual, incluyendo el recurso físico cuando aplica", example: "Clínica / Box 3 / Domicilio / Videollamada" },
-  { field: "Ciclo", desc: "Posición en las dimensiones de estado: entrega, evidencia, aceptación y liquidación — cada una con ciclo propio", example: "Completado · evidencia registrada · cobro pendiente" },
-  { field: "Evidencia", desc: "Cómo se prueba que ocurrió", example: "Registro GPS + duración + firma del cliente" },
-  { field: "Cobro", desc: "Liquidación financiera con estado independiente del ciclo", example: "$35.000 CLP · cobrado · paquete prepago" },
-] as const;
-
+// Los 7 principios del protocolo (PROTOCOL.md §9) — renderizados en /spec.
 export const PRINCIPLES = [
   { title: "Todo servicio tiene un ciclo observable", body: "No importa si es un masaje o una auditoría. El protocolo define estados independientes para observar el ciclo completo: entrega, evidencia, aceptación y liquidación — cada dimensión con su propio ciclo de vida, sin un orden total entre ellas." },
   { title: "La entrega debe ser verificable y liquidable", body: "Sin evidencia suficiente, una entrega no puede considerarse acreditada con el nivel de certeza requerido. El protocolo define qué constituye evidencia válida para humanos y agentes IA. Y verificable no basta: la liquidación se concilia con la prueba, no con una declaración." },
@@ -294,49 +269,6 @@ export const OWN_HTTP_SURFACE = [
   { method: "GET", path: "/api/registry/search", desc: "Búsqueda en el registry canónico" },
   { method: "GET", path: "/api/registry/{verticals|regions|event_types}", desc: "Descubrimiento cold-start de taxonomía" },
   { method: "GET", path: "/api/benchmarks", desc: "Benchmarks agregados (k-anonimato ≥ 5)" },
-] as const;
-
-export const GENESIS_SKILLS = [
-  {
-    num: "1",
-    label: "Agendar cita nueva",
-    desc: "Flujo completo de booking",
-    detail: "Manifest → disponibilidad (single-day, next-N, ventana) → confirmación → booking → resultado. Manejo automático de 402 (prepago requerido) → Habilidad 4.",
-    color: "text-[#7EC8E3]",
-    bg: "bg-[#7EC8E3]/10",
-  },
-  {
-    num: "2",
-    label: "Gestionar citas",
-    desc: "Buscar, cancelar o reagendar",
-    detail: "Buscar citas por email → mostrar lista → ver estado detallado, cancelar con evaluación de política, o reagendar con nueva disponibilidad.",
-    color: "text-accent",
-    bg: "bg-accent/10",
-  },
-  {
-    num: "3",
-    label: "Descubrimiento multi-org",
-    desc: "Encontrar el proveedor correcto",
-    detail: "Registry search por vertical/ubicación → mostrar opciones → explorar catálogo de servicios → fluir a Habilidad 1.",
-    color: "text-[#98C379]",
-    bg: "bg-[#98C379]/10",
-  },
-  {
-    num: "4",
-    label: "Pago anticipado",
-    desc: "Checkout cuando el servicio requiere prepago",
-    detail: "Se activa automáticamente con 402 o manifest. Crea checkout → entrega link de pago (15 min expiry) → polling de estado → booking con paymentIntentId.",
-    color: "text-[#E5C07B]",
-    bg: "bg-[#E5C07B]/10",
-  },
-  {
-    num: "5",
-    label: "Seguimiento post-sesión",
-    desc: "Confirmar, verificar y cerrar",
-    detail: "Confirmar asistencia, ver progreso de orden/paquete (sesiones totales vs realizadas vs pendientes, monto consumido), confirmación bilateral de entrega.",
-    color: "text-[#C678DD]",
-    bg: "bg-[#C678DD]/10",
-  },
 ] as const;
 
 export const CONTRATO_FIELDS = [

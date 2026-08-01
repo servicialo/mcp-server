@@ -10,6 +10,7 @@ import {
   PROTOCOL_VERSION,
   TOOL_COUNTS,
 } from "@/lib/manifest";
+import { PRINCIPLES } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Especificación — Servicialo",
@@ -574,6 +575,33 @@ export default function SpecPage() {
               Extensiones y madurez →
             </a>
           </div>
+        </div>
+      </SpecSection>
+
+      {/* §9 Principios */}
+      <SpecSection
+        id="principles"
+        num="§9 — Principios"
+        title="Las reglas del protocolo"
+        subtitle="Siete principios que aplican a cualquier servicio en cualquier vertical (PROTOCOL.md §9)."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {PRINCIPLES.map((p, i) => (
+            <div
+              key={p.title}
+              className="bg-surface rounded-[14px] py-4 px-4 md:py-[22px] md:px-6 border border-border"
+            >
+              <div className="font-mono text-[10px] text-accent mb-2 uppercase tracking-[0.1em]">
+                Principio {String(i + 1).padStart(2, "0")}
+              </div>
+              <div className="font-serif text-lg text-text mb-2.5 leading-[1.3]">
+                {p.title}
+              </div>
+              <div className="text-[13px] text-text-muted leading-[1.7]">
+                {p.body}
+              </div>
+            </div>
+          ))}
         </div>
       </SpecSection>
 
