@@ -27,7 +27,7 @@ export async function HeroSection() {
         <span>◆ Independiente del transporte — HTTP · MCP · A2A</span>
         <span>◆ v{PROTOCOL_VERSION} (borrador)</span>
       </div>
-      {hostCount > 0 && (
+      {(liveCount > 0 || hostCount > 0) && (
         <a
           href="/network"
           title="Hosts únicos del servidor MCP detectados por telemetría anónima. Una instalación técnica no equivale a una organización operando servicios."
@@ -38,12 +38,21 @@ export async function HeroSection() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
           </span>
           <span className="font-mono text-[11px] text-text-muted group-hover:text-accent transition-colors">
-            {liveCount}{" "}
-            {liveCount === 1
-              ? "implementación en producción"
-              : "implementaciones en producción"}{" "}
-            · {hostCount} instalaciones técnicas detectadas en {countryCount}{" "}
-            {countryCount === 1 ? "país" : "países"}
+            {liveCount > 0 && (
+              <>
+                {liveCount}{" "}
+                {liveCount === 1
+                  ? "implementación en producción"
+                  : "implementaciones en producción"}
+              </>
+            )}
+            {liveCount > 0 && hostCount > 0 && " · "}
+            {hostCount > 0 && (
+              <>
+                {hostCount} instalaciones técnicas detectadas en {countryCount}{" "}
+                {countryCount === 1 ? "país" : "países"}
+              </>
+            )}
           </span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim group-hover:text-accent transition-colors">
             <polyline points="9 18 15 12 9 6" />
