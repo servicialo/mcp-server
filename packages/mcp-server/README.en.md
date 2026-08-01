@@ -4,6 +4,8 @@
 
 There is no standard way for an AI agent to book, verify, and settle a professional service. Servicialo is an open protocol that fixes this — and this MCP server is its reference implementation. Think HTTP for service coordination: any agent, any platform, one protocol.
 
+> **Protocol:** v0.10 (draft) · **Spec:** [servicialo.com/spec](https://servicialo.com/spec) · This package versions independently of the protocol (`0.9.x` until 1.0).
+
 ---
 
 **Running a service business?**

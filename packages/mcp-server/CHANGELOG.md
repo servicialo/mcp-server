@@ -6,6 +6,31 @@ For protocol-level changes (new schemas, new endpoints, governance), see the [ro
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning is independent of the protocol's SemVer.
 
+## [0.9.13] - 2026-08-01
+
+Sync release. No tool surface changes, no wire changes. The 2026-08 repo
+refactor (protocol manifest as single source of truth, spec v0.10, honest
+docs) updated this package's README, `server.json` and the runtime
+`serverInstructions` in `src/index.ts` without publishing — readers on
+npmjs.com were seeing the pre-refactor docs. This release closes that gap.
+
+### Docs
+
+- README (ES + EN): reflects the 0.9.12→0.9.13 repo state — protocol version
+  declared explicitly (v0.10 draft), 40 tools (15 public + 25 authenticated),
+  protocol-level framing ("una sola tesis") from the 2026-08 pass.
+- `server.json`: description and schema refresh shipped with the refactor.
+
+### Changed
+
+- The conformance suite was renamed to what it actually is: an **HTTP
+  binding compatibility suite**. `npm run test:conformance` →
+  `npm run test:http-compat`; verdict `CONFORMANT` → `HTTP-COMPATIBLE`.
+  `CONFORMANT` is now reserved for the normative conformance assessment
+  (levels CORE / FULL) defined in the certification doc
+  (servicialo.com/spec/certification). The suite's checks are unchanged —
+  only its name and report stop overclaiming what they verify.
+
 ## [0.9.12] - 2026-05-20
 
 Docs-only patch. No code or tool surface changes. The `0.9.11` release added 5 tools and the operational-telemetry hook but shipped with a stale README — readers on npmjs.com saw "37 tools / 10 public" and zero mention of `SERVICIALO_VERTICAL`, `SERVICIALO_REGION`, `SERVICIALO_NODE_TOKEN`, `SERVICIALO_OPERATIONAL_TELEMETRY`. This release fixes that.

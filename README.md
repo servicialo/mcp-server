@@ -513,7 +513,7 @@ servicialo/
 |  | Versión | Estado |
 |---|---------|--------|
 | Protocol | 0.10 | Draft |
-| @servicialo/mcp-server | 0.9.12 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
+| @servicialo/mcp-server | 0.9.13 | [npm](https://www.npmjs.com/package/@servicialo/mcp-server) |
 
 ---
 

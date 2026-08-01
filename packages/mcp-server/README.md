@@ -5,6 +5,8 @@ HTTP hizo los documentos direccionables. Servicialo hace los servicios direccion
 
 Este paquete es la interfaz MCP a nivel de protocolo para **cualquier backend compatible con Servicialo** — no un conector a una plataforma específica. Coordinalo es la implementación de referencia (y el default), pero puedes conectar tu propio backend.
 
+> **Protocolo:** v0.10 (draft) · **Spec:** [servicialo.com/spec](https://servicialo.com/spec) · Este paquete versiona independiente del protocolo (`0.9.x` hasta 1.0).
+
 ## Road to 1.0
 
 El protocolo Servicialo entra en **fase de estabilización**. El primer cohort formal de RFCs está **abierto a comentarios** durante una ventana mínima de 4 semanas antes de pasar a Final Comment Period. Hasta 1.0, los releases siguen siendo `0.9.x` patch y cualquier cambio breaking al protocolo requiere su RFC merged y comunicación previa.
