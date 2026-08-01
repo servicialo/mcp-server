@@ -32,9 +32,14 @@ jobs:
           node-version: '24'
 
       # --- Install both workspaces (the repo isn't a formal monorepo) ---
+      # Root uses pnpm (pnpm-lock.yaml — same as Vercel); packages/mcp-server
+      # stays on npm (own package-lock.json, npm publish pipeline).
+
+      - name: Enable corepack (pnpm from package.json packageManager)
+        run: corepack enable
 
       - name: Install root dependencies
-        run: npm install --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       - name: Install mcp-server dependencies
         working-directory: packages/mcp-server
@@ -43,10 +48,10 @@ jobs:
       # --- Static checks ---
 
       - name: Lint (root)
-        run: npm run lint
+        run: pnpm run lint
 
       - name: TypeScript check (root)
-        run: npx tsc --noEmit
+        run: pnpm exec tsc --noEmit
 
       - name: TypeScript check (mcp-server)
         working-directory: packages/mcp-server

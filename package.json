@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Open protocol for professional service delivery — scheduling, verification & settlement for AI agents",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
