@@ -160,19 +160,19 @@ The same structure works across any vertical:
 
 ## Evidence by vertical
 
-Each vertical defines, by policy, what evidence accredits a delivery. The profiles below are configurable examples — not universal protocol requirements: each agreement may demand different evidence, and privacy, proportionality, and applicable regulation constrain what should be collected. No ambiguity — explicit, pre-agreed requirements, so an accreditable Proof of Service can be produced:
+Each vertical defines, by policy, what evidence accredits a delivery. The profiles below are configurable examples — not universal protocol requirements: each agreement may demand different evidence, and privacy, proportionality, and applicable regulation constrain what should be collected. The resulting accreditation holds under the applied policy and at its certainty level; it does not by itself determine service quality or the absolute truth of every claim. No ambiguity — explicit, pre-agreed requirements, so an accreditable Proof of Service can be produced:
 
 <details>
 <summary><b>Healthcare</b> — 4 evidence types</summary>
 
 | Evidence | Description | Capture |
 |----------|-------------|:-------:|
-| Check-in record | GPS timestamp when provider arrives | auto |
-| Check-out record | GPS timestamp when provider leaves | auto |
-| Signed clinical notes | Clinical record signed by provider and patient | manual |
+| Check-in record | Timestamp on arrival and, where applicable, location | auto |
+| Check-out record | Timestamp on departure and, where applicable, location | auto |
+| Signed clinical notes | Documentation or attestation associated with the delivery, where the applicable policy requires it | manual |
 | Treatment plan adherence | Checklist of treatment plan items completed | manual |
 
-**Accreditation rule (example):** If check-in/out records exist and clinical notes are signed by both parties → the delivery is accredited under this policy. If notes or signature missing → escalate.
+**Illustrative accreditation rule:** If the evidence this policy requires — check-in/out records and signed notes — is present and valid → the delivery is accredited under this policy, at its certainty level. If notes or signature missing → escalate.
 
 </details>
 
@@ -186,7 +186,7 @@ Each vertical defines, by policy, what evidence accredits a delivery. The profil
 | Task checklist | Agreed tasks marked as completed | manual |
 | Client signature | Digital signature confirming reception | manual |
 
-**Accreditation rule (example):** If before/after photos exist with valid metadata and checklist is complete → the delivery is accredited under this policy. If client signature missing → escalate.
+**Illustrative accreditation rule:** If before/after photos exist with valid metadata and checklist is complete → the delivery is accredited under this policy, at its certainty level. If client signature missing → escalate.
 
 </details>
 
@@ -199,7 +199,7 @@ Each vertical defines, by policy, what evidence accredits a delivery. The profil
 | Document delivery | Confirmation of generated documents delivered | manual |
 | Time log | Billable hours with activity descriptions | manual |
 
-**Accreditation rule (example):** If minutes exist and logged hours are within agreed range → the delivery is accredited under this policy. If hours exceed agreement without justification → escalate.
+**Illustrative accreditation rule:** If minutes exist and logged hours are within agreed range → the delivery is accredited under this policy, at its certainty level. If hours exceed agreement without justification → escalate.
 
 </details>
 
@@ -212,7 +212,7 @@ Each vertical defines, by policy, what evidence accredits a delivery. The profil
 | Material delivery | Materials or assignments delivered to student | manual |
 | Evaluation | Session evaluation or feedback | manual |
 
-**Accreditation rule (example):** If attendance recorded and material delivered → the delivery is accredited under this policy. If evaluation missing and contract requires it → escalate.
+**Illustrative accreditation rule:** If attendance recorded and material delivered → the delivery is accredited under this policy, at its certainty level. If evaluation missing and contract requires it → escalate.
 
 </details>
 

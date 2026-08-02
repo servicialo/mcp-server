@@ -70,7 +70,7 @@ export function EvidenciaVerticalSection() {
                     {vertical.label}
                   </div>
                   <div className="text-sm text-text-muted mt-0.5">
-                    {vertical.required.length} tipos de evidencia (perfil de ejemplo)
+                    Ejemplo de política: {vertical.required.length} evidencias posibles
                   </div>
                 </div>
                 <div
@@ -86,6 +86,10 @@ export function EvidenciaVerticalSection() {
 
               {isExpanded && (
                 <div onClick={(e) => e.stopPropagation()}>
+                  <div className="text-[12px] text-text-muted leading-[1.6] mb-3">
+                    Posibles evidencias según el tipo de servicio, el acuerdo,
+                    la política aplicable y la regulación correspondiente.
+                  </div>
                   {/* Tabla de evidencia */}
                   <div className="flex flex-col gap-1.5 mb-4">
                     {vertical.required.map((ev, i) => (
@@ -147,10 +151,14 @@ export function EvidenciaVerticalSection() {
                     <div
                       className={`font-mono text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 ${colors.text}`}
                     >
-                      Regla de acreditación (ejemplo)
+                      Regla de acreditación ilustrativa
                     </div>
                     <div className="text-[13px] text-text-body leading-[1.7]">
                       {vertical.resolution_rule}
+                    </div>
+                    <div className="mt-1.5 text-[12px] text-text-dim leading-[1.6]">
+                      Esto no determina por sí solo la calidad del servicio ni
+                      la verdad absoluta de cada afirmación.
                     </div>
                   </div>
                 </div>
@@ -167,16 +175,12 @@ export function EvidenciaVerticalSection() {
         </div>
         <div className="text-sm text-text-body leading-[1.8]">
           Un kinesiólogo y un electricista entregan servicios radicalmente distintos.
-          Pedirle a ambos la misma evidencia no funciona. Definir evidencia por
-          vertical permite acreditar cada entrega contra requisitos explícitos:
-          si la evidencia que exige la política está presente y es válida — una
-          ficha firmada, fotos antes-después — la entrega se acredita bajo esa
-          política, con su nivel de certeza. Una firma o un GPS son atestaciones,
-          no pruebas absolutas del mundo físico: la verificación es reproducible
-          contra un contrato aceptado por ambas partes, y no reemplaza el juicio
-          sobre la calidad. Qué evidencia corresponde exigir lo decide cada
-          política según el tipo de servicio, el acuerdo y la regulación
-          aplicable.
+          Pedirle a ambos la misma evidencia no funciona. Cada perfil puede
+          definir políticas configurables según el tipo de servicio, el acuerdo,
+          la sensibilidad de los datos y la regulación aplicable. La
+          verificación comprueba de forma reproducible si la evidencia
+          satisface esos requisitos explícitos; no convierte una señal aislada
+          en verdad objetiva ni reemplaza el juicio sobre la calidad.
         </div>
       </div>
     </section>

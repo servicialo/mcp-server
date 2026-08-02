@@ -105,12 +105,12 @@ export const EVIDENCE_BY_VERTICAL = [
     icon: "\u{1F3E5}",
     color: "blue" as const,
     required: [
-      { type: "check_in", label: "Registro de entrada", desc: "Marca temporal GPS del proveedor al llegar", auto: true },
-      { type: "check_out", label: "Registro de salida", desc: "Marca temporal GPS del proveedor al salir", auto: true },
-      { type: "clinical_record", label: "Ficha clínica firmada", desc: "Registro clínico firmado por profesional y paciente", auto: false },
+      { type: "check_in", label: "Registro de entrada", desc: "Marca temporal al llegar y, cuando corresponda, ubicación", auto: true },
+      { type: "check_out", label: "Registro de salida", desc: "Marca temporal al salir y, cuando corresponda, ubicación", auto: true },
+      { type: "clinical_record", label: "Ficha clínica firmada", desc: "Documentación o atestación asociada a la entrega, cuando la política aplicable lo requiera", auto: false },
       { type: "treatment_plan", label: "Adherencia al plan", desc: "Lista de verificación del plan de tratamiento ejecutado", auto: false },
     ],
-    resolution_rule: "Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes, la entrega se acredita. Si falta ficha o firma, escalar.",
+    resolution_rule: "Si las evidencias que esta política exige — registros de entrada/salida y ficha firmada — están presentes y son válidas, la entrega se acredita bajo esta política, con su nivel de certeza. Si falta ficha o firma, escalar.",
   },
   {
     vertical: "hogar",
@@ -123,7 +123,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "checklist", label: "Lista de verificación", desc: "Lista de tareas acordadas marcadas como completadas", auto: false },
       { type: "client_signature", label: "Firma del cliente", desc: "Firma digital del cliente confirmando recepción", auto: false },
     ],
-    resolution_rule: "Si fotos antes/después existen con metadatos válidos y lista de verificación completa, la entrega se acredita. Si falta firma del cliente, escalar.",
+    resolution_rule: "Si fotos antes/después existen con metadatos válidos y lista de verificación completa, la entrega se acredita bajo esta política, con su nivel de certeza. Si falta firma del cliente, escalar.",
   },
   {
     vertical: "legal",
@@ -135,7 +135,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "document_delivery", label: "Entrega de documentos", desc: "Confirmación de entrega de documentos generados", auto: false },
       { type: "billing_hours", label: "Registro de horas", desc: "Registro de horas facturables con descripción de actividades", auto: false },
     ],
-    resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, la entrega se acredita. Si horas exceden lo acordado sin justificación, escalar.",
+    resolution_rule: "Si minuta existe y horas registradas están dentro del rango acordado, la entrega se acredita bajo esta política, con su nivel de certeza. Si horas exceden lo acordado sin justificación, escalar.",
   },
   {
     vertical: "educación",
@@ -147,7 +147,7 @@ export const EVIDENCE_BY_VERTICAL = [
       { type: "material_delivery", label: "Entrega de material", desc: "Material o tareas entregadas al alumno", auto: false },
       { type: "evaluation", label: "Registro de evaluación", desc: "Evaluación o retroalimentación de la sesión", auto: false },
     ],
-    resolution_rule: "Si asistencia registrada y material entregado, la entrega se acredita. Si falta evaluación y contrato la requiere, escalar.",
+    resolution_rule: "Si asistencia registrada y material entregado, la entrega se acredita bajo esta política, con su nivel de certeza. Si falta evaluación y contrato la requiere, escalar.",
   },
 ] as const;
 

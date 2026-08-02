@@ -177,19 +177,19 @@ La misma estructura funciona para cualquier vertical:
 
 ## Evidencia por vertical
 
-Cada vertical define, por política, qué evidencia acredita una entrega. Los perfiles siguientes son ejemplos configurables — no requisitos universales del protocolo: cada acuerdo puede exigir evidencias distintas, y la privacidad, la proporcionalidad y la regulación acotan qué corresponde recopilar. Sin ambigüedad — requisitos explícitos, previamente acordados, para producir una Prueba de Servicio acreditable:
+Cada vertical define, por política, qué evidencia acredita una entrega. Los perfiles siguientes son ejemplos configurables — no requisitos universales del protocolo: cada acuerdo puede exigir evidencias distintas, y la privacidad, la proporcionalidad y la regulación acotan qué corresponde recopilar. La acreditación resultante vale bajo la política aplicada y con su nivel de certeza; no determina por sí sola la calidad del servicio ni la verdad absoluta de cada afirmación. Sin ambigüedad — requisitos explícitos, previamente acordados, para producir una Prueba de Servicio acreditable:
 
 <details>
 <summary><b>Salud</b> — 4 tipos de evidencia</summary>
 
 | Evidencia | Descripción | Captura |
 |-----------|-------------|:-------:|
-| Registro de entrada | Marca temporal GPS del proveedor al llegar | auto |
-| Registro de salida | Marca temporal GPS del proveedor al salir | auto |
-| Ficha clínica firmada | Registro clínico firmado por profesional y paciente | manual |
+| Registro de entrada | Marca temporal al llegar y, cuando corresponda, ubicación | auto |
+| Registro de salida | Marca temporal al salir y, cuando corresponda, ubicación | auto |
+| Ficha clínica firmada | Documentación o atestación asociada a la entrega, cuando la política aplicable lo requiera | manual |
 | Adherencia al plan | Lista de verificación del plan de tratamiento ejecutado | manual |
 
-**Regla de acreditación (ejemplo):** Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes → la entrega se acredita bajo esta política. Si falta ficha o firma → escalar.
+**Regla de acreditación ilustrativa:** Si las evidencias que esta política exige — registros de entrada/salida y ficha firmada — están presentes y son válidas → la entrega se acredita bajo esta política, con su nivel de certeza. Si falta ficha o firma → escalar.
 
 </details>
 
@@ -203,7 +203,7 @@ Cada vertical define, por política, qué evidencia acredita una entrega. Los pe
 | Lista de verificación | Tareas acordadas marcadas como completadas | manual |
 | Firma del cliente | Firma digital del cliente confirmando recepción | manual |
 
-**Regla de acreditación (ejemplo):** Si fotos antes/después existen con metadatos válidos y lista completa → la entrega se acredita bajo esta política. Si falta firma del cliente → escalar.
+**Regla de acreditación ilustrativa:** Si fotos antes/después existen con metadatos válidos y lista completa → la entrega se acredita bajo esta política, con su nivel de certeza. Si falta firma del cliente → escalar.
 
 </details>
 
@@ -216,7 +216,7 @@ Cada vertical define, por política, qué evidencia acredita una entrega. Los pe
 | Entrega de documentos | Confirmación de entrega de documentos generados | manual |
 | Registro de horas | Horas facturables con descripción de actividades | manual |
 
-**Regla de acreditación (ejemplo):** Si minuta existe y horas registradas dentro del rango acordado → la entrega se acredita bajo esta política. Si horas exceden lo acordado sin justificación → escalar.
+**Regla de acreditación ilustrativa:** Si minuta existe y horas registradas dentro del rango acordado → la entrega se acredita bajo esta política, con su nivel de certeza. Si horas exceden lo acordado sin justificación → escalar.
 
 </details>
 
@@ -229,7 +229,7 @@ Cada vertical define, por política, qué evidencia acredita una entrega. Los pe
 | Entrega de material | Material o tareas entregadas al alumno | manual |
 | Evaluación | Evaluación o retroalimentación de la sesión | manual |
 
-**Regla de acreditación (ejemplo):** Si asistencia registrada y material entregado → la entrega se acredita bajo esta política. Si falta evaluación y contrato la requiere → escalar.
+**Regla de acreditación ilustrativa:** Si asistencia registrada y material entregado → la entrega se acredita bajo esta política, con su nivel de certeza. Si falta evaluación y contrato la requiere → escalar.
 
 </details>
 

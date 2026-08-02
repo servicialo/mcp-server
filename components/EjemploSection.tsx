@@ -17,7 +17,7 @@ const STEPS = [
   },
   {
     element: "Evidencia",
-    text: "Los sistemas registran la entrada, la salida y la ficha firmada: evidencia asociada a esa entrega, no una declaración suelta.",
+    text: "Según la política acordada, los sistemas registran confirmaciones, marcas de tiempo, documentación o atestaciones: evidencia asociada a esa entrega, no una declaración suelta.",
   },
   {
     element: "Liquidación",
