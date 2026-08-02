@@ -7,7 +7,7 @@
   "required": ["vertical", "evidence"],
 
   "x-resolution-rule": {
-    "description": "If GPS check-in/check-out records exist AND clinical record is signed by both provider and patient, service is verified as delivered. If clinical record or any signature is missing, escalate to dispute.",
+    "description": "If GPS check-in/check-out records exist AND clinical record is signed by both provider and patient, the delivery is accredited under this profile. If clinical record or any signature is missing, escalate to dispute.",
     "required_for_resolution": ["gps_checkin", "gps_checkout", "clinical_record"],
     "escalate_if_missing": ["clinical_record"]
   },

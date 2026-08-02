@@ -7,7 +7,7 @@
   "required": ["vertical", "evidence"],
 
   "x-resolution-rule": {
-    "description": "If attendance is recorded AND material was delivered, service is verified as delivered. If evaluation is missing and the contract requires it, escalate to dispute.",
+    "description": "If attendance is recorded AND material was delivered, the delivery is accredited under this profile. If evaluation is missing and the contract requires it, escalate to dispute.",
     "required_for_resolution": ["attendance_record", "material_delivery"],
     "conditionally_required": {
       "evaluation": "Required only if the service contract specifies evaluation as mandatory."

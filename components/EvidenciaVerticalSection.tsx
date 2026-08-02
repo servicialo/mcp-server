@@ -39,7 +39,7 @@ export function EvidenciaVerticalSection() {
       <SectionTitle
         tag="Evidence Profiles — Evidencia por vertical"
         title="Qué constituye prueba"
-        subtitle="Cada vertical define qué evidencia se necesita para producir una Prueba de Servicio acreditable. Resolver disputas sin intervención humana es un caso de uso — no el fin."
+        subtitle="Cada política define qué evidencia se necesita para acreditar una Prueba de Servicio. Los perfiles por vertical son ejemplos configurables — no requisitos universales del protocolo. Resolver disputas sin intervención humana es un caso de uso — no el fin."
       />
 
       <div className="flex flex-col gap-2.5">
@@ -70,7 +70,7 @@ export function EvidenciaVerticalSection() {
                     {vertical.label}
                   </div>
                   <div className="text-sm text-text-muted mt-0.5">
-                    {vertical.required.length} tipos de evidencia requerida
+                    {vertical.required.length} tipos de evidencia (perfil de ejemplo)
                   </div>
                 </div>
                 <div
@@ -168,11 +168,15 @@ export function EvidenciaVerticalSection() {
         <div className="text-sm text-text-body leading-[1.8]">
           Un kinesiólogo y un electricista entregan servicios radicalmente distintos.
           Pedirle a ambos la misma evidencia no funciona. Definir evidencia por
-          vertical permite construir la prueba con criterios objetivos: si la
-          ficha clínica está firmada, el servicio de salud se entregó. Si las fotos
-          antes-después existen, la reparación del hogar se completó. Sin juicio
-          subjetivo — solo verificación objetiva contra un contrato aceptado por
-          ambas partes.
+          vertical permite acreditar cada entrega contra requisitos explícitos:
+          si la evidencia que exige la política está presente y es válida — una
+          ficha firmada, fotos antes-después — la entrega se acredita bajo esa
+          política, con su nivel de certeza. Una firma o un GPS son atestaciones,
+          no pruebas absolutas del mundo físico: la verificación es reproducible
+          contra un contrato aceptado por ambas partes, y no reemplaza el juicio
+          sobre la calidad. Qué evidencia corresponde exigir lo decide cada
+          política según el tipo de servicio, el acuerdo y la regulación
+          aplicable.
         </div>
       </div>
     </section>

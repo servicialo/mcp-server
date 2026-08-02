@@ -7,7 +7,7 @@
   "required": ["vertical", "evidence"],
 
   "x-resolution-rule": {
-    "description": "If before/after photos exist with valid metadata (timestamp + GPS) AND completion checklist is fully checked, service is verified as delivered. If client signature is missing, escalate to dispute.",
+    "description": "If before/after photos exist with valid metadata (timestamp + GPS) AND completion checklist is fully checked, the delivery is accredited under this profile. If client signature is missing, escalate to dispute.",
     "required_for_resolution": ["photo_before", "photo_after", "completion_checklist", "client_signature"],
     "escalate_if_missing": ["client_signature"]
   },

@@ -101,7 +101,7 @@ Todo servicio profesional — desde una sesión de kinesiología hasta una audit
 | **4** | **Cuándo** | Ventana temporal acordada | 2026-02-10 de 10:00 a 10:45 |
 | **5** | **Dónde** | Ubicación física o virtual, con `resource_id` opcional que referencia un Recurso físico (3.5b: sala, box, sillón, equipamiento) | Sala 3 de clínica, domicilio, videollamada |
 | **6** | **Ciclo** | Posición actual en las dimensiones de estado (entrega, evidencia, aceptación, liquidación) | Completado · evidencia registrada · cobro pendiente |
-| **7** | **Evidencia** | Cómo se prueba que el servicio ocurrió | GPS + duración + firma del cliente |
+| **7** | **Evidencia** | Cómo se respalda que el servicio ocurrió | GPS + duración + firma del cliente |
 | **8** | **Cobro** | Liquidación financiera, independiente del ciclo | $35.000 CLP · cobrado · paquete prepago |
 
 > **El pagador no siempre es el cliente.** En salud paga la aseguradora. En corporativo paga la empresa. En educación paga el apoderado. El protocolo separa explícitamente al cliente del pagador — porque en la vida real casi nunca son la misma persona.
@@ -177,7 +177,7 @@ La misma estructura funciona para cualquier vertical:
 
 ## Evidencia por vertical
 
-Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin ambigüedad — para producir una Prueba de Servicio acreditable con criterios objetivos previamente acordados:
+Cada vertical define, por política, qué evidencia acredita una entrega. Los perfiles siguientes son ejemplos configurables — no requisitos universales del protocolo: cada acuerdo puede exigir evidencias distintas, y la privacidad, la proporcionalidad y la regulación acotan qué corresponde recopilar. Sin ambigüedad — requisitos explícitos, previamente acordados, para producir una Prueba de Servicio acreditable:
 
 <details>
 <summary><b>Salud</b> — 4 tipos de evidencia</summary>
@@ -189,7 +189,7 @@ Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin amb
 | Ficha clínica firmada | Registro clínico firmado por profesional y paciente | manual |
 | Adherencia al plan | Lista de verificación del plan de tratamiento ejecutado | manual |
 
-**Regla de resolución:** Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes → servicio entregado. Si falta ficha o firma → escalar.
+**Regla de acreditación (ejemplo):** Si registros de entrada/salida existen y ficha clínica está firmada por ambas partes → la entrega se acredita bajo esta política. Si falta ficha o firma → escalar.
 
 </details>
 
@@ -203,7 +203,7 @@ Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin amb
 | Lista de verificación | Tareas acordadas marcadas como completadas | manual |
 | Firma del cliente | Firma digital del cliente confirmando recepción | manual |
 
-**Regla de resolución:** Si fotos antes/después existen con metadatos válidos y lista completa → servicio entregado. Si falta firma del cliente → escalar.
+**Regla de acreditación (ejemplo):** Si fotos antes/después existen con metadatos válidos y lista completa → la entrega se acredita bajo esta política. Si falta firma del cliente → escalar.
 
 </details>
 
@@ -216,7 +216,7 @@ Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin amb
 | Entrega de documentos | Confirmación de entrega de documentos generados | manual |
 | Registro de horas | Horas facturables con descripción de actividades | manual |
 
-**Regla de resolución:** Si minuta existe y horas registradas dentro del rango acordado → servicio entregado. Si horas exceden lo acordado sin justificación → escalar.
+**Regla de acreditación (ejemplo):** Si minuta existe y horas registradas dentro del rango acordado → la entrega se acredita bajo esta política. Si horas exceden lo acordado sin justificación → escalar.
 
 </details>
 
@@ -229,7 +229,7 @@ Cada vertical define qué constituye prueba de que el servicio ocurrió. Sin amb
 | Entrega de material | Material o tareas entregadas al alumno | manual |
 | Evaluación | Evaluación o retroalimentación de la sesión | manual |
 
-**Regla de resolución:** Si asistencia registrada y material entregado → servicio entregado. Si falta evaluación y contrato la requiere → escalar.
+**Regla de acreditación (ejemplo):** Si asistencia registrada y material entregado → la entrega se acredita bajo esta política. Si falta evaluación y contrato la requiere → escalar.
 
 </details>
 

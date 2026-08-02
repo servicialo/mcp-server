@@ -7,7 +7,7 @@
   "required": ["vertical", "evidence"],
 
   "x-resolution-rule": {
-    "description": "If meeting minutes exist AND billable hours are within the agreed range, service is verified as delivered. If hours exceed the agreed amount without justification, escalate to dispute.",
+    "description": "If meeting minutes exist AND billable hours are within the agreed range, the delivery is accredited under this profile. If hours exceed the agreed amount without justification, escalate to dispute.",
     "required_for_resolution": ["meeting_minutes", "document_delivery", "billable_hours"],
     "escalate_if_missing": ["meeting_minutes"],
     "escalate_condition": "hours_exceed_agreed_range_without_justification"

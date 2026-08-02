@@ -318,7 +318,7 @@ Current position in the 6+3 state lifecycle (6 core + 3 financial extension). Se
 
 ### 5.7 Proof of Delivery (Evidence)
 
-How the service proves it occurred.
+How the delivery is evidenced.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -649,7 +649,7 @@ The 6 core states (+ 3 financial extension states) are universal. The specifics 
 
 ### Principle 2: Delivery MUST Be Verifiable
 
-If you cannot prove the service occurred, it did not occur. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation. Each vertical defines its own required evidence and resolution rules — see [`schema/evidence/`](./schema/evidence/) for machine-readable schemas per vertical.
+A delivery that cannot be evidenced cannot be accredited. Evidence accredits a delivery under an explicit policy and at a certainty level — it does not by itself establish the quality of the service or the objective truth of every claim. Evidence types include: GPS check-in/checkout, duration tracking, signed clinical notes, photos, and client confirmation. Each vertical defines its own required evidence and resolution rules — see [`schema/evidence/`](./schema/evidence/) for machine-readable schemas per vertical.
 
 ### Principle 3: The Payer Is Not Always the Client
 
@@ -1798,6 +1798,11 @@ The protocol version is independent from the MCP server package version.
 ---
 
 ## Appendix B: Changelog
+
+### v0.10 — errata (2026-08-02)
+
+- **Errata §9 Principle 2.** The principle read "If you cannot prove the service occurred, it did not occur", implying that evidence settles the truth of the world. Reworded: a delivery that cannot be evidenced cannot be *accredited*; evidence accredits a delivery under an explicit policy and at a certainty level, and does not by itself establish service quality or the objective truth of every claim. Prose precision only — no state, schema, or conformance requirement changed.
+- **Errata §5.7.** Dimension gloss "How the service proves it occurred" corrected to "How the delivery is evidenced", aligning the Evidence dimension with the accreditation vocabulary of the Proof of Service extension. Mirrored in `SPEC.md` and in the `x-resolution-rule` descriptions of `schema/evidence/` ("service is verified as delivered" → "the delivery is accredited under this profile").
 
 ### v0.10 — conceptual-coherence amendment (2026-08-01)
 

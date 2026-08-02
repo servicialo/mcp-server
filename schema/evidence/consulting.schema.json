@@ -7,7 +7,7 @@
   "required": ["vertical", "evidence"],
 
   "x-resolution-rule": {
-    "description": "If the deliverable is approved by the client AND billable hours are within the authorized budget, service is verified as delivered. If hours exceed the budget without a scope change authorization, escalate to dispute.",
+    "description": "If the deliverable is approved by the client AND billable hours are within the authorized budget, the delivery is accredited under this profile. If hours exceed the budget without a scope change authorization, escalate to dispute.",
     "required_for_resolution": ["approved_deliverable", "committee_minutes", "billable_hours", "milestone_progress"],
     "escalate_condition": "hours_exceed_budget_without_scope_change_authorization"
   },

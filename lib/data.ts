@@ -272,7 +272,7 @@ export const OWN_HTTP_SURFACE = [
 ] as const;
 
 export const CONTRATO_FIELDS = [
-  { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para considerar el servicio entregado", example: "registro_entrada + registro_salida + ficha_clinica_firmada" },
+  { field: "evidencia_requerida", desc: "Qué evidencia debe registrarse para acreditar la entrega bajo el contrato", example: "registro_entrada + registro_salida + ficha_clinica_firmada" },
   { field: "plazo_disputa", desc: "Ventana de tiempo para abrir una disputa después de la entrega", example: "48 horas" },
   { field: "política_cancelación", desc: "Reglas de penalización por cancelación según tiempo restante", example: "p. ej.: 0% si >24h, 50% si 2-24h, 100% si <2h — política ilustrativa; cada implementación define la suya" },
   { field: "política_inasistencia", desc: "Qué ocurre si una parte no se presenta", example: "p. ej.: cliente ausente → se cobra según política; proveedor ausente → reasignación + penalidad" },

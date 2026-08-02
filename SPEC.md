@@ -20,7 +20,7 @@ Every service is modeled across 8 canonical dimensions, universal across vertica
 | 4 | **Schedule (When)** | Temporal window for the service | `requested_at`, `scheduled_for`, `duration_expected` |
 | 5 | **Location (Where)** | Physical or virtual location; may reference a Resource entity | `type` (in_person/remote), `address`, `resource_id`, `coordinates` |
 | 6 | **Lifecycle (States)** | Current position in the 6+3 state lifecycle (6 core + 3 financial extension) | `current_state`, `transitions[]` (audit trail), `exceptions[]` |
-| 7 | **Evidence (Proof)** | How the service proves it occurred | `checkin`, `checkout`, `duration_actual`, `evidence[]`, `data_sensitivity` |
+| 7 | **Evidence (Proof)** | How the delivery is evidenced | `checkin`, `checkout`, `duration_actual`, `evidence[]`, `data_sensitivity` |
 | 8 | **Billing (Payment)** | Financial settlement, independent from lifecycle | `amount`, `payer`, `status`, `payment_id`, `tax_document` |
 
 A **Resource** (physical space/equipment) is a first-class entity with `capacity`, `buffer_minutes`, its own availability schedule, and equipment list. Optional — solo practices work without it.

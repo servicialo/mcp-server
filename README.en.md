@@ -84,7 +84,7 @@ Every professional service — from a physiotherapy session to a tax audit — i
 | **4** | **When** | Agreed time window | 2026-02-10 from 10:00 to 10:45 |
 | **5** | **Where** | Physical or virtual location, with optional `resource_id` linking to a physical Resource (3.5b: room, box, chair, equipment) | Clinic room 3, home visit, video call |
 | **6** | **Lifecycle** | Current position across the state dimensions (delivery, evidence, acceptance, settlement) | Completed · evidence recorded · payment pending |
-| **7** | **Evidence** | How delivery is proven | GPS + duration + client signature |
+| **7** | **Evidence** | How delivery is evidenced | GPS + duration + client signature |
 | **8** | **Billing** | Financial settlement, independent from lifecycle | $35 USD · collected · prepaid package |
 
 > **The payer is not always the client.** In healthcare the insurer pays. In corporate the employer pays. In education the guardian pays. The protocol explicitly separates client from payer — because in practice they are rarely the same person.
@@ -160,7 +160,7 @@ The same structure works across any vertical:
 
 ## Evidence by vertical
 
-Each vertical defines what constitutes proof that the service occurred — with no ambiguity, so an accreditable Proof of Service can be produced from objective, pre-agreed criteria:
+Each vertical defines, by policy, what evidence accredits a delivery. The profiles below are configurable examples — not universal protocol requirements: each agreement may demand different evidence, and privacy, proportionality, and applicable regulation constrain what should be collected. No ambiguity — explicit, pre-agreed requirements, so an accreditable Proof of Service can be produced:
 
 <details>
 <summary><b>Healthcare</b> — 4 evidence types</summary>
@@ -172,7 +172,7 @@ Each vertical defines what constitutes proof that the service occurred — with 
 | Signed clinical notes | Clinical record signed by provider and patient | manual |
 | Treatment plan adherence | Checklist of treatment plan items completed | manual |
 
-**Resolution rule:** If check-in/out records exist and clinical notes are signed by both parties → service delivered. If notes or signature missing → escalate.
+**Accreditation rule (example):** If check-in/out records exist and clinical notes are signed by both parties → the delivery is accredited under this policy. If notes or signature missing → escalate.
 
 </details>
 
@@ -186,7 +186,7 @@ Each vertical defines what constitutes proof that the service occurred — with 
 | Task checklist | Agreed tasks marked as completed | manual |
 | Client signature | Digital signature confirming reception | manual |
 
-**Resolution rule:** If before/after photos exist with valid metadata and checklist is complete → service delivered. If client signature missing → escalate.
+**Accreditation rule (example):** If before/after photos exist with valid metadata and checklist is complete → the delivery is accredited under this policy. If client signature missing → escalate.
 
 </details>
 
@@ -199,7 +199,7 @@ Each vertical defines what constitutes proof that the service occurred — with 
 | Document delivery | Confirmation of generated documents delivered | manual |
 | Time log | Billable hours with activity descriptions | manual |
 
-**Resolution rule:** If minutes exist and logged hours are within agreed range → service delivered. If hours exceed agreement without justification → escalate.
+**Accreditation rule (example):** If minutes exist and logged hours are within agreed range → the delivery is accredited under this policy. If hours exceed agreement without justification → escalate.
 
 </details>
 
@@ -212,7 +212,7 @@ Each vertical defines what constitutes proof that the service occurred — with 
 | Material delivery | Materials or assignments delivered to student | manual |
 | Evaluation | Session evaluation or feedback | manual |
 
-**Resolution rule:** If attendance recorded and material delivered → service delivered. If evaluation missing and contract requires it → escalate.
+**Accreditation rule (example):** If attendance recorded and material delivered → the delivery is accredited under this policy. If evaluation missing and contract requires it → escalate.
 
 </details>
 

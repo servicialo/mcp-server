@@ -37,7 +37,7 @@ const DIMENSIONS = [
   { n: 4, name: "Agenda (cuándo)", desc: "Ventana temporal del servicio", fields: "requested_at, scheduled_for, duration_expected" },
   { n: 5, name: "Ubicación (dónde)", desc: "Física o virtual; puede referenciar un Resource", fields: "type, address, resource_id, coordinates" },
   { n: 6, name: "Ciclo (estados)", desc: "Posición en las dimensiones de estado — entrega, evidencia, aceptación y liquidación, cada una con ciclo propio", fields: "current_state, transitions[], exceptions[]" },
-  { n: 7, name: "Evidencia (prueba)", desc: "Cómo se prueba que ocurrió", fields: "checkin, checkout, duration_actual, evidence[], data_sensitivity" },
+  { n: 7, name: "Evidencia (prueba)", desc: "Cómo se respalda que ocurrió", fields: "checkin, checkout, duration_actual, evidence[], data_sensitivity" },
   { n: 8, name: "Cobro (liquidación)", desc: "Liquidación financiera, independiente del ciclo de entrega", fields: "amount, payer, status, payment_id, tax_document" },
 ];
 

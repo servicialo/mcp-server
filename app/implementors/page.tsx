@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 const NIVELES: { tier: ImplementationTier; def: string }[] = [
   {
     tier: "referencia",
-    def: "Define el comportamiento canónico del protocolo (Coordinalo).",
+    def: "Implementación mantenida por el proyecto que demuestra el protocolo en operación (Coordinalo). No define el protocolo: la fuente normativa es la especificación, sus schemas y el manifest.",
   },
   {
     tier: "compatible",
