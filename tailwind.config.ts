@@ -33,7 +33,7 @@ const config: Config = {
         "dark-soft": "var(--color-dark-soft)",
       },
       fontFamily: {
-        serif: ["var(--font-instrument-serif)", "Georgia", "serif"],
+        serif: ["var(--font-newsreader)", "Georgia", "serif"],
         mono: ["var(--font-ibm-plex-mono)", "Menlo", "monospace"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },

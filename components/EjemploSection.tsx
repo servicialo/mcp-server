@@ -27,38 +27,42 @@ const STEPS = [
 
 export function EjemploSection() {
   return (
-    <section id="ejemplo" className="mb-16">
+    <section id="ejemplo" className="mb-16 md:mb-24">
       <SectionTitle
         tag="03 — Un ejemplo"
         title="Una sesión de kinesiología, de punta a punta"
         subtitle="El mismo recorrido aplica a cualquier servicio profesional programado."
       />
 
-      <ol className="flex flex-col gap-2 list-none">
+      <ol className="relative list-none ml-1 md:ml-2 border-l border-border">
         {STEPS.map((step, i) => (
-          <li
-            key={step.element}
-            className="bg-surface rounded-[14px] py-4 px-4 md:px-6 border border-border flex items-start gap-4"
-          >
-            <div className="shrink-0 w-16 md:w-24">
-              <div className="font-mono text-[10px] text-text-dim mb-0.5">
-                {i + 1}
-              </div>
-              <div className="font-mono text-[11px] font-semibold text-accent leading-tight">
+          <li key={step.element} className="relative pl-6 md:pl-9 pb-7 last:pb-1">
+            <span
+              aria-hidden
+              className="absolute left-0 top-[6px] -translate-x-1/2 w-[7px] h-[7px] bg-text"
+            />
+            <div className="font-mono text-[11px] mb-1.5">
+              <span className="text-text-dim tabular-nums">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="font-semibold text-text ml-2.5 uppercase tracking-[0.08em]">
                 {step.element}
-              </div>
+              </span>
             </div>
-            <div className="text-[13px] md:text-sm text-text-body leading-[1.7]">
+            <p className="font-serif text-[15px] md:text-[16px] text-text-body leading-[1.7] max-w-[580px]">
               {step.text}
-            </div>
+            </p>
           </li>
         ))}
       </ol>
 
-      <p className="mt-4 text-[13px] text-text-muted leading-[1.7]">
+      <p className="mt-6 font-serif text-[15px] text-text-muted leading-[1.7]">
         La misma estructura cubre una orden de 12 sesiones, un contrato por
         horas o un proyecto por hitos —{" "}
-        <a href="/spec#states" className="text-accent hover:underline">
+        <a
+          href="/spec#states"
+          className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+        >
           estados y ciclo de vida en la especificación
         </a>
         .

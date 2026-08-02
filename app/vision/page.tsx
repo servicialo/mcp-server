@@ -48,7 +48,7 @@ export default function VisionPage() {
         subtitle="Este documento describe posibilidades futuras, líneas de investigación y visión de largo plazo. Nada de esta página es parte normativa del protocolo — lo especificado vive en /spec y lo implementado en /extensions."
       />
 
-      <div className="bg-accent-soft border border-accent/20 rounded-[14px] py-4 px-5 mb-10">
+      <div className="bg-accent-soft border border-accent/20 rounded-none py-4 px-5 mb-10">
         <div className="text-[13px] text-text-body leading-[1.7]">
           <span className="font-semibold text-text">Cómo leer esta página:</span>{" "}
           cada sección declara su estatus. <em>Visión</em> = aplicación futura
@@ -90,7 +90,7 @@ export default function VisionPage() {
           {ADOPTION_PATH.map((step) => (
             <div
               key={step.step}
-              className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border"
+              className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border"
             >
               <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
                 {step.step} · {step.actor}
@@ -108,7 +108,7 @@ export default function VisionPage() {
 
       {/* Inclusión financiera */}
       <VisionSection id="inclusion-financiera" badge="vision" tag="03 — Inclusión financiera" title="Datos de servicio como pasaporte financiero">
-        <div className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border mb-3">
+        <div className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border mb-3">
           <div className="text-[13px] text-text-body leading-[1.7] mb-4">
             En Latinoamérica, millones de profesionales entregan servicios de
             forma informal: confirman por WhatsApp, registran pagos en un
@@ -127,7 +127,7 @@ export default function VisionPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border">
+          <div className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               El problema
             </div>
@@ -137,7 +137,7 @@ export default function VisionPage() {
               repite.
             </div>
           </div>
-          <div className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border">
+          <div className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               La señal (hipótesis)
             </div>
@@ -147,7 +147,7 @@ export default function VisionPage() {
               crediticia.
             </div>
           </div>
-          <div className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border">
+          <div className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               El camino (visión)
             </div>
@@ -218,7 +218,7 @@ export default function VisionPage() {
         </p>
       </VisionSection>
 
-      <div className="mb-14 bg-surface rounded-[14px] py-5 px-6 border border-border">
+      <div className="mb-14 bg-surface rounded-none py-5 px-6 border border-border">
         <div className="text-[13px] text-text-muted leading-[1.7]">
           Lo normativo vive en{" "}
           <a href="/spec" className="text-accent hover:underline">/spec</a>; lo

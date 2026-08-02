@@ -226,7 +226,7 @@ export default function SpecPage() {
             </tbody>
           </table>
         </div>
-        <div className="bg-surface rounded-[20px] border border-border p-4 md:p-8">
+        <div className="bg-surface rounded-none border border-border p-4 md:p-8">
           <RelationDiagram />
         </div>
       </SpecSection>
@@ -270,7 +270,7 @@ export default function SpecPage() {
         subtitle="El protocolo no establece un orden total entre entrega, evidencia, aceptación y liquidación: cada dimensión conserva su propio ciclo de vida. Una implementación puede presentar una experiencia lineal; la interoperabilidad se evalúa por dimensión (PROTOCOL.md §6.0)."
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               Core requerido (6)
             </div>
@@ -278,7 +278,7 @@ export default function SpecPage() {
               {LIFECYCLE.required.join(" → ")}
             </div>
           </div>
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               Extensión financiera (3, opcional)
             </div>
@@ -286,7 +286,7 @@ export default function SpecPage() {
               {LIFECYCLE.optional_financial.join(" → ")}
             </div>
           </div>
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
               Excepción (5)
             </div>
@@ -296,7 +296,7 @@ export default function SpecPage() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-[14px] border border-border p-5 mb-5">
+        <div className="bg-surface rounded-none border border-border p-5 mb-5">
           <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
             Tracks paralelos ya presentes en el Core
           </div>
@@ -320,7 +320,7 @@ export default function SpecPage() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-[14px] border border-border p-5">
+        <div className="bg-surface rounded-none border border-border p-5">
           <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
             Camino feliz (vista de 9 hitos)
           </div>
@@ -381,7 +381,7 @@ export default function SpecPage() {
           {MANIFEST.profiles.map((p) => {
             const tools = MANIFEST.tools.filter((t) => t.profile === p.id);
             return (
-              <div key={p.id} className="bg-surface rounded-[14px] border border-border p-4">
+              <div key={p.id} className="bg-surface rounded-none border border-border p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-mono text-[13px] font-semibold text-text">
                     {p.name}
@@ -408,7 +408,7 @@ export default function SpecPage() {
       >
         <div className="flex flex-col gap-4">
           {toolsByPhaseOrdered.map((group) => (
-            <div key={group.phase} className="bg-surface rounded-[14px] border border-border p-4">
+            <div key={group.phase} className="bg-surface rounded-none border border-border p-4">
               <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
                 {group.label} · {group.tools.length}{" "}
                 {group.tools.length === 1 ? "tool" : "tools"}
@@ -442,7 +442,7 @@ export default function SpecPage() {
         subtitle="Servicialo define la semántica; los bindings definen cómo se expone. La conformidad exige al menos un binding máquina a máquina que implemente los perfiles Core — ninguno en particular. MCP es la vía recomendada para integraciones agénticas, no una condición para usar el protocolo."
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="font-mono text-[13px] font-semibold text-text">HTTP</span>
               <MaturityBadge maturity={MANIFEST.bindings.http.maturity} />
@@ -462,7 +462,7 @@ export default function SpecPage() {
               HTTP_PROFILE.md →
             </a>
           </div>
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="font-mono text-[13px] font-semibold text-text">MCP</span>
               <MaturityBadge maturity={MANIFEST.bindings.mcp.maturity} />
@@ -482,7 +482,7 @@ export default function SpecPage() {
               npm →
             </a>
           </div>
-          <div className="bg-surface rounded-[14px] border border-border p-4">
+          <div className="bg-surface rounded-none border border-border p-4">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="font-mono text-[13px] font-semibold text-text">A2A</span>
               <MaturityBadge maturity={MANIFEST.bindings.a2a.maturity} />
@@ -541,7 +541,7 @@ export default function SpecPage() {
             </tbody>
           </table>
         </div>
-        <div className="bg-surface rounded-[14px] border border-border p-5">
+        <div className="bg-surface rounded-none border border-border p-5">
           <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
             Proceso de verificación
           </div>
@@ -589,7 +589,7 @@ export default function SpecPage() {
           {PRINCIPLES.map((p, i) => (
             <div
               key={p.title}
-              className="bg-surface rounded-[14px] py-4 px-4 md:py-[22px] md:px-6 border border-border"
+              className="bg-surface rounded-none py-4 px-4 md:py-[22px] md:px-6 border border-border"
             >
               <div className="font-mono text-[10px] text-accent mb-2 uppercase tracking-[0.1em]">
                 Principio {String(i + 1).padStart(2, "0")}

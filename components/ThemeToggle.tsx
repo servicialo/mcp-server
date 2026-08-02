@@ -23,7 +23,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"
+      className="w-8 h-8 flex items-center justify-center rounded-none text-text-muted hover:text-accent transition-colors"
       aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
     >
       {dark ? (

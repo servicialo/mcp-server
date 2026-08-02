@@ -26,7 +26,7 @@ export function WorldMap({ countryData }: WorldMapProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-border bg-surface p-4 md:p-6">
+    <div className="w-full overflow-hidden rounded-none border border-border bg-surface p-4 md:p-6">
       <svg
         viewBox="30.767 241.591 784.077 458.627"
         className="w-full h-auto"

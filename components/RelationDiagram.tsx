@@ -77,7 +77,7 @@ function Chip({
 }) {
   return (
     <div
-      className={`rounded-xl border py-3 px-4 bg-surface ${
+      className={`rounded-none border py-3 px-4 bg-surface ${
         accent ? "border-accent" : "border-border"
       }`}
     >

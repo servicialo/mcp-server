@@ -10,16 +10,16 @@ export function RedSection() {
   const sinceYear = reference?.since?.slice(0, 4) ?? "2026";
 
   return (
-    <section id="implementaciones" className="mb-16">
+    <section id="implementaciones" className="mb-16 md:mb-24">
       <SectionTitle
         tag="05 — Implementaciones y red"
         title="Una implementación de referencia, una red opt-in"
         subtitle="El protocolo no depende de una plataforma, de la red ni de una autoridad central."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-        <div className="bg-surface rounded-[14px] py-5 px-5 border border-border">
-          <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 border border-border bg-surface divide-y md:divide-y-0 md:divide-x divide-border mb-5">
+        <div className="p-5">
+          <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em] mb-2.5">
             Referencia
           </div>
           <div className="text-[13px] text-text-body leading-[1.7]">
@@ -36,8 +36,8 @@ export function RedSection() {
             {sinceYear}.
           </div>
         </div>
-        <div className="bg-surface rounded-[14px] py-5 px-5 border border-border">
-          <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
+        <div className="p-5">
+          <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em] mb-2.5">
             Implementaciones independientes
           </div>
           <div className="text-[13px] text-text-body leading-[1.7]">
@@ -46,8 +46,8 @@ export function RedSection() {
             automatizada es objetivo del roadmap, no una capacidad actual.
           </div>
         </div>
-        <div className="bg-surface rounded-[14px] py-5 px-5 border border-border">
-          <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
+        <div className="p-5">
+          <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em] mb-2.5">
             La red es opt-in
           </div>
           <div className="text-[13px] text-text-body leading-[1.7]">
@@ -57,11 +57,11 @@ export function RedSection() {
         </div>
       </div>
 
-      <div className="bg-surface rounded-[14px] py-5 px-4 md:px-6 border border-border mb-4">
-        <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
+      <div className="border border-border bg-surface-alt py-5 px-5 md:px-6 mb-6">
+        <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em] mb-2.5">
           Cómo leer las cifras
         </div>
-        <div className="text-[13px] md:text-sm text-text-body leading-[1.7]">
+        <div className="text-[13px] md:text-sm text-text-body leading-[1.8]">
           La telemetría distingue cuatro cosas distintas:{" "}
           <strong>instalaciones técnicas detectadas</strong> (hosts únicos,
           anónimos), <strong>nodos recientemente activos</strong>,{" "}
@@ -80,18 +80,30 @@ export function RedSection() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-6">
         <a
           href="/network"
-          className="font-mono text-[11px] text-accent hover:text-text transition-colors"
+          className="group font-mono text-[11px] text-accent hover:text-accent-dark transition-colors"
         >
-          Telemetría en vivo →
+          Telemetría en vivo{" "}
+          <span
+            aria-hidden
+            className="inline-block transition-transform group-hover:translate-x-0.5"
+          >
+            →
+          </span>
         </a>
         <a
           href="/implementors"
-          className="font-mono text-[11px] text-accent hover:text-text transition-colors"
+          className="group font-mono text-[11px] text-accent hover:text-accent-dark transition-colors"
         >
-          Implementaciones y verificación →
+          Implementaciones y verificación{" "}
+          <span
+            aria-hidden
+            className="inline-block transition-transform group-hover:translate-x-0.5"
+          >
+            →
+          </span>
         </a>
       </div>
     </section>

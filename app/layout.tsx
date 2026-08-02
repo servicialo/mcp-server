@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono, Instrument_Serif } from "next/font/google";
+import { Inter, IBM_Plex_Mono, Newsreader } from "next/font/google";
 import { Navbar } from "@/components/Navbar";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -18,10 +18,10 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
+const newsreader = Newsreader({
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
-  variable: "--font-instrument-serif",
+  variable: "--font-newsreader",
   style: ["normal", "italic"],
   display: "swap",
 });
@@ -57,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${ibmPlexMono.variable} ${instrumentSerif.variable}`}
+      className={`${inter.variable} ${ibmPlexMono.variable} ${newsreader.variable}`}
       suppressHydrationWarning
     >
       <head>

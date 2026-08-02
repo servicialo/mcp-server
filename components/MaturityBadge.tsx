@@ -42,7 +42,7 @@ export function MaturityBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-[0.08em] px-2 py-0.5 rounded-full ${STYLES[maturity]}`}
+      className={`inline-flex items-center font-mono text-[10px] font-semibold uppercase tracking-[0.08em] px-1.5 py-px ${STYLES[maturity]}`}
     >
       {label ?? LABELS[maturity]}
     </span>

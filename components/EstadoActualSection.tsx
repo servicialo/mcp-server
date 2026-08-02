@@ -65,7 +65,7 @@ export function EstadoActualSection() {
   ];
 
   return (
-    <section id="estado-actual" className="mb-16">
+    <section id="estado-actual" className="mb-16 md:mb-24">
       <SectionTitle
         tag="04 — Estado actual"
         title="Qué existe hoy"

@@ -53,7 +53,7 @@ export function EvidenciaVerticalSection() {
               onClick={() =>
                 setExpanded(isExpanded ? null : vertical.vertical)
               }
-              className={`rounded-2xl cursor-pointer transition-all duration-300 ${
+              className={`rounded-none cursor-pointer transition-all duration-300 ${
                 isExpanded
                   ? `${colors.soft} ${colors.border} border p-4 md:p-6`
                   : "bg-surface border border-border p-4 md:p-5"
@@ -95,7 +95,7 @@ export function EvidenciaVerticalSection() {
                     {vertical.required.map((ev, i) => (
                       <div
                         key={ev.type}
-                        className={`rounded-[10px] py-3 px-3.5 md:px-4 ${
+                        className={`rounded-none py-3 px-3.5 md:px-4 ${
                           i % 2 === 0
                             ? "bg-surface border border-border-light"
                             : "border border-transparent"
@@ -146,7 +146,7 @@ export function EvidenciaVerticalSection() {
 
                   {/* Regla de resolución */}
                   <div
-                    className={`bg-surface rounded-xl py-4 px-5 border-l-[3px] ${colors.borderLeft}`}
+                    className={`bg-surface rounded-none py-4 px-5 border-l-[3px] ${colors.borderLeft}`}
                   >
                     <div
                       className={`font-mono text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 ${colors.text}`}
@@ -169,7 +169,7 @@ export function EvidenciaVerticalSection() {
       </div>
 
       {/* Dato clave */}
-      <div className="mt-6 bg-surface rounded-xl py-4 px-4 md:py-5 md:px-6 border border-border">
+      <div className="mt-6 bg-surface rounded-none py-4 px-4 md:py-5 md:px-6 border border-border">
         <div className="font-mono text-[11px] text-text-muted font-semibold uppercase tracking-[0.08em] mb-3">
           ¿Por qué separar por vertical?
         </div>

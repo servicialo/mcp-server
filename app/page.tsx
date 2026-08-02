@@ -9,7 +9,7 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-12 pb-24">
+    <div className="max-w-content mx-auto px-5 md:px-8 pt-10 md:pt-16 pb-24">
       <HeroSection />
       <ProblemaSection />
       <EstandarizaSection />

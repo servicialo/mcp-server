@@ -58,7 +58,7 @@ function countryFlag(code: string): string {
 
 function ImplementorCard({ impl }: { impl: VerifiedImplementor }) {
   return (
-    <div className="rounded-xl border border-border p-6 bg-surface hover:border-accent/40 transition-colors">
+    <div className="rounded-none border border-border p-6 bg-surface hover:border-accent/40 transition-colors">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
           <h3 className="font-serif text-lg text-text leading-tight">
@@ -147,7 +147,7 @@ export default async function ImplementorsPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {NIVELES.map((n) => (
-            <div key={n.tier} className="rounded-xl border border-border p-5 bg-surface">
+            <div key={n.tier} className="rounded-none border border-border p-5 bg-surface">
               <div className="mb-2.5">
                 <TierBadge tier={n.tier} />
               </div>
@@ -164,7 +164,7 @@ export default async function ImplementorsPage() {
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
           Implementación de referencia
         </h2>
-        <div className="rounded-xl border border-border p-6 bg-surface mb-4">
+        <div className="rounded-none border border-border p-6 bg-surface mb-4">
           <div className="flex items-start justify-between gap-3 mb-3">
             <h3 className="font-serif text-lg text-text leading-tight">
               <a
@@ -200,7 +200,7 @@ export default async function ImplementorsPage() {
         </div>
 
         {/* Coverage matrix — derived from protocol/manifest.yaml */}
-        <div className="rounded-xl border border-border overflow-hidden">
+        <div className="rounded-none border border-border overflow-hidden">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border bg-surface-alt">
@@ -260,13 +260,13 @@ export default async function ImplementorsPage() {
         <h2 className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-5">
           Cómo verificarse
         </h2>
-        <div className="rounded-xl border border-border p-6 bg-surface space-y-4">
+        <div className="rounded-none border border-border p-6 bg-surface space-y-4">
           <p className="text-[14px] text-text-body leading-relaxed">
             Cualquier operador de una instalación puede, opcionalmente,
             identificar su implementación configurando tres variables de entorno
             en su servidor MCP:
           </p>
-          <pre className="font-mono text-xs bg-dark text-white rounded-lg p-4 overflow-x-auto">
+          <pre className="font-mono text-xs bg-dark text-white rounded-none p-4 overflow-x-auto">
 {`SERVICIALO_IMPL_NAME="MyClinic Platform"
 SERVICIALO_IMPL_URL="https://myclinic.com"
 SERVICIALO_IMPL_CONTACT="admin@myclinic.com"`}

@@ -45,7 +45,7 @@ export default function ExtensionsPage() {
       />
 
       {/* Leyenda de madurez */}
-      <div className="bg-surface rounded-[14px] border border-border p-5 mb-10">
+      <div className="bg-surface rounded-none border border-border p-5 mb-10">
         <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
           Niveles de madurez
         </div>
@@ -80,7 +80,7 @@ export default function ExtensionsPage() {
           const href = docHref(ext.doc);
           return (
             <section key={ext.id} id={ext.id} className="scroll-mt-20">
-              <div className="bg-surface rounded-[20px] border border-border p-5 md:p-7">
+              <div className="bg-surface rounded-none border border-border p-5 md:p-7">
                 <div className="flex flex-wrap items-center gap-3 mb-2">
                   <h2 className="font-serif text-[22px] md:text-[26px] text-text leading-[1.2]">
                     {ext.name}
@@ -145,7 +145,7 @@ export default function ExtensionsPage() {
               {ext.id === "evidence-profiles" && (
                 <div className="mt-6">
                   <EvidenciaVerticalSection />
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em]">
                         Gradiente de certeza (Proof of Service)
@@ -179,13 +179,13 @@ export default function ExtensionsPage() {
 
               {ext.id === "disputes" && (
                 <div className="mt-6 grid grid-cols-1 gap-3">
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
                       Flujo objetivo (diseño)
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {DISPUTE_RESOLUTION_FLOW.map((s) => (
-                        <div key={s.id} className="rounded-xl border border-border-light p-4">
+                        <div key={s.id} className="rounded-none border border-border-light p-4">
                           <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-1.5">
                             Paso {s.step} · {s.actor}
                           </div>
@@ -209,7 +209,7 @@ export default function ExtensionsPage() {
                       .
                     </div>
                   </div>
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
                       Campos del contrato pre-acordado (ilustrativos)
                     </div>
@@ -243,7 +243,7 @@ export default function ExtensionsPage() {
 
               {ext.id === "proof-of-service" && (
                 <div className="mt-6 grid grid-cols-1 gap-3">
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
                       B · Estado del expediente — acreditación según política
                     </div>
@@ -251,7 +251,7 @@ export default function ExtensionsPage() {
                       {DOSSIER_STATES.map((s) => (
                         <div
                           key={s.id}
-                          className={`rounded-[12px] py-3 px-4 border ${
+                          className={`rounded-none py-3 px-4 border ${
                             s.id === "accredited" ? "border-green/40" : "border-border-light"
                           }`}
                         >
@@ -290,7 +290,7 @@ export default function ExtensionsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-3">
                       C · Estado de liquidación — los movimientos financieros
                     </div>
@@ -320,7 +320,7 @@ export default function ExtensionsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-surface rounded-[14px] border border-border p-5">
+                  <div className="bg-surface rounded-none border border-border p-5">
                     <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
                       Regla de presentación
                     </div>
@@ -339,7 +339,7 @@ export default function ExtensionsPage() {
         })}
       </div>
 
-      <div className="mb-14 bg-surface rounded-[14px] py-4 px-5 border border-border text-[12px] text-text-dim leading-[1.6]">
+      <div className="mb-14 bg-surface rounded-none py-4 px-5 border border-border text-[12px] text-text-dim leading-[1.6]">
         Operaciones especificadas pero no implementadas en el servidor de
         referencia ({MANIFEST.specified_unimplemented_tools.map((t) => t.name.split(".")[0]).filter((v, i, a) => a.indexOf(v) === i).join(".*, ")}.*):
         se listan como <code className="font-mono">specified_unimplemented_tools</code>{" "}

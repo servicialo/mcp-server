@@ -52,7 +52,7 @@ export function Navbar() {
           ))}
           <a
             href="/implementors"
-            className="ml-2 font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accent-dark transition-colors whitespace-nowrap"
+            className="ml-2 font-mono text-[11px] font-semibold px-3 py-1.5 border border-text text-text hover:bg-text hover:text-bg transition-colors whitespace-nowrap"
           >
             Implementar
           </a>
@@ -61,7 +61,7 @@ export function Navbar() {
               href="https://github.com/servicialo/mcp-server"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"
+              className="w-8 h-8 flex items-center justify-center rounded-none text-text-muted hover:text-accent transition-colors"
               aria-label="GitHub"
             >
               <GitHubIcon />
@@ -76,7 +76,7 @@ export function Navbar() {
             href="https://github.com/servicialo/mcp-server"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-text-muted hover:text-accent transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-none text-text-muted hover:text-accent transition-colors"
             aria-label="GitHub"
           >
             <GitHubIcon />
@@ -119,7 +119,7 @@ export function Navbar() {
               key={route.href}
               href={route.href}
               onClick={() => setMenuOpen(false)}
-              className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-text-body hover:bg-surface-alt"
+              className="font-mono text-[13px] px-3 py-2.5 text-left rounded-none transition-colors text-text-body hover:bg-surface-alt"
             >
               {route.name}
             </a>
@@ -127,7 +127,7 @@ export function Navbar() {
           <a
             href="/implementors"
             onClick={() => setMenuOpen(false)}
-            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-lg transition-colors text-accent font-semibold hover:bg-surface-alt"
+            className="font-mono text-[13px] px-3 py-2.5 text-left rounded-none transition-colors text-accent font-semibold hover:bg-surface-alt"
           >
             Implementar
           </a>

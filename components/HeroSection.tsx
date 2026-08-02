@@ -1,6 +1,16 @@
 import { getNetworkStats } from "@/lib/telemetry-stats";
 import { IMPLEMENTATIONS, PROTOCOL_VERSION } from "@/lib/manifest";
 
+// Índice de la portada: refleja las secciones numeradas de la página.
+const TOC = [
+  { num: "01", label: "El problema", anchor: "#problema" },
+  { num: "02", label: "Qué estandariza", anchor: "#que-estandariza" },
+  { num: "03", label: "Un ejemplo", anchor: "#ejemplo" },
+  { num: "04", label: "Estado actual", anchor: "#estado-actual" },
+  { num: "05", label: "Implementaciones y red", anchor: "#implementaciones" },
+  { num: "06", label: "Siguiente paso", anchor: "#empezar" },
+];
+
 export async function HeroSection() {
   const stats = await getNetworkStats();
   const hostCount = stats.uniqueHosts;
@@ -8,36 +18,31 @@ export async function HeroSection() {
   const liveCount = IMPLEMENTATIONS.filter((i) => i.status === "live").length;
 
   return (
-    <section className="mb-14 md:mb-20">
-      <div className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.12em] mb-4">
-        Protocolo abierto para servicios
+    <section className="mb-16 md:mb-24">
+      <div className="border-y border-border py-2.5 mb-9 md:mb-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-text-muted">
+        <span>Protocolo abierto para servicios</span>
+        <span>v{PROTOCOL_VERSION} — Borrador</span>
       </div>
-      <h1 className="font-serif text-[32px] md:text-[52px] font-normal text-text leading-[1.12] tracking-[-0.02em] mb-5">
+
+      <h1 className="font-serif text-[36px] md:text-[58px] font-normal text-text leading-[1.08] tracking-[-0.01em] mb-5 md:mb-6">
         Una semántica común para{" "}
-        <span className="text-accent">acordar, entregar y compensar</span>{" "}
+        <em className="text-accent">acordar, entregar y compensar</em>{" "}
         servicios
       </h1>
-      <p className="text-[15px] md:text-lg text-text-body leading-[1.7] max-w-[620px]">
+      <p className="font-serif text-[17px] md:text-[19px] text-text-body leading-[1.65] max-w-[600px]">
         Servicialo conecta lo ofrecido, lo acordado, lo entregado, la
         evidencia de la entrega y su liquidación, para que plataformas,
         sistemas y agentes operen servicios con un lenguaje compartido.
       </p>
-      <div className="flex flex-wrap gap-3 md:gap-6 mt-6 md:mt-8 font-mono text-[11px] text-text-dim">
-        <span>◆ Especificación abierta (Apache-2.0)</span>
-        <span>◆ Independiente del transporte — HTTP · MCP · A2A</span>
-        <span>◆ v{PROTOCOL_VERSION} (borrador)</span>
-      </div>
+
       {(liveCount > 0 || hostCount > 0) && (
         <a
           href="/network"
           title="Hosts únicos del servidor MCP detectados por telemetría anónima. Una instalación técnica no equivale a una organización operando servicios."
-          className="inline-flex items-center gap-2 mt-5 px-3 py-1.5 rounded-full border border-border bg-surface-alt hover:border-accent transition-colors group"
+          className="group inline-flex items-center gap-2.5 mt-6 font-mono text-[11px] text-text-muted hover:text-accent transition-colors"
         >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-          </span>
-          <span className="font-mono text-[11px] text-text-muted group-hover:text-accent transition-colors">
+          <span aria-hidden className="inline-block w-[7px] h-[7px] bg-green" />
+          <span className="underline decoration-border group-hover:decoration-accent underline-offset-4 transition-colors">
             {liveCount > 0 && (
               <>
                 {liveCount}{" "}
@@ -54,25 +59,60 @@ export async function HeroSection() {
               </>
             )}
           </span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-dim group-hover:text-accent transition-colors">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
         </a>
       )}
-      <div className="mt-6 md:mt-8 flex flex-wrap gap-3">
+
+      <div className="mt-8 flex flex-wrap gap-3">
         <a
           href="/spec"
-          className="inline-flex items-center gap-2 bg-accent text-white hover:bg-accent-dark font-mono text-[12px] font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="inline-flex items-center gap-2.5 bg-text text-bg hover:bg-accent hover:text-white font-mono text-[12px] font-semibold px-5 py-3 transition-colors"
         >
           Leer la especificación
+          <span aria-hidden>→</span>
         </a>
         <a
           href="/implementors"
-          className="inline-flex items-center gap-2 border border-accent text-accent hover:bg-accent hover:text-white font-mono text-[12px] font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="inline-flex items-center gap-2.5 border border-text text-text hover:bg-text hover:text-bg font-mono text-[12px] font-semibold px-5 py-3 transition-colors"
         >
           Cómo implementarlo
         </a>
       </div>
+
+      <div className="mt-8 flex flex-wrap gap-x-8 gap-y-1.5 font-mono text-[11px] text-text-dim">
+        <span>Especificación abierta (Apache-2.0)</span>
+        <span>Independiente del transporte — HTTP · MCP · A2A</span>
+      </div>
+
+      <nav aria-label="Índice" className="mt-12 md:mt-14">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+            Índice
+          </span>
+          <span aria-hidden className="h-px flex-1 bg-border" />
+        </div>
+        <ol className="list-none space-y-2.5">
+          {TOC.map((item) => (
+            <li key={item.anchor}>
+              <a
+                href={item.anchor}
+                className="group flex items-baseline gap-3 font-mono text-[12px]"
+              >
+                <span className="text-text-dim tabular-nums">{item.num}</span>
+                <span className="text-text group-hover:text-accent transition-colors">
+                  {item.label}
+                </span>
+                <span
+                  aria-hidden
+                  className="flex-1 border-b border-dotted border-border -translate-y-[3px] group-hover:border-text-dim transition-colors"
+                />
+                <span className="text-[11px] text-text-dim group-hover:text-accent transition-colors">
+                  {item.anchor}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
     </section>
   );
 }

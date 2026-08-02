@@ -39,7 +39,7 @@ export default function WhitepaperPage() {
 
       {/* Aviso de vigencia */}
       <section className="mb-14">
-        <div className="bg-accent-soft border border-accent/20 rounded-[14px] p-5">
+        <div className="bg-accent-soft border border-accent/20 rounded-none p-5">
           <p className="text-[14px] text-text leading-[1.7]">
             Este documento no refleja el estado actual del protocolo. Para la
             superficie vigente: la especificación en{" "}
@@ -72,7 +72,7 @@ export default function WhitepaperPage() {
           <a
             href="/docs/servicialo-whitepaper.pdf"
             download="servicialo-whitepaper-v0.9-es.pdf"
-            className="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-mono text-[13px] font-semibold px-5 py-3 rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-mono text-[13px] font-semibold px-5 py-3 rounded-none transition-colors"
           >
             <DownloadIcon />
             Descargar PDF (español) — v0.9
@@ -80,7 +80,7 @@ export default function WhitepaperPage() {
           <a
             href="/docs/servicialo-whitepaper-en.pdf"
             download="servicialo-whitepaper-v0.9-en.pdf"
-            className="inline-flex items-center gap-2 border border-border text-text-muted hover:border-accent hover:text-accent font-mono text-[13px] font-semibold px-5 py-3 rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 border border-border text-text-muted hover:border-accent hover:text-accent font-mono text-[13px] font-semibold px-5 py-3 rounded-none transition-colors"
           >
             <DownloadIcon />
             Download PDF (English) — v0.9

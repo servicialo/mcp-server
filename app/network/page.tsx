@@ -69,7 +69,7 @@ export default async function NetworkPage() {
 
       {/* Qué mide esta página */}
       <section className="mb-14">
-        <div className="bg-surface border border-border rounded-[14px] p-5">
+        <div className="bg-surface border border-border rounded-none p-5">
           <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-4">
             Qué mide esta página
           </div>
@@ -155,7 +155,7 @@ export default async function NetworkPage() {
 
         {/* Country table */}
         {stats.countryBreakdown.length > 0 && (
-          <div className="rounded-xl border border-border overflow-hidden">
+          <div className="rounded-none border border-border overflow-hidden">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-border bg-surface-alt">
@@ -268,7 +268,7 @@ export default async function NetworkPage() {
 
 function KpiCard({ label, value, subtitle, tooltip }: { label: string; value: string; subtitle?: string; tooltip?: string }) {
   return (
-    <div className="rounded-xl border border-border p-5 bg-surface group relative">
+    <div className="rounded-none border border-border p-5 bg-surface group relative">
       <div className="font-mono text-[10px] text-text-dim uppercase tracking-[0.1em] mb-2 flex items-center gap-1">
         {label}
         {tooltip && (
