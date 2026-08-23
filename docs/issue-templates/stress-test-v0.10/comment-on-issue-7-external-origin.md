@@ -56,15 +56,10 @@ with two notes:
   *commercially contested* — two different axes, which is exactly the separation
   §6.0 draws between the financial dimension and the rest.
 
-**A related gap this exposes, outside #7's scope.** `billing.status` in the core
-wire enum is `pending | charged | invoiced | paid | disputed`
-(`schema/service.schema.json`, `PROTOCOL.md §12.8.1`). There is no `refunded` and
-no `charged_back`. So even with `provenance` on the event, a conforming v0.10
-implementation has no core value to move the delivery's billing status to after a
-chargeback — only the draft extensions can express the resulting position. Worth
-noting here because it affects how much of this proposal is usable before the
-state-dimensions extension matures.
-
-The allocation half of the same case — *which* delivery a total-Order reversal
-attaches to — is filed separately, since it is about settlement structure rather
-than event provenance.
+**Two related gaps, filed separately so they do not widen this proposal.** What
+state the delivery lands in after such an event, and which delivery a total-Order
+reversal attaches to, are both open — the first because core `billing.status` has
+no unconsented-reversal value and RFC-003 does not add one, the second because
+allocation is undeclared. Both are settlement structure rather than event
+provenance, and each has its own issue. `provenance` answers who originated the
+event; those answer what it leaves behind.

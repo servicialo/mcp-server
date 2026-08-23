@@ -40,7 +40,7 @@ Two were dropped on those grounds and three were narrowed.
 | 9 | **Partial** → narrowed | [`q09-evidence-shared-artifacts.md`](q09-evidence-shared-artifacts.md) | `base.schema.json` `$defs` already carry `uri`; zero `hash`/`digest`/`checksum` in all of `schema/` |
 | 10 | **Open**, already registered | [`q10-acceptance-authority.md`](q10-acceptance-authority.md) | `actor.type ∈ {provider, client, system, agent}`; Order has no `policies` object; state-dimensions §6 open question 1 |
 | 11 | **Partial** → reframed | [`q11-consumer-conformance.md`](q11-consumer-conformance.md) | The MUST exists (`§10.5`, `§10.7`); no consumer profile exists in `certification.md`, and §10 is absent from the verification matrix |
-| 12 | **Open**, split in two | [`q12-settlement-allocation.md`](q12-settlement-allocation.md) + [comment on #7](comment-on-issue-7-external-origin.md) | `billing.amount` is per-delivery, ledger is Order-level, nothing declares the split. Origin overlaps #7's `provenance` |
+| 12 | **Open**, split in three | [`q12-settlement-allocation.md`](q12-settlement-allocation.md), [`q12b-chargeback-terminal-state.md`](q12b-chargeback-terminal-state.md), [comment on #7](comment-on-issue-7-external-origin.md) | `billing.amount` is per-delivery and the ledger is Order-level, so nothing declares the split. Origin overlaps #7's `provenance`. Core `billing.status` has no unconsented-reversal value, and RFC-003 — which extends that enum — adds only consented ones |
 
 Questions 1–4 get no issue of their own: the RFC-005 pull request and the Proof of
 Service 0.3.0 pull request are their discussion surface. Traceability is preserved
@@ -60,6 +60,7 @@ in the drafts' Motivation sections, which cite the originating cases explicitly
 | [`q10-acceptance-authority.md`](q10-acceptance-authority.md) | `[evidence]` Declare acceptance authority in Order policy | `protocol-evolution`, `rfc` | 6 |
 | [`q11-consumer-conformance.md`](q11-consumer-conformance.md) | `[conformance]` Define a consumer conformance profile | `protocol-evolution`, `rfc`, `v1.0-candidate` | 6 |
 | [`q12-settlement-allocation.md`](q12-settlement-allocation.md) | `[settlement]` Declare allocation of Order-level amounts across deliveries | `protocol-evolution`, `rfc` | 7 |
+| [`q12b-chargeback-terminal-state.md`](q12b-chargeback-terminal-state.md) | `[settlement]` Core `billing.status` cannot represent an unconsented reversal | `protocol-evolution`, `rfc`, `v1.0-candidate` | 7 |
 | [`doc-fixes.md`](doc-fixes.md) | `[docs]` Two spec clarifications surfaced by the stress test | `protocol-evolution` | 2 |
 | [`comment-on-issue-7-external-origin.md`](comment-on-issue-7-external-origin.md) | *(comment, not an issue)* external-rail origin on [#7](https://github.com/servicialo/mcp-server/issues/7) | — | 7 |
 
@@ -83,6 +84,13 @@ against it rather than in isolation:
   lands first.
 - **Q12 (origin)** vs [#7](https://github.com/servicialo/mcp-server/issues/7) —
   filed as a comment there, not as an issue.
+- **Q12b** vs [RFC-003 — Refunds & Credit Notes](https://github.com/servicialo/mcp-server/pull/13) —
+  RFC-003 already extends `billing.status` with `credited` / `partial_credit` and
+  settles the refund side; the refund half of this question is therefore answered
+  and was not filed. What remains is the unconsented reversal, which RFC-003's
+  `CreditNote` cannot carry (its first required field is who issued it) and which
+  the draft extensions already name `charged_back`. Recommended as a joint change
+  with RFC-003, not a follow-up.
 - **RFC-005** vs [#6](https://github.com/servicialo/mcp-server/issues/6) — `cac_resolved`
   is an aggregation over `(clientId, periodo)`. A period delivery is a single
   obligation satisfied over a window. RFC-005 distinguishes them explicitly;

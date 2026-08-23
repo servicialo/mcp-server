@@ -101,8 +101,11 @@ and allocation is exactly where an implementer would be tempted to break it.
 
 - [#7 — `provenance` on delivery and payment events](https://github.com/servicialo/mcp-server/issues/7)
   — companion half of this question.
-- Sibling settlement question from the same stress test: conditional holdback
-  (Case 2).
+- Sibling settlement questions from the same stress test: conditional holdback
+  (Case 2), and the absence of an unconsented-reversal terminal state in core
+  `billing.status` (same case) — allocation says *how much* of the reversal
+  attaches to a delivery; that one says *what state* it leaves the delivery's
+  billing track in. Both are needed for the representment dossier to be complete.
 - Blocked on the same gap as both: the Settlement extension has no specification
   document of its own (`protocol/manifest.yaml`: `experimental`,
   `doc: PROTOCOL.md#128-payment-model`).

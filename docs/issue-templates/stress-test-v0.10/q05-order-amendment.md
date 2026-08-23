@@ -77,6 +77,15 @@ which is additive and breaks nothing. Declare in the same change that a delivery
 MAY reference the amendment in force at its time — that is what B needs later, and
 recording it from the start avoids a migration.
 
+**Candidate mechanics: no new machinery.** The Order already has a
+`proposed → active` handshake with an acceptance requirement attached to it
+(`§8.3`, `§10.8`, `service_orders.propose` / `service_orders.activate` in
+`HTTP_PROFILE §10.4`–`§10.5`). An amendment can reuse it verbatim: the amended
+Order is proposed, the counterparty activates, and the `amended` entry records the
+delta and the acceptance. That is composition rather than a parallel amendment
+lifecycle, and it means the two constraints below are enforced by a path that
+already exists instead of by new rules.
+
 Two constraints that fall out of §10.8 and should be stated explicitly:
 
 - An amendment that changes scope, pricing or term is a change to a bilateral
