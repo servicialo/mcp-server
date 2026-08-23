@@ -100,11 +100,18 @@ against it rather than in isolation:
 
 ## Downstream of this analysis
 
-| Artifact | What it carries |
-|---|---|
-| [`rfcs/RFC-005-period-deliveries.md`](../../../rfcs/RFC-005-period-deliveries.md) | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
-| [`public/spec/extensions/proof-of-service.md`](../../../public/spec/extensions/proof-of-service.md) §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
-| [`docs/vocabulary-migration-plan.md`](../../vocabulary-migration-plan.md) | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
+These land in sibling pull requests, not in this one. They are linked by pull
+request rather than by path because a Minor RFC carries a two-week comment window
+plus a Final Comment Period (RFC-001 §3.2) — a `blob/main` link would be dead for
+the whole period during which people are most likely to follow it.
+
+| Artifact | Lands at | What it carries |
+|---|---|---|
+| {{PR_B}} | `rfcs/RFC-005-period-deliveries.md` | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
+| {{PR_C}} | `public/spec/extensions/proof-of-service.md` §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
+| {{PR_D}} | `docs/vocabulary-migration-plan.md` | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
+
+Re-point each to its path once the corresponding pull request merges.
 
 ## Citation rule
 
@@ -117,12 +124,34 @@ That is why publication order is A-first: every body cites
 `blob/main/docs/servicialo-stress-test-casos.md`, which exists only once PR A
 merges.
 
-Two bodies carry the token **`{{PR_D}}`** — `q12b` and `q13`. It refers to the
-vocabulary migration plan, which lands in PR D *after* the issues are published,
-so a `blob/main` path would break the rule. **Publication MUST substitute
-`{{PR_D}}` with the real pull request URL**, which is known by then: PRs B, C and
-D open before any issue is created. Optionally re-point it at `blob/main` after D
-merges.
+The same reasoning applies to this repository's own cross-references, which is
+why the table above links pull requests rather than paths.
+
+Every forward reference that cannot be a `blob/main` path yet is carried as a
+**double-brace token**, so substitution is mechanical rather than remembered.
+Token names are written below without their braces, so that the only literal
+double braces in this file are the three live ones in the table above — which
+makes the gate a single grep with no exceptions.
+
+| Token name | Where | Substitute with | When |
+|---|---|---|---|
+| `PR_B`, `PR_C`, `PR_D` | this README | the sibling pull request URLs | in a commit on this branch, after all four PRs are opened and **before this one merges** |
+| `PR_D` | `q12b`, `q13` | the vocabulary migration pull request URL | before creating those two issues |
+| `Q12B_URL`, `Q12_URL` | the comment body for #7 | the issue URLs created earlier in the same run | before posting the comment, which is last precisely so both exist |
+
+**The gate, run twice:**
+
+```sh
+grep -rnE '\{\{' docs/issue-templates/stress-test-v0.10/
+```
+
+- **Before merging this pull request** — it must return nothing. At that point the
+  only tokens left are this README's three, and substituting them is what clears it.
+- **Before creating any issue** — it must return nothing again. This README is
+  already clean by then, so no exclusions are needed and the command has no
+  arguments to get wrong.
+
+A leaked token in a public issue is exactly the failure a one-line check prevents.
 
 ## Publication
 

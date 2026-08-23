@@ -85,6 +85,19 @@ There is also a payroll consequence: `§6.5` requires payroll to read only
 `collected` sessions. An implementation that maps a chargeback to `credited` or
 leaves it at `paid` gets provider compensation wrong in opposite directions.
 
+## Out of scope
+
+**Refunds.** Every reversal the organization itself issues — a won dispute, a
+partial-delivery correction, a goodwill credit, a voided invoice — is settled by
+RFC-003 and is deliberately not reopened here. That is why this issue is narrower
+than the question that produced it: the stress test asked about refunds *and*
+chargebacks in one breath, and verification found half of it already answered.
+
+The line between them is consent, not direction of travel. Money going back to the
+client is a refund when the organization decided to send it, and a chargeback when
+someone outside the Order took it. RFC-003 models the first completely and cannot
+model the second without recording a concession that did not happen.
+
 ## The question
 
 Should core `billing.status` gain a terminal state for a reversal that no party to

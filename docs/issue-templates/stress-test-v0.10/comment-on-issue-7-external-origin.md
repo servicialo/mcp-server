@@ -9,6 +9,10 @@ assignees: ''
 > **This file is a comment body, not an issue.** Post it on
 > [#7 — Proposal: add `provenance` field to delivery and payment events](https://github.com/servicialo/mcp-server/issues/7).
 > Everything below the line is the comment.
+>
+> **Substitute before posting:** `{{Q12B_URL}}` and `{{Q12_URL}}` with the issue
+> URLs created earlier in the same publication run. This comment is posted last
+> precisely so both exist.
 
 ---
 
@@ -57,9 +61,9 @@ with two notes:
   §6.0 draws between the financial dimension and the rest.
 
 **Two related gaps, filed separately so they do not widen this proposal.** What
-state the delivery lands in after such an event, and which delivery a total-Order
-reversal attaches to, are both open — the first because core `billing.status` has
-no unconsented-reversal value and RFC-003 does not add one, the second because
-allocation is undeclared. Both are settlement structure rather than event
-provenance, and each has its own issue. `provenance` answers who originated the
+state the delivery lands in after such an event ({{Q12B_URL}}), and which delivery
+a total-Order reversal attaches to ({{Q12_URL}}), are both open — the first
+because core `billing.status` has no unconsented-reversal value and RFC-003 does
+not add one, the second because allocation is undeclared. Both are settlement
+structure rather than event provenance. `provenance` answers who originated the
 event; those answer what it leaves behind.
