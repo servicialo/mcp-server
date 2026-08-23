@@ -212,6 +212,47 @@ protocol has open elsewhere: who, on the receiving side, holds a given right. A
 period where the two are answered inconsistently would be worse than either
 answer, so the default here is stated as a default, not as a constant.
 
+#### The client floor (normative)
+
+A default that an Order can override is not protection. Without a floor, an Order
+could name the organization sole grantor and leave the beneficiary unable to show
+their own record — so the floor is a MUST, in three clauses:
+
+1. **The client MAY always grant access to a dossier concerning them**, whatever
+   the Order's policy says. This right is over a *view*: the grant is subject to
+   the applicable redaction profile exactly as any other grant is (§5.3). The
+   floor confers the power to show, not a bypass of redaction.
+2. **The client MUST be able to enumerate every grant over that dossier**, current
+   and historical, whoever issued it — with its scope, issuer, expiry and status.
+   Access transparency is as much a floor as the power to grant: knowing who was
+   shown your record is not a lesser right than showing it.
+3. **The floor does NOT confer revocation over grants issued by others.**
+   Revocation follows the issuer (§5.2). A client can always grant and can always
+   see; a client cannot cancel a grant that the Order's designated grantor issued.
+
+Clause 3 is the load-bearing one and the least obvious. If the floor read "the
+client controls access to their record", the adverse client of §5.6.2 would revoke
+the provider's defence grant and the representment would die exactly as it does
+without any of this. The floor is **affirmative power plus full visibility, with
+no veto over another grantor's grants** — which is a narrower right than control,
+and the only version of it that survives the case where the parties disagree.
+
+Two notes on the shape of the floor:
+
+- **Why it is a floor and not a preference.** Data-protection regimes generally
+  recognise a data subject's right of access to, and portability of, records
+  concerning them independently of any contract between other parties. An Order
+  that could strip that would be arguing with the law as well as with the ethics.
+  The adoption path needs it too: "the client presents the dossier to their payer"
+  — the entire premise of §5.6.1 — presupposes client agency. Without a floor
+  that agency is a concession the organization can withdraw.
+- **The floor belongs to the client, and only to the client.** In a coordination
+  where beneficiary, payer and mandatary are different parties, the payer's access
+  comes from the Order's policy and the mandatary's from a mandate under the
+  Delegated Agency Model. Neither gets it from this floor. The floor tracks who the
+  record is *about*, which is a different question from who pays for it or who acts
+  on someone's behalf.
+
 #### The mechanism is not specified, and composes with the Mandate
 
 This document specifies the **properties** of a grant, not its encoding. An
@@ -327,6 +368,17 @@ settlement event that contributes to `financially_reconciled` in the ordinary wa
 existing four are sufficient, and adding a fifth for "someone else paid" would
 rebuild the exact linear-scale error §3.1 exists to prevent.
 
+> **Dependency, stated rather than assumed.** This recording is **not expressible
+> today**. The evidence envelope's `actor.type` is
+> `provider | client | system | agent`, so an insurer's attestation has no
+> representable actor and would have to be recorded as one of the parties — which
+> is precisely the misattribution this subsection exists to avoid. The third-party
+> attestation described here therefore lands **together with** the Evidence
+> Profiles change in §5.5 item 2, not before it. That item also closes the
+> beneficiary/payer distinction from the other direction; the two are the same
+> hole seen from two sides and are to be closed once, in one change, rather than
+> in two passes that would each widen `actor.type` differently.
+
 Stated plainly for implementers: a dossier that an insurer reimbursed against is
 not *more true* than one it did not. It is a dossier that has survived an
 adversarial reading, which is a different and often more useful thing to be able
@@ -423,6 +475,13 @@ Order to have said so in advance. An Order that is silent leaves the provider
 holding evidence it cannot show — and discovering that during a chargeback is
 discovering it too late.
 
+It is also why clause 3 of the client floor is written as it is. The floor gives
+the client an affirmative power to grant and full visibility of every grant, and
+deliberately stops short of a veto: were it otherwise, the client here would revoke
+the provider's defence grant and this case would fail for the same reason it fails
+with no grant model at all. The client sees that the grant exists, and cannot
+cancel it.
+
 **The dossier's job is to disaggregate.** One Order, two deliveries. The coverage
 delivery reads: fulfilment `completed`, evidence recorded, acceptance `accepted` —
 by the client, before the reversal — and settlement reversed. The album delivery
@@ -500,17 +559,12 @@ satisfied by operational evidence.
 6. Does a grant (§5.2) reach a dossier, an Order, or a party relationship? A
    patient presenting a year of treatment to an insurer would rather issue one
    grant than forty; a per-dossier grant is easier to reason about and to revoke.
-7. When the granting party is not the client (§5.2, §5.6.2), what stops an Order
-   from designating the organization as sole grantor and cutting the beneficiary
-   out of control over their own record? A floor — the client can always grant,
-   and can always see what was granted — is the obvious answer and is not yet
-   written.
-8. Is a redacted view a distinct rendering of the dossier, or the dossier itself
+7. Is a redacted view a distinct rendering of the dossier, or the dossier itself
    with fields withheld? The difference shows up in whether the certainty level
    is recomputed over what the reader can see, or reported as computed over the
    whole. Reporting L3 to a reader who can see only L1's worth of evidence is
    defensible but needs to be a decision, not an accident.
-9. Should a grant be presentable *by the reader* — the provider hands the acquirer
+8. Should a grant be presentable *by the reader* — the provider hands the acquirer
    a token — or only issuable *to* a registered reader? The representment case
    (§5.6.2) wants the former; the audit properties of §5.2 are easier with the
    latter.
@@ -524,6 +578,13 @@ did not participate in producing, in order to make its own decision. Covers the
 access model (explicit, scoped, time-bounded, revocable grant, granted by default
 by the client), the redacted view (four questions, zero PII by default), and the
 optional recording of what the relying party did.
+
+§5.2 carries a normative **client floor**: the client MAY always grant access to a
+dossier concerning them (subject to redaction), MUST be able to enumerate every
+grant over it whoever issued it, and does NOT thereby gain revocation over grants
+issued by another designated grantor. The third clause is what keeps §5.6.2
+workable — a floor phrased as "the client controls access" would let an adverse
+client revoke the provider's defence grant.
 
 Additive only. No wire object existed at 0.2.0 and none is introduced. **The four
 certainty levels are unchanged and were not renumbered** — §5.4 explicitly
