@@ -107,9 +107,9 @@ the whole period during which people are most likely to follow it.
 
 | Artifact | Lands at | What it carries |
 |---|---|---|
-| {{PR_B}} | `rfcs/RFC-005-period-deliveries.md` | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
-| {{PR_C}} | `public/spec/extensions/proof-of-service.md` §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
-| {{PR_D}} | `docs/vocabulary-migration-plan.md` | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
+| [PR #21](https://github.com/servicialo/mcp-server/pull/21) | `rfcs/RFC-005-period-deliveries.md` | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
+| [PR #22](https://github.com/servicialo/mcp-server/pull/22) | `public/spec/extensions/proof-of-service.md` §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
+| [PR #23](https://github.com/servicialo/mcp-server/pull/23) | `docs/vocabulary-migration-plan.md` | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
 
 Re-point each to its path once the corresponding pull request merges.
 
