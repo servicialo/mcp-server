@@ -61,11 +61,13 @@ in the drafts' Motivation sections, which cite the originating cases explicitly
 | [`q11-consumer-conformance.md`](q11-consumer-conformance.md) | `[conformance]` Define a consumer conformance profile | `protocol-evolution`, `rfc`, `v1.0-candidate` | 6 |
 | [`q12-settlement-allocation.md`](q12-settlement-allocation.md) | `[settlement]` Declare allocation of Order-level amounts across deliveries | `protocol-evolution`, `rfc` | 7 |
 | [`q12b-chargeback-terminal-state.md`](q12b-chargeback-terminal-state.md) | `[settlement]` Core `billing.status` cannot represent an unconsented reversal | `protocol-evolution`, `rfc`, `v1.0-candidate` | 7 |
+| [`q13-version-negotiation-and-deprecation-envelope.md`](q13-version-negotiation-and-deprecation-envelope.md) | `[implementation]` Implement version negotiation and deprecation signalling | `protocol-evolution`, `v1.0-candidate`, `help wanted` | — |
 | [`doc-fixes.md`](doc-fixes.md) | `[docs]` Two spec clarifications surfaced by the stress test | `protocol-evolution` | 2 |
 | [`comment-on-issue-7-external-origin.md`](comment-on-issue-7-external-origin.md) | *(comment, not an issue)* external-rail origin on [#7](https://github.com/servicialo/mcp-server/issues/7) | — | 7 |
 
-**Labels.** Only the three labels already in use on this repository
-(`protocol-evolution`, `rfc`, `v1.0-candidate`). The domain travels in the title
+**Labels.** Only labels that already exist on this repository —
+`protocol-evolution`, `rfc`, `v1.0-candidate`, plus `help wanted` (verified
+present) on the one implementation-scoped issue. The domain travels in the title
 prefix — `[order]`, `[settlement]`, `[evidence]`, `[conformance]`, `[docs]` — not
 as a label. A label taxonomy of its own is worth creating past roughly twenty
 protocol issues, not before.
@@ -103,6 +105,24 @@ against it rather than in isolation:
 | [`rfcs/RFC-005-period-deliveries.md`](../../../rfcs/RFC-005-period-deliveries.md) | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
 | [`public/spec/extensions/proof-of-service.md`](../../../public/spec/extensions/proof-of-service.md) §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
 | [`docs/vocabulary-migration-plan.md`](../../vocabulary-migration-plan.md) | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
+
+## Citation rule
+
+An issue body may cite **(a) files already on `main`**, or **(b) an open pull
+request**. It may never cite a `blob/main/…` path that does not exist yet — a
+publication order that produces broken links for "a few hours" is exactly the
+detail a serious implementer notices.
+
+That is why publication order is A-first: every body cites
+`blob/main/docs/servicialo-stress-test-casos.md`, which exists only once PR A
+merges.
+
+Two bodies carry the token **`{{PR_D}}`** — `q12b` and `q13`. It refers to the
+vocabulary migration plan, which lands in PR D *after* the issues are published,
+so a `blob/main` path would break the rule. **Publication MUST substitute
+`{{PR_D}}` with the real pull request URL**, which is known by then: PRs B, C and
+D open before any issue is created. Optionally re-point it at `blob/main` after D
+merges.
 
 ## Publication
 

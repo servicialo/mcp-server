@@ -96,6 +96,19 @@ mapping goes toward the recoverable one.
 legacy vocabulary had no way to express. That is not a defect of the mapping; it
 is the information the legacy vocabulary never carried, surfacing.
 
+**Corollary (normative for the migration).** Under dual behavior (§5.2),
+`collected` is reachable **only** through the new vocabulary. A legacy `charged`
+MUST NOT resolve to `collected` under any circumstance, including a caller that
+sends legacy values while negotiating a new version. The lossy direction is
+quarantined away from the one state that moves money: §6.5 makes `collected` the
+sole input to payroll, so the alias can never, by itself, trigger cash
+recognition.
+
+This is also the faithful reading, not just the safe one. In the reference
+implementation's actual flow, `charged` fires when the charge is *created*
+(`payments.create_sale`), not when money arrives — `payments.record_payment` is a
+separate, later call. Legacy `charged` has always meant the accrual.
+
 ---
 
 ## 3. Coordinate with the settlement enum change — one window, not two

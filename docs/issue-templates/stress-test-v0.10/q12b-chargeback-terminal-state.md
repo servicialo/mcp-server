@@ -133,11 +133,13 @@ Two things worth stating normatively in whichever change lands:
 - Sibling settlement questions from the same case: allocation of Order-level
   amounts across deliveries, and conditional holdback (Case 2) — a forfeited
   holdback has the same "where does it terminate" problem.
-- **Vocabulary migration plan** — the `delivered`/`charged` divergence tracked in
-  `protocol/manifest.yaml` under
+- **Vocabulary migration plan** ({{PR_D}}) — the `delivered`/`charged` divergence
+  tracked in `protocol/manifest.yaml` under
   `state_machines.service_lifecycle.reference_implementation_divergence` touches the
-  same surfaces. If core settlement values are being added in v1.0, both enum
-  changes should be sequenced in one migration rather than two.
+  same enum. That plan already schedules this issue's addition into a single
+  deprecation window with RFC-003's, precisely so implementers face one breaking
+  change rather than two serialized ones. If this issue is accepted, it ships in
+  that window.
 
 ## Labels
 
