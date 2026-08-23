@@ -34,9 +34,9 @@ const STAGES = [
 
 export function EstandarizaSection() {
   return (
-    <section id="que-estandariza" className="mb-16 md:mb-24">
+    <section id="que-estandariza" className="mb-16 md:mb-24 scroll-mt-16">
       <SectionTitle
-        tag="02 — Qué estandariza"
+        tag="04 — El modelo"
         title="Cinco elementos, un lenguaje común"
         subtitle="El protocolo define objetos y eventos legibles por máquinas para cada etapa de un servicio — y la relación entre ellas."
       />

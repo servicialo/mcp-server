@@ -1,21 +1,21 @@
-import { getNetworkStats } from "@/lib/telemetry-stats";
 import { IMPLEMENTATIONS, PROTOCOL_VERSION } from "@/lib/manifest";
 
 // Índice de la portada: refleja las secciones numeradas de la página.
+// El orden abre por el rol y el porqué; el modelo de datos entra después.
 const TOC = [
   { num: "01", label: "El problema", anchor: "#problema" },
-  { num: "02", label: "Qué estandariza", anchor: "#que-estandariza" },
-  { num: "03", label: "Un ejemplo", anchor: "#ejemplo" },
-  { num: "04", label: "Estado actual", anchor: "#estado-actual" },
-  { num: "05", label: "Implementaciones y red", anchor: "#implementaciones" },
-  { num: "06", label: "Siguiente paso", anchor: "#empezar" },
+  { num: "02", label: "Por qué un protocolo", anchor: "#por-que" },
+  { num: "03", label: "Fuera de alcance", anchor: "#fuera-de-alcance" },
+  { num: "04", label: "El modelo", anchor: "#que-estandariza" },
+  { num: "05", label: "Un ejemplo", anchor: "#ejemplo" },
+  { num: "06", label: "Estado y honestidad epistémica", anchor: "#estado-actual" },
+  { num: "07", label: "Siguiente paso", anchor: "#empezar" },
 ];
 
-export async function HeroSection() {
-  const stats = await getNetworkStats();
-  const hostCount = stats.uniqueHosts;
-  const countryCount = stats.countryBreakdown.length;
-  const liveCount = IMPLEMENTATIONS.filter((i) => i.status === "live").length;
+export function HeroSection() {
+  const independentCount = IMPLEMENTATIONS.filter(
+    (i) => i.role !== "reference"
+  ).length;
 
   return (
     <section className="mb-16 md:mb-24">
@@ -24,43 +24,25 @@ export async function HeroSection() {
         <span>v{PROTOCOL_VERSION} — Borrador</span>
       </div>
 
-      <h1 className="font-serif text-[36px] md:text-[58px] font-normal text-text leading-[1.08] tracking-[-0.01em] mb-5 md:mb-6">
-        Una semántica común para{" "}
-        <em className="text-accent">acordar, entregar y compensar</em>{" "}
-        servicios
-      </h1>
-      <p className="font-serif text-[17px] md:text-[19px] text-text-body leading-[1.65] max-w-[600px]">
-        Servicialo conecta lo ofrecido, lo acordado, lo entregado, la
-        evidencia de la entrega y su liquidación, para que plataformas,
-        sistemas y agentes operen servicios con un lenguaje compartido.
-      </p>
+      <div className="flex items-center gap-3 mb-5">
+        <span aria-hidden className="h-px w-7 bg-accent" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          Declaración de rol
+        </span>
+      </div>
 
-      {(liveCount > 0 || hostCount > 0) && (
-        <a
-          href="/network"
-          title="Hosts únicos del servidor MCP detectados por telemetría anónima. Una instalación técnica no equivale a una organización operando servicios."
-          className="group inline-flex items-center gap-2.5 mt-6 font-mono text-[11px] text-text-muted hover:text-accent transition-colors"
-        >
-          <span aria-hidden className="inline-block w-[7px] h-[7px] bg-green" />
-          <span className="underline decoration-border group-hover:decoration-accent underline-offset-4 transition-colors">
-            {liveCount > 0 && (
-              <>
-                {liveCount}{" "}
-                {liveCount === 1
-                  ? "implementación en producción"
-                  : "implementaciones en producción"}
-              </>
-            )}
-            {liveCount > 0 && hostCount > 0 && " · "}
-            {hostCount > 0 && (
-              <>
-                {hostCount} instalaciones técnicas detectadas en {countryCount}{" "}
-                {countryCount === 1 ? "país" : "países"}
-              </>
-            )}
-          </span>
-        </a>
-      )}
+      <h1 className="font-serif text-[26px] md:text-[38px] font-normal text-text leading-[1.25] tracking-[-0.01em] mb-6 md:mb-7 max-w-[820px]">
+        Servicialo define qué significa que un servicio fue{" "}
+        <em className="text-accent">prometido, entregado y probado</em>, para
+        que dos sistemas que no se conocen puedan estar de acuerdo sin depender
+        de un intermediario que lo garantice.
+      </h1>
+
+      <p className="font-serif text-[17px] md:text-[19px] text-text-body leading-[1.65] max-w-[620px]">
+        Es una especificación, no una plataforma: define la semántica —
+        oferta, acuerdo, entrega, evidencia y liquidación — y deja a cada
+        implementación el resto.
+      </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
         <a
@@ -82,6 +64,27 @@ export async function HeroSection() {
         <span>Especificación abierta (Apache-2.0)</span>
         <span>Independiente del transporte — HTTP · MCP · A2A</span>
       </div>
+
+      {/* Estado, arriba y sin adornos: el lector debe saber qué está leyendo
+          antes de leerlo. El detalle vive en §06. */}
+      <a
+        href="#estado-actual"
+        className="group block mt-7 border-l-2 border-border hover:border-text-dim pl-4 transition-colors"
+      >
+        <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-text-muted mb-1.5">
+          Estado
+        </div>
+        <div className="text-[13px] text-text-body leading-[1.7] max-w-[620px]">
+          Borrador de especificación, mantenido por un autor único. Una
+          implementación de referencia, escrita por el mismo autor.{" "}
+          {independentCount === 0
+            ? "Ninguna implementación independiente verificada todavía."
+            : `${independentCount} implementaciones independientes verificadas.`}{" "}
+          <span className="text-text-muted underline decoration-border group-hover:decoration-accent underline-offset-4 transition-colors">
+            Cómo leer esto →
+          </span>
+        </div>
+      </a>
 
       <nav aria-label="Índice" className="mt-12 md:mt-14">
         <div className="flex items-center gap-3 mb-4">

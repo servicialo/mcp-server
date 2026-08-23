@@ -339,3 +339,5 @@ Registration attempts that fail this check MUST return HTTP 422 with error code 
 ---
 
 > Governance, data policy, and network neutrality: [GOVERNANCE.md](./GOVERNANCE.md) ([canonical](https://servicialo.com/governance))
+>
+> Why the sovereignty of the record matters, and to whom: the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto) is the philosophical argument; this document and [PROTOCOL.md](./PROTOCOL.md) are the technical counterpart. Record portability is a principle of the protocol; its normative specification is in development and is not yet part of this document.

@@ -177,6 +177,22 @@ export default function SpecPage() {
             spec.servicialo.com →
           </a>
         </div>
+        <p className="mt-5 text-[13px] text-text-muted leading-[1.7] max-w-[640px]">
+          Este documento es el cómo técnico: qué obliga el protocolo y qué
+          deja fuera. El porqué filosófico — por qué la soberanía del registro
+          importa, y para quién — vive en el{" "}
+          <a
+            href="https://grupodigitalo.com/manifiesto"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+          >
+            manifiesto de Grupo Digitalo
+          </a>
+. La portabilidad del registro es un principio del
+          protocolo; su especificación normativa está en desarrollo y todavía
+          no forma parte de este documento.
+        </p>
       </PageHeader>
 
       {/* §1 Objetos */}

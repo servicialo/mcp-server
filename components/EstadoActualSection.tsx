@@ -65,10 +65,10 @@ export function EstadoActualSection() {
   ];
 
   return (
-    <section id="estado-actual" className="mb-16 md:mb-24">
+    <section id="estado-actual" className="mb-10 md:mb-14 scroll-mt-16">
       <SectionTitle
-        tag="04 — Estado actual"
-        title="Qué existe hoy"
+        tag="06 — Estado y honestidad epistémica"
+        title="Qué existe hoy, y qué no"
         subtitle="Distinguimos explícitamente lo disponible de lo experimental, lo que está en diseño y lo aspiracional. Las hipótesis no se presentan como resultados."
       />
 

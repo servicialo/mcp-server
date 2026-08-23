@@ -82,11 +82,16 @@ Servicialo **is**:
 
 Servicialo **is not**:
 
-- A scheduling API (though it includes scheduling semantics).
-- A payments protocol (though it includes payment states).
+- **A marketplace.** It does not intermediate the commercial relationship or capture demand. It composes with the marketplaces, directories, and agents that already do: the resolver answers `slug → endpoint` and the registry publishes what an organization offers; pricing, selection, and the client relationship stay at the node.
+- **A payment rail.** It models settlement states — invoice, charge, payment, refund, reconciliation — but moves no money. It composes with existing rails: the settlement event references the movement; the movement happens outside the protocol.
+- **A scheduling product.** It defines availability, commitment, and rescheduling semantics; it does not replace the calendar, the booking interface, or the scheduling engine. It composes with the scheduling products already in operation.
+- **An identity system.** It neither issues nor verifies the identity of people or organizations. It composes with verifiable credentials and with the issuers that already accredit degrees, licenses, and authorizations: the protocol carries the attribute, its `origin`, and `verified_by` ([§12.2](#122-providerattribute)) — it does not certify it.
+- **A transport.** It does not define how two systems connect. It composes with MCP and A2A, and with HTTP as the normative binding ([§13](#13-mcp-tool-interface), [`HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md)).
 - A healthcare standard (though it works for healthcare).
 - A platform (platforms implement it).
 - Owned by any single company.
+
+The philosophical argument — why the sovereignty of the record matters, and to whom — is stated in the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto). This document is its technical counterpart: what the protocol obliges, and what it leaves out.
 
 ---
 

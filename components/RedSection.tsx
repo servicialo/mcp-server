@@ -1,7 +1,16 @@
 import { SectionTitle } from "./SectionTitle";
+import { getNetworkStats } from "@/lib/telemetry-stats";
 import { IMPLEMENTATIONS } from "@/lib/manifest";
 
-export function RedSection() {
+// Continuación de § 06: quién implementa, qué revisa la conformidad y cómo
+// leer las cifras. No lleva número propio — es la segunda mitad de la sección
+// de estado, no un capítulo aparte. Las cifras viven acá y no en la portada:
+// una instalación no es adopción, y el dato solo es legible junto a la
+// distinción que lo enmarca.
+export async function RedSection() {
+  const stats = await getNetworkStats();
+  const hostCount = stats.uniqueHosts;
+  const countryCount = stats.countryBreakdown.length;
   const reference = IMPLEMENTATIONS.find((i) => i.role === "reference");
   const liveCount = IMPLEMENTATIONS.filter((i) => i.status === "live").length;
   const independentCount = IMPLEMENTATIONS.filter(
@@ -10,11 +19,10 @@ export function RedSection() {
   const sinceYear = reference?.since?.slice(0, 4) ?? "2026";
 
   return (
-    <section id="implementaciones" className="mb-16 md:mb-24">
+    <section id="implementaciones" className="mb-16 md:mb-24 scroll-mt-16">
       <SectionTitle
-        tag="05 — Implementaciones y red"
-        title="Una implementación de referencia, una red opt-in"
-        subtitle="El protocolo no depende de una plataforma, de la red ni de una autoridad central."
+        title="Quién lo implementa, y quién lo revisa"
+        subtitle="El protocolo no depende de una plataforma, de la red ni de una autoridad central. Tampoco tiene, todavía, quien lo contradiga desde afuera."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 border border-border bg-surface divide-y md:divide-y-0 md:divide-x divide-border mb-5">
@@ -33,7 +41,9 @@ export function RedSection() {
             </a>{" "}
             es la implementación de referencia — no el protocolo ni la única
             forma de implementarlo. Opera en producción (vertical salud) desde{" "}
-            {sinceYear}.
+            {sinceYear}. La escribió el mismo autor que la especificación: no
+            es evidencia independiente de que el modelo sea implementable por
+            terceros.
           </div>
         </div>
         <div className="p-5">
@@ -42,8 +52,9 @@ export function RedSection() {
           </div>
           <div className="text-[13px] text-text-body leading-[1.7]">
             Cualquier plataforma puede implementar Servicialo desde la
-            especificación. La conformidad se revisa manualmente hoy; la suite
-            automatizada es objetivo del roadmap, no una capacidad actual.
+            especificación. La conformidad la revisa manualmente el autor; la
+            suite automatizada es objetivo del roadmap, no una capacidad
+            actual.
           </div>
         </div>
         <div className="p-5">
@@ -77,6 +88,20 @@ export function RedSection() {
             : `${independentCount} implementaciones independientes verificadas`}
           . Las instalaciones indican interés técnico, no adopción
           operacional.
+          {hostCount > 0 && (
+            <>
+              {" "}
+              El conteo actual —{" "}
+              <a
+                href="/network"
+                className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+              >
+                {hostCount} instalaciones técnicas detectadas en {countryCount}{" "}
+                {countryCount === 1 ? "país" : "países"}
+              </a>{" "}
+              — se publica bajo esa lectura, no como métrica de adopción.
+            </>
+          )}
         </div>
       </div>
 

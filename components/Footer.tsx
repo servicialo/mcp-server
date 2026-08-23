@@ -7,6 +7,8 @@ const LINKS = [
   { name: "Implementadores", href: "/implementors" },
   { name: "Visión", href: "/vision" },
   { name: "Whitepaper", href: "/whitepaper" },
+  // El manifiesto es el porqué filosófico; el spec, el cómo técnico.
+  { name: "Manifiesto", href: "https://grupodigitalo.com/manifiesto" },
   { name: "GitHub", href: "https://github.com/servicialo/mcp-server" },
   { name: "npm", href: "https://www.npmjs.com/package/@servicialo/mcp-server" },
 ];

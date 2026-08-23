@@ -23,9 +23,9 @@ const PATHS = [
 
 export function AudienciasSection() {
   return (
-    <section id="empezar" className="mb-16 md:mb-24">
+    <section id="empezar" className="mb-16 md:mb-24 scroll-mt-16">
       <SectionTitle
-        tag="06 — Siguiente paso"
+        tag="07 — Siguiente paso"
         title="Tres caminos de entrada"
       />
 

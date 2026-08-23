@@ -27,9 +27,9 @@ const STEPS = [
 
 export function EjemploSection() {
   return (
-    <section id="ejemplo" className="mb-16 md:mb-24">
+    <section id="ejemplo" className="mb-16 md:mb-24 scroll-mt-16">
       <SectionTitle
-        tag="03 — Un ejemplo"
+        tag="05 — Un ejemplo"
         title="Una sesión de kinesiología, de punta a punta"
         subtitle="El mismo recorrido aplica a cualquier servicio profesional programado."
       />
