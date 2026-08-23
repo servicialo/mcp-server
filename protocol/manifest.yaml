@@ -258,7 +258,12 @@ extensions:
   - { id: state-dimensions,     name: State Dimensions,     maturity: draft,
       doc: public/spec/extensions/state-dimensions.md }
   - { id: proof-of-service,     name: Proof of Service,     maturity: draft,
-      doc: public/spec/extensions/proof-of-service.md }
+      doc: public/spec/extensions/proof-of-service.md,
+      note: "Doc 0.3.0 adds the Proof Consumer (relying party): grant-based read access to a
+        redacted dossier by a party outside the Order. Maturity stays draft — the section
+        states a role, an access model and a view, but defines no wire object and no field,
+        and nothing is implemented. It moves to experimental when an implementation issues
+        grants and serves redacted views (PROTOCOL.md §15.6)." }
   - { id: webhooks,             name: Webhooks,             maturity: experimental,
       doc: WEBHOOKS.md }
 
