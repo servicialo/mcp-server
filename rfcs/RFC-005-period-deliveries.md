@@ -182,22 +182,64 @@ it.
 Instead, its meaning is defined for the new kind:
 
 - When `kind` is `period`, `duration_minutes` MUST equal the length of
-  `schedule.window` in whole minutes, rounded down. It is derived, not
-  independently chosen, and implementations MUST reject a document where the two
-  disagree.
+  `schedule.window` computed per §4.3.1. It is derived, not independently chosen,
+  and implementations MUST reject a document where the two disagree.
 - `schedule.duration_expected`, when present, follows the same rule.
 - `proof.duration_actual` carries the length in minutes during which the
-  obligation was actually in force. For a window that ran to completion this
-  equals `duration_minutes`; for an early termination (§4.6) it is smaller, and
-  the difference is the proration signal.
+  obligation was actually in force, computed the same way. For a window that ran
+  to completion this equals `duration_minutes`; for an early termination (§4.6) it
+  is smaller, and the difference is the proration signal.
 
-**Scheduling guardrail (normative).** A period delivery is not a booking.
-Implementations MUST NOT treat a `kind: period` delivery as an occupancy of
-provider, client or Resource availability, and `§6.2` (three-way resource
-commitment in the `scheduled` state) does not apply to it. A scheduler that
-blocked a provider's calendar for the length of a retainer window would be
-conformant with the letter of `duration_minutes` and useless in practice; this
-rule closes that reading.
+#### 4.3.1 How the window length is computed (normative)
+
+The MUST above needs an arithmetic, and the obvious one is wrong. The length of
+`schedule.window` is:
+
+> the number of whole minutes elapsed between `window.start` and `window.end`
+> **as instants on the timeline** — that is, after normalizing both to UTC —
+> truncated toward zero.
+
+Two consequences that are not optional readings:
+
+- **It is not `days × 1440`.** A window expressed in local calendar terms that
+  crosses a daylight-saving transition is longer or shorter than the day count
+  suggests. April 2026 in `America/Santiago` runs from `2026-04-01T00:00:00-03:00`
+  to `2026-05-01T00:00:00-04:00`; that is 30 calendar days but **43,260** minutes,
+  not 43,200, because the zone leaves DST inside the window. An implementation
+  that multiplies days by 1440 produces a document that fails its own MUST.
+- **Same-zone subtraction is not the same thing.** Several standard date libraries
+  subtract two zone-aware timestamps by wall clock when both carry the same zone,
+  returning the calendar difference rather than the elapsed one. Normalizing to
+  UTC first is the operation being specified; reaching for the library's default
+  subtraction is the bug this paragraph exists to prevent.
+
+Sub-minute components are truncated, so `window` boundaries SHOULD be
+minute-aligned. Implementations MUST NOT round to the nearest minute — truncation
+is specified so that two implementations computing the same window agree exactly.
+
+**What remains open** is only how an obligation expressed in *calendar* terms
+("the month of April") chooses the instants that go into `window`. That is
+open question 3. The arithmetic over instants, once chosen, is fixed here.
+
+#### 4.3.2 Guardrail: a period delivery is not an appointment (normative)
+
+`duration_minutes` and `scheduled_for` are populated on a period delivery for
+compatibility (§4.2, §4.3), and a consumer that reads them without checking `kind`
+will mistake a year-long stand-by commitment for an appointment. The rule is
+stated by category rather than by symptom, because the symptoms are several:
+
+Implementations MUST NOT give a `kind: period` delivery **appointment-type
+treatment**. A period delivery does not denote a punctual event, and therefore:
+
+| Treatment | Why it is wrong for a period |
+|---|---|
+| Availability occupancy | `§6.2`'s three-way commitment of provider, client and Resource in the `scheduled` state does not apply. A scheduler that blocked a lawyer's calendar for 31 days would be honoring the letter of `duration_minutes` and useless in practice. |
+| Appointment reminders | "Your appointment is tomorrow at 00:00" for a March retainer. |
+| Pre-appointment confirmation prompts | There is no arrival to confirm. This is about reminder-style prompts, not the `confirmed` lifecycle state — a period delivery does traverse `confirmed`, where the parties acknowledge the commitment for the window (§4.4). |
+| No-show detection | A detector watching for `scheduled_for` to pass without a check-in marks the provider a no-show on the first instant of the window. |
+
+The list is illustrative of the category, not exhaustive. The test is whether the
+behavior assumes someone shows up somewhere at a time.
 
 ### 4.4 Lifecycle
 
@@ -225,14 +267,22 @@ to `completed` — i.e. from window close, not from window start.
 The evidence floor for a period delivery is **bilateral confirmation at window
 close**: provider and recipient present compatible attestations that the
 obligation was held for the window. On the Proof of Service certainty gradient
-this is **L2 `bilateral`**
-([proof-of-service §3.1](../public/spec/extensions/proof-of-service.md)).
+that is the level keyed `bilateral` (currently numbered L2 —
+[proof-of-service §3.1](../public/spec/extensions/proof-of-service.md)).
+
+**The semantic key is the reference, not the number.** Where this document names a
+certainty level it names the key and gives the number parenthetically, because the
+numbers have already moved once.
 
 > **Note on level numbering.** The decision that motivated this RFC described this
 > floor as "L1". That matches Proof of Service **0.1.0**, where L1 was "Bilateral
-> verification". The extension renumbered at 0.2.0 and bilateral attestation is now
-> L2; 0.2.0's L1 is `asserted` (a single party). The requirement is unchanged —
+> verification". The extension renumbered at 0.2.0: bilateral attestation is now
+> L2, and 0.2.0's L1 is `asserted` (a single party). The requirement is unchanged —
 > bilateral confirmation at window close — only the label is current.
+>
+> This RFC therefore depends on the numbering staying put. Any subsequent revision
+> of the Proof of Service extension MUST treat the certainty levels as additive
+> only and MUST NOT renumber them while this reference stands.
 
 Richer floors are a per-vertical matter and belong to Evidence Profiles, not here.
 What this RFC asks of that extension is one thing: a period profile needs to
@@ -326,11 +376,18 @@ charge traces to a delivery.**
 > debt. Occurs 1:1 with a completed delivery — a session for
 > `kind: occurrence`, a closed window for `kind: period`.
 
-Neither edit changes the behavior of any conforming implementation: no
-implementation could have been relying on both readings, because they contradict
-each other. In effect these two are editorial; they are included in this RFC
-rather than filed as errata because patching them separately would decide this
-RFC's central question by accident.
+**Why this is editorial in effect.** The argument is one of scope, not of
+intent: the re-anchoring bites only on documents with `kind: period`, and no such
+document can exist before this RFC. For every delivery that exists today — all of
+them `occurrence` by §4.1 — both corrected paragraphs say exactly what the current
+text says and describe exactly the current behavior. No conforming implementation
+changes what it does, because the clause that changed does not reach any document
+it has ever produced or consumed.
+
+They are included in this RFC rather than filed as errata because patching them
+separately would decide this RFC's central question by accident: choosing which of
+the two contradicting texts to keep *is* choosing between route (a) and route (b)
+from §2.
 
 ---
 
@@ -423,8 +480,41 @@ No new entity, no new state, no new tool, no new extension.
 **Version negotiation.** Per RFC-001 §3.7 a v0.9/v0.10 client that does not
 understand `kind` needs no special handling, because ignoring it yields the
 correct legacy interpretation for every document that does not use it, and a
-defensible one for documents that do. No `Servicialo-Deprecated-Behavior` header
-and no downgrade mapping are required.
+readable one for documents that do. No `Servicialo-Deprecated-Behavior` header and
+no downgrade mapping are required.
+
+### 7.1 The cost this choice does buy, stated plainly
+
+Deriving `duration_minutes` rather than relaxing it (§4.3) keeps every period
+delivery a *valid, complete* document under the current schema — a legacy consumer
+reads it rather than rejecting it. That is the reason for the choice, and it has a
+price that this RFC does not hide:
+
+**A legacy consumer that aggregates `duration_minutes` will poison its own
+aggregates.** Utilization, capacity, average-session-length and provider-load
+metrics that sum or average the field across deliveries will absorb 44,640 minutes
+from a one-month retainer and 525,600 from an annual stand-by commitment. Nothing
+errors. The number is simply wrong, quietly, in a dashboard.
+
+Relaxing the field would have converted this into a loud failure (a missing
+required field) instead of a silent one — that is the honest counter-argument for
+alternative 10.2, and it is why the trade is stated here rather than buried. The
+choice stands because a rejected document is worse than a skewed metric: the
+rejection breaks the delivery record itself, which is the thing the Proof of
+Service depends on, while the metric is recoverable by anyone who reads `kind`.
+
+**Mitigation, and where it is enforced.** Every aggregate over `duration_minutes`
+MUST be conditioned on `kind`. Asking politely is not a mitigation, so it is
+anchored where it can be checked: the consumer conformance profile proposed for
+v1.0 — see
+[`docs/issue-templates/stress-test-v0.10/q11-consumer-conformance.md`](../docs/issue-templates/stress-test-v0.10/q11-consumer-conformance.md)
+— **MUST include a period delivery in its fixture set**, so that a consumer cannot
+claim the profile while treating `kind` as absent. That single fixture is what
+turns this paragraph from a warning into a requirement.
+
+Implementations SHOULD also expose period and occurrence deliveries as separately
+filterable in any listing surface, so the conditioning is easy rather than
+merely mandatory.
 
 **Deprecations.** None.
 
@@ -483,8 +573,15 @@ worth anything to a relying party.
 Cleaner semantically: a stand-ready obligation has no meaningful duration in
 minutes. Rejected on compatibility grounds (§4.3): relaxing a REQUIRED field
 breaks consumers that read it unconditionally, and the compatibility rules in
-§15.5 protect exactly that direction. Deriving it from the window costs one
-validation rule and breaks nobody.
+§15.5 protect exactly that direction. A period delivery would stop being a valid
+complete document under the current schema, so a legacy consumer would reject it
+outright rather than read it.
+
+The counter-argument deserves its due: relaxation would make the legacy failure
+*loud* (a missing required field) instead of silent (a skewed aggregate). §7.1
+states that cost and takes the trade anyway — a rejected delivery record is worse
+than a recoverable metric, because the record is what the Proof of Service is made
+of.
 
 ### 10.3 A new lifecycle state for "in force" — REJECTED
 
@@ -508,7 +605,30 @@ Covered in §5. Wrong layer.
 
 ---
 
-## 11. Open questions
+## 11. Promotion criteria and open questions
+
+### 11.1 Promotion from Draft to Accepted
+
+Not an open question — the repository's own governance answers it, and
+running-code-first is a criterion rather than a preference. This RFC is promoted
+when all three hold:
+
+1. **Process.** The comment window and Final Comment Period for a Minor RFC have
+   run per [RFC-001](RFC-001-rfc-process-and-deprecation-policy.md) §3.2 (2 weeks
+   + 1 week), and any formal objections under §3.10 are resolved.
+2. **Running code.** The reference implementation emits and consumes period
+   deliveries behind the version gate of RFC-001 §3.7 — declared in
+   `registry.manifest`, not shipped ahead of negotiation.
+3. **Verifiable.** A period delivery fixture is in the conformance corpus,
+   covering the two invariants JSON Schema cannot express (Annex A.4) and the
+   consumer-side conditioning required by §7.1.
+
+Criterion 2 is the one that matters for a Minor RFC per RFC-001 §3.2, which asks
+for reference-implementation evidence. Criterion 3 is what keeps the MUSTs in §4.2
+and §4.3 from becoming the kind of unverified requirement this repository already
+has one of (mandate scope enforcement, §10.5 — specified, unenforced, unchecked).
+
+### 11.2 Open questions
 
 1. **Overlapping period deliveries under one Order.** Two stand-by obligations
    with overlapping windows (e.g. a general retainer plus a project-specific
@@ -520,17 +640,21 @@ Covered in §5. Wrong layer.
    8 raised a related need — deliveries that reference each other ("corrects") —
    which suggests a general delivery-to-delivery relation rather than a
    renewal-specific field.
-3. **Window granularity and time zones.** `{start, end}` are instants, so a
-   "calendar month" is expressed as instants in some zone. Should the RFC require
-   an IANA zone alongside the window when the obligation is expressed in calendar
-   terms, or leave it to the parties?
-4. **Zero-consumption disclosure.** Should a period delivery carry an explicit
-   count of the occurrence deliveries recorded against the same Order within its
-   window, so a Proof of Service can state "held, zero call-outs" without the
-   reader joining? Derivable, but the dossier is exactly where derivation is
-   inconvenient.
-5. **Promotion criteria.** What evidence of adoption should gate this from Draft
-   to Accepted — one implementation emitting period deliveries, or two?
+3. **How a calendar obligation picks its instants.** Narrowed: the arithmetic over
+   `{start, end}` is fixed in §4.3.1 and is not open. What is open is the step
+   before it — when the parties agree on "the month of April", should the document
+   carry the IANA zone that turned that phrase into two instants, so a reader can
+   audit the conversion (and see why April 2026 in Santiago is 43,260 minutes),
+   or is the resulting instant pair sufficient on its own?
+4. **Zero-event disclosure.** Narrowed: for *consumption*, this answers itself —
+   the occurrence deliveries exist as objects (§4.8, Annex B.1), so a count is
+   derivable by anyone holding the Order. What remains open is the genuine
+   zero-event case, where the honest statement is an absence: should a period
+   delivery be able to assert "held, zero call-outs" explicitly, rather than
+   leaving a reader to conclude it from finding nothing? An absence is the one
+   thing a join cannot distinguish from a gap in the data.
+
+---
 
 ---
 
@@ -655,7 +779,31 @@ is `occurrence`, but JSON Schema `default` is annotation, not behavior — a
 validator does not inject it. The absent case therefore has to be matched
 explicitly, or a document with no `kind` and a stray `window` would validate.
 
-### A.4 What is deliberately not changed
+### A.4 The two invariants the schema cannot carry
+
+`§4.2` requires `scheduled_for == window.start`, and `§4.3` requires
+`duration_minutes == length(window)` per the arithmetic in §4.3.1. **Neither is
+expressible in JSON Schema 2020-12** (the draft these schemas declare): there is
+no cross-property comparison, and no arithmetic over `date-time` values.
+
+They are therefore not schema constraints, and this RFC does not pretend they are.
+**Both are verified in the conformance suite**, with fixtures in both directions:
+
+| Fixture | Expected |
+|---|---|
+| period, `scheduled_for == window.start` | accepted |
+| period, `scheduled_for != window.start` | rejected |
+| period, `duration_minutes` equal to the UTC-elapsed window length | accepted |
+| period, `duration_minutes` computed as `days × 1440` across a DST transition | rejected — this is the §4.3.1 trap, and it is the fixture that catches it |
+| period, `window.end` not after `window.start` | rejected |
+
+This is stated explicitly because the same repository already carries a MUST that
+nothing verifies (`§10.5` mandate scope enforcement, absent from the
+`certification.md` requirement→verification matrix). A new MUST without a named
+verification owner is how that happens; naming the owner here is the cost of
+adding one.
+
+### A.5 What is deliberately not changed
 
 | Not changed | Why |
 |---|---|
@@ -735,10 +883,15 @@ days of occupied calendar.
 
 **April — 14 hours. Ten included, four at the marginal rate.**
 
-One period delivery for the month, plus occurrence deliveries for the overage
-(§4.8). The included hours are consumption *of* the retainer and need no separate
-delivery unless the parties want each session recorded; the overage hours are
-separable acts and are occurrences.
+One period delivery for the month, **plus an occurrence delivery for every act**
+— the included ones and the overage ones alike. The guardrail in §4.7 does not
+have an exception for "already paid for": a call with counsel is a discrete
+separable act, so it is an occurrence whether it falls inside the ten included
+hours or beyond them. Folding the included hours into the period delivery's
+evidence would leave them with no object to present, which is precisely the
+criticism §5 makes of modeling a retainer as a CAC.
+
+What distinguishes included from overage is not the object — it is the amount.
 
 ```json
 [
@@ -747,48 +900,100 @@ separable acts and are occurrences.
     "service_order_id": "so_retainer_2026",
     "kind": "period",
     "name": "Priority availability retainer — April 2026",
-    "duration_minutes": 43200,
+    "duration_minutes": 43260,
     "schedule": {
       "requested_at": "2026-02-25T10:00:00-03:00",
       "scheduled_for": "2026-04-01T00:00:00-03:00",
-      "window": { "start": "2026-04-01T00:00:00-03:00", "end": "2026-05-01T00:00:00-03:00" }
+      "window": { "start": "2026-04-01T00:00:00-03:00", "end": "2026-05-01T00:00:00-04:00" }
     },
     "lifecycle": { "current_state": "documented" },
     "billing": { "amount": { "value": 800, "currency": "USD" }, "status": "invoiced" }
   },
+
   {
-    "id": "svc_apr_overage_1",
+    "id": "svc_apr_incl_1",
     "service_order_id": "so_retainer_2026",
     "kind": "occurrence",
-    "name": "Overage counsel — contract review",
-    "duration_minutes": 120,
-    "schedule": { "requested_at": "2026-04-18T08:00:00-03:00", "scheduled_for": "2026-04-18T14:00:00-03:00" },
+    "name": "Included counsel — employment policy review",
+    "duration_minutes": 240,
+    "schedule": { "requested_at": "2026-04-06T09:00:00-04:00", "scheduled_for": "2026-04-07T10:00:00-04:00" },
     "lifecycle": { "current_state": "documented" },
-    "proof": { "checkin": "2026-04-18T14:02:00-03:00", "checkout": "2026-04-18T16:00:00-03:00", "duration_actual": 118 },
-    "billing": { "amount": { "value": 300, "currency": "USD" }, "status": "invoiced" }
+    "proof": { "checkin": "2026-04-07T10:00:00-04:00", "checkout": "2026-04-07T14:00:00-04:00", "duration_actual": 240 },
+    "billing": { "amount": { "value": 0, "currency": "USD" }, "status": "pending" }
   },
   {
-    "id": "svc_apr_overage_2",
+    "id": "svc_apr_incl_2",
+    "service_order_id": "so_retainer_2026",
+    "kind": "occurrence",
+    "name": "Included counsel — lease renegotiation call",
+    "duration_minutes": 180,
+    "schedule": { "requested_at": "2026-04-13T11:20:00-04:00", "scheduled_for": "2026-04-14T09:00:00-04:00" },
+    "lifecycle": { "current_state": "documented" },
+    "proof": { "checkin": "2026-04-14T09:03:00-04:00", "checkout": "2026-04-14T12:00:00-04:00", "duration_actual": 177 },
+    "billing": { "amount": { "value": 0, "currency": "USD" }, "status": "pending" }
+  },
+  {
+    "id": "svc_apr_incl_3",
+    "service_order_id": "so_retainer_2026",
+    "kind": "occurrence",
+    "name": "Included counsel — board minutes review",
+    "duration_minutes": 180,
+    "schedule": { "requested_at": "2026-04-20T15:00:00-04:00", "scheduled_for": "2026-04-21T15:00:00-04:00" },
+    "lifecycle": { "current_state": "documented" },
+    "proof": { "checkin": "2026-04-21T15:00:00-04:00", "checkout": "2026-04-21T18:00:00-04:00", "duration_actual": 180 },
+    "billing": { "amount": { "value": 0, "currency": "USD" }, "status": "pending" }
+  },
+
+  {
+    "id": "svc_apr_over_1",
     "service_order_id": "so_retainer_2026",
     "kind": "occurrence",
     "name": "Overage counsel — supplier dispute",
     "duration_minutes": 120,
-    "schedule": { "requested_at": "2026-04-24T09:30:00-03:00", "scheduled_for": "2026-04-24T11:00:00-03:00" },
+    "schedule": { "requested_at": "2026-04-24T09:30:00-04:00", "scheduled_for": "2026-04-24T11:00:00-04:00" },
     "lifecycle": { "current_state": "documented" },
-    "proof": { "checkin": "2026-04-24T11:00:00-03:00", "checkout": "2026-04-24T13:05:00-03:00", "duration_actual": 125 },
+    "proof": { "checkin": "2026-04-24T11:00:00-04:00", "checkout": "2026-04-24T13:05:00-04:00", "duration_actual": 125 },
+    "billing": { "amount": { "value": 300, "currency": "USD" }, "status": "invoiced" }
+  },
+  {
+    "id": "svc_apr_over_2",
+    "service_order_id": "so_retainer_2026",
+    "kind": "occurrence",
+    "name": "Overage counsel — supplier dispute follow-up",
+    "duration_minutes": 120,
+    "schedule": { "requested_at": "2026-04-28T08:15:00-04:00", "scheduled_for": "2026-04-28T16:00:00-04:00" },
+    "lifecycle": { "current_state": "documented" },
+    "proof": { "checkin": "2026-04-28T16:00:00-04:00", "checkout": "2026-04-28T18:02:00-04:00", "duration_actual": 122 },
     "billing": { "amount": { "value": 300, "currency": "USD" }, "status": "invoiced" }
   }
 ]
 ```
 
-The April invoice of $1,400 decomposes into $800 against the period delivery and
-$600 against two occurrence deliveries. Every line traces to a delivery, and the
-two overage deliveries carry ordinary check-in/check-out evidence because they are
-ordinary acts.
+Ten included hours across three acts, four overage hours across two. The April
+invoice of $1,400 decomposes into $800 against the period delivery and $600
+against the two overage occurrences. The three included occurrences carry
+`amount: 0` — their economic value is in the retainer, and per `§4` the `billing`
+dimension of a delivery inside an Order is informative, not transactional. Every
+line of the invoice traces to a delivery; every act has an object that can be
+presented.
 
-Note what is *not* modeled: the ten included hours are not a quantity on the period
-delivery. They are the Order's `scope.hours_limit`, which already exists, and the
-ledger's `hours_consumed` already projects consumption against it (§8.2.5).
+`scope.hours_limit: 10` on the Order is what makes three of these "included" and
+two "overage", and `ledger.hours_consumed` projects the 14 consumed hours from the
+five occurrence deliveries (§8.2.5) — the period delivery contributes none, since
+availability is not consumption.
+
+**Note the window.** April 2026 in `America/Santiago` ends at `-04:00`, not
+`-03:00`, because the zone leaves DST on April 5. `duration_minutes` is therefore
+**43,260**, not the 43,200 that `30 × 1440` would give. This is the §4.3.1 case,
+and it is in the worked example on purpose: it is the arithmetic an implementer
+gets wrong first.
+
+**And note what this settles.** Open question 4 asks whether a period delivery
+should declare how much happened inside its window. For consumption it does not
+need to: the acts are objects, so the count and the hours are derivable by anyone
+holding the Order. Only the genuine zero-event case — B.2's maintenance contract in
+a quiet quarter — has nothing to derive from, which is why the question survives in
+narrowed form.
 
 ### B.2 Elevator maintenance contract — both kinds under one Order
 
@@ -840,25 +1045,36 @@ visits folded into its evidence. Then "was the Q3 preventive visit performed?" �
 question the building administrator actually asks, and the one a regulator asks
 after an incident — has no record to answer it.
 
-**Early termination (§4.6).** If the contract is cancelled on 2026-06-30:
+**Early termination (§4.6).** The contract is cancelled effective the end of June:
 
 ```diff
    { "id": "svc_sla_2026", "kind": "period",
      "duration_minutes": 525600,
 -    "lifecycle": { "current_state": "in_progress" },
 +    "lifecycle": { "current_state": "partial",
-+                   "exceptions": [ { "type": "cancellation", "at": "2026-06-30T23:59:59-04:00",
++                   "exceptions": [ { "type": "cancellation", "at": "2026-07-01T00:00:00-04:00",
 +                                     "initiated_by": "cli_edificio",
-+                                     "resolution": "Terminated by client with 30 days notice per clause 8." } ] },
++                                     "resolution": "Terminated by client with 30 days notice per clause 8. Prorated to two completed calendar quarters." } ] },
 -    "billing": { "amount": { "value": 2400000, "currency": "CLP" }, "status": "invoiced" } }
-+    "proof": { "duration_actual": 260640 },
++    "proof": { "duration_actual": 260700 },
 +    "billing": { "amount": { "value": 1200000, "currency": "CLP" }, "status": "invoiced" } }
 ```
 
-`duration_actual` is 181 days in minutes. The prorated amount is declared as half
-the annual price — which the parties agreed as "by completed calendar half", not
-as `260640 / 525600 = 49.6%`. That difference is exactly why §4.6 requires the
-proration to be declared rather than inferred.
+Two things this small diff carries.
+
+**The DST hour shows up again.** `duration_actual` is **260,700**, not the 260,640
+that `181 × 1440` would give — the obligation was in force across the April
+transition, so the elapsed minutes exceed the day count by 60. §4.3.1 governs
+`duration_actual` exactly as it governs `duration_minutes`, and this is the second
+place in one example where the naive multiplication is wrong.
+
+**The proration is declared, not derived.** The amount is half the annual price,
+because the parties agreed "by completed calendar quarter". The elapsed ratio is
+`260700 / 525600 = 49.6%`, which is close enough to look like the same answer and
+is not. §4.6 requires the declaration precisely so that a reader is never invited
+to reverse-engineer a commercial term from a duration — and this example is
+calibrated to show a case where doing so would land within half a percent of the
+truth and still be the wrong method.
 
 ---
 
