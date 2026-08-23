@@ -107,8 +107,9 @@ release.
 
 ## Sequencing
 
-Per the session plan this is the **next draft after RFC-005 (period deliveries)
-and Proof of Service 0.3.0**.
+Per the analysis that produced it, this is the **next draft after RFC-005 (period
+deliveries, [#21](https://github.com/servicialo/mcp-server/pull/21)) and Proof of
+Service 0.3.0 ([#22](https://github.com/servicialo/mcp-server/pull/22))**.
 
 ## Labels
 
