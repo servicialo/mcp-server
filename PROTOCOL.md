@@ -33,6 +33,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 7.  [Exception Flows](#7-exception-flows)
 8.  [Service Order](#8-service-order)
 9.  [Principles](#9-principles)
+    - 9.9 [Unilateral Exit and Record Portability](#99-unilateral-exit-and-record-portability)
 10. [Delegated Agency Model](#10-delegated-agency-model)
 11. [Agent Decision Model](#11-agent-decision-model)
 12. [Provider Profile & Discoverable Attributes](#12-provider-profile--discoverable-attributes)
@@ -91,7 +92,7 @@ Servicialo **is not**:
 - A platform (platforms implement it).
 - Owned by any single company.
 
-The philosophical argument — why the sovereignty of the record matters, and to whom — is stated in the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto). This document is its technical counterpart: what the protocol obliges, and what it leaves out.
+The philosophical argument — why the sovereignty of the record matters, and to whom — is stated in the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto). This document is its technical counterpart: what the protocol obliges (see [§9.9](#99-unilateral-exit-and-record-portability)), and what it leaves out.
 
 ---
 
@@ -718,6 +719,40 @@ Every evidence envelope MAY include a `data_sensitivity` field that classifies t
 The protocol does not prescribe specific regulatory frameworks. The `restricted` classification implies compliance with applicable jurisdiction-specific health or legal data regulations (e.g., Ley 20.584 in Chile, HIPAA in the US, LGPD in Brazil, NOM-024 in Mexico, GDPR in the EU).
 
 **MUST NOT:** The `clinical_record` evidence type in the health vertical MUST be classified as `restricted`. Implementations that downgrade this classification are non-compliant with the protocol.
+
+### 9.9 Unilateral Exit and Record Portability
+
+> **Status: normative intent, incomplete mechanism.** The guarantee stated in this section is normative. The export mechanism that would make it testable — operation surface, container format, consistency semantics — is **not yet specified**; the open design questions are listed at the end of the section and are tracked as `TODO(autor)` in the repository. No implementation, including the reference implementation, exposes a conformant export operation today. This section states an obligation the protocol intends to hold implementations to; it does not describe a capability that already exists.
+
+Node sovereignty is stated in [GOVERNANCE.md](./GOVERNANCE.md) as a property of the network: each implementation owns its operational data. Stated that way it is a policy of whoever operates the network, not an obligation of the protocol — and a sovereignty that depends on the goodwill of whoever runs the software is not sovereignty. This section makes it an obligation.
+
+**9.9.1 The guarantee.** An implementation MUST allow a node to export the complete record of its Service Orders, Service Deliveries, and Evidence Events, in a format conformant with the published schemas (`https://servicialo.com/schema/`).
+
+**9.9.2 No third-party gate.** Exercising the export MUST NOT require authorization, approval, or countersignature from any operator other than the exporting node itself. It MUST NOT require authorization from the resolver, the registry, or any network-intelligence service. Registration in the resolver and contribution of telemetry are OPTIONAL ([§14](#14-network-intelligence), GOVERNANCE.md); an implementation MUST NOT condition the export on either of them, and MUST NOT condition it on the node's continued participation in the network.
+
+**9.9.3 No commercial gate.** No outstanding balance, debt, or commercial dispute between the node and any operator — including the operator of the implementation the node runs on — MAY condition, delay, or degrade the export. An implementation MUST NOT withhold, truncate, throttle, or charge for the export on those grounds, and MUST NOT make it contingent on settling an account first.
+
+Suspending *service* over an unpaid balance is legitimate: an operator MAY stop accepting new bookings, close write access, or terminate the contract. Withholding the *record* is not. The distinction is the point of the section — a record that can be held hostage over an invoice is not the professional's record, whatever the commercial terms say. An implementation that is entitled to stop serving a node is still obliged to let that node leave with what it produced.
+
+**9.9.4 Conformance of the exported record.** The exported record MUST validate against the same schemas the implementation uses on the wire. An implementation MUST NOT satisfy this section with a format that only its own software can read: an export that requires the exporting implementation in order to be interpreted does not discharge the obligation.
+
+**9.9.5 Availability.** The export SHOULD be exercisable through a machine-readable binding the implementation already exposes for conformance ([§16](#16-implementations)), so that exercising it requires no privileged channel and no manual request to the operator.
+
+#### Open design questions
+
+The following are unresolved. They are listed rather than answered because each requires a design decision that the current draft does not determine, and answering them by inference would put invented normative text into the specification.
+
+- `TODO(autor)`: **Scope — does settlement belong in the export?** §9.9.1 covers agreements, deliveries, and evidence. Settlement Events are the fifth canonical object; including them makes the record complete for reconciliation, but drags in payment-processor references that may not be the node's to export.
+- `TODO(autor)`: **Who may exercise it.** *Design intent, not yet specified:* the guarantee is meant to reach the individual professional over the record of their own deliveries, even when they do not operate the node and never will. A right that only the node operator can exercise protects the platform's ability to switch vendors, not the professional's ownership of their own record — and the professional is who §9.9 exists for. What is undecided is how to grant it without breaking three things that cross it:
+  - *Bilateral evidence.* An Evidence Event can carry attestations from both provider and client. Exporting one party's record exports something the other party also participated in producing. Whether the professional's export carries the counterparty's attestation, a redacted form of it, or only their own side, is undecided.
+  - *Third-party data.* Health deliveries reference patients; the clinical record is not the professional's to take. [§9.8](#98-evidence-sensitivity-classification) classifies it `restricted` for that reason. The export has to distinguish *the professional's record of having delivered* from *the data produced inside the delivery*, and the current object model does not draw that line.
+  - *Authorization.* Who authenticates an individual-provider export against a node they do not administer, and how the node distinguishes it from a data-exfiltration attempt, is undecided.
+  This entry crosses the sensitivity question below; neither can be settled alone.
+- `TODO(autor)`: **Operation surface.** No tool, endpoint, or profile is defined. Whether this becomes an operation in an existing profile, a new profile, or an obligation with no wire surface at all, is undecided.
+- `TODO(autor)`: **Container format and consistency.** Whether the export is a stream of schema-conformant objects, an archive with a manifest, or a paginated read; and what consistency guarantee it carries (point-in-time snapshot vs. best-effort), is undecided.
+- `TODO(autor)`: **Binary evidence.** Evidence Events reference documents, photos, and signatures. Whether the export MUST include the referenced blobs, MAY include resolvable references, and for how long those references must resolve after export, is undecided.
+- `TODO(autor)`: **Sensitivity and data protection.** [§9.8](#98-evidence-sensitivity-classification) classifies `restricted` evidence with encryption, access-logging, and retention obligations. How those obligations travel with an exported record — and whether exporting `restricted` evidence requires additional controls — is undecided. Crosses "who may exercise it" above: the answer differs for a node exporting its own corpus and for an individual professional exporting their slice of it.
+- `TODO(autor)`: **Conformance integration.** This section states MUST-level requirements that are absent from the conformance list in [§16](#16-implementations). Until they are added there, no implementation is measured against them — and adding them changes what "conformant" means for the reference implementation, which exposes no export today. That decision is deferred to the author.
 
 ---
 

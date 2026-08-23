@@ -71,6 +71,8 @@ Data contributed to the network belongs to the protocol, not to any implementati
 
 Each implementation retains full ownership and control of its operational data. Contributing to the network is voluntary. Nodes can stop contributing at any time. Withdrawal removes access to network intelligence (contribute-to-access model).
 
+Stated here, this is a policy of whoever operates the network. Its normative counterpart — the obligation on every implementation to let a node take its complete record out, without authorization from any operator or from the registry, and without any commercial balance being allowed to gate it — is [PROTOCOL.md §9.9](./PROTOCOL.md#99-unilateral-exit-and-record-portability). That section is normative in intent and incomplete in mechanism: the export operation is not yet specified, and no implementation exposes one today.
+
 ### 3. Anonymity by design
 
 Individual records never leave a node. Only aggregate metrics — computed locally before transmission — flow to the protocol layer. Benchmark segments are suppressed below a minimum size of 5 contributing organizations (k-anonymity), enforced in the aggregation API, and raw operational events are not publicly readable — re-identification via the public data surface is closed. **Hardening in progress (2026-06):** the contributor fingerprint is still derived from a client-side salt; deriving it server-side from an authenticated node identity is on the roadmap. That is an integrity / anti-spoofing improvement, not a re-identification gap — stored fingerprints are not exposed through any public read path.

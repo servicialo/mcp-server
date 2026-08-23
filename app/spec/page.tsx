@@ -189,9 +189,11 @@ export default function SpecPage() {
           >
             manifiesto de Grupo Digitalo
           </a>
-. La portabilidad del registro es un principio del
-          protocolo; su especificación normativa está en desarrollo y todavía
-          no forma parte de este documento.
+. Donde ese valor se vuelve obligación, es{" "}
+          <a href="#salida-unilateral" className="text-accent hover:underline">
+            §10 — Salida unilateral
+          </a>
+          .
         </p>
       </PageHeader>
 
@@ -592,6 +594,16 @@ export default function SpecPage() {
             </a>
           </div>
         </div>
+        <div className="mt-4 text-[12px] text-text-muted leading-[1.7]">
+          <span className="font-semibold text-text">Todavía fuera de esta
+          tabla:</span>{" "}
+          <a href="#salida-unilateral" className="text-accent hover:underline">
+            §10 — Salida unilateral
+          </a>{" "}
+          enuncia requisitos MUST que están deliberadamente ausentes de la
+          lista. Incorporarlos cambia qué significa &ldquo;conforme&rdquo;,
+          incluida la implementación de referencia, que hoy no exporta.
+        </div>
       </SpecSection>
 
       {/* §9 Principios */}
@@ -618,6 +630,121 @@ export default function SpecPage() {
               </div>
             </div>
           ))}
+        </div>
+      </SpecSection>
+
+      {/* §10 Salida unilateral */}
+      <SpecSection
+        id="salida-unilateral"
+        num="§10 — Salida unilateral"
+        title="Portabilidad como garantía normativa"
+        subtitle="La soberanía del nodo estaba enunciada en la gobernanza como propiedad de la red — es decir, como política de quien la opera. PROTOCOL.md §9.9 la convierte en obligación del protocolo."
+      >
+        <div className="bg-surface rounded-none border border-border border-l-2 border-l-text p-5 mb-5">
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em]">
+              Intención normativa, mecanismo incompleto
+            </div>
+            <MaturityBadge maturity="draft" />
+          </div>
+          <div className="text-[13px] text-text-body leading-[1.7]">
+            La garantía es normativa. El mecanismo de exportación que la haría
+            verificable — superficie de operación, formato contenedor,
+            semántica de consistencia — <strong>no está especificado</strong>.
+            Ninguna implementación, incluida la de referencia, expone hoy una
+            operación de exportación conforme. Esta sección enuncia una
+            obligación que el protocolo pretende imponer; no describe una
+            capacidad que ya exista.
+          </div>
+        </div>
+
+        <ul className="list-none border-t border-border mb-5">
+          {[
+            {
+              rule: "MUST",
+              text: "Una implementación debe permitir que un nodo exporte el registro completo de sus Órdenes de Servicio, Entregas y Eventos de Evidencia, en formato conforme con los esquemas publicados.",
+            },
+            {
+              rule: "MUST NOT",
+              text: "Ejercer la exportación no puede requerir autorización, aprobación ni contrafirma de ningún operador distinto del nodo que exporta — ni del resolver, ni del registry, ni de ningún servicio de inteligencia de red.",
+            },
+            {
+              rule: "MUST NOT",
+              text: "La exportación no puede condicionarse al registro en el resolver, a la contribución de telemetría ni a la permanencia en la red: las tres son opcionales (§14).",
+            },
+            {
+              rule: "MUST NOT",
+              text: "Ningún saldo, deuda ni disputa comercial entre el nodo y cualquier operador puede condicionar, demorar ni degradar la exportación: no se puede retener, truncar, limitar ni cobrar por ella con ese fundamento. Suspender el servicio por una deuda es legítimo; retener el registro no lo es.",
+            },
+            {
+              rule: "MUST",
+              text: "El registro exportado debe validar contra los mismos esquemas que la implementación usa en el wire. Una exportación que requiere a la implementación que la emitió para poder interpretarse no cumple la obligación.",
+            },
+            {
+              rule: "SHOULD",
+              text: "La exportación debería ejercerse por un binding legible por máquinas que la implementación ya expone para conformidad — sin canal privilegiado ni solicitud manual al operador.",
+            },
+          ].map((item, i) => (
+            <li
+              key={i}
+              className="border-b border-border py-3.5 flex flex-col sm:flex-row sm:gap-5"
+            >
+              <span className="font-mono text-[11px] font-semibold text-accent uppercase tracking-[0.06em] sm:w-[86px] sm:shrink-0 mb-1 sm:mb-0">
+                {item.rule}
+              </span>
+              <span className="text-[13px] text-text-body leading-[1.7]">
+                {item.text}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="bg-surface-alt rounded-none border border-border p-5 mb-4">
+          <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
+            Intención de diseño, todavía sin especificar
+          </div>
+          <div className="text-[13px] text-text-body leading-[1.7]">
+            La garantía tiene que alcanzar al{" "}
+            <strong>profesional individual</strong> sobre el registro de sus
+            propias entregas, aunque no opere el nodo ni vaya a operarlo. Un
+            derecho que solo ejerce el operador protege la capacidad de la
+            plataforma de cambiar de proveedor, no la propiedad del
+            profesional sobre su registro — y el profesional es para quien
+            existe la sección. Lo que falta decidir es cómo otorgarlo sin
+            romper tres cosas que lo cruzan: la{" "}
+            <strong>evidencia bilateral</strong> (una atestación en la que
+            también participó la contraparte), los{" "}
+            <strong>datos de terceros</strong> (la ficha clínica de un
+            paciente no es del profesional, y §9.8 la clasifica{" "}
+            <code className="font-mono text-[12px]">restricted</code> por eso)
+            y la <strong>autorización</strong> de un export individual contra
+            un nodo que el profesional no administra.
+          </div>
+        </div>
+
+        <div className="bg-surface-alt rounded-none border border-border p-5">
+          <div className="font-mono text-[11px] font-semibold text-text-muted uppercase tracking-[0.08em] mb-2">
+            Preguntas abiertas
+          </div>
+          <div className="text-[13px] text-text-body leading-[1.7] mb-3">
+            Cada una requiere una decisión de diseño que el borrador actual no
+            determina, y se listan en vez de responderse: si los Eventos de
+            Liquidación entran en el alcance; la superficie de operación; el
+            formato contenedor y su garantía de consistencia; la evidencia
+            binaria; cómo viajan las obligaciones de{" "}
+            <code className="font-mono text-[12px]">data_sensitivity</code> con
+            un registro exportado; y si entra en la lista de conformidad de §16
+            — decisión que cambia qué significa &ldquo;conforme&rdquo; para la
+            implementación de referencia, que hoy no exporta.
+          </div>
+          <a
+            href={`${REPO}/blob/main/PROTOCOL.md#99-unilateral-exit-and-record-portability`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[11px] text-accent hover:underline"
+          >
+            PROTOCOL.md §9.9 — texto normativo y preguntas abiertas →
+          </a>
         </div>
       </SpecSection>
 

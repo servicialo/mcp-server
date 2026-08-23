@@ -67,15 +67,18 @@ export function PorQueSection() {
             esta está escrita. Si otra la define mejor, el resultado buscado
             igual se cumple.
           </p>
-          {/* Línea no normativa: enuncia el principio, no obliga. La cláusula
-              con lenguaje RFC 2119 se publica cuando exista el mecanismo que
-              la haga verificable, no antes. */}
           <p className="font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75]">
-            De ese argumento se sigue una consecuencia directa: la
-            portabilidad del registro es un principio del protocolo — si la
-            evidencia es del profesional, tiene que poder salir. Su
-            especificación normativa está en desarrollo y todavía no forma
-            parte del documento.
+            De ese argumento se sigue una consecuencia directa: si la
+            evidencia es del profesional, tiene que poder salir. Eso deja de
+            ser un valor y pasa a ser una obligación del protocolo en{" "}
+            <a
+              href="/spec#salida-unilateral"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              §10 — Salida unilateral
+            </a>
+            : ningún operador, ni el registry, ni un saldo pendiente pueden
+            condicionar la salida del registro.
           </p>
         </div>
       </div>

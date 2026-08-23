@@ -81,9 +81,10 @@ export function FueraDeAlcanceSection() {
         >
           PROTOCOL.md §1.2
         </a>
-. Lo que sí obliga el protocolo está en la{" "}
+. Lo que sí obliga el protocolo — incluida la salida unilateral del
+        registro — está en la{" "}
         <a
-          href="/spec"
+          href="/spec#salida-unilateral"
           className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
         >
           especificación

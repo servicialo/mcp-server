@@ -6,6 +6,8 @@ MCP and A2A define how agents connect. Servicialo defines what it means to coord
 
 Out of scope (PROTOCOL.md §1.2): Servicialo is not a marketplace (it does not intermediate the commercial relationship), not a payment rail (it models settlement states, moves no money), not a scheduling product (it defines availability and commitment semantics, not the calendar), not an identity system (it carries an attribute, its origin and who verified it — it does not certify it), and not a transport (it composes with MCP, A2A, and HTTP).
 
+Unilateral exit (PROTOCOL.md §9.9, normative intent / incomplete mechanism): an implementation MUST let a node export the complete record of its Service Orders, Service Deliveries, and Evidence Events in schema-conformant form, without authorization from any operator, the resolver, or the registry, and with no commercial balance allowed to gate it — suspending service over an unpaid balance is legitimate, withholding the record is not. The export operation itself is not yet specified and no implementation exposes one today; the open design questions are listed in §9.9.
+
 The protocol models every service through 8 dimensions and a 6+3 lifecycle (6 core states required, 3 financial states optional), with 6 exception flows. The 9-milestone sequence below is the happy-path view; delivery, evidence, acceptance, and settlement have no total order across them — each retains its own lifecycle:
 
 Happy path: Requested → Scheduled → Confirmed → In Progress → Completed → Documented → (optional) Invoiced → Collected → Verified

@@ -244,6 +244,8 @@ From PROTOCOL.md §16. To be listed as a compatible Servicialo implementation:
 | 7 | Implement Provider Profiles | §12 | No |
 | 8 | Contribute to Network Intelligence | §14 | No |
 
+> **Not in this table yet:** [§8 Unilateral Exit](#8-unilateral-exit-and-record-portability) states MUST-level requirements that are deliberately absent from this list. Adding them changes what "conformant" means — including for the reference implementation, which exposes no export today. See the open questions in PROTOCOL.md §9.9.
+
 ---
 
 ## 7. API Surface
@@ -338,6 +340,23 @@ Registration attempts that fail this check MUST return HTTP 422 with error code 
 
 ---
 
+## 8. Unilateral Exit and Record Portability
+
+> **Status: normative intent, incomplete mechanism.** The guarantee is normative; the export mechanism that would make it testable is not yet specified. Full text and the list of open design questions: [PROTOCOL.md §9.9](./PROTOCOL.md#99-unilateral-exit-and-record-portability). No implementation, including the reference implementation, exposes a conformant export operation today.
+
+Node sovereignty is stated in [GOVERNANCE.md](./GOVERNANCE.md) as a property of the network. This section makes it an obligation of the protocol.
+
+- An implementation **MUST** allow a node to export the complete record of its Service Orders, Service Deliveries, and Evidence Events, in a format conformant with the published schemas.
+- Exercising the export **MUST NOT** require authorization, approval, or countersignature from any operator other than the exporting node itself, nor from the resolver, the registry, or any network-intelligence service.
+- An implementation **MUST NOT** condition the export on registration in the resolver, on telemetry contribution, or on continued participation in the network (all three are OPTIONAL — §14).
+- No outstanding balance, debt, or commercial dispute between the node and any operator **MAY** condition, delay, or degrade the export; an implementation **MUST NOT** withhold, truncate, throttle, or charge for it on those grounds. Suspending service over an unpaid balance is legitimate; withholding the record is not.
+- The exported record **MUST** validate against the same schemas the implementation uses on the wire. An export that requires the exporting implementation in order to be interpreted does not discharge the obligation.
+- The export **SHOULD** be exercisable through a machine-readable binding the implementation already exposes for conformance — no privileged channel, no manual request to the operator.
+
+Unresolved (each requires a design decision, tracked as `TODO(autor)` in PROTOCOL.md §9.9): whether Settlement Events are in scope; how the guarantee reaches the individual professional over the record of their own deliveries when they do not operate the node — the design intent — without breaking bilateral evidence, third-party data, or authorization; the operation surface; the container format and its consistency guarantee; binary evidence; how `data_sensitivity` obligations travel with an exported record; and whether it enters the conformance list in §16.
+
+---
+
 > Governance, data policy, and network neutrality: [GOVERNANCE.md](./GOVERNANCE.md) ([canonical](https://servicialo.com/governance))
 >
-> Why the sovereignty of the record matters, and to whom: the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto) is the philosophical argument; this document and [PROTOCOL.md](./PROTOCOL.md) are the technical counterpart. Record portability is a principle of the protocol; its normative specification is in development and is not yet part of this document.
+> Why the sovereignty of the record matters, and to whom: the [Grupo Digitalo manifesto](https://grupodigitalo.com/manifiesto) is the philosophical argument; this document and [PROTOCOL.md](./PROTOCOL.md) are the technical counterpart — §8 above is where that value becomes an obligation.
