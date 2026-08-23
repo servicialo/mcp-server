@@ -10,6 +10,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { createAdapter, type ServicialoAdapter } from './adapter.js';
 import { detectMode } from './mode.js';
 import { loadEmitterContext } from './telemetry/operational.js';
+import { resolveIdentity, hasIdentity } from './identity.js';
+import { printStartupNotices } from './notices.js';
 import { dispatchOperationalTelemetry } from './telemetry/dispatch.js';
 import type { z } from 'zod';
 
@@ -189,8 +191,16 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
+  const telemetryEnabled = process.env.SERVICIALO_TELEMETRY?.toLowerCase() !== 'false';
+
+  // --- Startup notices (stderr only — stdout carries JSON-RPC) ---
+  printStartupNotices({
+    telemetryEnabled,
+    identified: hasIdentity(),
+  });
+
   // --- Telemetry (fire-and-forget, respects SERVICIALO_TELEMETRY=false) ---
-  if (process.env.SERVICIALO_TELEMETRY?.toLowerCase() !== 'false') {
+  if (telemetryEnabled) {
     // 1. Persistent node_id: read or create ~/.servicialo/node_id
     let nodeId: string | undefined;
     const servicialoDir = join(homedir(), '.servicialo');
@@ -215,7 +225,7 @@ async function main() {
         console.error(
           '\n  Servicialo sends anonymous usage telemetry (node_id + version).\n' +
           '  To opt out, set SERVICIALO_TELEMETRY=false\n' +
-          '  Details: https://servicialo.com/docs/telemetry\n',
+          '  Details: https://servicialo.com/network\n',
         );
         try {
           mkdirSync(servicialoDir, { recursive: true });
@@ -226,11 +236,11 @@ async function main() {
       // Non-critical — proceed without notice
     }
 
-    // 2. Anonymous telemetry instance registration
-    // Optional identity: operators can set these env vars to identify their implementation
-    const implName = process.env.SERVICIALO_IMPL_NAME;
-    const implUrl = process.env.SERVICIALO_IMPL_URL;
-    const implContact = process.env.SERVICIALO_IMPL_CONTACT;
+    // 2. Telemetry instance registration
+    // Optional identity: operators can set SERVICIALO_IMPL_NAME / _URL / _CONTACT to
+    // identify their implementation. The contact email is hashed here, on this host —
+    // only the digest is included below. Unset variables contribute nothing.
+    const identity = resolveIdentity();
 
     fetch('https://servicialo.com/api/telemetry/instance', {
       method: 'POST',
@@ -240,9 +250,7 @@ async function main() {
         version: pkg.version,
         node_id: nodeId,
         ts: Date.now(),
-        ...(implName ? { impl_name: implName } : {}),
-        ...(implUrl ? { impl_url: implUrl } : {}),
-        ...(implContact ? { impl_contact: implContact } : {}),
+        ...identity,
       }),
     }).catch(() => {});
 

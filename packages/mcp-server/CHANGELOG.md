@@ -6,6 +6,96 @@ For protocol-level changes (new schemas, new endpoints, governance), see the [ro
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning is independent of the protocol's SemVer.
 
+## [0.9.14] - 2026-08-23
+
+Outreach patch. **No wire changes** — no protocol, tool, enum or header change, and
+in particular the resolver version header is untouched (see
+[#33](https://github.com/servicialo/mcp-server/issues/33)). For a node that sets
+nothing, the only difference is two lines on stderr.
+
+The reason for shipping it: the network is ~139 hosts across 21 countries and every
+one of them is anonymous, so the artifact they already run is the only channel that
+reaches them. The vocabulary migration plan reached the same conclusion from the other
+direction — in-band signals are *"the only channel with full reach"*.
+
+### Road to 1.0
+
+**RFC-005 (period deliveries) is open for comment through 2026-09-06**, with the final
+comment period through 2026-09-13. Three entry points, by what you build:
+
+- **Platform implementers** — [RFC-005 (#21)](https://github.com/servicialo/mcp-server/pull/21):
+  `kind: occurrence | period` on the Delivery, so a retainer month with zero consumed
+  hours is a delivery rather than an absence.
+- **Agent developers** — [#30](https://github.com/servicialo/mcp-server/issues/30): a
+  consumer conformance profile. The MUST already exists in `§10.5`/`§10.7`; the profile
+  that would let a caller declare it does not.
+- **Contributors** — [#33](https://github.com/servicialo/mcp-server/issues/33)
+  (`help wanted`): version negotiation and the deprecation envelope. Design already
+  decided by RFC-001, acceptance criteria mechanical, two v1.0 changes blocked behind it.
+
+Full announcement, including how the cohort was reviewed and audited:
+[`docs/announcements/2026-08-rfc-005-window.md`](https://github.com/servicialo/mcp-server/blob/main/docs/announcements/2026-08-rfc-005-window.md).
+
+### Added
+
+- **Startup notices on stderr** (`src/notices.ts`), printed once per process: the open
+  RFC comment window, and — for a node that has not identified itself — how to. The
+  window notice carries its own expiry and stops printing after 2026-09-13, so a host
+  installing in October is not greeted by a dead announcement.
+- **`SERVICIALO_QUIET`** silences both notices. It affects only these two; the mode
+  banner and the first-run telemetry notice keep their existing behavior.
+- **`src/__tests__/stdout-purity.test.ts`** — spawns the *built* server, sends
+  `initialize`, and asserts the first bytes on stdout are a JSON-RPC message while the
+  notices land on stderr. stdout is the protocol channel; anything else written there
+  corrupts the stream for every client, and that guarantee now has a test instead of a
+  convention.
+
+### Changed
+
+- **The contact email is hashed on the operator's host** (`src/identity.ts`). The ping
+  now carries `impl_contact_hash` — SHA-256 of the lowercased, trimmed address — and
+  never `impl_contact`. Previously the raw address was transmitted and hashed
+  server-side, so the plaintext email left the machine. It no longer does.
+  The ingest endpoint accepts both, with identical normalization, so a digest computed
+  on the host matches one computed for a pre-0.9.14 client; the raw-email path is
+  marked deprecated-for-removal.
+- **The publish pipeline runs the suite before publishing.** `publish-mcp-server.yml`
+  gains a `test` job (`tsc --noEmit` + `npm test`) that the publish job depends on.
+  This release's central guarantee lives in a test; a pipeline that publishes without
+  running it could ship a corrupted stdout stream to every installed host.
+- `vitest.config.ts` excludes `dist/**`, so the compiled copy of the suite no longer
+  runs alongside the source copy.
+
+### Fixed
+
+- `servicialo.com/docs/telemetry` is not a route and never resolved. The three
+  references to it — both READMEs and the first-run telemetry notice on stderr — now
+  point at [servicialo.com/network](https://servicialo.com/network), which documents
+  what the ping reports and that it is optional.
+
+### Docs
+
+- README (ES + EN): **"Identify your node" / "Identifica tu nodo"** replaces the old
+  verified-implementor section. It states per variable exactly what leaves the host —
+  name and URL in plain text, contact as a digest only — the
+  `anonymous → pending → verified` cycle, how to stop sending it, and what the contact
+  hash is *not*: a one-way digest is not a channel, and setting it subscribes you to
+  nothing.
+- README (ES + EN): new "Startup notices" section documenting both notices and
+  `SERVICIALO_QUIET`.
+- README (ES + EN): `benchmark.weekly_snapshot` documented as an adjacent capability
+  with its real prerequisite — a registry entry and an explicit Webhooks API
+  subscription. The three identity variables do not enable it, and it delivers
+  benchmark data, not protocol announcements.
+- `.env.example`: documents `SERVICIALO_QUIET` and where the contact hashing happens.
+
+### Notes
+
+- No tool surface change: still 40 tools (15 public + 25 authenticated).
+- Identification stays strictly opt-in. No new telemetry, no change to ping frequency,
+  no additional tracking. A node that sets none of the three variables sends exactly
+  what it sent in 0.9.13.
+
 ## [0.9.13] - 2026-08-01
 
 Sync release. No tool surface changes, no wire changes. The 2026-08 repo

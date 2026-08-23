@@ -540,7 +540,7 @@ O en la configuración MCP:
 }
 ```
 
-Más detalles: [servicialo.com/docs/telemetry](https://servicialo.com/docs/telemetry)
+Más detalles: [servicialo.com/network](https://servicialo.com/network)
 
 ## Únete a la red
 
@@ -548,19 +548,64 @@ Al instalar `@servicialo/mcp-server`, tu nodo se registra automáticamente en la
 
 La telemetría reporta únicamente: versión del paquete, un UUID de nodo persistente, y un hash de IP (para geolocalización aproximada — no almacenamos IPs). Puedes desactivarla en cualquier momento con `SERVICIALO_TELEMETRY=false`.
 
-## Verificación de implementador
+## Avisos de arranque
 
-Si operas una implementación propia del protocolo, puedes identificar tu nodo y solicitar el estatus de **implementador verificado**. Configura estas variables de entorno opcionales:
+El servidor escribe dos avisos informativos en **stderr** — nunca en stdout, que transporta JSON-RPC y se corrompe con cualquier otra cosa:
 
-```bash
-SERVICIALO_IMPL_NAME="Mi Plataforma"    # Nombre de tu implementación
-SERVICIALO_IMPL_URL="https://example.com" # Tu sitio web o repositorio
-SERVICIALO_IMPL_CONTACT="admin@example.com" # Email de contacto (hasheado, nunca se muestra)
+- **La ventana de comentarios de RFC-005**, mientras siga abierta. Tiene la expiración incorporada: deja de imprimirse después del 2026-09-13, el cierre del período final de comentarios. Un nodo instalado en octubre no ve un anuncio muerto.
+- **Si tu nodo es anónimo**, cómo identificarlo (abajo).
+
+Ambos se imprimen una vez por proceso y se silencian con `SERVICIALO_QUIET=true`:
+
+```json
+{
+  "env": {
+    "SERVICIALO_QUIET": "true"
+  }
+}
 ```
 
-Cuando un nuevo `IMPL_NAME` aparece por primera vez, el equipo de Servicialo recibe una notificación y revisa manualmente. Una vez verificado, tu implementación aparece en [servicialo.com/implementors](https://servicialo.com/implementors) con un badge de verificado.
+Esa variable afecta **solo a estos dos avisos**. El banner de modo y el aviso de primera ejecución de telemetría mantienen su comportamiento anterior.
 
-Si no configuras estas variables, tu nodo permanece completamente anónimo — sin cambios en el comportamiento.
+## Identifica tu nodo
+
+Por defecto tu nodo es anónimo: el ping lleva evento, versión, `node_id` y timestamp, nada más. Si operas una implementación propia del protocolo, estas tres variables opcionales la identifican y la postulan a **implementador verificado**:
+
+```bash
+SERVICIALO_IMPL_NAME="Mi Plataforma"        # Nombre de tu implementación
+SERVICIALO_IMPL_URL="https://example.com"   # Tu sitio web o repositorio
+SERVICIALO_IMPL_CONTACT="admin@example.com" # Email de contacto — se hashea antes de salir
+```
+
+### Qué sale de tu máquina bajo cada variable
+
+| Variable | Qué viaja | Qué no viaja |
+|---|---|---|
+| `SERVICIALO_IMPL_NAME` | El nombre en texto plano, como `impl_name`. Es público: se muestra en `/implementors` una vez verificado. | — |
+| `SERVICIALO_IMPL_URL` | La URL en texto plano, como `impl_url`. También pública una vez verificada. | — |
+| `SERVICIALO_IMPL_CONTACT` | Únicamente `impl_contact_hash`: el SHA-256 del email en minúsculas y sin espacios, calculado **en tu máquina** antes de cualquier petición de red. | El email. No sale del host, no se loguea, no se almacena y no se muestra en ninguna parte. |
+
+Sin variables configuradas, ninguno de estos campos aparece en el ping. Un nodo sin configurar se comporta exactamente igual que antes de esta versión.
+
+### El ciclo de verificación
+
+`anonymous` → `pending` → `verified`
+
+1. **`anonymous`** — sin variables configuradas. Es el estado por defecto, y un nodo anónimo es plenamente conforme.
+2. **`pending`** — la primera vez que aparece un `impl_name` nuevo, el registro queda pendiente y el equipo recibe una notificación con el nombre, la URL y el país. El hash de contacto no va en esa notificación, y no podría ir: no serviría de nada.
+3. **`verified`** — tras revisión manual contra la checklist de conformance, tu implementación aparece en [servicialo.com/implementors](https://servicialo.com/implementors) con su nivel y el número de hosts que reporta.
+
+La verificación es manual hoy. La suite automatizada de conformance está en el roadmap; no es una capacidad actual.
+
+**Para qué sirve el hash de contacto — y para qué no.** Es un digest de una sola vía: nadie puede escribirte a partir de él, y configurarlo no te suscribe a ningún anuncio ni lista. Sirve para lo contrario: cuando *vos* escribís sobre tu implementación, el hash de tu email confirma que sos el operador que envió esos pings.
+
+### Cómo dejar de enviarlo
+
+Elimina las variables de tu configuración MCP (o `unset SERVICIALO_IMPL_NAME SERVICIALO_IMPL_URL SERVICIALO_IMPL_CONTACT`) y reinicia el servidor. El siguiente ping vuelve a ser anónimo, sin ningún campo de identidad. Los pings ya enviados conservan lo que enviaron; para pedir la eliminación de registros existentes, abre un issue en el [repositorio](https://github.com/servicialo/mcp-server/issues).
+
+### Capacidad adyacente: snapshots semanales
+
+El registry emite `benchmark.weekly_snapshot` cada lunes a las 00:00 UTC hacia los endpoints suscritos, con payload firmado por HMAC-SHA256. **Estas tres variables no lo activan.** Requiere una entrada en el registry y una suscripción explícita vía la [Webhooks API](https://github.com/servicialo/mcp-server/blob/main/WEBHOOKS.md), y entrega datos de benchmarks, no anuncios del protocolo.
 
 ## Licencia
 
