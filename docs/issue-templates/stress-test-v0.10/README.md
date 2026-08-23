@@ -153,12 +153,36 @@ grep -rnE '\{\{' docs/issue-templates/stress-test-v0.10/
 
 A leaked token in a public issue is exactly the failure a one-line check prevents.
 
-## Publication
+## Published
 
-Nothing here is published yet. When it is: one issue per file, body verbatim below
-the frontmatter, title from the frontmatter `title` field. The two drafts go as
-separate pull requests — one RFC, one PR, per the convention in
-[`rfcs/README.md`](https://github.com/servicialo/mcp-server/pull/13).
+Published 2026-08-23. Every body in this directory is now live; the files are
+kept as the source of record and match what was posted, minus the Claude Code
+attribution footer that GitHub posts carry.
+
+| # | File | Published as |
+|:-:|------|--------------|
+| 1 | [`q05-order-amendment.md`](q05-order-amendment.md) | [#25](https://github.com/servicialo/mcp-server/issues/25) |
+| 2 | [`q06-settlement-holdback.md`](q06-settlement-holdback.md) | [#26](https://github.com/servicialo/mcp-server/issues/26) |
+| 3 | [`q08-pricing-units-tiers.md`](q08-pricing-units-tiers.md) | [#27](https://github.com/servicialo/mcp-server/issues/27) |
+| 4 | [`q09-evidence-shared-artifacts.md`](q09-evidence-shared-artifacts.md) | [#28](https://github.com/servicialo/mcp-server/issues/28) |
+| 5 | [`q10-acceptance-authority.md`](q10-acceptance-authority.md) | [#29](https://github.com/servicialo/mcp-server/issues/29) |
+| 6 | [`q11-consumer-conformance.md`](q11-consumer-conformance.md) | [#30](https://github.com/servicialo/mcp-server/issues/30) |
+| 7 | [`q12-settlement-allocation.md`](q12-settlement-allocation.md) | [#31](https://github.com/servicialo/mcp-server/issues/31) |
+| 8 | [`q12b-chargeback-terminal-state.md`](q12b-chargeback-terminal-state.md) | [#32](https://github.com/servicialo/mcp-server/issues/32) |
+| 9 | [`q13-version-negotiation-and-deprecation-envelope.md`](q13-version-negotiation-and-deprecation-envelope.md) | [#33](https://github.com/servicialo/mcp-server/issues/33) |
+| 10 | [`doc-fixes.md`](doc-fixes.md) | [#34](https://github.com/servicialo/mcp-server/issues/34) |
+| — | [`comment-on-issue-7-external-origin.md`](comment-on-issue-7-external-origin.md) | [comment on #7](https://github.com/servicialo/mcp-server/issues/7#issuecomment-5387629082) |
+
+Sibling pull requests from the same analysis:
+[#21](https://github.com/servicialo/mcp-server/pull/21) (RFC-005),
+[#22](https://github.com/servicialo/mcp-server/pull/22) (Proof of Service 0.3.0),
+[#23](https://github.com/servicialo/mcp-server/pull/23) (vocabulary migration
+plan). This directory arrived in
+[#24](https://github.com/servicialo/mcp-server/pull/24).
+
+All double-brace tokens are resolved; the gate returns clean. Should another
+cohort reuse this directory's conventions, the citation rule and the gate above
+still apply.
 
 ---
 

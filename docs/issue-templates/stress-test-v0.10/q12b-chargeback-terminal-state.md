@@ -144,9 +144,10 @@ Two things worth stating normatively in whichever change lands:
 - [RFC-003](https://github.com/servicialo/mcp-server/pull/13) — owns the enum being
   extended.
 - Sibling settlement questions from the same case: allocation of Order-level
-  amounts across deliveries, and conditional holdback (Case 2) — a forfeited
-  holdback has the same "where does it terminate" problem.
-- **Vocabulary migration plan** ({{PR_D}}) — the `delivered`/`charged` divergence
+  amounts across deliveries ([#31](https://github.com/servicialo/mcp-server/issues/31)),
+  and conditional holdback ([#26](https://github.com/servicialo/mcp-server/issues/26))
+  — a forfeited holdback has the same "where does it terminate" problem.
+- **Vocabulary migration plan** ([PR #23](https://github.com/servicialo/mcp-server/pull/23)) — the `delivered`/`charged` divergence
   tracked in `protocol/manifest.yaml` under
   `state_machines.service_lifecycle.reference_implementation_divergence` touches the
   same enum. That plan already schedules this issue's addition into a single

@@ -48,7 +48,8 @@ window — `services_verified` unchanged, `amount_billed` unchanged,
 
 ## 2. `§10.5` cites v0.9 compliance inside a v0.10 document
 
-**Where it came from:** verifying question 11 (consumer conformance).
+**Where it came from:** verifying question 11 (consumer conformance,
+[#30](https://github.com/servicialo/mcp-server/issues/30)).
 
 **What it says:** *"Any implementation claiming Servicialo v0.9 compliance MUST
 enforce these rules"* — in `PROTOCOL.md`, whose header table reads
@@ -77,8 +78,9 @@ isolated typo but one surface of the `delivered`/`charged` vs
 `completed`/`invoiced`/`collected` divergence tracked in
 `protocol/manifest.yaml` under
 `state_machines.service_lifecycle.reference_implementation_divergence`, and it
-belongs to the vocabulary migration plan rather than to a docs pass. Fixing it
-alone would make the mapping table correct and the tool enum still wrong.
+belongs to the vocabulary migration plan
+([PR #23](https://github.com/servicialo/mcp-server/pull/23)) rather than to a docs
+pass. Fixing it alone would make the mapping table correct and the tool enum still wrong.
 
 ## Labels
 

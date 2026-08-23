@@ -8,7 +8,7 @@ assignees: ''
 
 ## Context
 
-Surfaced while drafting the vocabulary migration plan ({{PR_D}}) from the
+Surfaced while drafting the vocabulary migration plan ([PR #23](https://github.com/servicialo/mcp-server/pull/23)) from the
 [v0.10 case stress test](https://github.com/servicialo/mcp-server/blob/main/docs/servicialo-stress-test-casos.md).
 
 [RFC-001](https://github.com/servicialo/mcp-server/pull/13) specifies version
@@ -29,7 +29,7 @@ change:
   breaking change, and mitigates it thus: *"Implementations MUST emit the new
   values only when the client has indicated v1.0 support via version negotiation
   (RFC-001 §3.7)."*
-- **The vocabulary migration** ({{PR_D}}) selects legacy or canonical lifecycle
+- **The vocabulary migration** ([PR #23](https://github.com/servicialo/mcp-server/pull/23)) selects legacy or canonical lifecycle
   vocabulary by negotiated version throughout its two-minor dual-behavior window.
 
 Neither can ship as specified. Both would either break v0.x clients or quietly
