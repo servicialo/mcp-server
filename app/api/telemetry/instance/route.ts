@@ -132,6 +132,25 @@ async function checkRateLimit(ipHash: string): Promise<boolean> {
  * Server-side: resolves the request IP to country-level geolocation.
  * Never stores city, region, or the IP itself.
  */
+/** SHA-256 as lowercase hex. */
+async function sha256Hex(value: string): Promise<string> {
+  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/**
+ * Accept a client-computed digest only if it is shaped like one: 64 lowercase
+ * hex characters. Anything else is a malformed or hand-crafted value and is
+ * ignored rather than stored.
+ */
+function sanitizeContactHash(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase();
+  return /^[0-9a-f]{64}$/.test(normalized) ? normalized : null;
+}
+
 export async function POST(request: Request) {
   if (!REGISTRY_URL || !REGISTRY_KEY) {
     return NextResponse.json({ ok: true }, { headers: CORS_HEADERS });
@@ -140,14 +159,31 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { event, version, node_id, ts, impl_name, impl_url, impl_contact } = body as {
+    const {
+      event,
+      version,
+      node_id,
+      ts,
+      impl_name,
+      impl_url,
+      impl_contact,
+      impl_contact_hash,
+    } = body as {
       event?: string;
       version?: string;
       node_id?: string;
       ts?: number;
       impl_name?: string;
       impl_url?: string;
+      /**
+       * DEPRECATED-FOR-REMOVAL. Raw contact email, sent by clients 0.9.10–0.9.13,
+       * which had no client-side hashing. Hashed on arrival and discarded — never
+       * logged, never persisted, never echoed. Remove this field once those
+       * versions have aged out of the network; `impl_contact_hash` replaces it.
+       */
       impl_contact?: string;
+      /** SHA-256 of the normalized contact, computed on the host. Clients >= 0.9.14. */
+      impl_contact_hash?: string;
     };
 
     if (!event || !version || !ts) {
@@ -174,14 +210,17 @@ export async function POST(request: Request) {
 
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
-    // Hash contact email if provided (never store raw)
-    let implContactHash: string | null = null;
-    if (impl_contact) {
-      const contactEncoded = new TextEncoder().encode(impl_contact.toLowerCase().trim());
-      const contactHashBuffer = await crypto.subtle.digest('SHA-256', contactEncoded);
-      implContactHash = Array.from(new Uint8Array(contactHashBuffer))
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('');
+    // Contact digest. Two paths converge on the same value:
+    //   - Clients >= 0.9.14 hash on the operator's host and send `impl_contact_hash`.
+    //     The raw email never leaves that machine.
+    //   - Clients 0.9.10–0.9.13 send the raw email. DEPRECATED-FOR-REMOVAL: it is
+    //     hashed here and the raw value is dropped on the spot — it is not logged,
+    //     not persisted, and not included in the implementor notification below.
+    // Both use the same normalization (lowercase + trim), so the same operator
+    // produces the same digest before and after upgrading.
+    let implContactHash: string | null = sanitizeContactHash(impl_contact_hash);
+    if (!implContactHash && impl_contact) {
+      implContactHash = await sha256Hex(impl_contact.toLowerCase().trim());
     }
 
     // Determine verification_status for identified nodes

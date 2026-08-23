@@ -8,7 +8,32 @@ on:
       - '.github/workflows/publish-mcp-server.yml'
 
 jobs:
+  # Gate: nothing reaches npm without the suite passing first.
+  # 0.9.14's central guarantee — stdout carries JSON-RPC and nothing else —
+  # lives in src/__tests__/stdout-purity.test.ts. A pipeline that publishes
+  # without running it can ship a corrupted stream to every installed host.
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: packages/mcp-server
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - run: npm install --no-audit --no-fund
+      - name: TypeScript check
+        run: npx tsc --noEmit
+      - name: Test suite
+        run: npm test
+
   publish:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       id-token: write

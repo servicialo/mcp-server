@@ -524,7 +524,7 @@ Or in MCP configuration:
 }
 ```
 
-More details: [servicialo.com/docs/telemetry](https://servicialo.com/docs/telemetry)
+More details: [servicialo.com/network](https://servicialo.com/network)
 
 ## Join the network
 
@@ -532,19 +532,64 @@ When you install `@servicialo/mcp-server`, your node automatically registers wit
 
 Telemetry reports only: package version, a persistent node UUID, and an IP hash (for approximate geolocation — IPs are not stored). You can disable it at any time with `SERVICIALO_TELEMETRY=false`.
 
-## Verified implementor
+## Startup notices
 
-If you operate your own implementation of the protocol, you can identify your node and apply for **verified implementor** status. Set these optional environment variables:
+The server writes two informational notices to **stderr** — never to stdout, which carries JSON-RPC and is corrupted by anything else:
 
-```bash
-SERVICIALO_IMPL_NAME="My Platform"         # Name of your implementation
-SERVICIALO_IMPL_URL="https://example.com"  # Your website or repository
-SERVICIALO_IMPL_CONTACT="admin@example.com" # Contact email (hashed, never displayed)
+- **The RFC-005 comment window**, while it is open. Expiry is built in: it stops printing after 2026-09-13, the close of the final comment period, so a node installed in October is not greeted by a dead announcement.
+- **If your node is anonymous**, how to identify it (below).
+
+Both print once per process and are silenced with `SERVICIALO_QUIET=true`:
+
+```json
+{
+  "env": {
+    "SERVICIALO_QUIET": "true"
+  }
+}
 ```
 
-When a new `IMPL_NAME` appears for the first time, the Servicialo team is notified and reviews manually. Once verified, your implementation appears at [servicialo.com/implementors](https://servicialo.com/implementors) with a verified badge.
+That variable affects **only these two notices**. The mode banner and the first-run telemetry notice keep their previous behavior.
 
-If you don't set these variables, your node remains fully anonymous — no change in behavior.
+## Identify your node
+
+Your node is anonymous by default: the ping carries event, version, `node_id` and timestamp, and nothing else. If you operate your own implementation of the protocol, these three optional variables identify it and apply for **verified implementor** status:
+
+```bash
+SERVICIALO_IMPL_NAME="My Platform"          # Name of your implementation
+SERVICIALO_IMPL_URL="https://example.com"   # Your website or repository
+SERVICIALO_IMPL_CONTACT="admin@example.com" # Contact email — hashed before it leaves
+```
+
+### What leaves your machine under each variable
+
+| Variable | What travels | What does not |
+|---|---|---|
+| `SERVICIALO_IMPL_NAME` | The name in plain text, as `impl_name`. It is public: rendered on `/implementors` once verified. | — |
+| `SERVICIALO_IMPL_URL` | The URL in plain text, as `impl_url`. Also public once verified. | — |
+| `SERVICIALO_IMPL_CONTACT` | Only `impl_contact_hash`: the SHA-256 of the lowercased, trimmed email, computed **on your machine** before any network request. | The email itself. It does not leave the host, is not logged, is not stored, and is never displayed. |
+
+With none of them set, none of these fields appear in the ping. An unconfigured node behaves exactly as it did before this release.
+
+### The verification cycle
+
+`anonymous` → `pending` → `verified`
+
+1. **`anonymous`** — no variables set. This is the default, and an anonymous node is fully conformant.
+2. **`pending`** — the first time a new `impl_name` appears, the record is marked pending and the team is notified with the name, the URL and the country. The contact hash is not in that notification, and could not be: it would serve no purpose there.
+3. **`verified`** — after manual review against the conformance checklist, your implementation appears at [servicialo.com/implementors](https://servicialo.com/implementors) with its tier and the number of hosts it reports.
+
+Verification is manual today. The automated conformance suite is on the roadmap; it is not a current capability.
+
+**What the contact hash is for — and what it is not.** It is a one-way digest: nobody can write to you from it, and setting it does not subscribe you to any announcement or list. It serves the reverse — when *you* write in about your implementation, the hash of your email confirms you are the operator who sent those pings.
+
+### How to stop sending it
+
+Remove the variables from your MCP configuration (or `unset SERVICIALO_IMPL_NAME SERVICIALO_IMPL_URL SERVICIALO_IMPL_CONTACT`) and restart the server. The next ping is anonymous again, with no identity fields at all. Pings already sent keep what they sent; to request removal of existing records, open an issue on the [repository](https://github.com/servicialo/mcp-server/issues).
+
+### Adjacent capability: weekly snapshots
+
+The registry emits `benchmark.weekly_snapshot` every Monday at 00:00 UTC to subscribed endpoints, with an HMAC-SHA256 signed payload. **These three variables do not enable it.** It requires a registry entry and an explicit subscription through the [Webhooks API](https://github.com/servicialo/mcp-server/blob/main/WEBHOOKS.md), and it delivers benchmark data, not protocol announcements.
 
 ## License
 
