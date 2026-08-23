@@ -5,10 +5,10 @@
 | RFC number | 005 |
 | Title | Period Deliveries (availability obligations satisfied over a window) |
 | Author(s) | Servicialo SpA — Franco Danioni ([@danioni](https://github.com/danioni)), acting maintainer |
-| Status | Draft |
+| Status | Draft — Open for Comment (window opened 2026-08-23) |
 | Category | Minor (additive OPTIONAL field) — 2 wks comment + 1 wk FCP per [RFC-001](RFC-001-rfc-process-and-deprecation-policy.md) §3.2 |
 | Type | Protocol Semantics |
-| Discussion | To be linked when the RFC enters Open for Comment |
+| Discussion | [PR #21](https://github.com/servicialo/mcp-server/pull/21) |
 | Created | 2026-08-23 |
 | Last updated | 2026-08-23 |
 | Target version | Servicialo Protocol v1.0 |
