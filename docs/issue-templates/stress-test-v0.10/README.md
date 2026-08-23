@@ -96,6 +96,14 @@ against it rather than in isolation:
   obligation satisfied over a window. RFC-005 distinguishes them explicitly;
   without that, the divergence the RFC closes reappears through CAC.
 
+## Downstream of this analysis
+
+| Artifact | What it carries |
+|---|---|
+| [`rfcs/RFC-005-period-deliveries.md`](../../../rfcs/RFC-005-period-deliveries.md) | Questions 1 and 2 — `kind: occurrence \| period`, and the §8.2.5 ⟷ §5.8/§12.8.1 reconciliation |
+| [`public/spec/extensions/proof-of-service.md`](../../../public/spec/extensions/proof-of-service.md) §5 | Questions 3 and 4 — the Proof Consumer, at doc version 0.3.0 |
+| [`docs/vocabulary-migration-plan.md`](../../vocabulary-migration-plan.md) | The `delivered`/`charged` divergence, coordinated with the `billing.status` additions from RFC-003 and from `q12b` into a single deprecation window |
+
 ## Publication
 
 Nothing here is published yet. When it is: one issue per file, body verbatim below
