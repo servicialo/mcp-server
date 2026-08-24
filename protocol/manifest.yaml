@@ -10,6 +10,8 @@
 #                                          resolver_api_version and
 #                                          extensions[webhooks].version)
 #   - scripts/verify-doc-claims.mjs       (CI: doc claims vs derived counts)
+#   - scripts/verify-conformance-parity.mjs (CI: conformance.core ↔ tools,
+#                                          profile, openapi, docs, suite)
 #
 # Rules:
 #   - Counts are NEVER stored here. They are derived from the `tools` list.
@@ -98,16 +100,17 @@ profiles:
   - { id: network,      name: Network,      status: experimental }
 
 # ── Bindings (the protocol is transport-independent) ─────────────────────────
-# Conformance requires AT LEAST ONE machine-to-machine binding implementing
-# the required Core profiles. No specific binding is mandatory: a pure-HTTP
-# implementation is conformant without MCP. MCP is the RECOMMENDED binding
-# for agentic integrations, not a conformance condition.
+# Conformance requires AT LEAST ONE machine-to-machine binding exposing every
+# operation in `conformance.core.required_operations` below — that list, not
+# this comment, is the canonical one. No specific binding is mandatory: a
+# pure-HTTP implementation is conformant without MCP. MCP is the RECOMMENDED
+# binding for agentic integrations, not a conformance condition.
 # maturity: stable | candidate | experimental
 bindings:
   http:
     maturity: stable             # normative machine-to-machine binding
     profile: spec/HTTP_PROFILE.md
-    profile_version: "1.0.0"     # version of the HTTP binding document, not the protocol
+    profile_version: "1.1.0"     # version of the HTTP binding document, not the protocol
     # Wire value of X-Servicialo-Version (lib/servicialo/response.ts) — DO NOT
     # change to match the protocol or the profile document. It identifies a
     # compatible family of the observable HTTP contract, and moves only on a
@@ -127,6 +130,46 @@ bindings:
     version: "0.3"
     agent_card: /.well-known/agent.json
     endpoint: "POST /{orgSlug}/a2a"
+
+# ── Conformance ──────────────────────────────────────────────────────────────
+# The single machine-readable list of what CORE requires. Everything else
+# derives from this or is checked against it:
+#   - public/spec/certification.md  says WHICH capabilities CORE satisfies and why
+#   - this block                    says WHICH operations express them
+#   - scripts/verify-conformance-parity.mjs fails CI when a surface disagrees
+#
+# Counts are never stored (see Rules above). Required states are referenced,
+# not copied, so the two cannot drift apart.
+conformance:
+  core:
+    defined_in: public/spec/certification.md#core-level-1
+    # Each operation maps to one verb of the normative sentence in
+    # certification.md §CORE: discover an offer, know availability before
+    # committing it, create the commitment, manage its lifecycle, record
+    # evidence.
+    required_operations:
+      - registry.manifest             # the node declares itself: protocol_version + endpoints
+      - services.list                 # discover the offer
+      - scheduling.check_availability # know availability before committing it
+      - scheduling.book               # create the commitment
+      - lifecycle.transition          # manage the lifecycle
+      - delivery.record_evidence      # record evidence
+    required_states: state_machines.service_lifecycle.required   # reference, not a copy
+    # OPTIONAL conveniences: expressible through the required operations, so
+    # requiring them would inflate CORE. Verified against the reference tools:
+    # `confirmed`, `in_progress` and `delivered` are all in the
+    # lifecycle.transition enum, and `gps`/`duration` are record_evidence
+    # types. The one behaviour not reproducible that way is checkout's
+    # automatic duration computation — a reference convenience, not a
+    # protocol requirement.
+    expressible_conveniences:
+      - { operation: scheduling.confirm,  via: [lifecycle.transition] }
+      - { operation: delivery.checkin,    via: [lifecycle.transition, delivery.record_evidence] }
+      - { operation: delivery.checkout,   via: [lifecycle.transition, delivery.record_evidence] }
+    # Belongs to the resolver/meta-registry, not to a node. A node is
+    # discoverable because it is registered, not because it implements search.
+    not_node_requirements:
+      - registry.search
 
 # ── Tools (ground truth mirror of packages/mcp-server/src/tools) ─────────────
 # tier: public | authenticated

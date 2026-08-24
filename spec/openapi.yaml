@@ -1,1564 +1,1457 @@
+# Generated from the contract table in docs/analysis/contract-audit-2026-08-24.md
+# and kept in step with spec/HTTP_PROFILE.md 1.1.0.
+# scripts/verify-conformance-parity.mjs fails CI if the two disagree.
 openapi: 3.1.0
 info:
   title: Servicialo HTTP API
-  description: |
-    Canonical HTTP binding for the Servicialo protocol v0.10.
-    Maps MCP tools to REST endpoints with exact semantic parity.
-    See HTTP_PROFILE.md for the full specification.
-  version: 1.0.0
-  x-servicialo-protocol-version: "0.10"
+  description: 'Canonical HTTP binding for the Servicialo protocol v0.10.
+
+    Describes the contract the reference tool handlers actually send through
+
+    HttpAdapter (packages/mcp-server/src/adapter-http.ts) — plain JSON, no
+
+    JSON:API envelope. See spec/HTTP_PROFILE.md 1.1.0 for the normative text
+
+    and its erratum for what changed from 1.0.0.
+
+    '
+  version: 1.1.0
+  x-servicialo-protocol-version: '0.10'
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
   contact:
     name: Servicialo
     url: https://servicialo.com
-
 servers:
-  - url: https://api.example.com/servicialo/v1
-    description: Example server (replace with actual implementation URL)
-
+- url: https://{host}/v1
+  description: Example server. Paths resolve against {base}/v1 — the literal segment /servicialo is NOT
+    required.
+  variables:
+    host:
+      default: api.your-implementation.com
+      description: Your implementation host, optionally with a path prefix.
 tags:
-  - name: Discovery
-    description: "Phase 1 — Public endpoints. No authentication required."
-  - name: Understanding
-    description: "Phase 2 — Service and contract details."
-  - name: Commitment
-    description: "Phase 3 — Client resolution, booking, and confirmation."
-  - name: Lifecycle
-    description: "Phase 4 — State transitions, rescheduling, cancellation."
-  - name: Delivery
-    description: "Phase 5 — Check-in, check-out, evidence."
-  - name: Closing
-    description: "Phase 6 — Documentation, sales, payments."
-  - name: Service Orders
-    description: "Bilateral commercial agreements."
-  - name: Mandates
-    description: "AI agent delegation management."
-  - name: Resources
-    description: "Physical resource management (rooms, boxes, equipment)."
-  - name: A2A Extension
-    description: |
-      Agent-to-Agent (A2A) interoperability endpoints.
-      Optional for basic Servicialo implementations.
-      Required for "Servicialo A2A Ready" certification.
-      See: https://a2a-protocol.org/
+- name: Discovery
+  description: Phase 1 — Public endpoints. No authentication required.
+- name: Understanding
+  description: Phase 2 — Service and contract details.
+- name: Commitment
+  description: Phase 3 — Client resolution, booking, and confirmation.
+- name: Lifecycle
+  description: Phase 4 — State transitions, rescheduling, cancellation.
+- name: Delivery
+  description: Phase 5 — Check-in, check-out, evidence.
+- name: Closing
+  description: Phase 6 — Documentation, sales, payments.
+- name: Service Orders
+  description: Bilateral commercial agreements.
+- name: Mandates
+  description: AI agent delegation management.
+- name: Resources
+  description: Physical resource management (rooms, boxes, equipment).
+- name: A2A Extension
+  description: 'Agent-to-Agent (A2A) interoperability endpoints.
 
+    Optional for basic Servicialo implementations.
+
+    Required for "Servicialo A2A Ready" certification.
+
+    See: https://a2a-protocol.org/
+
+    '
 security:
-  - BearerAuth: []
-  - ApiKeyAuth: []
-
+- BearerAuth: []
+- ApiKeyAuth: []
 paths:
   /:
     get:
       operationId: getCapabilities
       summary: Server capabilities
       description: Returns protocol version and supported tools.
-      tags: [Discovery]
+      tags:
+      - Discovery
       security: []
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       responses:
-        "200":
+        '200':
           description: Server capabilities.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/CapabilitiesResponse"
+                $ref: '#/components/schemas/CapabilitiesResponse'
               example:
-                data:
-                  type: server
-                  id: servicialo
-                  attributes:
-                    protocol_version: "0.10"
-                    profile_version: "1.0.0"
-                    compliance: extended
-                    capabilities:
-                      - registry.search
-                      - service.get
-                      - scheduling.book
-                      - lifecycle.transition
-                      - delivery.record_evidence
-                      - payments.create_sale
-        "406":
+                protocol_version: '0.10'
+                profile_version: 1.1.0
+                compliance: extended
+                capabilities:
+                - registry.search
+                - service.get
+                - scheduling.book
+                - lifecycle.transition
+                - delivery.record_evidence
+                - payments.create_sale
+        '406':
           description: Unsupported protocol version.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: '#/components/schemas/ErrorResponse'
               example:
                 errors:
-                  - status: "406"
-                    code: UNSUPPORTED_VERSION
-                    title: Unsupported protocol version
-                    detail: "X-Servicialo-Version '0.5' is not supported."
+                - status: '406'
+                  code: UNSUPPORTED_VERSION
+                  title: Unsupported protocol version
+                  detail: X-Servicialo-Version '0.5' is not supported.
+  /manifest:
+    get:
+      operationId: registryManifest
+      x-mcp-tool: registry.manifest
+      summary: Node manifest
+      description: 'Returns the node manifest: the protocol version it speaks and the endpoints it exposes.
+        REQUIRED by conformance.core.required_operations.
 
-  # ────────────────────────────────────────────
-  # Phase 1 — Discovery (Public)
-  # ────────────────────────────────────────────
 
-  /registry/organizations:
+        Field shape note: the reference compatibility suite and scripts/verify-interop.mjs both read `protocol_version`;
+        no reference tool consumes any field of this response (registry.manifest returns the body verbatim).
+        The resolver publishes its own, different manifest object at /api/servicialo/manifest using `servicialo_version`
+        — that is the resolver describing itself, not a node manifest.'
+      tags:
+      - Discovery
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      responses:
+        '200':
+          description: Node manifest.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeManifest'
+              example:
+                protocol_version: '0.10'
+                name: Coordinalo
+                org_slug: clinica-dental-sur
+                endpoints:
+                  services: /v1/organizations/{org_slug}/services
+                  availability: /v1/organizations/{org_slug}/availability
+                  sessions: /v1/sessions
+  /registry:
     get:
       operationId: registrySearch
       x-mcp-tool: registry.search
       summary: Search organizations by vertical and location
-      tags: [Discovery]
+      tags:
+      - Discovery
       security: []
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: vertical
-          in: query
-          required: true
-          schema:
-            type: string
-          example: kinesiologia
-        - name: location
-          in: query
-          schema:
-            type: string
-          example: Santiago
-        - name: country
-          in: query
-          schema:
-            type: string
-            default: cl
-          example: cl
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 10
-            maximum: 100
-          example: 10
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: vertical
+        in: query
+        required: true
+        schema:
+          type: string
+        example: kinesiologia
+      - name: location
+        in: query
+        schema:
+          type: string
+        example: Santiago
+      - name: country
+        in: query
+        schema:
+          type: string
+          default: cl
+        example: cl
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 10
+          maximum: 100
+        example: 10
       responses:
-        "200":
+        '200':
           description: Matching organizations.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/OrganizationCollection"
+                $ref: '#/components/schemas/OrganizationCollection'
               example:
-                data:
-                  - type: organizations
-                    id: clinica-dental-sur
-                    attributes:
-                      name: "Clínica Dental Sur"
-                      vertical: dental
-                      location: Santiago
-                      country: cl
-                meta:
-                  total: 1
-                  page: 1
-                  per_page: 10
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /registry/organizations/{org_slug}:
-    get:
-      operationId: registryGetOrganization
-      x-mcp-tool: registry.get_organization
-      summary: Get public organization details
-      tags: [Discovery]
-      security: []
-      parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: org_slug
-          in: path
-          required: true
-          schema:
-            type: string
-          example: clinica-dental-sur
-        - name: country
-          in: query
-          schema:
-            type: string
-            default: cl
-      responses:
-        "200":
-          description: Organization with services, professionals, and booking config.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: "#/components/schemas/OrganizationResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+              - id: clinica-dental-sur
+                name: Clínica Dental Sur
+                vertical: dental
+                location: Santiago
+                country: cl
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /organizations/{org_slug}/services:
     get:
       operationId: servicesList
       x-mcp-tool: services.list
       summary: List public service catalog
-      tags: [Discovery]
+      tags:
+      - Discovery
       security: []
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: org_slug
-          in: path
-          required: true
-          schema:
-            type: string
-          example: clinica-dental-sur
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: org_slug
+        in: path
+        required: true
+        schema:
+          type: string
+        example: clinica-dental-sur
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+          default: cl
+        description: ISO 3166-1 alpha-2. Sent by registry.get_organization.
       responses:
-        "200":
+        '200':
           description: Collection of public services.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceCollection"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  /availability:
+                $ref: '#/components/schemas/ServiceCollection'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: Both services.list and registry.get_organization resolve to this endpoint in the reference
+        client; registry.get_organization additionally sends a `country` query parameter.
+      x-mcp-tool-also: registry.get_organization
+  /organizations/{org_slug}/availability:
     get:
       operationId: schedulingCheckAvailability
       x-mcp-tool: scheduling.check_availability
       summary: Check available time slots (public)
-      tags: [Discovery]
+      tags:
+      - Discovery
       security: []
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: org_slug
-          in: query
-          required: true
-          schema:
-            type: string
-          example: clinica-dental-sur
-        - name: date_from
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: "2026-03-16"
-        - name: date_to
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: "2026-03-22"
-        - name: service_id
-          in: query
-          schema:
-            type: string
-        - name: provider_id
-          in: query
-          schema:
-            type: string
-        - name: resource_id
-          in: query
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/OrgSlug'
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+        example: '2026-03-16'
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+        example: '2026-03-22'
+      - name: serviceId
+        in: query
+        schema:
+          type: string
+      - name: providerId
+        in: query
+        schema:
+          type: string
+      - name: resourceId
+        in: query
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Available time slots.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/AvailabilityCollection"
+                $ref: '#/components/schemas/AvailabilityCollection'
               example:
-                data:
-                  - type: availability_slots
-                    id: slot_001
-                    attributes:
-                      provider_id: prov_abc
-                      starts_at: "2026-03-16T09:00:00-03:00"
-                      ends_at: "2026-03-16T09:45:00-03:00"
-                      resource_id: res_box3
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  # ────────────────────────────────────────────
-  # Phase 2 — Understanding
-  # ────────────────────────────────────────────
-
+                slots:
+                - providerId: prov_abc
+                  start: '2026-03-16T12:00:00Z'
+                  end: '2026-03-16T12:45:00Z'
+                  resourceId: res_box3
+                timezone: America/Santiago
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /services/{service_id}:
     get:
       operationId: serviceGet
       x-mcp-tool: service.get
       summary: Get full 8-dimension service definition
-      tags: [Understanding]
+      tags:
+      - Understanding
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: service_id
-          in: path
-          required: true
-          schema:
-            type: string
-          example: svc_kinesiologia_45
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: service_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: svc_kinesiologia_45
       responses:
-        "200":
+        '200':
           description: Service object.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceResource"
+                $ref: '#/components/schemas/ServiceResource'
               example:
-                data:
-                  type: services
-                  id: svc_kinesiologia_45
-                  attributes:
-                    type: physical_therapy_session
-                    vertical: health
-                    name: "Sesión de rehabilitación — 45 min"
-                    duration_minutes: 45
-                    provider:
-                      id: prov_abc
-                      organization_id: org_xyz
-                    client:
-                      id: cli_001
-                    schedule:
-                      requested_at: "2026-03-15T08:00:00Z"
-                    location:
-                      type: in_person
-                      room: "Box 3"
-                    lifecycle:
-                      current_state: requested
-                    proof: {}
-                    billing:
-                      amount:
-                        value: 35000
-                        currency: CLP
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-
+                id: svc_kinesiologia_45
+                type: physical_therapy_session
+                vertical: health
+                name: Sesión de rehabilitación — 45 min
+                duration_minutes: 45
+                provider:
+                  id: prov_abc
+                  organization_id: org_xyz
+                client:
+                  id: cli_001
+                schedule:
+                  requested_at: '2026-03-15T08:00:00Z'
+                location:
+                  type: in_person
+                  room: Box 3
+                lifecycle:
+                  current_state: requested
+                proof: {}
+                billing:
+                  amount:
+                    value: 35000
+                    currency: CLP
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /services/{service_id}/contract:
     get:
       operationId: contractGet
       x-mcp-tool: contract.get
       summary: Get service contract (policies, evidence requirements)
-      tags: [Understanding]
+      tags:
+      - Understanding
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: service_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: org_id
-          in: query
-          required: true
-          schema:
-            type: string
-          example: org_xyz
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: service_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: org_id
+        in: query
+        required: true
+        schema:
+          type: string
+        example: org_xyz
       responses:
-        "200":
+        '200':
           description: Contract with cancellation, no-show, arbitration policies.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ContractResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ────────────────────────────────────────────
-  # Phase 3 — Commitment
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/ContractResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /clients:
     post:
       operationId: clientsGetOrCreate
       x-mcp-tool: clients.get_or_create
       summary: Find or create a client (upsert)
-      tags: [Commitment]
+      tags:
+      - Commitment
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ClientUpsertRequest"
+              $ref: '#/components/schemas/ClientUpsertRequest'
             example:
-              data:
-                type: clients
-                attributes:
-                  email: maria@example.com
-                  phone: "+56912345678"
-                  name: María
-                  last_name: González
-                  actor:
-                    type: agent
-                    id: agent_01
-                    mandate_id: mdt_abc
+              email: maria@example.com
+              phone: '+56912345678'
+              name: María
+              lastName: González
+              actor:
+                type: agent
+                id: agent_01
+                mandate_id: mdt_abc
       responses:
-        "200":
+        '200':
           description: Existing client found.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ClientResource"
-        "201":
+                $ref: '#/components/schemas/ClientResource'
+        '201':
           description: New client created.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ClientResource"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/ClientResource'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /sessions:
     post:
       operationId: schedulingBook
       x-mcp-tool: scheduling.book
       summary: Book a new session
-      tags: [Commitment]
+      tags:
+      - Commitment
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/SessionBookRequest"
+              $ref: '#/components/schemas/SessionBookRequest'
             example:
-              data:
-                type: sessions
-                attributes:
-                  service_id: svc_001
-                  provider_id: prov_abc
-                  client_id: cli_001
-                  starts_at: "2026-03-16T09:00:00-03:00"
-                  resource_id: res_box3
-                  actor:
-                    type: agent
-                    id: agent_01
-                    mandate_id: mdt_abc
+              serviceId: svc_001
+              providerId: prov_abc
+              clientId: cli_001
+              startTime: '2026-03-16T09:00:00-03:00'
+              resourceId: res_box3
+              actor:
+                type: agent
+                id: agent_01
+                mandate_id: mdt_abc
       responses:
-        "201":
+        '201':
           description: Session created in `requested` state.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
+                $ref: '#/components/schemas/SessionResource'
               example:
-                data:
-                  type: sessions
-                  id: ses_abc123
-                  attributes:
-                    service_id: svc_001
-                    provider_id: prov_abc
-                    client_id: cli_001
-                    starts_at: "2026-03-16T09:00:00-03:00"
-                    resource_id: res_box3
-                    lifecycle:
-                      current_state: requested
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                id: ses_abc123
+                service_id: svc_001
+                provider_id: prov_abc
+                client_id: cli_001
+                starts_at: '2026-03-16T09:00:00-03:00'
+                resource_id: res_box3
+                lifecycle:
+                  current_state: requested
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /sessions/{session_id}/confirm:
     post:
       operationId: schedulingConfirm
       x-mcp-tool: scheduling.confirm
       summary: Confirm a booked session
-      tags: [Commitment]
+      tags:
+      - Commitment
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ActorRequest"
+              $ref: '#/components/schemas/ActorRequest'
             example:
-              data:
-                type: confirmations
-                attributes:
-                  actor:
-                    type: client
-                    id: cli_001
+              actor:
+                type: client
+                id: cli_001
       responses:
-        "200":
+        '200':
           description: Session confirmed.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
-  # ────────────────────────────────────────────
-  # Phase 4 — Lifecycle
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sessions/{session_id}/lifecycle:
     get:
       operationId: lifecycleGetState
       x-mcp-tool: lifecycle.get_state
       summary: Get lifecycle state and transition history
-      tags: [Lifecycle]
+      tags:
+      - Lifecycle
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       responses:
-        "200":
+        '200':
           description: Lifecycle state with available transitions and history.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/LifecycleResource"
+                $ref: '#/components/schemas/LifecycleResource'
               example:
-                data:
-                  type: lifecycle_states
-                  id: ses_abc123
-                  attributes:
-                    current_state: confirmed
-                    available_transitions:
-                      - in_progress
-                      - cancelled
-                    transitions:
-                      - from: null
-                        to: requested
-                        at: "2026-03-15T08:00:00Z"
-                        by: agent_01
-                        method: agent
-                      - from: requested
-                        to: confirmed
-                        at: "2026-03-15T08:05:00Z"
-                        by: cli_001
-                        method: manual
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  /sessions/{session_id}/transitions:
+                id: ses_abc123
+                current_state: confirmed
+                available_transitions:
+                - in_progress
+                - cancelled
+                transitions:
+                - from: null
+                  to: requested
+                  at: '2026-03-15T08:00:00Z'
+                  by: agent_01
+                  method: agent
+                - from: requested
+                  to: confirmed
+                  at: '2026-03-15T08:05:00Z'
+                  by: cli_001
+                  method: manual
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /sessions/{session_id}:
+    put:
+      operationId: schedulingReschedule
+      x-mcp-tool: scheduling.reschedule
+      summary: Reschedule a session (update start time)
+      tags:
+      - Lifecycle
+      parameters:
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleRequest'
+            example:
+              startTime: '2026-03-17T10:00:00-03:00'
+              actor:
+                type: client
+                id: cli_001
+      responses:
+        '200':
+          description: Session rescheduled (state returns to `scheduled`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
+      description: The reference tool sends PUT to the session resource with the new startTime. 1.0.0
+        specified POST /sessions/{session_id}/reschedule, which no reference client calls.
+  /sessions/{session_id}/lifecycle/transition:
     post:
       operationId: lifecycleTransition
       x-mcp-tool: lifecycle.transition
       summary: Execute a state transition
-      tags: [Lifecycle]
+      tags:
+      - Lifecycle
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/TransitionRequest"
+              $ref: '#/components/schemas/TransitionRequest'
             example:
-              data:
-                type: transitions
-                attributes:
-                  to_state: in_progress
-                  actor:
-                    type: provider
-                    id: prov_abc
+              toState: in_progress
+              actor:
+                type: provider
+                id: prov_abc
       responses:
-        "200":
+        '200':
           description: Session transitioned.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
+                $ref: '#/components/schemas/SessionResource'
               example:
-                data:
-                  type: sessions
-                  id: ses_abc123
-                  attributes:
-                    lifecycle:
-                      current_state: in_progress
-                meta:
-                  transition:
-                    from: confirmed
-                    to: in_progress
-                    at: "2026-03-16T09:02:00Z"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
-  /sessions/{session_id}/reschedule:
-    post:
-      operationId: schedulingReschedule
-      x-mcp-tool: scheduling.reschedule
-      summary: Reschedule a session
-      tags: [Lifecycle]
-      parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
-      requestBody:
-        required: true
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: "#/components/schemas/RescheduleRequest"
-            example:
-              data:
-                type: reschedules
-                attributes:
-                  new_datetime: "2026-03-17T10:00:00-03:00"
-                  actor:
-                    type: client
-                    id: cli_001
-      responses:
-        "200":
-          description: Session rescheduled (state returns to `scheduled`).
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                id: ses_abc123
+                lifecycle:
+                  current_state: in_progress
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sessions/{session_id}/cancel:
     post:
       operationId: schedulingCancel
       x-mcp-tool: scheduling.cancel
       summary: Cancel a session
-      tags: [Lifecycle]
+      tags:
+      - Lifecycle
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/CancelRequest"
+              $ref: '#/components/schemas/CancelRequest'
             example:
-              data:
-                type: cancellations
-                attributes:
-                  reason: "Client requested cancellation."
-                  actor:
-                    type: client
-                    id: cli_001
+              reason: Client requested cancellation.
+              actor:
+                type: client
+                id: cli_001
       responses:
-        "200":
+        '200':
           description: Session cancelled with policy applied.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
-  # ────────────────────────────────────────────
-  # Phase 5 — Delivery Verification
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sessions/{session_id}/checkin:
     post:
       operationId: deliveryCheckin
       x-mcp-tool: delivery.checkin
       summary: Record check-in
-      tags: [Delivery]
+      tags:
+      - Delivery
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/CheckinRequest"
+              $ref: '#/components/schemas/CheckinRequest'
             example:
-              data:
-                type: checkins
-                attributes:
-                  actor:
-                    type: provider
-                    id: prov_abc
-                  location:
-                    lat: -33.4489
-                    lng: -70.6693
-                  timestamp: "2026-03-16T09:02:00-03:00"
+              actor:
+                type: provider
+                id: prov_abc
+              location:
+                lat: -33.4489
+                lng: -70.6693
+              timestamp: '2026-03-16T09:02:00-03:00'
       responses:
-        "200":
+        '200':
           description: Check-in recorded, session in `in_progress`.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sessions/{session_id}/checkout:
     post:
       operationId: deliveryCheckout
       x-mcp-tool: delivery.checkout
       summary: Record check-out
-      tags: [Delivery]
+      tags:
+      - Delivery
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/CheckoutRequest"
+              $ref: '#/components/schemas/CheckoutRequest'
             example:
-              data:
-                type: checkouts
-                attributes:
-                  actor:
-                    type: provider
-                    id: prov_abc
-                  location:
-                    lat: -33.4489
-                    lng: -70.6693
-                  timestamp: "2026-03-16T09:47:00-03:00"
+              actor:
+                type: provider
+                id: prov_abc
+              location:
+                lat: -33.4489
+                lng: -70.6693
+              timestamp: '2026-03-16T09:47:00-03:00'
       responses:
-        "200":
+        '200':
           description: Check-out recorded, session in `completed`.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sessions/{session_id}/evidence:
     post:
       operationId: deliveryRecordEvidence
       x-mcp-tool: delivery.record_evidence
       summary: Record proof-of-delivery evidence
-      tags: [Delivery]
+      tags:
+      - Delivery
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/EvidenceRequest"
+              $ref: '#/components/schemas/EvidenceRequest'
             example:
+              evidenceType: gps
               data:
-                type: evidence
-                attributes:
-                  evidence_type: gps
-                  data:
-                    lat: -33.4489
-                    lng: -70.6693
-                    accuracy_meters: 5
-                  actor:
-                    type: provider
-                    id: prov_abc
+                lat: -33.4489
+                lng: -70.6693
+                accuracy_meters: 5
+              actor:
+                type: provider
+                id: prov_abc
       responses:
-        "201":
+        '201':
           description: Evidence recorded.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  # ────────────────────────────────────────────
-  # Phase 6 — Closing
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /sessions/{session_id}/documentation:
     post:
       operationId: documentationCreate
       x-mcp-tool: documentation.create
       summary: Create service documentation
-      tags: [Closing]
+      tags:
+      - Closing
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/DocumentationRequest"
+              $ref: '#/components/schemas/DocumentationRequest'
             example:
-              data:
-                type: documentation
-                attributes:
-                  content: "Paciente presenta mejoría en rango de movimiento..."
-                  template_id: tmpl_clinical_note
-                  actor:
-                    type: provider
-                    id: prov_abc
+              content: Paciente presenta mejoría en rango de movimiento...
+              templateId: tmpl_clinical_note
+              actor:
+                type: provider
+                id: prov_abc
       responses:
-        "201":
+        '201':
           description: Documentation created, session in `documented`.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SessionResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                $ref: '#/components/schemas/SessionResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /sales:
     post:
       operationId: paymentsCreateSale
       x-mcp-tool: payments.create_sale
       summary: Create a sale (charge)
-      tags: [Closing]
+      tags:
+      - Closing
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/SaleCreateRequest"
+              $ref: '#/components/schemas/SaleCreateRequest'
             example:
-              data:
-                type: sales
-                attributes:
-                  client_id: cli_001
-                  service_id: svc_001
-                  provider_id: prov_abc
-                  quantity: 1
-                  unit_price: 35000
+              clientId: cli_001
+              serviceId: svc_001
+              providerId: prov_abc
+              quantity: 1
+              unitPrice: 35000
       responses:
-        "201":
+        '201':
           description: Sale created.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/SaleResource"
+                $ref: '#/components/schemas/SaleResource'
               example:
-                data:
-                  type: sales
-                  id: sale_001
-                  attributes:
-                    client_id: cli_001
-                    service_id: svc_001
-                    provider_id: prov_abc
-                    quantity: 1
-                    unit_price: 35000
-                    total: 35000
-                    status: pending
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /sales/{sale_id}/payments:
+                id: sale_001
+                client_id: cli_001
+                service_id: svc_001
+                provider_id: prov_abc
+                quantity: 1
+                unit_price: 35000
+                total: 35000
+                status: pending
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /sales/{sale_id}:
+    get:
+      operationId: paymentsGetStatusBySale
+      x-mcp-tool: payments.get_status
+      summary: Get payment status for a sale
+      tags:
+      - Closing
+      parameters:
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: sale_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Payment status or account history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatusResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /payments:
     post:
       operationId: paymentsRecordPayment
       x-mcp-tool: payments.record_payment
       summary: Record a payment against a sale
-      tags: [Closing]
+      tags:
+      - Closing
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: sale_id
-          in: path
-          required: true
-          schema:
-            type: string
-          example: sale_001
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/PaymentRequest"
+              $ref: '#/components/schemas/PaymentRequest'
             example:
-              data:
-                type: payments
-                attributes:
-                  amount: 35000
-                  method: transferencia
-                  reference: TRX-20260316-001
+              ventaId: sale_001
+              amount: 35000
+              paymentMethod: transferencia
+              reference: TRX-20260316-001
       responses:
-        "201":
+        '201':
           description: Payment recorded.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/PaymentResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  /payments/status:
+                $ref: '#/components/schemas/PaymentResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+      description: Record a payment against a sale. The sale is identified by `ventaId` in the body, not
+        by a path parameter. Spanish wire vocabulary — see HTTP_PROFILE.md 9.3.
+  /clients/{client_id}/account-history:
     get:
-      operationId: paymentsGetStatus
+      operationId: paymentsGetAccountHistory
       x-mcp-tool: payments.get_status
-      summary: Get payment status (by sale or client)
-      tags: [Closing]
+      summary: Get a client account history
+      tags:
+      - Closing
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: sale_id
-          in: query
-          schema:
-            type: string
-          description: Sale ID (provide sale_id OR client_id).
-        - name: client_id
-          in: query
-          schema:
-            type: string
-          description: Client ID for full account status.
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Payment status or account history.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/PaymentStatusResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  # ────────────────────────────────────────────
-  # Service Orders
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/PaymentStatusResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /service-orders:
     get:
       operationId: serviceOrdersList
       x-mcp-tool: service_orders.list
       summary: List service orders
-      tags: [Service Orders]
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: organization_id
-          in: query
-          schema:
-            type: string
-        - name: client_id
-          in: query
-          schema:
-            type: string
-        - name: state
-          in: query
-          schema:
-            type: string
-            enum: [draft, proposed, negotiating, active, paused, completed, cancelled]
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/PerPage"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: organization_id
+        in: query
+        schema:
+          type: string
+      - name: client_id
+        in: query
+        schema:
+          type: string
+      - name: state
+        in: query
+        schema:
+          type: string
+          enum:
+          - draft
+          - proposed
+          - negotiating
+          - active
+          - paused
+          - completed
+          - cancelled
       responses:
-        "200":
+        '200':
           description: Paginated service orders.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceOrderCollection"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/ServiceOrderCollection'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     post:
       operationId: serviceOrdersCreate
       x-mcp-tool: service_orders.create
       summary: Create a service order (draft)
-      tags: [Service Orders]
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ServiceOrderCreateRequest"
+              $ref: '#/components/schemas/ServiceOrderCreateRequest'
       responses:
-        "201":
+        '201':
           description: Service order created in `draft` state.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceOrderResource"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/ServiceOrderResource'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /service-orders/{order_id}:
     get:
       operationId: serviceOrdersGet
       x-mcp-tool: service_orders.get
       summary: Get full service order details
-      tags: [Service Orders]
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: order_id
-          in: path
-          required: true
-          schema:
-            type: string
-          example: so_abc123
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: so_abc123
       responses:
-        "200":
+        '200':
           description: Service order.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceOrderResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/ServiceOrderResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /service-orders/{order_id}/propose:
     post:
       operationId: serviceOrdersPropose
       x-mcp-tool: service_orders.propose
-      summary: "Transition: draft → proposed"
-      tags: [Service Orders]
+      summary: 'Transition: draft → proposed'
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: order_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ActorRequest"
+              $ref: '#/components/schemas/ActorRequest'
             example:
-              data:
-                type: order_transitions
-                attributes:
-                  actor:
-                    type: organization
-                    id: org_xyz
+              actor:
+                type: organization
+                id: org_xyz
       responses:
-        "200":
+        '200':
           description: Order in `proposed` state.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceOrderResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                $ref: '#/components/schemas/ServiceOrderResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /service-orders/{order_id}/activate:
     post:
       operationId: serviceOrdersActivate
       x-mcp-tool: service_orders.activate
-      summary: "Transition: proposed → active"
-      tags: [Service Orders]
+      summary: 'Transition: proposed → active'
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: order_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ActorRequest"
+              $ref: '#/components/schemas/ActorRequest'
             example:
-              data:
-                type: order_transitions
-                attributes:
-                  actor:
-                    type: client
-                    id: cli_001
+              actor:
+                type: client
+                id: cli_001
       responses:
-        "200":
+        '200':
           description: Order in `active` state.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ServiceOrderResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/InvalidTransition"
-
+                $ref: '#/components/schemas/ServiceOrderResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidTransition'
   /service-orders/{order_id}/ledger:
     get:
       operationId: serviceOrdersGetLedger
       x-mcp-tool: service_orders.get_ledger
       summary: Get real-time computed ledger
-      tags: [Service Orders]
+      tags:
+      - Service Orders
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: order_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Ledger with consumption and billing totals.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/LedgerResource"
+                $ref: '#/components/schemas/LedgerResource'
               example:
-                data:
-                  type: ledgers
-                  id: so_abc123
-                  attributes:
-                    services_verified: 8
-                    hours_consumed: 6.0
-                    amount_consumed: 280000
-                    amount_billed: 280000
-                    amount_collected: 210000
-                    amount_remaining: 140000
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-  # ────────────────────────────────────────────
-  # Mandate Management
-  # ────────────────────────────────────────────
-
+                id: so_abc123
+                services_verified: 8
+                hours_consumed: 6.0
+                amount_consumed: 280000
+                amount_billed: 280000
+                amount_collected: 210000
+                amount_remaining: 140000
+        '404':
+          $ref: '#/components/responses/NotFound'
   /mandates:
     get:
       operationId: mandatesList
       x-mcp-tool: mandates.list
       summary: List mandates
-      tags: [Mandates]
+      tags:
+      - Mandates
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: status
-          in: query
-          schema:
-            type: string
-            enum: [active, expired, revoked, suspended]
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/PerPage"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - active
+          - expired
+          - revoked
+          - suspended
       responses:
-        "200":
+        '200':
           description: Paginated mandates.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/MandateCollection"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-
+                $ref: '#/components/schemas/MandateCollection'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /mandates/{mandate_id}:
     get:
       operationId: mandatesGet
       x-mcp-tool: mandates.get
       summary: Get mandate details
-      tags: [Mandates]
+      tags:
+      - Mandates
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: mandate_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: mandate_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
-        "200":
+        '200':
           description: Mandate object.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/MandateResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/MandateResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /mandates/{mandate_id}/suspend:
     post:
       operationId: mandatesSuspend
       x-mcp-tool: mandates.suspend
       summary: Suspend a mandate
-      tags: [Mandates]
+      tags:
+      - Mandates
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: mandate_id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: mandate_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/SuspendRequest"
+              $ref: '#/components/schemas/SuspendRequest'
             example:
-              data:
-                type: mandate_actions
-                attributes:
-                  reason: "Security review in progress."
+              reason: Security review in progress.
       responses:
-        "200":
+        '200':
           description: Mandate suspended.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/MandateResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-
-  # ────────────────────────────────────────────
-  # Resource Management
-  # ────────────────────────────────────────────
-
+                $ref: '#/components/schemas/MandateResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /resources:
     get:
       operationId: resourceList
       x-mcp-tool: resource.list
       summary: List physical resources
-      tags: [Resources]
+      tags:
+      - Resources
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: organization_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: type
-          in: query
-          schema:
-            type: string
-            enum: [room, box, chair, equipment]
-        - name: is_active
-          in: query
-          schema:
-            type: boolean
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/PerPage"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: organization_id
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: type
+        in: query
+        schema:
+          type: string
+          enum:
+          - room
+          - box
+          - chair
+          - equipment
+      - name: is_active
+        in: query
+        schema:
+          type: boolean
       responses:
-        "200":
+        '200':
           description: Paginated resources.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ResourceCollection"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/ResourceCollection'
+        '422':
+          $ref: '#/components/responses/ValidationError'
     post:
       operationId: resourceCreate
       x-mcp-tool: resource.create
       summary: Create a physical resource
-      tags: [Resources]
+      tags:
+      - Resources
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ResourceCreateRequest"
+              $ref: '#/components/schemas/ResourceCreateRequest'
             example:
-              data:
-                type: resources
-                attributes:
-                  organization_id: org_xyz
-                  name: "Box 3"
-                  type: box
-                  capacity: 1
-                  buffer_minutes: 15
-                  equipment: [camilla, TENS]
-                  location: "Piso 2, ala norte"
-                  actor:
-                    type: organization
-                    id: org_xyz
+              organizationId: org_xyz
+              name: Box 3
+              type: box
+              capacity: 1
+              bufferMinutes: 15
+              equipment:
+              - camilla
+              - TENS
+              location: Piso 2, ala norte
+              actor:
+                type: organization
+                id: org_xyz
       responses:
-        "201":
+        '201':
           description: Resource created (active by default).
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ResourceResource"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
+                $ref: '#/components/schemas/ResourceResource'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /resources/{resource_id}:
     get:
       operationId: resourceGet
       x-mcp-tool: resource.get
       summary: Get resource details with availability blocks
-      tags: [Resources]
+      tags:
+      - Resources
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: resource_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
-        "200":
+        '200':
           description: Resource with availability blocks.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ResourceResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/ResourceResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       operationId: resourceUpdate
       x-mcp-tool: resource.update
       summary: Partial update (patch semantics)
-      tags: [Resources]
+      tags:
+      - Resources
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: resource_id
-          in: path
-          required: true
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
-          application/vnd.api+json:
+          application/json:
             schema:
-              $ref: "#/components/schemas/ResourceUpdateRequest"
+              $ref: '#/components/schemas/ResourceUpdateRequest'
             example:
-              data:
-                type: resources
-                attributes:
-                  capacity: 2
-                  buffer_minutes: 10
-                  actor:
-                    type: organization
-                    id: org_xyz
+              capacity: 2
+              bufferMinutes: 10
+              actor:
+                type: organization
+                id: org_xyz
       responses:
-        "200":
+        '200':
           description: Updated resource.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ResourceResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-    delete:
-      operationId: resourceDelete
-      x-mcp-tool: resource.delete
-      summary: Soft-delete (deactivate) a resource
-      tags: [Resources]
-      parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - name: resource_id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/vnd.api+json:
-            schema:
-              $ref: "#/components/schemas/ActorRequest"
-      responses:
-        "200":
-          description: Resource deactivated.
-          content:
-            application/vnd.api+json:
-              schema:
-                $ref: "#/components/schemas/ResourceResource"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/ResourceResource'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: 'Also serves resource.delete: the reference tool soft-deletes by sending {"isActive":
+        false} to this endpoint. 1.0.0 specified DELETE, which no reference client calls.'
+      x-mcp-tool-also: resource.delete
   /resources/{resource_id}/availability:
     get:
       operationId: resourceGetAvailability
       x-mcp-tool: resource.get_availability
       summary: Get resource availability for a date range
-      tags: [Resources]
+      tags:
+      - Resources
       parameters:
-        - $ref: "#/components/parameters/ServicialoVersion"
-        - $ref: "#/components/parameters/Accept"
-        - $ref: "#/components/parameters/ActorHeader"
-        - name: resource_id
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: date_from
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: "2026-03-16"
-        - name: date_to
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date
-          example: "2026-03-22"
-        - name: timezone
-          in: query
-          schema:
-            type: string
-          example: America/Santiago
+      - $ref: '#/components/parameters/ServicialoVersion'
+      - $ref: '#/components/parameters/Accept'
+      - name: resource_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: date_from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+        example: '2026-03-16'
+      - name: date_to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+        example: '2026-03-22'
+      - name: timezone
+        in: query
+        schema:
+          type: string
+        example: America/Santiago
       responses:
-        "200":
+        '200':
           description: Available time slots.
           content:
-            application/vnd.api+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/AvailabilityCollection"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-
-  # ── A2A Extension ────────────────────────────
-
+                $ref: '#/components/schemas/AvailabilityCollection'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
   /.well-known/agents.json:
     get:
       operationId: a2aListAgents
       summary: A2A agent directory
-      description: |
-        Returns a list of AgentCards for all organizations in this Servicialo node.
+      description: 'Returns a list of AgentCards for all organizations in this Servicialo node.
+
         Enables A2A-compatible agents to discover available service providers.
-      tags: [A2A Extension]
+
+        '
+      tags:
+      - A2A Extension
       security: []
       responses:
-        "200":
+        '200':
           description: Agent directory.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AgentCard"
-
+                  $ref: '#/components/schemas/AgentCard'
   /organizations/{org_slug}/.well-known/agent.json:
     get:
       operationId: a2aGetAgentCard
       summary: A2A Agent Card for an organization
-      description: |
-        Returns the A2A Agent Card describing this organization's capabilities,
+      description: 'Returns the A2A Agent Card describing this organization''s capabilities,
+
         skills, and supported interaction modes. Used by external agents for
+
         discovery before initiating A2A tasks.
-      tags: [A2A Extension]
+
+        '
+      tags:
+      - A2A Extension
       security: []
       parameters:
-        - name: org_slug
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Organization slug.
+      - name: org_slug
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Organization slug.
       responses:
-        "200":
+        '200':
           description: Agent Card.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AgentCard"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/AgentCard'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /organizations/{org_slug}/a2a:
     post:
       operationId: a2aTaskEndpoint
       summary: A2A JSON-RPC task endpoint
-      description: |
-        JSON-RPC 2.0 endpoint for A2A task operations.
+      description: 'JSON-RPC 2.0 endpoint for A2A task operations.
+
         Supports methods: `tasks/send`, `tasks/get`, `tasks/cancel`.
+
         The remote agent processes booking requests and returns task status.
-      tags: [A2A Extension]
+
+        '
+      tags:
+      - A2A Extension
       parameters:
-        - name: org_slug
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Organization slug.
+      - name: org_slug
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Organization slug.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/A2AJsonRpcRequest"
+              $ref: '#/components/schemas/A2AJsonRpcRequest'
             examples:
               tasksSend:
                 summary: Send a booking task
                 value:
-                  jsonrpc: "2.0"
-                  id: "req-1"
+                  jsonrpc: '2.0'
+                  id: req-1
                   method: tasks/send
                   params:
-                    id: "task-abc-123"
+                    id: task-abc-123
                     message:
                       role: user
                       parts:
-                        - type: text
-                          text: "Book a kinesiology session for tomorrow at 10am"
+                      - type: text
+                        text: Book a kinesiology session for tomorrow at 10am
       responses:
-        "200":
+        '200':
           description: JSON-RPC response.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/A2AJsonRpcResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-# ════════════════════════════════════════════════
-# Components
-# ════════════════════════════════════════════════
-
+                $ref: '#/components/schemas/A2AJsonRpcResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
-
-  # ── Security ──────────────────────────────────
-
   securitySchemes:
     BearerAuth:
       type: http
@@ -1569,9 +1462,6 @@ components:
       in: header
       name: X-API-Key
       description: API key authentication.
-
-  # ── Parameters ────────────────────────────────
-
   parameters:
     ServicialoVersion:
       name: X-Servicialo-Version
@@ -1579,24 +1469,19 @@ components:
       required: true
       schema:
         type: string
-        enum: ["1.0"]
-      description: Resolver API version (wire value — independent of the protocol document version, which is declared in protocol/manifest.yaml).
-
+        enum:
+        - '1.0'
+      description: Version of the observable HTTP contract (HTTP_PROFILE.md 2.2.1). Independent of the
+        protocol version and of the profile document version, both declared in protocol/manifest.yaml.
     Accept:
       name: Accept
       in: header
-      required: true
+      required: false
       schema:
         type: string
-        enum: ["application/vnd.api+json"]
-
-    ActorHeader:
-      name: X-Servicialo-Actor
-      in: header
-      schema:
-        type: string
-      description: Base64-encoded JSON Actor object.
-
+        enum:
+        - application/json
+      description: RECOMMENDED. The reference client does not send it; servers MUST NOT require it.
     SessionId:
       name: session_id
       in: path
@@ -1604,109 +1489,92 @@ components:
       schema:
         type: string
       example: ses_abc123
-
-    Page:
-      name: page
-      in: query
+    OrgSlug:
+      name: org_slug
+      in: path
+      required: true
       schema:
-        type: integer
-        default: 1
-        minimum: 1
-
-    PerPage:
-      name: per_page
-      in: query
-      schema:
-        type: integer
-        default: 20
-        minimum: 1
-        maximum: 100
-
-  # ── Responses ─────────────────────────────────
-
+        type: string
+      example: clinica-dental-sur
   responses:
     NotFound:
       description: Resource not found.
       content:
-        application/vnd.api+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             errors:
-              - status: "404"
-                code: NOT_FOUND
-                title: Resource not found
-                detail: "The requested resource does not exist."
-
+            - status: '404'
+              code: NOT_FOUND
+              title: Resource not found
+              detail: The requested resource does not exist.
     ValidationError:
       description: Validation error.
       content:
-        application/vnd.api+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             errors:
-              - status: "422"
-                code: VALIDATION_ERROR
-                title: Validation failed
-                detail: "Missing required field."
-                source:
-                  pointer: /data/attributes/service_id
-
+            - status: '422'
+              code: VALIDATION_ERROR
+              title: Validation failed
+              detail: Missing required field.
+              source:
+                pointer: /data/attributes/service_id
     InvalidTransition:
       description: Invalid state transition.
       content:
-        application/vnd.api+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             errors:
-              - status: "422"
-                code: INVALID_TRANSITION
-                title: Invalid state transition
-                detail: "Cannot transition from 'requested' to 'in_progress'. Valid targets: ['scheduled']."
-                source:
-                  pointer: /data/attributes/to_state
-
+            - status: '422'
+              code: INVALID_TRANSITION
+              title: Invalid state transition
+              detail: 'Cannot transition from ''requested'' to ''in_progress''. Valid targets: [''scheduled''].'
+              source:
+                pointer: /data/attributes/to_state
     Conflict:
       description: Resource conflict.
       content:
-        application/vnd.api+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             errors:
-              - status: "409"
-                code: CONFLICT
-                title: Conflict
-                detail: "Time slot is no longer available."
-
+            - status: '409'
+              code: CONFLICT
+              title: Conflict
+              detail: Time slot is no longer available.
     Forbidden:
       description: Insufficient permissions or mandate.
       content:
-        application/vnd.api+json:
+        application/json:
           schema:
-            $ref: "#/components/schemas/ErrorResponse"
+            $ref: '#/components/schemas/ErrorResponse'
           example:
             errors:
-              - status: "403"
-                code: SCOPE_INSUFFICIENT
-                title: Insufficient scope
-                detail: "Mandate does not grant 'service:read'."
-
-  # ── Schemas ───────────────────────────────────
-
+            - status: '403'
+              code: SCOPE_INSUFFICIENT
+              title: Insufficient scope
+              detail: Mandate does not grant 'service:read'.
   schemas:
-
-    # ── Core types ──
-
     Actor:
       type: object
-      required: [type, id]
+      required:
+      - type
+      - id
       properties:
         type:
           type: string
-          enum: [client, provider, organization, agent]
+          enum:
+          - client
+          - provider
+          - organization
+          - agent
         id:
           type: string
         mandate_id:
@@ -1719,7 +1587,6 @@ components:
               type: string
             id:
               type: string
-
     GeoLocation:
       type: object
       properties:
@@ -1731,13 +1598,17 @@ components:
           type: number
           minimum: -180
           maximum: 180
-
     Transition:
       type: object
-      required: [to, at, by]
+      required:
+      - to
+      - at
+      - by
       properties:
         from:
-          type: ["string", "null"]
+          type:
+          - string
+          - 'null'
         to:
           type: string
         at:
@@ -1747,45 +1618,25 @@ components:
           type: string
         method:
           type: string
-          enum: [auto, manual, agent]
+          enum:
+          - auto
+          - manual
+          - agent
         metadata:
           type: object
-
-    PaginationMeta:
-      type: object
-      properties:
-        total:
-          type: integer
-        page:
-          type: integer
-        per_page:
-          type: integer
-
-    PaginationLinks:
-      type: object
-      properties:
-        self:
-          type: string
-        next:
-          type: ["string", "null"]
-        prev:
-          type: ["string", "null"]
-        first:
-          type: string
-        last:
-          type: string
-
-    # ── Error ──
-
     ErrorResponse:
       type: object
-      required: [errors]
+      required:
+      - errors
       properties:
         errors:
           type: array
           items:
             type: object
-            required: [status, code, title]
+            required:
+            - status
+            - code
+            - title
             properties:
               status:
                 type: string
@@ -1802,938 +1653,590 @@ components:
                     type: string
                   parameter:
                     type: string
-
-    # ── Capabilities ──
-
     CapabilitiesResponse:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: server
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                protocol_version:
-                  type: string
-                profile_version:
-                  type: string
-                compliance:
-                  type: string
-                  enum: [minimum, extended]
-                capabilities:
-                  type: array
-                  items:
-                    type: string
-
-    # ── Resource wrappers (JSON:API) ──
-
-    OrganizationCollection:
-      type: object
-      properties:
-        data:
+        protocol_version:
+          type: string
+        profile_version:
+          type: string
+        compliance:
+          type: string
+          enum:
+          - minimum
+          - extended
+        capabilities:
           type: array
           items:
-            $ref: "#/components/schemas/OrganizationData"
-        meta:
-          $ref: "#/components/schemas/PaginationMeta"
-        links:
-          $ref: "#/components/schemas/PaginationLinks"
-
+            type: string
+    OrganizationCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrganizationData'
     OrganizationData:
       type: object
-      required: [type, id, attributes]
       properties:
-        type:
-          type: string
-          const: organizations
         id:
           type: string
-        attributes:
-          type: object
-          properties:
-            name:
-              type: string
-            vertical:
-              type: string
-            location:
-              type: string
-            country:
-              type: string
-
+        name:
+          type: string
+        vertical:
+          type: string
+        location:
+          type: string
+        country:
+          type: string
     OrganizationResource:
-      type: object
-      properties:
-        data:
-          $ref: "#/components/schemas/OrganizationData"
-
+      $ref: '#/components/schemas/OrganizationData'
     ServiceCollection:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/ServiceData"
-        meta:
-          $ref: "#/components/schemas/PaginationMeta"
-        links:
-          $ref: "#/components/schemas/PaginationLinks"
-
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceData'
     ServiceData:
-      type: object
-      required: [type, id, attributes]
-      properties:
-        type:
-          type: string
-          const: services
-        id:
-          type: string
-        attributes:
-          description: Service object per schema/service.schema.json
-          $ref: "../schema/service.schema.json"
-
+      description: Service object per schema/service.schema.json
+      $ref: ../schema/service.schema.json
     ServiceResource:
-      type: object
-      properties:
-        data:
-          $ref: "#/components/schemas/ServiceData"
-
+      $ref: '#/components/schemas/ServiceData'
     AvailabilityCollection:
       type: object
       properties:
-        data:
+        slots:
           type: array
           items:
             type: object
             properties:
-              type:
+              providerId:
                 type: string
-                const: availability_slots
-              id:
+              start:
                 type: string
-              attributes:
-                type: object
-                properties:
-                  provider_id:
-                    type: string
-                  starts_at:
-                    type: string
-                    format: date-time
-                  ends_at:
-                    type: string
-                    format: date-time
-                  resource_id:
-                    type: string
-
+                format: date-time
+              end:
+                type: string
+                format: date-time
+              resourceId:
+                type: string
+        timezone:
+          type: string
+      description: 'Availability as the reference implementation returns it: a flat `slots` list with
+        ISO 8601 UTC datetimes, plus the timezone.'
     ContractResource:
       type: object
+      description: Contract with policies and evidence requirements.
       properties:
-        data:
+        id:
+          type: string
+        cancellation_policy:
           type: object
-          properties:
-            type:
-              type: string
-              const: contracts
-            id:
-              type: string
-            attributes:
-              type: object
-              description: Contract with policies and evidence requirements.
-              properties:
-                cancellation_policy:
-                  type: object
-                no_show_policy:
-                  type: object
-                arbitration_policy:
-                  type: object
-                required_evidence:
-                  type: array
-                  items:
-                    type: string
-
-    # ── Client ──
-
+        no_show_policy:
+          type: object
+        arbitration_policy:
+          type: object
+        required_evidence:
+          type: array
+          items:
+            type: string
     ClientUpsertRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: clients
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                email:
-                  type: string
-                  format: email
-                phone:
-                  type: string
-                name:
-                  type: string
-                last_name:
-                  type: string
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        name:
+          type: string
+        lastName:
+          type: string
+        actor:
+          $ref: '#/components/schemas/Actor'
     ClientResource:
       type: object
       properties:
-        data:
+        id:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        name:
+          type: string
+        last_name:
+          type: string
+        history_summary:
           type: object
-          properties:
-            type:
-              type: string
-              const: clients
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                email:
-                  type: string
-                phone:
-                  type: string
-                name:
-                  type: string
-                last_name:
-                  type: string
-                history_summary:
-                  type: object
-
-    # ── Session ──
-
     SessionBookRequest:
       type: object
-      required: [data]
+      required:
+      - serviceId
+      - providerId
+      - clientId
+      - startTime
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: sessions
-            attributes:
-              type: object
-              required: [service_id, provider_id, client_id, starts_at, actor]
-              properties:
-                service_id:
-                  type: string
-                provider_id:
-                  type: string
-                client_id:
-                  type: string
-                starts_at:
-                  type: string
-                  format: date-time
-                resource_id:
-                  type: string
-                human_intent_confirmed:
-                  type: boolean
-                  default: false
-                  description: |
-                    OPTIONAL. When true, the caller asserts that a human user
-                    has reviewed and confirmed this booking intent before
-                    submission. When omitted or false, no such assertion is
-                    made. Caller-neutral vocabulary: the protocol records
-                    what the caller asserts; treatment of either case is
-                    implementer policy. See HTTP_PROFILE.md §6.2.1.
-                actor:
-                  $ref: "#/components/schemas/Actor"
+        serviceId:
+          type: string
+        providerId:
+          type: string
+        clientId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        resourceId:
+          type: string
+        human_intent_confirmed:
+          type: boolean
+          default: false
+          description: 'OPTIONAL. When true, the caller asserts that a human user
 
+            has reviewed and confirmed this booking intent before
+
+            submission. When omitted or false, no such assertion is
+
+            made. Caller-neutral vocabulary: the protocol records
+
+            what the caller asserts; treatment of either case is
+
+            implementer policy. See HTTP_PROFILE.md §6.2.1.
+
+            '
+        actor:
+          $ref: '#/components/schemas/Actor'
     SessionResource:
       type: object
       properties:
-        data:
+        id:
+          type: string
+        service_id:
+          type: string
+        provider_id:
+          type: string
+        client_id:
+          type: string
+        starts_at:
+          type: string
+          format: date-time
+        resource_id:
+          type: string
+        lifecycle:
           type: object
           properties:
-            type:
+            current_state:
               type: string
-              const: sessions
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                service_id:
-                  type: string
-                provider_id:
-                  type: string
-                client_id:
-                  type: string
-                starts_at:
-                  type: string
-                  format: date-time
-                resource_id:
-                  type: string
-                lifecycle:
-                  type: object
-                  properties:
-                    current_state:
-                      type: string
-                    transitions:
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/Transition"
-                proof:
-                  type: object
-                documentation:
-                  type: object
-        meta:
+            transitions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transition'
+        proof:
           type: object
-          properties:
-            transition:
-              $ref: "#/components/schemas/Transition"
-
-    # ── Actor-only request ──
-
+        documentation:
+          type: object
     ActorRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
-    # ── Lifecycle ──
-
+        actor:
+          $ref: '#/components/schemas/Actor'
     LifecycleResource:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: lifecycle_states
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                current_state:
-                  type: string
-                available_transitions:
-                  type: array
-                  items:
-                    type: string
-                transitions:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/Transition"
-
+        id:
+          type: string
+        current_state:
+          type: string
+        available_transitions:
+          type: array
+          items:
+            type: string
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transition'
     TransitionRequest:
       type: object
-      required: [data]
+      required:
+      - toState
+      - actor
       properties:
-        data:
+        toState:
+          type: string
+          enum:
+          - scheduled
+          - confirmed
+          - in_progress
+          - completed
+          - documented
+          - invoiced
+          - collected
+          - verified
+          - cancelled
+          description: 'Canonical lifecycle target state (PROTOCOL.md 6). The reference implementation
+            additionally accepts `delivered` and `charged` in place of `completed` and `invoiced`/`collected`
+            — a known divergence tracked in protocol/manifest.yaml (state_machines.service_lifecycle.reference_implementation_divergence),
+            migration in PR #23.'
+        actor:
+          $ref: '#/components/schemas/Actor'
+        reason:
+          type: string
+        evidence:
           type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: transitions
-            attributes:
-              type: object
-              required: [to_state, actor]
-              properties:
-                to_state:
-                  type: string
-                  enum:
-                    - scheduled
-                    - confirmed
-                    - in_progress
-                    - completed
-                    - documented
-                    - invoiced
-                    - collected
-                    - verified
-                    - cancelled
-                actor:
-                  $ref: "#/components/schemas/Actor"
-                reason:
-                  type: string
-                evidence:
-                  type: object
-
     RescheduleRequest:
       type: object
-      required: [data]
+      required:
+      - startTime
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: reschedules
-            attributes:
-              type: object
-              required: [new_datetime, actor]
-              properties:
-                new_datetime:
-                  type: string
-                  format: date-time
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
+        startTime:
+          type: string
+          format: date-time
+        actor:
+          $ref: '#/components/schemas/Actor'
     CancelRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: cancellations
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                reason:
-                  type: string
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
-    # ── Delivery ──
-
+        reason:
+          type: string
+        actor:
+          $ref: '#/components/schemas/Actor'
     CheckinRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: checkins
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                actor:
-                  $ref: "#/components/schemas/Actor"
-                location:
-                  $ref: "#/components/schemas/GeoLocation"
-                timestamp:
-                  type: string
-                  format: date-time
-
+        actor:
+          $ref: '#/components/schemas/Actor'
+        location:
+          $ref: '#/components/schemas/GeoLocation'
+        timestamp:
+          type: string
+          format: date-time
     CheckoutRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: checkouts
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                actor:
-                  $ref: "#/components/schemas/Actor"
-                location:
-                  $ref: "#/components/schemas/GeoLocation"
-                timestamp:
-                  type: string
-                  format: date-time
-
+        actor:
+          $ref: '#/components/schemas/Actor'
+        location:
+          $ref: '#/components/schemas/GeoLocation'
+        timestamp:
+          type: string
+          format: date-time
     EvidenceRequest:
       type: object
-      required: [data]
+      required:
+      - evidenceType
+      - data
+      - actor
       properties:
+        evidenceType:
+          type: string
+          enum:
+          - gps
+          - signature
+          - photo
+          - document
+          - duration
+          - notes
         data:
           type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: evidence
-            attributes:
-              type: object
-              required: [evidence_type, data, actor]
-              properties:
-                evidence_type:
-                  type: string
-                  enum: [gps, signature, photo, document, duration, notes]
-                data:
-                  type: object
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
-    # ── Closing ──
-
+        actor:
+          $ref: '#/components/schemas/Actor'
     DocumentationRequest:
       type: object
-      required: [data]
+      required:
+      - content
+      - actor
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: documentation
-            attributes:
-              type: object
-              required: [content, actor]
-              properties:
-                content:
-                  type: string
-                template_id:
-                  type: string
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
+        content:
+          type: string
+        templateId:
+          type: string
+        actor:
+          $ref: '#/components/schemas/Actor'
     SaleCreateRequest:
       type: object
-      required: [data]
+      required:
+      - clientId
+      - serviceId
+      - providerId
+      - unitPrice
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: sales
-            attributes:
-              type: object
-              required: [client_id, service_id, provider_id, unit_price]
-              properties:
-                client_id:
-                  type: string
-                service_id:
-                  type: string
-                provider_id:
-                  type: string
-                quantity:
-                  type: integer
-                  default: 1
-                unit_price:
-                  type: number
-
+        clientId:
+          type: string
+        serviceId:
+          type: string
+        providerId:
+          type: string
+        quantity:
+          type: integer
+          default: 1
+        unitPrice:
+          type: number
     SaleResource:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: sales
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                client_id:
-                  type: string
-                service_id:
-                  type: string
-                provider_id:
-                  type: string
-                quantity:
-                  type: integer
-                unit_price:
-                  type: number
-                total:
-                  type: number
-                status:
-                  type: string
-
+        id:
+          type: string
+        client_id:
+          type: string
+        service_id:
+          type: string
+        provider_id:
+          type: string
+        quantity:
+          type: integer
+        unit_price:
+          type: number
+        total:
+          type: number
+        status:
+          type: string
     PaymentRequest:
       type: object
-      required: [data]
+      required:
+      - amount
+      - paymentMethod
+      - ventaId
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: payments
-            attributes:
-              type: object
-              required: [amount, method]
-              properties:
-                amount:
-                  type: number
-                method:
-                  type: string
-                  enum: [efectivo, transferencia, mercadopago, tarjeta]
-                reference:
-                  type: string
-
+        ventaId:
+          type: string
+          description: Identifier of the sale this payment settles.
+        amount:
+          type: number
+        paymentMethod:
+          type: string
+          enum:
+          - efectivo
+          - transferencia
+          - mercadopago
+          - tarjeta
+        reference:
+          type: string
     PaymentResource:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: payments
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                sale_id:
-                  type: string
-                amount:
-                  type: number
-                method:
-                  type: string
-                reference:
-                  type: string
-                recorded_at:
-                  type: string
-                  format: date-time
-
+        id:
+          type: string
+        sale_id:
+          type: string
+        amount:
+          type: number
+        method:
+          type: string
+        reference:
+          type: string
+        recorded_at:
+          type: string
+          format: date-time
     PaymentStatusResource:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: payment_status
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                total:
-                  type: number
-                paid:
-                  type: number
-                balance:
-                  type: number
-                status:
-                  type: string
-                payments:
-                  type: array
-                  items:
-                    type: object
-
-    # ── Service Orders ──
-
-    ServiceOrderCollection:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/ServiceOrderData"
-        meta:
-          $ref: "#/components/schemas/PaginationMeta"
-        links:
-          $ref: "#/components/schemas/PaginationLinks"
-
-    ServiceOrderData:
-      type: object
-      required: [type, id, attributes]
-      properties:
-        type:
-          type: string
-          const: service_orders
         id:
           type: string
-        attributes:
-          description: Service Order per schema/service-order.schema.json
-          $ref: "../schema/service-order.schema.json"
-
+        total:
+          type: number
+        paid:
+          type: number
+        balance:
+          type: number
+        status:
+          type: string
+        payments:
+          type: array
+          items:
+            type: object
+    ServiceOrderCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/ServiceOrderData'
+    ServiceOrderData:
+      description: Service Order per schema/service-order.schema.json
+      $ref: ../schema/service-order.schema.json
     ServiceOrderResource:
-      type: object
-      properties:
-        data:
-          $ref: "#/components/schemas/ServiceOrderData"
-
+      $ref: '#/components/schemas/ServiceOrderData'
     ServiceOrderCreateRequest:
-      type: object
-      required: [data]
-      properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: service_orders
-            attributes:
-              description: Service Order body per schema/service-order.schema.json.
-              $ref: "../schema/service-order.schema.json"
-
+      description: Service Order body per schema/service-order.schema.json.
+      $ref: ../schema/service-order.schema.json
     LedgerResource:
       type: object
       properties:
-        data:
-          type: object
-          properties:
-            type:
-              type: string
-              const: ledgers
-            id:
-              type: string
-            attributes:
-              type: object
-              properties:
-                services_verified:
-                  type: integer
-                hours_consumed:
-                  type: number
-                amount_consumed:
-                  type: number
-                amount_billed:
-                  type: number
-                amount_collected:
-                  type: number
-                amount_remaining:
-                  type: number
-
-    # ── Mandates ──
-
-    MandateCollection:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/MandateData"
-        meta:
-          $ref: "#/components/schemas/PaginationMeta"
-        links:
-          $ref: "#/components/schemas/PaginationLinks"
-
-    MandateData:
-      type: object
-      required: [type, id, attributes]
-      properties:
-        type:
-          type: string
-          const: mandates
         id:
           type: string
-        attributes:
-          description: Mandate per schema/service-mandate.schema.json
-          $ref: "../schema/service-mandate.schema.json"
-
+        services_verified:
+          type: integer
+        hours_consumed:
+          type: number
+        amount_consumed:
+          type: number
+        amount_billed:
+          type: number
+        amount_collected:
+          type: number
+        amount_remaining:
+          type: number
+    MandateCollection:
+      type: array
+      items:
+        $ref: '#/components/schemas/MandateData'
+    MandateData:
+      description: Mandate per schema/service-mandate.schema.json
+      $ref: ../schema/service-mandate.schema.json
     MandateResource:
-      type: object
-      properties:
-        data:
-          $ref: "#/components/schemas/MandateData"
-
+      $ref: '#/components/schemas/MandateData'
     SuspendRequest:
       type: object
-      required: [data]
       properties:
-        data:
-          type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: mandate_actions
-            attributes:
-              type: object
-              properties:
-                reason:
-                  type: string
-
-    # ── Resources ──
-
+        reason:
+          type: string
     ResourceCollection:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/ResourceData"
-        meta:
-          $ref: "#/components/schemas/PaginationMeta"
-        links:
-          $ref: "#/components/schemas/PaginationLinks"
-
+      type: array
+      items:
+        $ref: '#/components/schemas/ResourceData'
     ResourceData:
       type: object
-      required: [type, id, attributes]
       properties:
-        type:
-          type: string
-          const: resources
         id:
           type: string
-        attributes:
+        organization_id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - room
+          - box
+          - chair
+          - equipment
+        capacity:
+          type: integer
+          default: 1
+        buffer_minutes:
+          type: integer
+          default: 0
+        equipment:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        is_active:
+          type: boolean
+        rules:
           type: object
-          properties:
-            organization_id:
-              type: string
-            name:
-              type: string
-            type:
-              type: string
-              enum: [room, box, chair, equipment]
-            capacity:
-              type: integer
-              default: 1
-            buffer_minutes:
-              type: integer
-              default: 0
-            equipment:
-              type: array
-              items:
+        availability:
+          type: array
+          items:
+            type: object
+            properties:
+              resource_id:
                 type: string
-            location:
-              type: string
-            is_active:
-              type: boolean
-            rules:
-              type: object
-            availability:
-              type: array
-              items:
-                type: object
-                properties:
-                  resource_id:
-                    type: string
-                  day_of_week:
-                    type: integer
-                    minimum: 0
-                    maximum: 6
-                  start_time:
-                    type: string
-                  end_time:
-                    type: string
-                  is_available:
-                    type: boolean
-                  timezone:
-                    type: string
-
+              day_of_week:
+                type: integer
+                minimum: 0
+                maximum: 6
+              start_time:
+                type: string
+              end_time:
+                type: string
+              is_available:
+                type: boolean
+              timezone:
+                type: string
     ResourceResource:
-      type: object
-      properties:
-        data:
-          $ref: "#/components/schemas/ResourceData"
-
+      $ref: '#/components/schemas/ResourceData'
     ResourceCreateRequest:
       type: object
-      required: [data]
+      required:
+      - organizationId
+      - name
+      - actor
       properties:
-        data:
+        organizationId:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - room
+          - box
+          - chair
+          - equipment
+        capacity:
+          type: integer
+          default: 1
+        bufferMinutes:
+          type: integer
+          default: 0
+        equipment:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        rules:
           type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: resources
-            attributes:
-              type: object
-              required: [organization_id, name, actor]
-              properties:
-                organization_id:
-                  type: string
-                name:
-                  type: string
-                type:
-                  type: string
-                  enum: [room, box, chair, equipment]
-                capacity:
-                  type: integer
-                  default: 1
-                buffer_minutes:
-                  type: integer
-                  default: 0
-                equipment:
-                  type: array
-                  items:
-                    type: string
-                location:
-                  type: string
-                rules:
-                  type: object
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
+        actor:
+          $ref: '#/components/schemas/Actor'
     ResourceUpdateRequest:
       type: object
-      required: [data]
+      required:
+      - actor
       properties:
-        data:
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - room
+          - box
+          - chair
+          - equipment
+        capacity:
+          type: integer
+        bufferMinutes:
+          type: integer
+        equipment:
+          type: array
+          items:
+            type: string
+        location:
+          type: string
+        rules:
           type: object
-          required: [type, attributes]
-          properties:
-            type:
-              type: string
-              const: resources
-            attributes:
-              type: object
-              required: [actor]
-              properties:
-                name:
-                  type: string
-                type:
-                  type: string
-                  enum: [room, box, chair, equipment]
-                capacity:
-                  type: integer
-                buffer_minutes:
-                  type: integer
-                equipment:
-                  type: array
-                  items:
-                    type: string
-                location:
-                  type: string
-                rules:
-                  type: object
-                actor:
-                  $ref: "#/components/schemas/Actor"
-
-    # ── A2A Extension Schemas ──────────────────
-
+        actor:
+          $ref: '#/components/schemas/Actor'
+        isActive:
+          type: boolean
+          description: Set false to soft-delete the resource (resource.delete).
     AgentCard:
       type: object
-      required: [name, url, version, skills]
-      description: |
-        A2A Agent Card — declares an agent's identity, capabilities, and skills.
+      required:
+      - name
+      - url
+      - version
+      - skills
+      description: 'A2A Agent Card — declares an agent''s identity, capabilities, and skills.
+
         See https://a2a-protocol.org/latest/specification/
+
+        '
       properties:
         name:
           type: string
           description: Human-readable agent name.
-          example: "Clínica Dental Sur"
+          example: Clínica Dental Sur
         description:
           type: string
           description: What this agent does.
-          example: "Booking agent for dental services"
+          example: Booking agent for dental services
         url:
           type: string
           format: uri
@@ -2749,11 +2252,11 @@ components:
         version:
           type: string
           description: Agent implementation version.
-          example: "1.0.0"
+          example: 1.0.0
         a2aVersion:
           type: string
           description: A2A protocol version supported.
-          example: "0.3"
+          example: '0.3'
         capabilities:
           type: object
           properties:
@@ -2766,17 +2269,19 @@ components:
         skills:
           type: array
           items:
-            $ref: "#/components/schemas/AgentSkill"
+            $ref: '#/components/schemas/AgentSkill'
         defaultInputModes:
           type: array
           items:
             type: string
-          default: ["text"]
+          default:
+          - text
         defaultOutputModes:
           type: array
           items:
             type: string
-          default: ["text"]
+          default:
+          - text
         securitySchemes:
           type: array
           items:
@@ -2784,48 +2289,61 @@ components:
             properties:
               type:
                 type: string
-                enum: [apiKey, http, oauth2, openIdConnect]
+                enum:
+                - apiKey
+                - http
+                - oauth2
+                - openIdConnect
               description:
                 type: string
-
     AgentSkill:
       type: object
-      required: [id, name]
+      required:
+      - id
+      - name
       properties:
         id:
           type: string
-          example: "booking"
+          example: booking
         name:
           type: string
-          example: "Service Booking"
+          example: Service Booking
         description:
           type: string
-          example: "Book professional service appointments"
+          example: Book professional service appointments
         tags:
           type: array
           items:
             type: string
-          example: ["scheduling", "healthcare"]
+          example:
+          - scheduling
+          - healthcare
         examples:
           type: array
           items:
             type: string
-          example: ["Book a kinesiology session for tomorrow at 10am"]
-
+          example:
+          - Book a kinesiology session for tomorrow at 10am
     A2AJsonRpcRequest:
       type: object
-      required: [jsonrpc, method, id]
+      required:
+      - jsonrpc
+      - method
+      - id
       description: JSON-RPC 2.0 request for A2A task operations.
       properties:
         jsonrpc:
           type: string
-          const: "2.0"
+          const: '2.0'
         id:
           type: string
           description: Request identifier.
         method:
           type: string
-          enum: [tasks/send, tasks/get, tasks/cancel]
+          enum:
+          - tasks/send
+          - tasks/get
+          - tasks/cancel
           description: A2A method name.
         params:
           type: object
@@ -2838,20 +2356,21 @@ components:
               type: string
               description: Groups related tasks.
             message:
-              $ref: "#/components/schemas/A2AMessage"
-
+              $ref: '#/components/schemas/A2AMessage'
     A2AJsonRpcResponse:
       type: object
-      required: [jsonrpc, id]
+      required:
+      - jsonrpc
+      - id
       description: JSON-RPC 2.0 response.
       properties:
         jsonrpc:
           type: string
-          const: "2.0"
+          const: '2.0'
         id:
           type: string
         result:
-          $ref: "#/components/schemas/A2ATask"
+          $ref: '#/components/schemas/A2ATask'
         error:
           type: object
           properties:
@@ -2861,10 +2380,11 @@ components:
               type: string
             data:
               type: object
-
     A2ATask:
       type: object
-      required: [id, status]
+      required:
+      - id
+      - status
       description: Represents a stateful unit of work in the A2A protocol.
       properties:
         id:
@@ -2872,29 +2392,35 @@ components:
         contextId:
           type: string
         status:
-          $ref: "#/components/schemas/A2ATaskStatus"
+          $ref: '#/components/schemas/A2ATaskStatus'
         messages:
           type: array
           items:
-            $ref: "#/components/schemas/A2AMessage"
+            $ref: '#/components/schemas/A2AMessage'
         artifacts:
           type: array
           items:
-            $ref: "#/components/schemas/A2AArtifact"
+            $ref: '#/components/schemas/A2AArtifact'
         createdTime:
           type: string
           format: date-time
         updatedTime:
           type: string
           format: date-time
-
     A2ATaskStatus:
       type: object
-      required: [state]
+      required:
+      - state
       properties:
         state:
           type: string
-          enum: [submitted, working, input-required, completed, failed, canceled]
+          enum:
+          - submitted
+          - working
+          - input-required
+          - completed
+          - failed
+          - canceled
           description: Current task state.
         message:
           type: string
@@ -2902,26 +2428,31 @@ components:
         timestamp:
           type: string
           format: date-time
-
     A2AMessage:
       type: object
-      required: [role, parts]
+      required:
+      - role
+      - parts
       properties:
         role:
           type: string
-          enum: [user, agent]
+          enum:
+          - user
+          - agent
         parts:
           type: array
           items:
-            $ref: "#/components/schemas/A2APart"
-
+            $ref: '#/components/schemas/A2APart'
     A2APart:
       type: object
       description: Polymorphic content part — text, file, or structured data.
       properties:
         type:
           type: string
-          enum: [text, file, data]
+          enum:
+          - text
+          - file
+          - data
         text:
           type: string
           description: Text content (when type=text).
@@ -2935,17 +2466,37 @@ components:
         data:
           type: object
           description: Structured data (when type=data).
-
     A2AArtifact:
       type: object
-      required: [id, parts]
+      required:
+      - id
+      - parts
       properties:
         id:
           type: string
         parts:
           type: array
           items:
-            $ref: "#/components/schemas/A2APart"
+            $ref: '#/components/schemas/A2APart'
         metadata:
           type: object
           additionalProperties: true
+    NodeManifest:
+      type: object
+      required:
+      - protocol_version
+      properties:
+        protocol_version:
+          type: string
+          example: '0.10'
+          description: Protocol version this node speaks.
+        name:
+          type: string
+        org_slug:
+          type: string
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+      description: Node manifest. Shape not verified against a node in this repository — see the endpoint
+        description.

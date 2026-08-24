@@ -36,6 +36,43 @@ Minimum viable Servicialo implementation. Required for listing in the
 meta-registry. An implementation that satisfies all five CORE requirements
 is CONFORMANT at level CORE.
 
+**What CORE guarantees a consumer.** One sentence scopes the level:
+
+> A consumer MUST be able to discover an offer, know its availability before
+> committing it, create the commitment, manage that commitment's lifecycle,
+> and record evidence of delivery.
+
+Each clause is satisfied by exactly one required operation. The canonical,
+machine-readable list lives in
+[`protocol/manifest.yaml`](https://github.com/servicialo/mcp-server/blob/main/protocol/manifest.yaml)
+under `conformance.core.required_operations` — this document says *which
+capabilities* CORE requires and why; the manifest says *which operations*
+express them. `scripts/verify-conformance-parity.mjs` fails CI if the two, or
+any document derived from them, disagree.
+
+| Clause of the sentence | Required operation |
+|---|---|
+| (the node declares itself) | `registry.manifest` |
+| discover an offer | `services.list` |
+| know availability before committing it | `scheduling.check_availability` |
+| create the commitment | `scheduling.book` |
+| manage the lifecycle | `lifecycle.transition` |
+| record evidence of delivery | `delivery.record_evidence` |
+
+Two notes on what is deliberately *not* in that list:
+
+- **`registry.search` is not a node requirement.** Discovery across nodes is
+  the resolver's job; a node is discoverable because it is registered, not
+  because it implements search.
+- **`scheduling.confirm`, `delivery.checkin` and `delivery.checkout` are
+  OPTIONAL conveniences.** Their effects are expressible through the required
+  operations — `confirmed`, `in_progress` and `delivered` are all valid
+  `lifecycle.transition` targets, and GPS and duration are
+  `delivery.record_evidence` types. Requiring them would inflate CORE without
+  adding a capability. (One convenience is not reproducible that way: the
+  reference implementation computes real duration automatically on checkout.
+  That is reference behaviour, not a protocol requirement.)
+
 **Requirements:**
 
 1. **8 Dimensions** — Model services using all 8 canonical dimensions
