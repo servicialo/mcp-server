@@ -66,7 +66,26 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## 1. Purpose
 
-The Servicialo protocol (§13) defines its tool interface as MCP operations. This document defines a canonical HTTP profile that maps every MCP tool to a REST endpoint with exact semantic parity. HTTP and MCP are **parallel channels** — neither wraps the other. A conformant HTTP implementation MUST produce identical outcomes to a conformant MCP implementation for the same logical operation.
+The Servicialo protocol (§13) defines its tool interface as MCP operations. This document defines a canonical HTTP profile that maps the **node** operations to REST endpoints with exact semantic parity. HTTP and MCP are **parallel channels** — neither wraps the other. A conformant HTTP implementation MUST produce identical outcomes to a conformant MCP implementation for the same logical operation.
+
+### 1.1 Scope — what this profile does and does not cover
+
+This profile covers the operations a **node** serves: the 27 endpoints in
+Appendix A. It deliberately does not cover the operations the **global resolver
+and network layer** serve, which no node implements:
+
+| Out of scope | Tools | Served at |
+|---|---|---|
+| Resolver | `resolve.lookup`, `resolve.search`, `resolve.register`, `resolve.update_endpoint`, `trust.get_score`, `telemetry.heartbeat` | `/v1/resolve/*` on the global resolver |
+| Network taxonomy | `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types` | `/api/registry/*` on the resolver |
+| Network intelligence | `market.list_segments`, `market.get_benchmark` | `/api/benchmarks*` on the resolver |
+| Client-side only | `docs.quickstart` | no network call — returns static onboarding data |
+
+`a2a.get_agent_card` is a node endpoint but belongs to the experimental A2A
+binding; it appears in `spec/openapi.yaml` and is not part of the HTTP
+conformance surface.
+
+An implementer building a node needs Appendix A and nothing from this table.
 
 This profile does NOT define authentication mechanisms. Implementations MUST provide authentication but MAY choose any scheme (Bearer tokens, API keys, OAuth 2.0, etc.). The profile defines only the `Authorization` header requirement.
 

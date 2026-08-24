@@ -1402,6 +1402,7 @@ paths:
                 $ref: '#/components/schemas/AgentCard'
         '404':
           $ref: '#/components/responses/NotFound'
+      x-mcp-tool: a2a.get_agent_card
   /organizations/{org_slug}/a2a:
     post:
       operationId: a2aTaskEndpoint
