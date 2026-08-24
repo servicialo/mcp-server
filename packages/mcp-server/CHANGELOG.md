@@ -6,6 +6,29 @@ For protocol-level changes (new schemas, new endpoints, governance), see the [ro
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning is independent of the protocol's SemVer.
 
+## [Unreleased]
+
+Not published to npm. Ships with the next release.
+
+### Changed
+
+- **Operational telemetry now declares protocol `0.10` by default.** The
+  fallback in `src/telemetry/operational.ts` was `'0.9'` while the protocol had
+  been `0.10` since 2026-05-20, so every node that did not set
+  `SERVICIALO_PROTOCOL_VERSION` explicitly reported a protocol version one
+  minor behind the one it actually spoke. Nodes that set the variable are
+  unaffected. This is the only behaviour change in the version-unification
+  pass — no path, method, field name, enum, header or envelope moved.
+- Documented default for `SERVICIALO_PROTOCOL_VERSION` corrected to `0.10` in
+  both READMEs, and the "current stable version" line with it.
+
+### Note
+
+`FINGERPRINT_SALT` remains `servicialo-op-v0.9` and MUST NOT be bumped with the
+protocol: it is a wire value, and changing it re-buckets every telemetry
+fingerprint. `scripts/verify-salt-parity.mjs` guards it;
+`scripts/verify-versions.mjs` deliberately ignores it.
+
 ## [0.9.14] - 2026-08-23
 
 Outreach patch. **No wire changes** — no protocol, tool, enum or header change, and

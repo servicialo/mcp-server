@@ -344,7 +344,7 @@ For platforms with enough volume or where the amount per service makes disputes 
 JSON Schemas for automated validation: [`schema/service.schema.json`](./schema/service.schema.json) and [`schema/service-order.schema.json`](./schema/service-order.schema.json)
 
 ```yaml
-# ── SERVICIALO v0.6 ──────────────────
+# ── SERVICIALO v0.10 ─────────────────
 # The 8 dimensions of a service
 
 service:

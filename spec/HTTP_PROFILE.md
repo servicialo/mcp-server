@@ -64,13 +64,39 @@ Every request MUST include:
 |---|---|---|
 | `Content-Type` | `application/vnd.api+json` | Required for requests with a body. |
 | `Accept` | `application/vnd.api+json` | Required on all requests. |
-| `X-Servicialo-Version` | `0.8` | Protocol version. Servers MUST reject unknown versions with `406`. |
+| `X-Servicialo-Version` | `1.0` | Version of this HTTP binding — see §2.2.1. Servers MUST reject unknown versions with `406`. |
 
 Authenticated endpoints additionally require:
 
 | Header | Value |
 |---|---|
 | `Authorization` | Implementation-defined (e.g., `Bearer <token>`, `ApiKey <key>`). |
+
+#### 2.2.1 What `X-Servicialo-Version` versions
+
+`X-Servicialo-Version` identifies a compatible family of the observable HTTP
+contract. It changes when, and only when, a change is incompatible for a
+consumer: paths, methods, required fields, wire vocabulary, error codes,
+preconditions, or observable semantics.
+
+It does **not** automatically follow the protocol version, and it does not
+follow the editorial revision of this document. Three versions are in play and
+they are deliberately independent:
+
+| Version | Current | What it tracks |
+|---|---|---|
+| Protocol | `0.10` (draft) | The protocol itself — `protocol/manifest.yaml` → `protocol.version`. |
+| HTTP Profile document | `1.1.0` | The editorial revision of *this document* — `bindings.http.profile_version`. |
+| `X-Servicialo-Version` | `1.0` | The observable HTTP contract — `bindings.http.resolver_api_version`. |
+
+So "HTTP Profile 1.1.0 / Protocol 0.10 draft / `X-Servicialo-Version` 1.0" is
+not a contradiction: the header versions compatibility, not maturity and not
+edition. A draft protocol can have a stable binding; rewriting this document to
+describe the same wire more accurately changes the profile version and leaves
+the header untouched.
+
+Implementations MUST send the literal value above. Servers MUST reject an
+unknown value with `406`.
 
 ### 2.3 Actor Header
 
@@ -254,7 +280,7 @@ Response:
     "type": "server",
     "id": "servicialo",
     "attributes": {
-      "protocol_version": "0.8",
+      "protocol_version": "0.10",
       "profile_version": "1.0.0",
       "compliance": "extended",
       "capabilities": [
@@ -311,7 +337,7 @@ Server manifest — returns protocol version, server name, and available endpoin
 
 ```json
 {
-  "servicialo": "0.7",
+  "protocol_version": "0.10",
   "name": "Coordinalo",
   "description": "Plataforma abierta para la gestión integral de servicios profesionales.",
   "endpoints": {
