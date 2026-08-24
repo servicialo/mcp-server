@@ -144,7 +144,7 @@ interface EmitterContext {
  */
 export function loadEmitterContext(nodeVersion: string): EmitterContext {
   return {
-    protocolVersion: process.env.SERVICIALO_PROTOCOL_VERSION || '0.9',
+    protocolVersion: process.env.SERVICIALO_PROTOCOL_VERSION || '0.10',
     nodeVersion,
     vertical: process.env.SERVICIALO_VERTICAL || 'unspecified',
     region: (process.env.SERVICIALO_REGION || 'CL').toUpperCase(),

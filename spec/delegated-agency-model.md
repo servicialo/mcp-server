@@ -191,7 +191,7 @@ Suspension is useful for: security incidents, investigation periods, and tempora
 
 ## 10.4 Validation Rules
 
-The following rules are normative. Any implementation claiming Servicialo v0.8 compliance must enforce them.
+The following rules are normative. Any implementation claiming Servicialo compliance must enforce them.
 
 **Rule 1: No self-issuance.** `principal_id` must reference a human entity. The `agent_id` in a mandate must not equal the `principal_id`. An agent cannot issue, modify, extend, or renew its own mandate.
 
@@ -262,7 +262,7 @@ This creates a dual audit path: the service's lifecycle transitions record _what
 
 > This section updates the Agent Decision Model from v0.7 to integrate with the Delegated Agency Model.
 
-The autonomy matrix from v0.7 (§10 in the previous version) remains valid. The v0.8 update adds one requirement: **every agent action — whether autonomous or requiring human confirmation — must be performed under a valid ServiceMandate.**
+The autonomy matrix remains valid, with one requirement holding across every level: **every agent action — whether autonomous or requiring human confirmation — must be performed under a valid ServiceMandate.**
 
 The autonomy level determines _whether_ the agent can act without confirmation. The mandate determines _whether_ the agent is authorized to act at all.
 

@@ -4,7 +4,7 @@ import { withRateLimit } from '@/lib/servicialo/response';
 import { type NextRequest } from 'next/server';
 
 const A2A_VERSION = '0.3.0';
-const SERVICIALO_PROTOCOL_VERSION = '0.9';
+const SERVICIALO_PROTOCOL_VERSION = '0.10';
 
 export async function GET(
   request: NextRequest,

@@ -257,7 +257,7 @@ Estas variables habilitan que tu nodo contribuya eventos anonimizados a los benc
 | `SERVICIALO_REGION` | No | `CL` | ISO 3166-1 alpha-2 del país operativo. Los eventos se etiquetan con esto |
 | `SERVICIALO_NODE_TOKEN` | No | — | `ownership_token` de tu nodo en el registry. Se envía como header `X-Servicialo-Node-Token` en los calls `market.*` para identificar tu tier (incluye tier 2 = real-time access) |
 | `SERVICIALO_OPERATIONAL_TELEMETRY` | No | `true` | Setear a `false` para desactivar la emisión automática de eventos operacionales (booking_created, service_completed, dispute_opened, payment_settled) |
-| `SERVICIALO_PROTOCOL_VERSION` | No | `0.9` | Versión del protocolo declarada en los eventos emitidos |
+| `SERVICIALO_PROTOCOL_VERSION` | No | `0.10` | Versión del protocolo declarada en los eventos emitidos |
 | `SERVICIALO_TELEMETRY_BASE_URL` | No | `https://servicialo.com` | Endpoint receptor de telemetría operacional (sólo cambiar para testing) |
 
 > **Cómo se relaciona con tiers de benchmarks:** un nodo que emite ≥ 50 eventos operacionales en 30 días automáticamente alcanza tier 2 y `market.get_benchmark` devuelve datos en tiempo real (en lugar del default tier 0/1 con 90 días de delay). Política completa: [GOVERNANCE.md#contribute-to-access-policy-v01](https://github.com/servicialo/mcp-server/blob/main/GOVERNANCE.md#contribute-to-access-policy-v01).
@@ -467,7 +467,7 @@ La especificación completa del protocolo Servicialo está disponible en:
 
 - **Repositorio:** [github.com/servicialo/protocol](https://github.com/servicialo/protocol)
 - **Sitio web:** [servicialo.com](https://servicialo.com)
-- **Versión estable actual:** 0.9
+- **Versión estable actual:** 0.10
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json), [`resolution.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/resolution.schema.json), [`servicialo-config.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/servicialo-config.schema.json)
 
 La spec cubre las 8 dimensiones del servicio, el ciclo de vida 6+3, 6 flujos de excepción, 7 principios fundamentales, la arquitectura de dos entidades (Servicio atómico + Orden de Servicio), el Modelo de Agencia Delegada, resolución DNS, e interoperabilidad A2A.

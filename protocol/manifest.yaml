@@ -5,7 +5,10 @@
 # Consumed by:
 #   - lib/manifest.ts            (site: versions, tool lists, extensions)
 #   - scripts/verify-manifest-tools.mjs   (CI: manifest ↔ code parity)
-#   - scripts/verify-versions.mjs         (CI: version unification)
+#   - scripts/verify-versions.mjs         (CI: version unification — also reads
+#                                          bindings.http.profile_version,
+#                                          resolver_api_version and
+#                                          extensions[webhooks].version)
 #   - scripts/verify-doc-claims.mjs       (CI: doc claims vs derived counts)
 #
 # Rules:
@@ -105,7 +108,13 @@ bindings:
     maturity: stable             # normative machine-to-machine binding
     profile: spec/HTTP_PROFILE.md
     profile_version: "1.0.0"     # version of the HTTP binding document, not the protocol
-    resolver_api_version: "1.0"  # wire value of X-Servicialo-Version (lib/servicialo/response.ts) — DO NOT change
+    # Wire value of X-Servicialo-Version (lib/servicialo/response.ts) — DO NOT
+    # change to match the protocol or the profile document. It identifies a
+    # compatible family of the observable HTTP contract, and moves only on a
+    # change that is incompatible for a consumer: paths, methods, required
+    # fields, wire vocabulary, error codes, preconditions or observable
+    # semantics. Normative definition: spec/HTTP_PROFILE.md §2.2.1.
+    resolver_api_version: "1.0"
     openapi: spec/openapi.yaml
   mcp:
     maturity: stable             # reference binding, in production (Coordinalo)
@@ -260,7 +269,7 @@ extensions:
   - { id: proof-of-service,     name: Proof of Service,     maturity: draft,
       doc: public/spec/extensions/proof-of-service.md }
   - { id: webhooks,             name: Webhooks,             maturity: experimental,
-      doc: WEBHOOKS.md }
+      doc: WEBHOOKS.md, version: "0.2" }   # version of the WEBHOOKS.md document itself
 
 # ── Implementations ──────────────────────────────────────────────────────────
 implementations:

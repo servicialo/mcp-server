@@ -243,7 +243,7 @@ Enable your node to contribute anonymized bucketed events to network benchmarks 
 | `SERVICIALO_REGION` | No | `CL` | ISO 3166-1 alpha-2 country code |
 | `SERVICIALO_NODE_TOKEN` | No | — | Your node's `ownership_token` from the registry. Sent as `X-Servicialo-Node-Token` header on `market.*` calls to identify tier (tier 2 = real-time access) |
 | `SERVICIALO_OPERATIONAL_TELEMETRY` | No | `true` | Set to `false` to disable automatic emission of operational events (booking_created, service_completed, dispute_opened, payment_settled) |
-| `SERVICIALO_PROTOCOL_VERSION` | No | `0.9` | Protocol version declared in emitted events |
+| `SERVICIALO_PROTOCOL_VERSION` | No | `0.10` | Protocol version declared in emitted events |
 | `SERVICIALO_TELEMETRY_BASE_URL` | No | `https://servicialo.com` | Operational telemetry receiver endpoint (change only for testing) |
 
 > **How it relates to benchmark tiers:** a node that emits ≥ 50 operational events in 30 days automatically reaches tier 2, and `market.get_benchmark` returns real-time data (instead of the default 90-day-delayed view). Full policy: [GOVERNANCE.md#contribute-to-access-policy-v01](https://github.com/servicialo/mcp-server/blob/main/GOVERNANCE.md#contribute-to-access-policy-v01).
@@ -451,7 +451,7 @@ The full Servicialo protocol specification is available at:
 
 - **Repository:** [github.com/servicialo/protocol](https://github.com/servicialo/protocol)
 - **Website:** [servicialo.com](https://servicialo.com)
-- **Current stable version:** 0.9
+- **Current stable version:** 0.10
 - **JSON Schemas:** [`service.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service.schema.json), [`service-order.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-order.schema.json), [`service-mandate.schema.json`](https://github.com/servicialo/protocol/blob/main/schema/service-mandate.schema.json)
 
 The spec covers the 8 dimensions, the 6+3 lifecycle, 6 exception flows (no-show, cancellation, dispute, reschedule, partial delivery), 7 core principles, the two-entity architecture (atomic Service + Service Order), the Delegated Agency Model, DNS resolution, and A2A interoperability.

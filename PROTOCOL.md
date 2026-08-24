@@ -874,7 +874,7 @@ An organizational administrator or system process MAY temporarily suspend a mand
 
 ### 10.5 Normative Validation Rules
 
-Any implementation claiming Servicialo v0.9 compliance MUST enforce these rules:
+Any implementation claiming Servicialo compliance MUST enforce these rules:
 
 | Rule | Statement |
 |------|-----------|
@@ -950,7 +950,7 @@ This creates a dual audit path: the service lifecycle records *what happened*; t
 
 Not all states are equal from an autonomy perspective. Some transitions are deterministic and safe for an agent to execute alone. Others involve ambiguity, real money, or irreversible consequences that require human confirmation.
 
-The v0.8 update adds one requirement: **every agent action — whether autonomous or requiring human confirmation — MUST be performed under a valid ServiceMandate (§10).**
+One requirement holds across every autonomy level: **every agent action — whether autonomous or requiring human confirmation — MUST be performed under a valid ServiceMandate (§10).**
 
 | Dimension | Determined by |
 |-----------|--------------|

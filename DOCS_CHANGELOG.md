@@ -4,6 +4,52 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-08-24 — version unification: one truth per version
+
+`scripts/verify-versions.mjs` checked six header lines and three package
+fields. Everything else — document bodies, example payloads, code defaults,
+wire constants — was unguarded, which is how 14 stale version literals sat in
+green CI. The guardrail was rewritten (v2) to read those surfaces, and every
+drift it found was closed.
+
+**Three versions, now stated as distinct** (new HTTP Profile §2.2.1, mirrored in
+`protocol/manifest.yaml`): the protocol (`0.10`, draft), the HTTP Profile
+document, and `X-Servicialo-Version` (`1.0`). The header identifies a
+compatible family of the observable HTTP contract — it does not track the
+protocol's maturity or the document's edition, so
+"Profile / Protocol 0.10 draft / header 1.0" is not a contradiction.
+
+- **`X-Servicialo-Version` was documented as `0.8` and labelled "Protocol
+  version"** in HTTP Profile §2.2, while the resolver has always emitted `1.0`
+  (`lib/servicialo/response.ts`, `lib/servicialo/proxy.ts`). The mislabel is
+  what invited the drift: a reader bumps it whenever the protocol moves. Row
+  corrected to `1.0` and relabelled; §2.2.1 added.
+- **Examples corrected**: `protocol_version` in the §3.3 capabilities payload
+  (`0.8` → `0.10`); the §4.0 `registry.manifest` example used a field name no
+  surface produces (`"servicialo": "0.7"`) and now shows `protocol_version`.
+- **Normative scoping clauses no longer pin a version.** `PROTOCOL.md §10.5`
+  scoped eight MUSTs to *"claiming Servicialo v0.9 compliance"* inside a v0.10
+  document; `spec/delegated-agency-model.md` said v0.8. Both drop the version
+  rather than bump it, so the clause cannot drift again.
+- **History moved out of normative bodies**: *"The v0.8 update adds one
+  requirement…"* now states the requirement in the present tense.
+- **Stale advertisements fixed**: the agent card's `x-servicialo.protocolVersion`
+  constant (`0.9` → `0.10`), the documented `SERVICIALO_PROTOCOL_VERSION`
+  default, the "current stable version" lines, and the schema banners in both
+  root READMEs (`v0.9` / `v0.6` → `v0.10`). The whitepaper link is now labelled
+  a historical snapshot instead of carrying a bare version.
+- **`WEBHOOKS.md` versions itself (`v0.2`)** and now declares that in the
+  manifest, the way `bindings.a2a.version` does, so it is not a fourth
+  unexplained number.
+
+Deliberately untouched: `FINGERPRINT_SALT` (a wire value), Appendix B changelog
+headings, bannered historical snapshots, and package CHANGELOG history — these
+record when something happened and are correct as written.
+
+Evidence baseline: [`docs/analysis/contract-audit-2026-08-24.md`](./docs/analysis/contract-audit-2026-08-24.md).
+
+---
+
 ## 2026-08-01 — intents.md 1.2.0: payloads verified against the reference implementation
 
 `public/spec/intents.md` claimed shapes the reference implementation (Coordinalo) never produced. Every request/response in the doc is now verified against the live implementation:

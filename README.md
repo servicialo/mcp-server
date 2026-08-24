@@ -26,7 +26,7 @@ de entrega y liquidación financiera de servicios profesionales.
 
 For a formal description of the architecture, message flows, and data model:
 
-- [Whitepaper v0.9](https://servicialo.com/whitepaper) — formal protocol specification
+- [Whitepaper](https://servicialo.com/whitepaper) — historical snapshot (protocol v0.9, March 2026); not updated. Current surface: [PROTOCOL.md](./PROTOCOL.md) and [`protocol/manifest.yaml`](./protocol/manifest.yaml)
 - [Protocol repository](https://github.com/servicialo/protocol) — schemas, RFCs, and reference materials
 - [PROTOCOL.md](./PROTOCOL.md) — full specification in this repo
 
@@ -380,7 +380,7 @@ JSON Schemas para validación automática: [`schema/service.schema.json`](./sche
 
 ```yaml
 # ─────────────────────────────────────────────
-# SERVICIALO v0.9
+# SERVICIALO v0.10
 # Dos entidades: Orden + Servicios atómicos
 # ─────────────────────────────────────────────
 
