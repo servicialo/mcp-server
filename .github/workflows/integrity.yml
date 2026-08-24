@@ -10,6 +10,7 @@ name: Integrity checks
 #   - protocol/manifest.yaml ↔ tool source parity
 #   - Version unification (manifest ↔ PROTOCOL/SPEC/CHANGELOG/package/server.json)
 #   - Documentation claims (tool counts, state claims) vs manifest
+#   - Conformance parity (manifest CORE list ↔ profile, openapi, guides, suite)
 #
 # Independent from publish-mcp-server.yml which only fires when the
 # package is bumped. This one catches regressions before they reach
@@ -80,3 +81,6 @@ jobs:
 
       - name: Documentation claims
         run: node scripts/verify-doc-claims.mjs
+
+      - name: Conformance parity (one CORE list)
+        run: node scripts/verify-conformance-parity.mjs

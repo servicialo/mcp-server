@@ -240,6 +240,9 @@ state_machines:
     happy_path: [requested, scheduled, confirmed, in_progress, completed,
                  documented, invoiced, collected, verified]
     required: [requested, scheduled, confirmed, in_progress, completed, documented]
+    # Key name kept: lib/manifest.ts and app/spec/page.tsx consume it.
+    # Note the name is imprecise — `invoiced` and `collected` are settlement,
+    # but `verified` is acceptance/verification, not a financial state.
     optional_financial: [invoiced, collected, verified]
     exception: [cancelled, disputed, reassigning, rescheduling, partial]
     reference_implementation_divergence:

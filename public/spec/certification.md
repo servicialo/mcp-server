@@ -84,7 +84,7 @@ Two notes on what is deliberately *not* in that list:
    ```
    requested → scheduled → confirmed → in_progress → completed → documented
    ```
-   The 3 financial states (`invoiced → collected → verified`) are OPTIONAL
+   The 3 close-out states (`invoiced → collected → verified`) are OPTIONAL
    extensions — implementations MAY bundle them into the session lifecycle or
    manage them independently (PROTOCOL.md §6). No total order is imposed
    across delivery, evidence, acceptance, and settlement (§6.0).
@@ -145,17 +145,23 @@ certified conformance.
 | # | Requirement | `test:http-compat` (automated) | Manual review |
 |:-:|-------------|--------------------------------|---------------|
 | 1 | 8 dimensions modeled | Partial — checks `id`, `name`, `duration_minutes` on one service read | Yes — service payloads validated against `schema/service.schema.json` |
-| 2 | 6 core lifecycle states, strictly ordered | Partial — exercises the book → confirm → transition(cancel) happy path; does **not** attempt invalid transitions | Yes — reviewer requests an invalid-transition rejection (e.g. `requested → in_progress`) |
+| 2 | 6 core lifecycle states, strictly ordered | Partial — exercises book → confirm → transition through the real tool handlers, in canonical vocabulary; does **not** attempt invalid transitions | Yes — reviewer requests an invalid-transition rejection (e.g. `requested → in_progress`) |
 | 3 | 3+ exception flows | Partial — cancellation only | Yes — remaining flows demonstrated with request/response evidence |
 | 4 | JSON Schema conformance | No | Yes — `ajv` validation of submitted payloads |
 | 5 | Discovery endpoint (agent card) | No — the suite checks `/v1/manifest`, not `/.well-known/agent.json` | Yes — card fetched and inspected |
 | 6–10 | FULL requirements (all exception flows, Service Orders, resources, evidence by vertical, contracts) | No | Yes — when FULL is claimed |
 | 11–14 | NETWORK requirements (MCP server, resolver registration, telemetry, A2A) | No | Yes — when NETWORK is claimed |
 
-The suite's value is real but narrow: it proves the HTTP binding surface
-exists and behaves plausibly (phases 0–4 required, 5–6 optional). The
-normative substance of conformance is verified by review until the
-automated certification suite ships.
+The suite's value is real but narrow: it proves the required CORE operations
+answer on the paths the reference tools actually call. Because it drives the
+tool handlers rather than a parallel set of requests, "the suite passes" and
+"an agent can talk to this node" are the same statement — but neither is
+conformance. The normative substance is verified by review until the automated
+certification suite ships.
+
+`scripts/verify-conformance-parity.mjs` keeps this document, the manifest, the
+HTTP Profile, `openapi.yaml`, the implementer guides and the suite from
+disagreeing about which operations are required.
 
 ## Verification Process (today)
 
@@ -168,9 +174,18 @@ automated certification suite ships.
    SERVICIALO_ORG_ID=your-test-org \
    npm run test:http-compat
    ```
-   The suite reports `HTTP-COMPATIBLE`, `PARTIAL` or `NOT-COMPATIBLE`.
-   `HTTP-COMPATIBLE` is a prerequisite for listing, not a conformance
-   verdict.
+   The suite invokes the **reference tool handlers** through the HTTP
+   adapter, so it exercises the same codepath an agent uses. It reports two
+   levels separately:
+
+   - **(a) Binding** — `CORE required operations: n/n` and `optional: m/k`.
+     The verdict `HTTP-COMPATIBLE` is defined as exactly this: **the required
+     CORE operations respond**. It is a prerequisite for listing, not a
+     conformance verdict.
+   - **(b) Certification** — *not evaluated by this suite.* Every run prints
+     the CORE requirements that still need additional or manual verification
+     (rows 1–5 of the matrix above: invalid-transition rejection, the
+     remaining exception flows, schema conformance, the agent card).
 2. **Submit:** Open a pull request to the
    [repository](https://github.com/servicialo/mcp-server) with your suite
    output and implementation details, following

@@ -11,9 +11,34 @@ A step-by-step guide for building a Servicialo-compatible platform. You don't ne
 To be listed as a Servicialo implementation ([§16](./PROTOCOL.md#16-implementations)), your platform MUST:
 
 1. Model services using the **8 dimensions** (§5)
-2. Implement the **6 core lifecycle states** (§6) — the 3 financial states are optional
+2. Implement the **6 core lifecycle states** (§6) — `requested → scheduled → confirmed → in_progress → completed → documented`. The states `invoiced → collected → verified` are an OPTIONAL extension: bundle them into the session lifecycle or manage them independently. Transitions are **strictly ordered within the sequence you implement**, and no total order is imposed across delivery, evidence, acceptance and settlement ([§6.0](./PROTOCOL.md#60-happy-path-milestones-and-orthogonal-dimensions))
 3. Handle at least **3 exception flows** (§7)
-4. Expose **at least one machine-to-machine binding** implementing the Core profiles, declaring supported profiles and versions — HTTP (normative), MCP (reference, recommended for agents), A2A, or an equivalent. A purely HTTP implementation is conformant without MCP
+4. Expose **at least one machine-to-machine binding** exposing the 6 CORE operations and declaring supported profiles and versions — HTTP (normative), MCP (reference, recommended for agents), A2A, or an equivalent. A purely HTTP implementation is conformant without MCP
+
+### The 6 CORE operations
+
+The canonical, machine-readable list is in
+[`protocol/manifest.yaml`](./protocol/manifest.yaml) under
+`conformance.core.required_operations`; this table restates it and
+`scripts/verify-conformance-parity.mjs` fails CI if they disagree. Each satisfies
+one clause of the CORE sentence in
+[`certification.md`](./public/spec/certification.md): *a consumer MUST be able to
+discover an offer, know its availability before committing it, create the
+commitment, manage that commitment's lifecycle, and record evidence of delivery.*
+
+| Operation | Clause it satisfies |
+|---|---|
+| `registry.manifest` | the node declares itself (protocol version + endpoints) |
+| `services.list` | discover an offer |
+| `scheduling.check_availability` | know availability before committing it |
+| `scheduling.book` | create the commitment |
+| `lifecycle.transition` | manage the lifecycle |
+| `delivery.record_evidence` | record evidence of delivery |
+
+Not required: `registry.search` (a resolver concern — you are discoverable by
+registering); `scheduling.confirm`, `delivery.checkin` and `delivery.checkout`
+(conveniences, expressible through `lifecycle.transition` and
+`delivery.record_evidence`); `payments.create_sale` (settlement — OPTIONAL / FULL).
 
 Everything else — Service Orders, Delegated Agency, Provider Profiles, Network Intelligence — is optional.
 
@@ -100,7 +125,7 @@ interface Service {
 
 ## Step 2: Implement the 6+3 Lifecycle States
 
-The states are strictly ordered. No skipping (§6.1). The first 6 (`requested` → `documented`) are the required core; states 7–9 (`invoiced`, `collected`, `verified`) are optional financial extensions — implement them if your platform covers financial close.
+Transitions are strictly ordered within the sequence you implement — no skipping (§6.1). The first 6 (`requested` → `documented`) are the required core. States 7–9 are an optional extension covering settlement and acceptance: `invoiced` and `collected` are settlement, `verified` is acceptance/verification — not a financial state. Implement them if your platform covers close-out.
 
 ```
 requested → scheduled → confirmed → in_progress → completed → documented → invoiced → collected → verified
@@ -305,16 +330,21 @@ function rescheduleService(
 
 Expose HTTP endpoints that cover the 6 agent phases from §13. At minimum, you need endpoints for:
 
-| Phase | Endpoint | Maps to MCP tool |
-|-------|----------|-----------------|
-| 1. Discover | `GET /services` | `services.list` |
-| 1. Discover | `GET /availability?service_id=X&date_from=Y&date_to=Z` | `scheduling.check_availability` |
-| 3. Commit | `POST /bookings` | `scheduling.book` |
-| 3. Commit | `POST /bookings/:id/confirm` | `scheduling.confirm` |
-| 4. Manage | `POST /bookings/:id/transition` | `lifecycle.transition` |
-| 5. Verify | `POST /bookings/:id/checkin` | `delivery.checkin` |
+| Phase | Endpoint | MCP tool | Level |
+|-------|----------|----------|-------|
+| 1. Discover | `GET /v1/manifest` | `registry.manifest` | REQUIRED |
+| 1. Discover | `GET /v1/organizations/{org_slug}/services` | `services.list` | REQUIRED |
+| 1. Discover | `GET /v1/organizations/{org_slug}/availability?from=&to=` | `scheduling.check_availability` | REQUIRED |
+| 3. Commit | `POST /v1/sessions` | `scheduling.book` | REQUIRED |
+| 3. Commit | `POST /v1/sessions/{id}/confirm` | `scheduling.confirm` | OPTIONAL |
+| 4. Manage | `POST /v1/sessions/{id}/lifecycle/transition` | `lifecycle.transition` | REQUIRED |
+| 5. Verify | `POST /v1/sessions/{id}/evidence` | `delivery.record_evidence` | REQUIRED |
+| 5. Verify | `POST /v1/sessions/{id}/checkin` | `delivery.checkin` | OPTIONAL |
 
-[SPEC GAP] The protocol defines MCP tool signatures (§13) but does not prescribe HTTP endpoint paths or REST conventions. Each implementation chooses its own API surface — the MCP server adapts to it.
+These are the paths the reference client actually calls. They are documented in
+[`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) 1.1.0 and checked against the
+tool sources in CI. If you expose different paths, the reference MCP server
+cannot talk to your backend without an adapter of your own.
 
 For a complete walkthrough with request/response examples, see [`examples/minimal-implementation.md`](./examples/minimal-implementation.md).
 
@@ -406,8 +436,8 @@ Your implementation MUST store evidence immutably — once recorded, evidence ca
 | # | Requirement | Spec reference | Check |
 |---|-------------|---------------|-------|
 | 1 | Service has all 8 dimensions | §5 | Validate against `schema/service.schema.json` |
-| 2 | The 6 core states are implemented | §6 | Create a service and advance it through the 6 core states (financial states optional) |
-| 3 | States are strictly ordered (no skipping) | §6.1 | Attempt an invalid transition — it should fail |
+| 2 | The 6 core states are implemented | §6 | Create a service and advance it through the 6 core states (`invoiced/collected/verified` are an optional extension) |
+| 3 | Strictly ordered within the implemented sequence | §6.1, §6.0 | Attempt an invalid transition — it should fail. No total order is required across delivery, evidence, acceptance and settlement |
 | 4 | Every transition records `from`, `to`, `at`, `by` | §6.1 | Inspect the transitions array after a full cycle |
 | 5 | 3+ exception flows work | §7 | Trigger each one and verify the state machine |
 | 6 | MCP server connects and tools respond | §13 | Connect an agent and run a discovery query |
@@ -470,9 +500,16 @@ SERVICIALO_ORG_ID=your_org_id \
 npm run test:http-compat --prefix packages/mcp-server
 ```
 
-An `HTTP-COMPATIBLE` implementation covers phases 0–4 (Resolve, Discover, Understand,
-Commit, Manage). Phases 5–6 (Verify, Close) are optional in v0.10 but required for
-listing in regulated verticals (health, legal).
+The suite invokes the **real tool handlers** through the HTTP adapter, so it
+exercises the same codepath an agent uses. It reports two levels separately:
+
+- **(a) Binding** — `CORE required operations: n/n` and `optional: m/k`. The
+  verdict `HTTP-COMPATIBLE` means exactly that: **the required CORE operations
+  respond.**
+- **(b) Certification** — *not evaluated by this suite.* Every run prints the
+  CORE requirements still needing additional or manual verification:
+  invalid-transition rejection, the remaining exception flows, schema
+  conformance and the agent card.
 
 **What this suite certifies and what it does not:** it verifies that your HTTP
 surface exposes the [HTTP profile](./spec/HTTP_PROFILE.md) endpoints and that they
