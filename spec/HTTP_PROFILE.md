@@ -4,11 +4,39 @@
 
 | | |
 |---|---|
-| **Profile Version** | 1.0.0 |
+| **Profile Version** | 1.1.0 |
 | **Protocol Version** | 0.10 |
-| **Date** | 2026-08-01 |
+| **Date** | 2026-08-24 |
 | **Status** | Draft |
 | **License** | Apache-2.0 |
+
+---
+
+## Erratum — what changed in 1.1.0
+
+**1.0.0 described a binding design that was never the implemented reference
+wire.** It specified a JSON:API envelope, a `/v1/` base path, an
+`X-Servicialo-Actor` header, and paths (`/registry/organizations`,
+`/sessions/{id}/transitions`, `/availability`) that no reference client has
+ever called. An implementer who built against it would not have interoperated
+with the reference implementation.
+
+**1.1.0 documents the contract that actually runs**: the paths, methods, bodies
+and vocabulary produced by the reference tool handlers
+(`packages/mcp-server/src/tools/**`) through `HttpAdapter`
+(`packages/mcp-server/src/adapter-http.ts`), which is the codepath an agent
+uses against a non-Coordinalo node. Where this document and the reference code
+disagreed, the code won. Where the code diverges from `PROTOCOL.md`, the
+divergence is labelled as such and left in place.
+
+**`X-Servicialo-Version` remains `1.0`** because no public wire was ever
+implemented under the 1.0.0 design: there is no deployed consumer of the
+envelope, paths or header this document previously described, so nothing
+observable broke. The header versions the observable contract (§2.2.1), not
+this document.
+
+The evidence behind each change is recorded in
+[`docs/analysis/contract-audit-2026-08-24.md`](../docs/analysis/contract-audit-2026-08-24.md).
 
 ---
 
@@ -38,7 +66,26 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## 1. Purpose
 
-The Servicialo protocol (§13) defines its tool interface as MCP operations. This document defines a canonical HTTP profile that maps every MCP tool to a REST endpoint with exact semantic parity. HTTP and MCP are **parallel channels** — neither wraps the other. A conformant HTTP implementation MUST produce identical outcomes to a conformant MCP implementation for the same logical operation.
+The Servicialo protocol (§13) defines its tool interface as MCP operations. This document defines a canonical HTTP profile that maps the **node** operations to REST endpoints with exact semantic parity. HTTP and MCP are **parallel channels** — neither wraps the other. A conformant HTTP implementation MUST produce identical outcomes to a conformant MCP implementation for the same logical operation.
+
+### 1.1 Scope — what this profile does and does not cover
+
+This profile covers the operations a **node** serves: the 27 endpoints in
+Appendix A. It deliberately does not cover the operations the **global resolver
+and network layer** serve, which no node implements:
+
+| Out of scope | Tools | Served at |
+|---|---|---|
+| Resolver | `resolve.lookup`, `resolve.search`, `resolve.register`, `resolve.update_endpoint`, `trust.get_score`, `telemetry.heartbeat` | `/v1/resolve/*` on the global resolver |
+| Network taxonomy | `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types` | `/api/registry/*` on the resolver |
+| Network intelligence | `market.list_segments`, `market.get_benchmark` | `/api/benchmarks*` on the resolver |
+| Client-side only | `docs.quickstart` | no network call — returns static onboarding data |
+
+`a2a.get_agent_card` is a node endpoint but belongs to the experimental A2A
+binding; it appears in `spec/openapi.yaml` and is not part of the HTTP
+conformance surface.
+
+An implementer building a node needs Appendix A and nothing from this table.
 
 This profile does NOT define authentication mechanisms. Implementations MUST provide authentication but MAY choose any scheme (Bearer tokens, API keys, OAuth 2.0, etc.). The profile defines only the `Authorization` header requirement.
 
@@ -48,13 +95,24 @@ This profile does NOT define authentication mechanisms. Implementations MUST pro
 
 ### 2.1 Base Path
 
-All endpoints are relative to:
+All endpoints in this document are written relative to `/v1/`, and resolve
+against the implementation's base URL:
 
 ```
-/servicialo/v1/
+{base}/v1/
 ```
 
-Implementations MAY prepend a host-specific prefix (e.g., `https://api.example.com/servicialo/v1/`).
+`{base}` is the value a client is configured with (`SERVICIALO_BASE_URL` in the
+reference client). It MAY include a host-specific prefix — `https://api.example.com`
+and `https://example.com/servicialo` are both valid, yielding
+`https://api.example.com/v1/sessions` and `https://example.com/v1/sessions`.
+
+Implementations MUST NOT require the literal segment `/servicialo` before `/v1`.
+1.0.0 specified a fixed `/v1/` base; the reference adapter has always
+concatenated `{base}` + `/v1` + path
+(`packages/mcp-server/src/adapter-http.ts`), so a node that only answers on
+`/v1/` is unreachable unless the operator folds that segment into
+`{base}`.
 
 ### 2.2 Required HTTP Headers
 
@@ -62,8 +120,8 @@ Every request MUST include:
 
 | Header | Value | Notes |
 |---|---|---|
-| `Content-Type` | `application/vnd.api+json` | Required for requests with a body. |
-| `Accept` | `application/vnd.api+json` | Required on all requests. |
+| `Content-Type` | `application/json` | Required for requests with a body. |
+| `Accept` | `application/json` | RECOMMENDED. The reference client does not send it; servers MUST NOT require it. |
 | `X-Servicialo-Version` | `1.0` | Version of this HTTP binding — see §2.2.1. Servers MUST reject unknown versions with `406`. |
 
 Authenticated endpoints additionally require:
@@ -98,9 +156,10 @@ the header untouched.
 Implementations MUST send the literal value above. Servers MUST reject an
 unknown value with `406`.
 
-### 2.3 Actor Header
+### 2.3 Actor
 
-All authenticated endpoints accept an `X-Servicialo-Actor` header as a Base64-encoded JSON object:
+The actor travels **in the request body**, as a field named `actor`, on every
+write operation. Servers MUST accept it there.
 
 ```json
 {
@@ -114,74 +173,83 @@ All authenticated endpoints accept an `X-Servicialo-Actor` header as a Base64-en
 }
 ```
 
-Alternatively, the `actor` field MAY be included in the request body for `POST`/`PATCH` operations. When present in both, the request body takes precedence.
-
 When `actor.type` is `agent`, the `mandate_id` field is REQUIRED per protocol §10.
+
+1.0.0 specified an `X-Servicialo-Actor` header carrying this object Base64-encoded.
+**No reference tool sends that header** and no reference client reads it, so it is
+removed rather than kept as an unexercised alternative. Implementations MAY accept
+it as an extension; they MUST NOT require it.
+
+### 2.3.1 Organization context
+
+Authenticated requests carry the organization in the `X-Servicialo-Org` header
+(`packages/mcp-server/src/adapter-http.ts`). This header runs today and was
+undocumented in 1.0.0.
+
+| Header | Value | Notes |
+|---|---|---|
+| `X-Servicialo-Org` | Organization slug or id | Sent on authenticated requests, and on public requests when the client is org-scoped. |
+| `X-Servicialo-Node-Token` | Opaque token | Sent on public requests when `SERVICIALO_NODE_TOKEN` is set. Optional. |
 
 ### 2.4 Response Envelope
 
-#### 2.4.1 Success — Single Resource
+**Responses are plain JSON objects.** There is no envelope: a resource is
+returned as the resource, a collection as an array or as an object whose fields
+the client reads directly.
+
+1.0.0 specified a JSON:API envelope (`{"data":{"type","id","attributes"}}`).
+No reference tool produces or unwraps it: every handler returns `res.json()`
+verbatim to the caller (`packages/mcp-server/src/adapter-http.ts`). An
+implementation that wrapped its payloads as 1.0.0 described would hand agents
+an object whose fields are one level deeper than any consumer expects.
+
+#### 2.4.1 Single resource
 
 ```json
 {
-  "data": {
-    "type": "sessions",
-    "id": "ses_abc123",
-    "attributes": { }
-  }
+  "id": "ses_abc123",
+  "status": "confirmed",
+  "serviceId": "svc_001",
+  "startTime": "2026-03-16T09:00:00-03:00"
 }
 ```
 
-#### 2.4.2 Success — Collection
+#### 2.4.2 Collection
 
 ```json
-{
-  "data": [
-    {
-      "type": "services",
-      "id": "svc_001",
-      "attributes": { }
-    }
-  ],
-  "meta": {
-    "total": 42,
-    "page": 1,
-    "per_page": 20
-  },
-  "links": {
-    "self": "/servicialo/v1/services?page=1&per_page=20",
-    "next": "/servicialo/v1/services?page=2&per_page=20",
-    "prev": null,
-    "first": "/servicialo/v1/services?page=1&per_page=20",
-    "last": "/servicialo/v1/services?page=3&per_page=20"
-  }
-}
+[
+  { "id": "svc_001", "name": "Kinesiología", "duration_minutes": 45 }
+]
 ```
 
-#### 2.4.3 Success — Action Result
+Implementations MAY return a wrapper object with the collection under a named
+field (the reference availability endpoint returns `slots`). Clients MUST NOT
+assume a fixed wrapper name across operations; each operation below documents
+what it returns.
 
-For endpoints that trigger an action (confirm, transition, cancel, etc.), the response MUST return the affected resource in its new state:
+#### 2.4.3 Action result
 
-```json
-{
-  "data": {
-    "type": "sessions",
-    "id": "ses_abc123",
-    "attributes": { }
-  },
-  "meta": {
-    "transition": {
-      "from": "scheduled",
-      "to": "confirmed",
-      "at": "2026-03-15T10:30:00Z"
-    }
-  }
-}
-```
+For endpoints that trigger an action (confirm, transition, cancel), the response
+SHOULD return the affected resource in its new state, so the caller can read the
+resulting `status` without a follow-up read.
 
-### 2.5 Error Envelope
+### 2.5 Errors
 
-All error responses MUST use the following format:
+**What the reference client does:** any non-2xx response is a failure. It reads
+the body as text and raises an error carrying the method, path, status and that
+text (`packages/mcp-server/src/adapter-http.ts`). It does **not** parse a JSON
+error body, and it does not branch on any error code.
+
+Consequently:
+
+- Implementations MUST signal failure with an appropriate HTTP status code.
+  This is the only part of error handling any reference codepath depends on.
+- The structured envelope below is **RECOMMENDED**, not required. It is **not
+  exercised by the reference client** — no reference code reads `errors[]`,
+  `code`, `title`, `source`, or any of the codes in the table. Declaring it a
+  MUST would assert an interoperability guarantee nothing verifies.
+- A machine-readable `code` remains valuable for humans debugging an
+  integration and for future clients; new implementations SHOULD emit it.
 
 ```json
 {
@@ -191,9 +259,7 @@ All error responses MUST use the following format:
       "code": "INVALID_TRANSITION",
       "title": "Invalid state transition",
       "detail": "Cannot transition from 'requested' to 'in_progress'. Valid targets: ['scheduled'].",
-      "source": {
-        "pointer": "/data/attributes/to_state"
-      }
+      "source": { "pointer": "/toState" }
     }
   ]
 }
@@ -201,14 +267,20 @@ All error responses MUST use the following format:
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `status` | string | Yes | HTTP status code as a string. |
-| `code` | string | Yes | Machine-readable error code. Uppercase snake_case. |
-| `title` | string | Yes | Short human-readable summary. Stable across locales. |
+| `status` | string | Yes* | HTTP status code as a string. |
+| `code` | string | Yes* | Machine-readable error code. Uppercase snake_case. |
+| `title` | string | Yes* | Short human-readable summary. Stable across locales. |
 | `detail` | string | No | Instance-specific explanation. |
 | `source.pointer` | string | No | JSON Pointer to the offending field. |
 | `source.parameter` | string | No | Query parameter name, if applicable. |
 
-#### Standard Error Codes
+\* Required *within the envelope*, when an implementation chooses to emit it.
+The envelope itself is RECOMMENDED.
+
+#### Standard Error Codes (RECOMMENDED)
+
+None of these is exercised by the reference client; the HTTP status is what it
+acts on.
 
 | Code | Status | Meaning |
 |---|---|---|
@@ -226,14 +298,18 @@ All error responses MUST use the following format:
 
 ### 2.6 Pagination
 
-Collection endpoints MUST support pagination via query parameters:
+**Not verified.** 1.0.0 required `page`/`per_page` query parameters and
+`meta`/`links` in every collection response. No reference tool sends either
+parameter, and no reference code reads `meta` or `links`, so this profile
+cannot state a requirement that any implementation has met.
 
-| Parameter | Default | Description |
-|---|---|---|
-| `page` | `1` | 1-indexed page number. |
-| `per_page` | `20` | Items per page. Maximum: `100`. |
+Implementations that paginate SHOULD use `page` (1-indexed) and `per_page`
+(default `20`, maximum `100`), and SHOULD describe the shape they return in
+their own documentation. Clients MUST NOT assume pagination is present.
 
-Responses MUST include `meta.total`, `meta.page`, `meta.per_page`, and `links` as shown in §2.4.2.
+`registry.search` and `scheduling.check_availability` accept a `limit` and a
+date range respectively (§4.1, §4.4) — those are the only result-bounding
+parameters any reference tool sends.
 
 ### 2.7 Date and Time
 
@@ -249,64 +325,105 @@ Clients MAY send an `Idempotency-Key` header on `POST` requests. Servers that su
 
 ### 3.1 REQUIRED — Minimum Compliance
 
-An implementation MUST support these 6 endpoints to claim Servicialo HTTP compliance. They represent the minimum agent cycle: discover → understand → commit → manage → verify → close.
+An implementation MUST support these 6 endpoints to claim Servicialo HTTP
+compliance. They are the operations named in
+`conformance.core.required_operations` in
+[`protocol/manifest.yaml`](../protocol/manifest.yaml) — **that list is
+canonical; this table restates it.** `scripts/verify-conformance-parity.mjs`
+fails CI if the two disagree.
 
-| # | MCP Tool | HTTP Endpoint |
-|---|---|---|
-| 1 | `registry.search` | `GET /registry/organizations` |
-| 2 | `service.get` | `GET /services/{service_id}` |
-| 3 | `scheduling.book` | `POST /sessions` |
-| 4 | `lifecycle.transition` | `POST /sessions/{session_id}/transitions` |
-| 5 | `delivery.record_evidence` | `POST /sessions/{session_id}/evidence` |
-| 6 | `payments.create_sale` | `POST /sales` |
+Each satisfies one clause of the CORE sentence in
+[`public/spec/certification.md`](../public/spec/certification.md): *a consumer
+MUST be able to discover an offer, know its availability before committing it,
+create the commitment, manage that commitment's lifecycle, and record evidence
+of delivery.*
+
+| # | MCP Tool | HTTP Endpoint | Clause |
+|---|---|---|---|
+| 1 | `registry.manifest` | `GET /v1/manifest` | the node declares itself |
+| 2 | `services.list` | `GET /v1/organizations/{org_slug}/services` | discover an offer |
+| 3 | `scheduling.check_availability` | `GET /v1/organizations/{org_slug}/availability` | know availability before committing it |
+| 4 | `scheduling.book` | `POST /v1/sessions` | create the commitment |
+| 5 | `lifecycle.transition` | `POST /v1/sessions/{session_id}/lifecycle/transition` | manage the lifecycle |
+| 6 | `delivery.record_evidence` | `POST /v1/sessions/{session_id}/evidence` | record evidence of delivery |
+
+**What changed from 1.0.0, and why.** The 1.0.0 table listed
+`registry.search`, `service.get` and `payments.create_sale` as REQUIRED and
+omitted `registry.manifest`, `services.list` and `scheduling.check_availability`
+— while marking `registry.manifest` REQUIRED in its own section (§4.0), so the
+document contradicted itself on the count.
+
+- `registry.search` is **not a node requirement**: cross-node discovery is the
+  resolver's job. A node is discoverable because it is registered.
+- `service.get` returns the 8 dimensions of one delivery and is genuinely
+  useful, but a consumer can discover, commit and deliver without it. OPTIONAL.
+- `payments.create_sale` is **settlement**, an OPTIONAL/FULL capability (§9.2).
+  Requiring it would make every free or externally-billed service non-conformant.
+- `scheduling.check_availability` is required because committing a slot without
+  being able to ask whether it is free is not a usable coordination contract.
+  It was already listed as mandatory in `IMPLEMENTORS.md` and already exercised
+  by the compatibility suite; naming it here makes those consistent.
 
 ### 3.2 OPTIONAL — Extended Compliance
 
-All other endpoints defined in this profile are OPTIONAL. Implementations SHOULD declare which optional endpoints they support via the `GET /` metadata endpoint (see §4).
+All other endpoints in this profile are OPTIONAL. Implementations SHOULD declare
+which they support via the capabilities endpoint (§3.3).
+
+Three OPTIONAL endpoints are **conveniences**: their effect is reachable through
+the required operations, which is why requiring them would inflate CORE without
+adding a capability.
+
+| Convenience | Expressible as |
+|---|---|
+| `scheduling.confirm` (§6.3) | `lifecycle.transition` → `confirmed` |
+| `delivery.checkin` (§8.1) | `lifecycle.transition` → `in_progress`, plus `delivery.record_evidence` (`gps`) |
+| `delivery.checkout` (§8.2) | `lifecycle.transition` → `delivered`, plus `delivery.record_evidence` (`gps`, `duration`) |
+
+Verified against the reference tool schemas: `confirmed`, `in_progress` and
+`delivered` are all valid `lifecycle.transition` targets, and `gps` and
+`duration` are valid `delivery.record_evidence` types. One behaviour is **not**
+reproducible that way: the reference implementation computes real duration
+automatically on checkout. That is reference behaviour, not a protocol
+requirement — a client using the required operations supplies duration itself.
 
 ### 3.3 Capabilities Endpoint
 
 Implementations SHOULD expose:
 
 ```
-GET /servicialo/v1/
+GET {base}/v1/
 ```
 
 Response:
 
 ```json
 {
-  "data": {
-    "type": "server",
-    "id": "servicialo",
-    "attributes": {
-      "protocol_version": "0.10",
-      "profile_version": "1.0.0",
-      "compliance": "extended",
-      "capabilities": [
-        "registry.search",
-        "registry.get_organization",
-        "services.list",
-        "scheduling.check_availability",
-        "service.get",
-        "contract.get",
-        "clients.get_or_create",
-        "scheduling.book",
-        "scheduling.confirm",
-        "lifecycle.get_state",
-        "lifecycle.transition",
-        "scheduling.reschedule",
-        "scheduling.cancel",
-        "delivery.checkin",
-        "delivery.checkout",
-        "delivery.record_evidence",
-        "documentation.create",
-        "payments.create_sale",
-        "payments.record_payment",
-        "payments.get_status"
-      ]
-    }
-  }
+  "protocol_version": "0.10",
+  "profile_version": "1.1.0",
+  "compliance": "extended",
+  "capabilities": [
+    "registry.manifest",
+    "services.list",
+    "scheduling.check_availability",
+    "scheduling.book",
+    "lifecycle.transition",
+    "delivery.record_evidence",
+    "registry.search",
+    "registry.get_organization",
+    "service.get",
+    "contract.get",
+    "clients.get_or_create",
+    "scheduling.confirm",
+    "lifecycle.get_state",
+    "scheduling.reschedule",
+    "scheduling.cancel",
+    "delivery.checkin",
+    "delivery.checkout",
+    "documentation.create",
+    "payments.create_sale",
+    "payments.record_payment",
+    "payments.get_status"
+  ]
 }
 ```
 
@@ -327,7 +444,7 @@ Server manifest — returns protocol version, server name, and available endpoin
 | **Compliance** | REQUIRED |
 | **MCP Tool** | `registry.manifest` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/manifest` |
+| **Path** | `/v1/manifest` |
 
 **Success Response**
 
@@ -356,10 +473,10 @@ Search organizations by vertical and location.
 
 | | |
 |---|---|
-| **Compliance** | REQUIRED |
+| **Compliance** | OPTIONAL |
 | **MCP Tool** | `registry.search` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/registry/organizations` |
+| **Path** | `/v1/registry` |
 
 **Query Parameters**
 
@@ -377,21 +494,15 @@ Search organizations by vertical and location.
 | `200 OK` | Collection of organization summaries. |
 
 ```json
-{
-  "data": [
-    {
-      "type": "organizations",
-      "id": "clinica-dental-sur",
-      "attributes": {
-        "name": "Clínica Dental Sur",
-        "vertical": "dental",
-        "location": "Santiago",
-        "country": "cl"
-      }
-    }
-  ],
-  "meta": { "total": 1, "page": 1, "per_page": 10 }
-}
+[
+  {
+    "slug": "clinica-dental-sur",
+    "name": "Clínica Dental Sur",
+    "vertical": "dental",
+    "location": "Santiago",
+    "country": "cl"
+  }
+]
 ```
 
 **Error Responses**
@@ -411,7 +522,7 @@ Get public details of an organization.
 | **Compliance** | OPTIONAL |
 | **MCP Tool** | `registry.get_organization` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/registry/organizations/{org_slug}` |
+| **Path** | `/v1/organizations/{org_slug}/services` |
 
 **Path Parameters**
 
@@ -445,10 +556,10 @@ List the public service catalog of an organization.
 
 | | |
 |---|---|
-| **Compliance** | OPTIONAL |
+| **Compliance** | REQUIRED |
 | **MCP Tool** | `services.list` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/organizations/{org_slug}/services` |
+| **Path** | `/v1/organizations/{org_slug}/services` |
 
 **Path Parameters**
 
@@ -476,10 +587,10 @@ Check available time slots without authentication.
 
 | | |
 |---|---|
-| **Compliance** | OPTIONAL |
+| **Compliance** | REQUIRED |
 | **MCP Tool** | `scheduling.check_availability` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/availability` |
+| **Path** | `/v1/organizations/{org_slug}/availability` |
 
 **Query Parameters**
 
@@ -490,7 +601,7 @@ Check available time slots without authentication.
 | `date_to` | date | Yes | End date (`YYYY-MM-DD`). |
 | `service_id` | string | No | Filter by service. |
 | `provider_id` | string | No | Filter by provider. |
-| `resource_id` | string | No | Filter by physical resource. |
+| `resourceId` | string | No | Filter by physical resource. |
 
 **Success Response**
 
@@ -500,18 +611,15 @@ Check available time slots without authentication.
 
 ```json
 {
-  "data": [
+  "slots": [
     {
-      "type": "availability_slots",
-      "id": "slot_001",
-      "attributes": {
-        "provider_id": "prov_abc",
-        "starts_at": "2026-03-16T09:00:00-03:00",
-        "ends_at": "2026-03-16T09:45:00-03:00",
-        "resource_id": "res_box3"
-      }
+      "providerId": "prov_abc",
+      "start": "2026-03-16T12:00:00Z",
+      "end": "2026-03-16T12:45:00Z",
+      "resourceId": "res_box3"
     }
-  ]
+  ],
+  "timezone": "America/Santiago"
 }
 ```
 
@@ -535,11 +643,11 @@ Get the full 8-dimension service definition.
 
 | | |
 |---|---|
-| **Compliance** | REQUIRED |
+| **Compliance** | OPTIONAL |
 | **MCP Tool** | `service.get` |
 | **Required Scope** | `service:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/services/{service_id}` |
+| **Path** | `/v1/services/{service_id}` |
 
 **Path Parameters**
 
@@ -555,23 +663,18 @@ Get the full 8-dimension service definition.
 
 ```json
 {
-  "data": {
-    "type": "services",
-    "id": "svc_kinesiologia_45",
-    "attributes": {
-      "type": "physical_therapy_session",
-      "vertical": "health",
-      "name": "Sesión de rehabilitación — 45 min",
-      "duration_minutes": 45,
-      "provider": { "id": "prov_abc", "organization_id": "org_xyz" },
-      "client": { "id": "cli_001" },
-      "schedule": { "requested_at": "2026-03-15T08:00:00Z" },
-      "location": { "type": "in_person", "room": "Box 3" },
-      "lifecycle": { "current_state": "requested" },
-      "proof": {},
-      "billing": { "amount": { "value": 35000, "currency": "CLP" } }
-    }
-  }
+  "id": "svc_kinesiologia_45",
+  "type": "physical_therapy_session",
+  "vertical": "health",
+  "name": "Sesión de rehabilitación — 45 min",
+  "duration_minutes": 45,
+  "provider": { "id": "prov_abc", "organization_id": "org_xyz" },
+  "client": { "id": "cli_001" },
+  "schedule": { "requested_at": "2026-03-15T08:00:00Z" },
+  "location": { "type": "in_person", "room": "Box 3" },
+  "lifecycle": { "current_state": "requested" },
+  "proof": {},
+  "billing": { "amount": { "value": 35000, "currency": "CLP" } }
 }
 ```
 
@@ -594,7 +697,7 @@ Get the service contract (rules, policies, evidence requirements).
 | **MCP Tool** | `contract.get` |
 | **Required Scope** | `service:read` or `order:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/services/{service_id}/contract` |
+| **Path** | `/v1/services/{service_id}/contract` |
 
 **Path Parameters**
 
@@ -636,26 +739,17 @@ Find a client by email or phone. If not found, create with the provided data. Up
 | **MCP Tool** | `clients.get_or_create` |
 | **Required Scope** | `patient:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/clients` |
+| **Path** | `/v1/clients` |
 
 **Request Body**
 
 ```json
 {
-  "data": {
-    "type": "clients",
-    "attributes": {
-      "email": "maria@example.com",
-      "phone": "+56912345678",
-      "name": "María",
-      "last_name": "González",
-      "actor": {
-        "type": "agent",
-        "id": "agent_01",
-        "mandate_id": "mdt_abc"
-      }
-    }
-  }
+  "email": "maria@example.com",
+  "phone": "+56912345678",
+  "name": "María",
+  "lastName": "González",
+  "actor": { "type": "agent", "id": "agent_01", "mandate_id": "mdt_abc" }
 }
 ```
 
@@ -664,7 +758,7 @@ Find a client by email or phone. If not found, create with the provided data. Up
 | `email` | string (email) | No* | Client email. Search key. |
 | `phone` | string | No* | Client phone. Search key if no email. |
 | `name` | string | No** | First name. Required if creating. |
-| `last_name` | string | No** | Last name. Required if creating. |
+| `lastName` | string | No** | Last name. Required if creating. |
 | `actor` | Actor | Yes | Who performs the action. |
 
 \* At least one of `email` or `phone` is REQUIRED.
@@ -695,37 +789,28 @@ Book a new session. Creates the session in `requested` state.
 | **MCP Tool** | `scheduling.book` |
 | **Required Scope** | `schedule:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions` |
+| **Path** | `/v1/sessions` |
 
 **Request Body**
 
 ```json
 {
-  "data": {
-    "type": "sessions",
-    "attributes": {
-      "service_id": "svc_001",
-      "provider_id": "prov_abc",
-      "client_id": "cli_001",
-      "starts_at": "2026-03-16T09:00:00-03:00",
-      "resource_id": "res_box3",
-      "actor": {
-        "type": "agent",
-        "id": "agent_01",
-        "mandate_id": "mdt_abc"
-      }
-    }
-  }
+  "serviceId": "svc_001",
+  "providerId": "prov_abc",
+  "clientId": "cli_001",
+  "startTime": "2026-03-16T09:00:00-03:00",
+  "resourceId": "res_box3",
+  "actor": { "type": "agent", "id": "agent_01", "mandate_id": "mdt_abc" }
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `service_id` | string | Yes | Service to book. |
-| `provider_id` | string | Yes | Assigned provider. |
-| `client_id` | string | Yes | Client/beneficiary. |
-| `starts_at` | datetime | Yes | Session start time (ISO 8601). |
-| `resource_id` | string | No | Physical resource. REQUIRED if the service specifies `location.resource_id`. |
+| `serviceId` | string | Yes | Service to book. |
+| `providerId` | string | Yes | Assigned provider. |
+| `clientId` | string | Yes | Client/beneficiary. |
+| `startTime` | datetime | Yes | Session start time (ISO 8601). |
+| `resourceId` | string | No | Physical resource. REQUIRED if the service specifies `location.resource_id`. |
 | `actor` | Actor | Yes | Who performs the action. |
 | `human_intent_confirmed` | boolean | No | Caller asserts a human reviewed and confirmed this booking intent. Defaults to `false`. Caller-neutral vocabulary; see §6.2.1. |
 
@@ -765,7 +850,7 @@ Confirm a booked session. Moves to `confirmed` state.
 | **MCP Tool** | `scheduling.confirm` |
 | **Required Scope** | `schedule:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/confirm` |
+| **Path** | `/v1/sessions/{session_id}/confirm` |
 
 **Path Parameters**
 
@@ -777,15 +862,7 @@ Confirm a booked session. Moves to `confirmed` state.
 
 ```json
 {
-  "data": {
-    "type": "confirmations",
-    "attributes": {
-      "actor": {
-        "type": "client",
-        "id": "cli_001"
-      }
-    }
-  }
+  "actor": { "type": "client", "id": "cli_001" }
 }
 ```
 
@@ -818,7 +895,7 @@ Get the current lifecycle state, available transitions, and transition history.
 | **MCP Tool** | `lifecycle.get_state` |
 | **Required Scope** | `service:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/lifecycle` |
+| **Path** | `/v1/sessions/{session_id}/lifecycle` |
 
 **Path Parameters**
 
@@ -834,30 +911,13 @@ Get the current lifecycle state, available transitions, and transition history.
 
 ```json
 {
-  "data": {
-    "type": "lifecycle_states",
-    "id": "ses_abc123",
-    "attributes": {
-      "current_state": "confirmed",
-      "available_transitions": ["in_progress", "cancelled"],
-      "transitions": [
-        {
-          "from": null,
-          "to": "requested",
-          "at": "2026-03-15T08:00:00Z",
-          "by": "agent_01",
-          "method": "agent"
-        },
-        {
-          "from": "requested",
-          "to": "confirmed",
-          "at": "2026-03-15T08:05:00Z",
-          "by": "cli_001",
-          "method": "manual"
-        }
-      ]
-    }
-  }
+  "id": "ses_abc123",
+  "current_state": "confirmed",
+  "available_transitions": ["in_progress", "cancelled"],
+  "transitions": [
+    { "from": null, "to": "requested", "at": "2026-03-15T08:00:00Z", "by": "agent_01", "method": "agent" },
+    { "from": "requested", "to": "confirmed", "at": "2026-03-15T08:05:00Z", "by": "cli_001", "method": "manual" }
+  ]
 }
 ```
 
@@ -879,7 +939,7 @@ Execute a state transition on a session.
 | **MCP Tool** | `lifecycle.transition` |
 | **Required Scope** | `service:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/transitions` |
+| **Path** | `/v1/sessions/{session_id}/lifecycle/transition` |
 
 **Path Parameters**
 
@@ -891,27 +951,35 @@ Execute a state transition on a session.
 
 ```json
 {
-  "data": {
-    "type": "transitions",
-    "attributes": {
-      "to_state": "in_progress",
-      "actor": {
-        "type": "provider",
-        "id": "prov_abc"
-      },
-      "reason": null,
-      "evidence": {}
-    }
-  }
+  "toState": "in_progress",
+  "actor": { "type": "provider", "id": "prov_abc" },
+  "reason": null,
+  "evidence": {}
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `to_state` | enum | Yes | Target state: `scheduled`, `confirmed`, `in_progress`, `completed`, `documented`, `invoiced`, `collected`, `verified`, `cancelled`. |
+| `toState` | enum | Yes | Target state, from the canonical lifecycle enum (`PROTOCOL.md` §6): `scheduled`, `confirmed`, `in_progress`, `completed`, `documented`, `invoiced`, `collected`, `verified`, `cancelled`. **The reference implementation diverges — see below.** |
 | `actor` | Actor | Yes | Who triggers the transition. |
 | `reason` | string | No | Reason. REQUIRED for `cancelled`. |
 | `evidence` | object | No | Evidence required by the contract for this transition. |
+
+> **Reference implementation divergence.** The reference `lifecycle.transition`
+> tool accepts `delivered` and `charged` where the canonical enum has
+> `completed` and `invoiced`/`collected`
+> (`packages/mcp-server/src/tools/authenticated/lifecycle.ts`). This is a known
+> divergence recorded in
+> [`protocol/manifest.yaml`](../protocol/manifest.yaml) under
+> `state_machines.service_lifecycle.reference_implementation_divergence`, kept
+> for compatibility with the Coordinalo upstream API. A coordinated migration
+> is in progress in
+> [PR #23](https://github.com/servicialo/mcp-server/pull/23).
+>
+> This is **the reference implementation's vocabulary, not the protocol's**. A
+> new implementation SHOULD accept the canonical values. One that also accepts
+> `delivered`/`charged` will interoperate with reference clients built before
+> the migration lands.
 
 **Success Response**
 
@@ -938,8 +1006,8 @@ Reschedule a session to a new date/time. Exception flow (§7.5).
 | **Compliance** | OPTIONAL |
 | **MCP Tool** | `scheduling.reschedule` |
 | **Required Scope** | `schedule:write` |
-| **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/reschedule` |
+| **Method** | `PUT` |
+| **Path** | `/v1/sessions/{session_id}` |
 
 **Path Parameters**
 
@@ -951,22 +1019,14 @@ Reschedule a session to a new date/time. Exception flow (§7.5).
 
 ```json
 {
-  "data": {
-    "type": "reschedules",
-    "attributes": {
-      "new_datetime": "2026-03-17T10:00:00-03:00",
-      "actor": {
-        "type": "client",
-        "id": "cli_001"
-      }
-    }
-  }
+  "startTime": "2026-03-17T10:00:00-03:00",
+  "actor": { "type": "client", "id": "cli_001" }
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `new_datetime` | datetime | Yes | New start time (ISO 8601). |
+| `startTime` | datetime | Yes | New start time (ISO 8601). |
 | `actor` | Actor | Yes | Who reschedules. |
 
 **Success Response**
@@ -995,7 +1055,7 @@ Cancel a session. Applies cancellation policy per contract (§7.3).
 | **MCP Tool** | `scheduling.cancel` |
 | **Required Scope** | `schedule:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/cancel` |
+| **Path** | `/v1/sessions/{session_id}/cancel` |
 
 **Path Parameters**
 
@@ -1007,16 +1067,8 @@ Cancel a session. Applies cancellation policy per contract (§7.3).
 
 ```json
 {
-  "data": {
-    "type": "cancellations",
-    "attributes": {
-      "reason": "Client requested reschedule but no compatible slot available.",
-      "actor": {
-        "type": "client",
-        "id": "cli_001"
-      }
-    }
-  }
+  "reason": "Client requested reschedule but no compatible slot available.",
+  "actor": { "type": "client", "id": "cli_001" }
 }
 ```
 
@@ -1054,7 +1106,7 @@ Record provider or client check-in. Moves session to `in_progress`.
 | **MCP Tool** | `delivery.checkin` |
 | **Required Scope** | `evidence:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/checkin` |
+| **Path** | `/v1/sessions/{session_id}/checkin` |
 
 **Path Parameters**
 
@@ -1066,20 +1118,9 @@ Record provider or client check-in. Moves session to `in_progress`.
 
 ```json
 {
-  "data": {
-    "type": "checkins",
-    "attributes": {
-      "actor": {
-        "type": "provider",
-        "id": "prov_abc"
-      },
-      "location": {
-        "lat": -33.4489,
-        "lng": -70.6693
-      },
-      "timestamp": "2026-03-16T09:02:00-03:00"
-    }
-  }
+  "actor": { "type": "provider", "id": "prov_abc" },
+  "location": { "lat": -33.4489, "lng": -70.6693 },
+  "timestamp": "2026-03-16T09:02:00-03:00"
 }
 ```
 
@@ -1114,7 +1155,7 @@ Record check-out at service completion. Moves session to `completed`.
 | **MCP Tool** | `delivery.checkout` |
 | **Required Scope** | `evidence:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/checkout` |
+| **Path** | `/v1/sessions/{session_id}/checkout` |
 
 **Path Parameters**
 
@@ -1126,20 +1167,9 @@ Record check-out at service completion. Moves session to `completed`.
 
 ```json
 {
-  "data": {
-    "type": "checkouts",
-    "attributes": {
-      "actor": {
-        "type": "provider",
-        "id": "prov_abc"
-      },
-      "location": {
-        "lat": -33.4489,
-        "lng": -70.6693
-      },
-      "timestamp": "2026-03-16T09:47:00-03:00"
-    }
-  }
+  "actor": { "type": "provider", "id": "prov_abc" },
+  "location": { "lat": -33.4489, "lng": -70.6693 },
+  "timestamp": "2026-03-16T09:47:00-03:00"
 }
 ```
 
@@ -1174,7 +1204,7 @@ Record proof-of-delivery evidence.
 | **MCP Tool** | `delivery.record_evidence` |
 | **Required Scope** | `evidence:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/evidence` |
+| **Path** | `/v1/sessions/{session_id}/evidence` |
 
 **Path Parameters**
 
@@ -1186,27 +1216,16 @@ Record proof-of-delivery evidence.
 
 ```json
 {
-  "data": {
-    "type": "evidence",
-    "attributes": {
-      "evidence_type": "gps",
-      "data": {
-        "lat": -33.4489,
-        "lng": -70.6693,
-        "accuracy_meters": 5
-      },
-      "actor": {
-        "type": "provider",
-        "id": "prov_abc"
-      }
-    }
-  }
+  "evidenceType": "gps",
+  "data": { "lat": -33.4489, "lng": -70.6693, "accuracy_meters": 5 },
+  "data_sensitivity": "internal",
+  "actor": { "type": "provider", "id": "prov_abc" }
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `evidence_type` | enum | Yes | `gps`, `signature`, `photo`, `document`, `duration`, `notes`. |
+| `evidenceType` | enum | Yes | `gps`, `signature`, `photo`, `document`, `duration`, `notes`. |
 | `data` | object | Yes | Type-specific payload. |
 | `actor` | Actor | Yes | Who records the evidence. |
 
@@ -1231,7 +1250,18 @@ Record proof-of-delivery evidence.
 
 ### 9.1 `documentation.create`
 
-Generate the service record (clinical note, inspection report, etc.). Moves session to `documented`.
+Generate the service record (clinical note, inspection report, etc.).
+
+**Precondition — reference behaviour, not a protocol MUST.** The reference tool
+documents that this is called after delivery, and the reference implementation
+requires the session to have completed before it will accept documentation.
+`PROTOCOL.md` does not state that ordering as a normative requirement, and
+§6.0 explicitly imposes no total order across delivery, evidence, acceptance and
+settlement — so this profile records it as the reference's behaviour rather than
+a requirement on every implementation. Whether the upstream enforces it in every
+case is **not verified** from this repository.
+
+**Effect:** in the reference implementation the session moves to `documented`.
 
 | | |
 |---|---|
@@ -1239,7 +1269,7 @@ Generate the service record (clinical note, inspection report, etc.). Moves sess
 | **MCP Tool** | `documentation.create` |
 | **Required Scope** | `document:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sessions/{session_id}/documentation` |
+| **Path** | `/v1/sessions/{session_id}/documentation` |
 
 **Path Parameters**
 
@@ -1251,24 +1281,16 @@ Generate the service record (clinical note, inspection report, etc.). Moves sess
 
 ```json
 {
-  "data": {
-    "type": "documentation",
-    "attributes": {
-      "content": "Paciente presenta mejoría en rango de movimiento...",
-      "template_id": "tmpl_clinical_note",
-      "actor": {
-        "type": "provider",
-        "id": "prov_abc"
-      }
-    }
-  }
+  "content": "Paciente presenta mejoría en rango de movimiento...",
+  "templateId": "tmpl_clinical_note",
+  "actor": { "type": "provider", "id": "prov_abc" }
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `content` | string | Yes | Documentation content. |
-| `template_id` | string | No | Template identifier, if applicable. |
+| `templateId` | string | No | Template identifier, if applicable. |
 | `actor` | Actor | Yes | Who creates the documentation. |
 
 **Success Response**
@@ -1288,40 +1310,45 @@ Generate the service record (clinical note, inspection report, etc.). Moves sess
 
 ### 9.2 `payments.create_sale`
 
-Create a sale (charge) linked to a documented service. Moves session to `invoiced`.
+Create a settlement object (a sale) linked to a delivery.
+
+**Settlement is decoupled from the lifecycle.** Creating a sale does **not**
+normatively move the session to `invoiced`. `PROTOCOL.md` §6.0 imposes no total
+order across delivery, evidence, acceptance and settlement, and the three
+financial states are an OPTIONAL extension — an implementation MAY manage
+settlement entirely outside the session lifecycle and remain conformant.
+
+The reference implementation does couple them: creating a sale advances the
+session. That is **reference behaviour, documented here so an implementer can
+predict it — not a rule to reproduce.**
 
 | | |
 |---|---|
-| **Compliance** | REQUIRED |
+| **Compliance** | OPTIONAL |
 | **MCP Tool** | `payments.create_sale` |
 | **Required Scope** | `payment:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sales` |
+| **Path** | `/v1/sales` |
 
 **Request Body**
 
 ```json
 {
-  "data": {
-    "type": "sales",
-    "attributes": {
-      "client_id": "cli_001",
-      "service_id": "svc_001",
-      "provider_id": "prov_abc",
-      "quantity": 1,
-      "unit_price": 35000
-    }
-  }
+  "clientId": "cli_001",
+  "serviceId": "svc_001",
+  "providerId": "prov_abc",
+  "quantity": 1,
+  "unitPrice": 35000
 }
 ```
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `client_id` | string | Yes | — | Client identifier. |
-| `service_id` | string | Yes | — | Service identifier. |
-| `provider_id` | string | Yes | — | Provider identifier. |
+| `clientId` | string | Yes | — | Client identifier. |
+| `serviceId` | string | Yes | — | Service identifier. |
+| `providerId` | string | Yes | — | Provider identifier. |
 | `quantity` | integer | No | `1` | Number of sessions. |
-| `unit_price` | number | Yes | — | Price per unit. |
+| `unitPrice` | number | Yes | — | Price per unit. |
 
 **Success Response**
 
@@ -1347,7 +1374,7 @@ Record a payment against an existing sale.
 | **MCP Tool** | `payments.record_payment` |
 | **Required Scope** | `payment:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/sales/{sale_id}/payments` |
+| **Path** | `/v1/payments` |
 
 **Path Parameters**
 
@@ -1359,21 +1386,18 @@ Record a payment against an existing sale.
 
 ```json
 {
-  "data": {
-    "type": "payments",
-    "attributes": {
-      "amount": 35000,
-      "method": "transferencia",
-      "reference": "TRX-20260316-001"
-    }
-  }
+  "ventaId": "sale_001",
+  "amount": 35000,
+  "paymentMethod": "transferencia",
+  "reference": "TRX-20260316-001"
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
+| `ventaId` | string | Yes | Identifier of the sale this payment settles. |
 | `amount` | number | Yes | Payment amount. |
-| `method` | enum | Yes | `efectivo`, `transferencia`, `mercadopago`, `tarjeta`. |
+| `paymentMethod` | enum | Yes | `efectivo`, `transferencia`, `mercadopago`, `tarjeta`. **Spanish values — see note below.** |
 | `reference` | string | No | Transaction reference. |
 
 **Success Response**
@@ -1391,6 +1415,14 @@ Record a payment against an existing sale.
 
 ---
 
+> **Vocabulary note.** `payments.record_payment` is the one reference
+> operation whose wire vocabulary is Spanish: the sale identifier is `ventaId`
+> and `paymentMethod` takes `efectivo` / `transferencia` / `mercadopago` /
+> `tarjeta`. This is documented as it runs, not endorsed. It is unrelated to
+> the `delivered`/`charged` lifecycle divergence (§7.2) and is not covered by
+> that migration. Renaming it would break the reference implementation, so it
+> is tracked as a separate gap.
+
 ### 9.4 `payments.get_status`
 
 Get payment status for a specific sale or a client's full account.
@@ -1401,7 +1433,7 @@ Get payment status for a specific sale or a client's full account.
 | **MCP Tool** | `payments.get_status` |
 | **Required Scope** | `payment:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/payments/status` |
+| **Path** | `/v1/sales/{sale_id}` or `/v1/clients/{client_id}/account-history` |
 
 **Query Parameters**
 
@@ -1445,7 +1477,7 @@ List service orders.
 | **MCP Tool** | `service_orders.list` |
 | **Required Scope** | `order:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/service-orders` |
+| **Path** | `/v1/service-orders` |
 
 **Query Parameters**
 
@@ -1475,7 +1507,7 @@ Get full service order details.
 | **MCP Tool** | `service_orders.get` |
 | **Required Scope** | `order:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/service-orders/{order_id}` |
+| **Path** | `/v1/service-orders/{order_id}` |
 
 **Path Parameters**
 
@@ -1507,7 +1539,7 @@ Create a new service order in `draft` state.
 | **MCP Tool** | `service_orders.create` |
 | **Required Scope** | `order:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/service-orders` |
+| **Path** | `/v1/service-orders` |
 
 **Request Body**
 
@@ -1537,7 +1569,7 @@ Transition a service order from `draft` to `proposed`.
 | **MCP Tool** | `service_orders.propose` |
 | **Required Scope** | `order:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/service-orders/{order_id}/propose` |
+| **Path** | `/v1/service-orders/{order_id}/propose` |
 
 **Path Parameters**
 
@@ -1549,12 +1581,7 @@ Transition a service order from `draft` to `proposed`.
 
 ```json
 {
-  "data": {
-    "type": "order_transitions",
-    "attributes": {
-      "actor": { "type": "organization", "id": "org_xyz" }
-    }
-  }
+  "actor": { "type": "organization", "id": "org_xyz" }
 }
 ```
 
@@ -1583,7 +1610,7 @@ Transition a service order from `proposed` to `active`.
 | **MCP Tool** | `service_orders.activate` |
 | **Required Scope** | `order:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/service-orders/{order_id}/activate` |
+| **Path** | `/v1/service-orders/{order_id}/activate` |
 
 **Path Parameters**
 
@@ -1595,12 +1622,7 @@ Transition a service order from `proposed` to `active`.
 
 ```json
 {
-  "data": {
-    "type": "order_transitions",
-    "attributes": {
-      "actor": { "type": "client", "id": "cli_001" }
-    }
-  }
+  "actor": { "type": "client", "id": "cli_001" }
 }
 ```
 
@@ -1629,7 +1651,7 @@ Get the real-time computed ledger for a service order.
 | **MCP Tool** | `service_orders.get_ledger` |
 | **Required Scope** | `order:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/service-orders/{order_id}/ledger` |
+| **Path** | `/v1/service-orders/{order_id}/ledger` |
 
 **Path Parameters**
 
@@ -1669,7 +1691,7 @@ List mandates issued by the authenticated principal.
 | **MCP Tool** | `mandates.list` |
 | **Required Scope** | `mandate:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/mandates` |
+| **Path** | `/v1/mandates` |
 
 **Query Parameters**
 
@@ -1697,7 +1719,7 @@ Get mandate details.
 | **MCP Tool** | `mandates.get` |
 | **Required Scope** | `mandate:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/mandates/{mandate_id}` |
+| **Path** | `/v1/mandates/{mandate_id}` |
 
 **Path Parameters**
 
@@ -1729,7 +1751,7 @@ Suspend an active mandate.
 | **MCP Tool** | `mandates.suspend` |
 | **Required Scope** | `mandate:admin` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/mandates/{mandate_id}/suspend` |
+| **Path** | `/v1/mandates/{mandate_id}/suspend` |
 
 **Path Parameters**
 
@@ -1741,12 +1763,7 @@ Suspend an active mandate.
 
 ```json
 {
-  "data": {
-    "type": "mandate_actions",
-    "attributes": {
-      "reason": "Security review in progress."
-    }
-  }
+  "reason": "Security review in progress."
 }
 ```
 
@@ -1785,13 +1802,13 @@ List physical resources of an organization.
 | **MCP Tool** | `resource.list` |
 | **Required Scope** | `resource:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/resources` |
+| **Path** | `/v1/resources` |
 
 **Query Parameters**
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `organization_id` | string | Yes | Organization identifier. |
+| `organizationId` | string | Yes | Organization identifier. |
 | `type` | enum | No | Filter: `room`, `box`, `chair`, `equipment`. |
 | `is_active` | boolean | No | Filter by active/inactive. |
 | `page` | integer | No | Page number. |
@@ -1815,7 +1832,7 @@ Get full details of a physical resource including availability blocks.
 | **MCP Tool** | `resource.get` |
 | **Required Scope** | `resource:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/resources/{resource_id}` |
+| **Path** | `/v1/resources/{resource_id}` |
 
 **Path Parameters**
 
@@ -1847,35 +1864,30 @@ Create a new physical resource.
 | **MCP Tool** | `resource.create` |
 | **Required Scope** | `resource:write` |
 | **Method** | `POST` |
-| **Path** | `/servicialo/v1/resources` |
+| **Path** | `/v1/resources` |
 
 **Request Body**
 
 ```json
 {
-  "data": {
-    "type": "resources",
-    "attributes": {
-      "organization_id": "org_xyz",
-      "name": "Box 3",
-      "type": "box",
-      "capacity": 1,
-      "buffer_minutes": 15,
-      "equipment": ["camilla", "TENS"],
-      "location": "Piso 2, ala norte",
-      "actor": { "type": "organization", "id": "org_xyz" }
-    }
-  }
+  "organizationId": "org_xyz",
+  "name": "Box 3",
+  "type": "box",
+  "capacity": 1,
+  "bufferMinutes": 15,
+  "equipment": ["camilla", "TENS"],
+  "location": "Piso 2, ala norte",
+  "actor": { "type": "organization", "id": "org_xyz" }
 }
 ```
 
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `organization_id` | string | Yes | — | Owner organization. |
+| `organizationId` | string | Yes | — | Owner organization. |
 | `name` | string | Yes | — | Resource name. |
 | `type` | enum | No | — | `room`, `box`, `chair`, `equipment`. |
 | `capacity` | integer | No | `1` | Simultaneous capacity. |
-| `buffer_minutes` | integer | No | `0` | Preparation time between sessions. |
+| `bufferMinutes` | integer | No | `0` | Preparation time between sessions. |
 | `equipment` | string[] | No | — | Available equipment. |
 | `location` | string | No | — | Physical location within the org. |
 | `rules` | object | No | — | Resource-specific rules. |
@@ -1905,7 +1917,7 @@ Partial update of a physical resource (patch semantics).
 | **MCP Tool** | `resource.update` |
 | **Required Scope** | `resource:write` |
 | **Method** | `PATCH` |
-| **Path** | `/servicialo/v1/resources/{resource_id}` |
+| **Path** | `/v1/resources/{resource_id}` |
 
 **Path Parameters**
 
@@ -1919,14 +1931,9 @@ Only include fields to update. Omitted fields remain unchanged.
 
 ```json
 {
-  "data": {
-    "type": "resources",
-    "attributes": {
-      "capacity": 2,
-      "buffer_minutes": 10,
-      "actor": { "type": "organization", "id": "org_xyz" }
-    }
-  }
+  "capacity": 2,
+  "bufferMinutes": 10,
+  "actor": { "type": "organization", "id": "org_xyz" }
 }
 ```
 
@@ -1953,8 +1960,8 @@ Soft-delete a resource (sets `is_active = false`).
 | **Compliance** | OPTIONAL |
 | **MCP Tool** | `resource.delete` |
 | **Required Scope** | `resource:write` |
-| **Method** | `DELETE` |
-| **Path** | `/servicialo/v1/resources/{resource_id}` |
+| **Method** | `PATCH` |
+| **Path** | `/v1/resources/{resource_id}` |
 
 **Path Parameters**
 
@@ -1966,12 +1973,8 @@ Soft-delete a resource (sets `is_active = false`).
 
 ```json
 {
-  "data": {
-    "type": "resource_actions",
-    "attributes": {
-      "actor": { "type": "organization", "id": "org_xyz" }
-    }
-  }
+  "isActive": false,
+  "actor": { "type": "organization", "id": "org_xyz" }
 }
 ```
 
@@ -2001,7 +2004,7 @@ Get available time slots for a resource in a date range. Pure calendar query —
 | **MCP Tool** | `resource.get_availability` |
 | **Required Scope** | `resource:read` |
 | **Method** | `GET` |
-| **Path** | `/servicialo/v1/resources/{resource_id}/availability` |
+| **Path** | `/v1/resources/{resource_id}/availability` |
 
 **Path Parameters**
 
@@ -2048,46 +2051,70 @@ The following MCP behaviors do not have a direct HTTP equivalent. Implementation
 
 ## Appendix A: Endpoint Summary
 
+Compliance in this table is the same set as §3.1, which restates
+`conformance.core.required_operations` from
+[`protocol/manifest.yaml`](../protocol/manifest.yaml).
+`scripts/verify-conformance-parity.mjs` fails CI if this table, §3.1, the
+manifest, `spec/openapi.yaml`, the implementer guides or the compatibility
+suite disagree.
+
 | # | MCP Tool | Method | Path | Compliance |
 |---|---|---|---|---|
-| 1 | `registry.search` | GET | `/registry/organizations` | REQUIRED |
-| 2 | `registry.get_organization` | GET | `/registry/organizations/{org_slug}` | OPTIONAL |
-| 3 | `services.list` | GET | `/organizations/{org_slug}/services` | OPTIONAL |
-| 4 | `scheduling.check_availability` | GET | `/availability` | OPTIONAL |
-| 5 | `service.get` | GET | `/services/{service_id}` | REQUIRED |
-| 6 | `contract.get` | GET | `/services/{service_id}/contract` | OPTIONAL |
-| 7 | `clients.get_or_create` | POST | `/clients` | OPTIONAL |
-| 8 | `scheduling.book` | POST | `/sessions` | REQUIRED |
-| 9 | `scheduling.confirm` | POST | `/sessions/{session_id}/confirm` | OPTIONAL |
-| 10 | `lifecycle.get_state` | GET | `/sessions/{session_id}/lifecycle` | OPTIONAL |
-| 11 | `lifecycle.transition` | POST | `/sessions/{session_id}/transitions` | REQUIRED |
-| 12 | `scheduling.reschedule` | POST | `/sessions/{session_id}/reschedule` | OPTIONAL |
-| 13 | `scheduling.cancel` | POST | `/sessions/{session_id}/cancel` | OPTIONAL |
-| 14 | `delivery.checkin` | POST | `/sessions/{session_id}/checkin` | OPTIONAL |
-| 15 | `delivery.checkout` | POST | `/sessions/{session_id}/checkout` | OPTIONAL |
-| 16 | `delivery.record_evidence` | POST | `/sessions/{session_id}/evidence` | REQUIRED |
-| 17 | `documentation.create` | POST | `/sessions/{session_id}/documentation` | OPTIONAL |
-| 18 | `payments.create_sale` | POST | `/sales` | REQUIRED |
-| 19 | `payments.record_payment` | POST | `/sales/{sale_id}/payments` | OPTIONAL |
-| 20 | `payments.get_status` | GET | `/payments/status` | OPTIONAL |
-| 21 | `service_orders.list` | GET | `/service-orders` | OPTIONAL |
-| 22 | `service_orders.get` | GET | `/service-orders/{order_id}` | OPTIONAL |
-| 23 | `service_orders.create` | POST | `/service-orders` | OPTIONAL |
-| 24 | `service_orders.propose` | POST | `/service-orders/{order_id}/propose` | OPTIONAL |
-| 25 | `service_orders.activate` | POST | `/service-orders/{order_id}/activate` | OPTIONAL |
-| 26 | `service_orders.get_ledger` | GET | `/service-orders/{order_id}/ledger` | OPTIONAL |
-| 27 | `mandates.list` | GET | `/mandates` | OPTIONAL |
-| 28 | `mandates.get` | GET | `/mandates/{mandate_id}` | OPTIONAL |
-| 29 | `mandates.suspend` | POST | `/mandates/{mandate_id}/suspend` | OPTIONAL |
-| 30 | `resource.list` | GET | `/resources` | OPTIONAL |
-| 31 | `resource.get` | GET | `/resources/{resource_id}` | OPTIONAL |
-| 32 | `resource.create` | POST | `/resources` | OPTIONAL |
-| 33 | `resource.update` | PATCH | `/resources/{resource_id}` | OPTIONAL |
-| 34 | `resource.delete` | DELETE | `/resources/{resource_id}` | OPTIONAL |
-| 35 | `resource.get_availability` | GET | `/resources/{resource_id}/availability` | OPTIONAL |
+| 1 | `registry.manifest` | GET | `/v1/manifest` | REQUIRED |
+| 2 | `registry.search` | GET | `/v1/registry` | OPTIONAL |
+| 3 | `registry.get_organization` | GET | `/v1/organizations/{org_slug}/services` | OPTIONAL |
+| 4 | `services.list` | GET | `/v1/organizations/{org_slug}/services` | REQUIRED |
+| 5 | `scheduling.check_availability` | GET | `/v1/organizations/{org_slug}/availability` | REQUIRED |
+| 6 | `service.get` | GET | `/v1/services/{service_id}` | OPTIONAL |
+| 7 | `contract.get` | GET | `/v1/services/{service_id}/contract` | OPTIONAL |
+| 8 | `clients.get_or_create` | POST | `/v1/clients` | OPTIONAL |
+| 9 | `scheduling.book` | POST | `/v1/sessions` | REQUIRED |
+| 10 | `scheduling.confirm` | POST | `/v1/sessions/{session_id}/confirm` | OPTIONAL |
+| 11 | `lifecycle.get_state` | GET | `/v1/sessions/{session_id}/lifecycle` | OPTIONAL |
+| 12 | `lifecycle.transition` | POST | `/v1/sessions/{session_id}/lifecycle/transition` | REQUIRED |
+| 13 | `scheduling.reschedule` | PUT | `/v1/sessions/{session_id}` | OPTIONAL |
+| 14 | `scheduling.cancel` | POST | `/v1/sessions/{session_id}/cancel` | OPTIONAL |
+| 15 | `delivery.checkin` | POST | `/v1/sessions/{session_id}/checkin` | OPTIONAL |
+| 16 | `delivery.checkout` | POST | `/v1/sessions/{session_id}/checkout` | OPTIONAL |
+| 17 | `delivery.record_evidence` | POST | `/v1/sessions/{session_id}/evidence` | REQUIRED |
+| 18 | `documentation.create` | POST | `/v1/sessions/{session_id}/documentation` | OPTIONAL |
+| 19 | `payments.create_sale` | POST | `/v1/sales` | OPTIONAL |
+| 20 | `payments.record_payment` | POST | `/v1/payments` | OPTIONAL |
+| 21 | `payments.get_status` | GET | `/v1/sales/{sale_id}` | OPTIONAL |
+| 21b | `payments.get_status` (account) | GET | `/v1/clients/{client_id}/account-history` | OPTIONAL |
+| 22 | `resource.list` | GET | `/v1/resources` | OPTIONAL |
+| 23 | `resource.get` | GET | `/v1/resources/{resource_id}` | OPTIONAL |
+| 24 | `resource.create` | POST | `/v1/resources` | OPTIONAL |
+| 25 | `resource.update` | PATCH | `/v1/resources/{resource_id}` | OPTIONAL |
+| 26 | `resource.delete` | PATCH | `/v1/resources/{resource_id}` | OPTIONAL |
+| 27 | `resource.get_availability` | GET | `/v1/resources/{resource_id}/availability` | OPTIONAL |
 
-All paths are relative to `/servicialo/v1/`.
+`resource.delete` is a soft delete: the reference tool sends
+`PATCH {"isActive": false}` to the resource path rather than `DELETE`
+(1.0.0 specified `DELETE`).
+
+`payments.get_status` is one tool over two endpoints: it reads a sale when given
+a sale id, and an account history when given a client id.
+
+**Specified, not implemented — binding shape not verified.** The following are
+defined in §10 and §11 and tracked as `specified_unimplemented_tools` in the
+manifest. No reference tool calls them, so unlike every row above, their paths
+and bodies have not been checked against running code.
+
+| MCP Tool | Method | Path |
+|---|---|---|
+| `service_orders.list` | GET | `/v1/service-orders` |
+| `service_orders.get` | GET | `/v1/service-orders/{order_id}` |
+| `service_orders.create` | POST | `/v1/service-orders` |
+| `service_orders.propose` | POST | `/v1/service-orders/{order_id}/propose` |
+| `service_orders.activate` | POST | `/v1/service-orders/{order_id}/activate` |
+| `service_orders.get_ledger` | GET | `/v1/service-orders/{order_id}/ledger` |
+| `mandates.list` | GET | `/v1/mandates` |
+| `mandates.get` | GET | `/v1/mandates/{mandate_id}` |
+| `mandates.suspend` | POST | `/v1/mandates/{mandate_id}/suspend` |
+
+All paths resolve against `{base}` (§2.1).
 
 ---
 
-*End of HTTP Profile v1.0.0*
+*End of HTTP Profile v1.1.0*

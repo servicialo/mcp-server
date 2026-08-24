@@ -196,12 +196,21 @@ check(
   extract('spec/HTTP_PROFILE.md', new RegExp(String.raw`\|\s*\`X-Servicialo-Version\`\s*\|\s*\`${SEMVERISH}\`\s*\|`)),
   WIRE,
 );
-// openapi must pin the same value in the header parameter enum.
-check(
-  'openapi X-Servicialo-Version enum',
-  extract('spec/openapi.yaml', new RegExp(String.raw`X-Servicialo-Version[\s\S]{0,600}?enum:\s*\[\s*["']${SEMVERISH}["']\s*\]`)),
-  WIRE,
-);
+// openapi must pin the same value in the header parameter enum. Parsed
+// structurally rather than by regex: openapi.yaml is machine-readable, and a
+// reformat (flow vs block style) must not blind this check.
+const openapi = parse(read('spec/openapi.yaml'));
+const versionEnum = openapi?.components?.parameters?.ServicialoVersion?.schema?.enum;
+if (!Array.isArray(versionEnum) || versionEnum.length !== 1) {
+  errors.push(
+    'openapi X-Servicialo-Version enum: components.parameters.ServicialoVersion.schema.enum ' +
+    'is missing or not a single-value list (surface changed shape?)',
+  );
+} else {
+  check('openapi X-Servicialo-Version enum', String(versionEnum[0]), WIRE);
+}
+// The document's own version must track the profile it binds.
+check('openapi info.version', openapi?.info?.version ?? null, PROFILE);
 
 // ── [G] Header semantics: the profile must say what the header versions ─────
 // Mislabelling it "Protocol version" is what produced the 0.8 drift: a reader

@@ -85,6 +85,11 @@ const DIRS = [
   { dir: 'lib', exts: ['.ts'], skip: [] },
   { dir: 'public/spec', exts: ['.md'], skip: [] },
   { dir: 'schema', exts: ['.json'], skip: [] },
+  // The MCP tool sources are an agent-facing surface: docs.quickstart returns
+  // a tool inventory that agents read. It advertised "9 herramientas públicas"
+  // against 15 for several releases precisely because this directory was not
+  // walked.
+  { dir: 'packages/mcp-server/src/tools', exts: ['.ts'], skip: [] },
 ];
 
 // Allowlist: { file (repo-relative, /-separated), match (exact matched text) }

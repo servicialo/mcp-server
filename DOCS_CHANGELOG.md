@@ -4,6 +4,86 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-08-24 — one CORE list, and a profile that describes the running wire
+
+The repo carried **five mutually inconsistent lists of "required operations"** —
+the HTTP Profile's §3.1 table, its own per-endpoint REQUIRED markers (seven,
+where the table said six), `IMPLEMENTORS.md`, `IMPLEMENTING.md`, and a manifest
+comment pointing at "Core profiles". Nothing failed. It also shipped an HTTP
+Profile describing a binding that was never implemented.
+
+**HTTP Profile 1.1.0** now documents the contract the reference tool handlers
+actually send through `HttpAdapter`. 1.0.0 specified a JSON:API envelope, a
+`/servicialo/v1/` base, an `X-Servicialo-Actor` header and paths no reference
+client calls (`/registry/organizations`, `/sessions/{id}/transitions`,
+`/availability`). An implementer who built against it would not have
+interoperated. The erratum at the top of the profile says so plainly.
+`X-Servicialo-Version` stays `1.0`: nothing observable broke, because no public
+wire was ever implemented under the 1.0.0 design.
+
+- Plain JSON in and out; bodies carry the camelCase names the wire uses
+  (`toState`, `evidenceType`, `serviceId`, `startTime`, `unitPrice`,
+  `templateId`, `lastName`, `ventaId`, `paymentMethod`). Renaming them would
+  break the reference implementation, so they are documented as they run and
+  tracked as a gap.
+- Errors: HTTP status is the contract, because that is all the reference client
+  reads — it never parses an error body. The envelope and its eleven codes drop
+  from MUST to RECOMMENDED, labelled "not exercised by the reference client".
+- Pagination is marked **not verified**: nothing sends `page`/`per_page`,
+  nothing reads `meta`/`links`.
+- The `delivered`/`charged` divergence is labelled as the reference
+  implementation's vocabulary, pointing at the manifest and PR #23 — not
+  presented as protocol vocabulary.
+- Settlement is decoupled: creating a sale does not normatively advance the
+  session. `documentation.create`'s ordering is recorded as reference
+  behaviour, not a MUST.
+
+**One CORE list.** `protocol/manifest.yaml` gains `conformance.core`, the single
+machine-readable statement of what CORE requires: `registry.manifest`,
+`services.list`, `scheduling.check_availability`, `scheduling.book`,
+`lifecycle.transition`, `delivery.record_evidence`. `certification.md` says
+which capabilities CORE guarantees and why — one normative sentence, with each
+clause tied to one operation. Everything else restates that list.
+
+- `registry.search` is out: cross-node discovery is the resolver's job.
+- `scheduling.confirm`, `delivery.checkin`, `delivery.checkout` are OPTIONAL
+  conveniences — verified against the tool schemas as expressible through
+  `lifecycle.transition` and `delivery.record_evidence`.
+- `payments.create_sale` is OPTIONAL/FULL: a free service is conformant.
+- `scheduling.check_availability` is required by conscious decision, recorded in
+  that sentence. It already appeared in `IMPLEMENTORS.md` row 4 and in the
+  suite; naming it makes those consistent rather than introducing a new demand.
+
+**The suite no longer claims more than it verifies.** It now invokes the real
+tool handlers through the adapter, so suite and agent codepath are the same by
+construction — the old version called four paths no tool sends
+(`/sessions/{id}/state`, `/sessions/{id}/transition`, `/contracts/{id}`,
+`/payments/sales`) and asserted Spanish state values. Output separates
+**(a) binding** — required CORE `n/n`, optional `m/k` — from **(b) certification,
+not evaluated**, which lists the CORE requirements needing manual review.
+`HTTP-COMPATIBLE` survives with an explicit definition: *binding — required CORE
+operations OK*, propagated to `IMPLEMENTING.md` step 8, `IMPLEMENTORS.md` step 1
+and the certification matrix.
+
+**CI now fails on any of this drifting.** `scripts/verify-conformance-parity.mjs`
+checks six things: required operations exist as tools; the profile's §3.1,
+Appendix A and per-endpoint markers agree with the manifest and each other; both
+implementer guides list the same set; `openapi.yaml` defines a path for each;
+the suite tags a REQUIRED test for each; and — beyond list parity — every
+documented path equals the path the tool actually sends after `translatePath`.
+
+Also corrected: `verify-doc-claims.mjs` never walked
+`packages/mcp-server/src/tools`, so `docs.quickstart` advertised "9 herramientas
+públicas" against 15 and listed 10 of them. The directory is now scanned and the
+inventory is complete. `verified` is no longer called a "financial state" in
+prose (`invoiced`/`collected` are settlement; `verified` is acceptance) — the
+manifest key `optional_financial` keeps its name, since `lib/manifest.ts` and
+`app/spec/page.tsx` consume it.
+
+Evidence baseline: [`docs/analysis/contract-audit-2026-08-24.md`](./docs/analysis/contract-audit-2026-08-24.md).
+
+---
+
 ## 2026-08-24 — version unification: one truth per version
 
 `scripts/verify-versions.mjs` checked six header lines and three package

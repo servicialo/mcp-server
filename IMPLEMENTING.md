@@ -13,9 +13,47 @@ Guía paso a paso para construir una plataforma compatible con Servicialo. No ne
 Para aparecer como implementación de Servicialo ([§16](./PROTOCOL.md#16-implementations)), tu plataforma DEBE:
 
 1. Modelar servicios usando las **8 dimensiones** (§5)
-2. Implementar los **6 estados core del ciclo de vida** (§6) — los 3 financieros son opcionales
+2. Implementar los **6 estados core del ciclo de vida** (§6) — `requested → scheduled → confirmed → in_progress → completed → documented`. Los 3 estados `invoiced → collected → verified` son una extensión OPCIONAL: puedes integrarlos al ciclo de vida de la sesión o gestionarlos por separado. Las transiciones son **estrictamente ordenadas dentro de la secuencia que implementes**, y no hay orden total entre entrega, evidencia, aceptación y liquidación ([§6.0](./PROTOCOL.md#60-happy-path-milestones-and-orthogonal-dimensions))
 3. Manejar al menos **3 flujos de excepción** (§7)
-4. Exponer **al menos un binding máquina a máquina** que implemente los perfiles Core y declare perfiles y versiones soportados — HTTP (normativo), MCP (referencia, recomendado para agentes), A2A u otro equivalente. Una implementación puramente HTTP es conforme sin MCP
+4. Exponer **al menos un binding máquina a máquina** que exponga las 6 operaciones CORE y declare perfiles y versiones soportados — HTTP (normativo), MCP (referencia, recomendado para agentes), A2A u otro equivalente. Una implementación puramente HTTP es conforme sin MCP
+
+### Las 6 operaciones CORE
+
+La lista canónica y legible por máquina vive en
+[`protocol/manifest.yaml`](./protocol/manifest.yaml) bajo
+`conformance.core.required_operations`. Esta tabla la reproduce;
+`scripts/verify-conformance-parity.mjs` falla en CI si ambas divergen.
+
+Cada una satisface una cláusula de la frase CORE de
+[`certification.md`](./public/spec/certification.md): *un consumidor DEBE poder
+descubrir una oferta, conocer su disponibilidad antes de comprometerla, crear el
+compromiso, gestionar el ciclo de vida de ese compromiso y registrar evidencia de
+la entrega.*
+
+<!-- conformance:required:start -->
+
+| Operación | Cláusula que satisface |
+|---|---|
+| `registry.manifest` | el nodo se declara (versión de protocolo + endpoints) |
+| `services.list` | descubrir una oferta |
+| `scheduling.check_availability` | conocer disponibilidad antes de comprometerla |
+| `scheduling.book` | crear el compromiso |
+| `lifecycle.transition` | gestionar el ciclo de vida |
+| `delivery.record_evidence` | registrar evidencia de la entrega |
+
+<!-- conformance:required:end -->
+
+No son requisito, y por qué:
+
+- **`registry.search`** es del resolver, no de tu nodo: eres descubrible por estar
+  registrado, no por implementar búsqueda.
+- **`scheduling.confirm`, `delivery.checkin`, `delivery.checkout`** son
+  conveniencias — su efecto se expresa con las operaciones requeridas
+  (`confirmed`, `in_progress` y `delivered` son destinos válidos de
+  `lifecycle.transition`; `gps` y `duration` son tipos de
+  `delivery.record_evidence`).
+- **`payments.create_sale`** es liquidación: OPTIONAL / FULL. Un servicio gratuito
+  o facturado fuera de la plataforma es conforme sin ella.
 
 Todo lo demás — Órdenes de Servicio, Agencia Delegada, Perfiles de Proveedor, Inteligencia de Red — es opcional.
 
@@ -322,17 +360,22 @@ function rescheduleService(
 
 Expón endpoints HTTP que cubran las fases de agente del §13. La Fase 0 (resolución DNS) la provee el resolver global — no la implementas tú. Como mínimo, necesitas endpoints para:
 
-| Fase | Endpoint | Mapea a herramienta MCP |
-|------|----------|------------------------|
-| 0. Resolver | (provisto por el resolver global) | `resolve.lookup`, `resolve.search` |
-| 1. Descubrir | `GET /services` | `services.list` |
-| 1. Descubrir | `GET /availability?service_id=X&date_from=Y&date_to=Z` | `scheduling.check_availability` |
-| 3. Comprometer | `POST /bookings` | `scheduling.book` |
-| 3. Comprometer | `POST /bookings/:id/confirm` | `scheduling.confirm` |
-| 4. Gestionar | `POST /bookings/:id/transition` | `lifecycle.transition` |
-| 5. Verificar | `POST /bookings/:id/checkin` | `delivery.checkin` |
+| Fase | Endpoint | Herramienta MCP | Nivel |
+|------|----------|-----------------|-------|
+| 0. Resolver | (provisto por el resolver global) | `resolve.lookup`, `resolve.search` | — |
+| 1. Descubrir | `GET /v1/manifest` | `registry.manifest` | REQUIRED |
+| 1. Descubrir | `GET /v1/organizations/{org_slug}/services` | `services.list` | REQUIRED |
+| 1. Descubrir | `GET /v1/organizations/{org_slug}/availability?from=&to=` | `scheduling.check_availability` | REQUIRED |
+| 3. Comprometer | `POST /v1/sessions` | `scheduling.book` | REQUIRED |
+| 3. Comprometer | `POST /v1/sessions/{id}/confirm` | `scheduling.confirm` | OPTIONAL |
+| 4. Gestionar | `POST /v1/sessions/{id}/lifecycle/transition` | `lifecycle.transition` | REQUIRED |
+| 5. Verificar | `POST /v1/sessions/{id}/evidence` | `delivery.record_evidence` | REQUIRED |
+| 5. Verificar | `POST /v1/sessions/{id}/checkin` | `delivery.checkin` | OPTIONAL |
 
-[SPEC GAP] El protocolo define firmas de herramientas MCP (§13) pero no prescribe rutas HTTP ni convenciones REST. Cada implementación elige su propia superficie de API — el servidor MCP se adapta a ella.
+Estas rutas son las que el cliente de referencia efectivamente llama — están
+documentadas en [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) 1.1.0 y
+verificadas contra el código en CI. Si expones otras rutas, el servidor MCP de
+referencia no podrá hablar con tu backend sin un adaptador propio.
 
 Para un walkthrough completo con ejemplos de request/response, ver [`examples/minimal-implementation.md`](./examples/minimal-implementation.md) ([English](./examples/minimal-implementation.en.md)).
 
@@ -426,8 +469,8 @@ Tu implementación DEBE almacenar evidencia de forma inmutable — una vez regis
 | # | Requisito | Ref. spec | Verificar |
 |---|-----------|-----------|-----------|
 | 1 | El servicio tiene las 8 dimensiones | §5 | Validar contra `schema/service.schema.json` |
-| 2 | Los 6 estados core están implementados | §6 | Crear un servicio y avanzarlo por los 6 estados core (los financieros son opcionales) |
-| 3 | Los estados son estrictamente ordenados (sin saltos) | §6.1 | Intentar una transición inválida — debe fallar |
+| 2 | Los 6 estados core están implementados | §6 | Crear un servicio y avanzarlo por los 6 estados core (los 3 estados `invoiced/collected/verified` son una extensión opcional) |
+| 3 | Estrictamente ordenados dentro de la secuencia implementada | §6.1, §6.0 | Intentar una transición inválida — debe fallar. No se exige orden total entre entrega, evidencia, aceptación y liquidación |
 | 4 | Cada transición registra `from`, `to`, `at`, `by` | §6.1 | Inspeccionar el array de transiciones después de un ciclo completo |
 | 5 | 3+ flujos de excepción funcionan | §7 | Disparar cada uno y verificar la máquina de estados |
 | 6 | El servidor MCP se conecta y las herramientas responden | §13 | Conectar un agente y ejecutar una consulta de descubrimiento |
@@ -494,9 +537,19 @@ SERVICIALO_ORG_ID=tu_org_id \
 npm run test:http-compat --prefix packages/mcp-server
 ```
 
-Una implementación `HTTP-COMPATIBLE` cubre las fases 0–4 (Resolver, Descubrir,
-Entender, Comprometer, Gestionar). Las fases 5–6 (Verificar, Cerrar) son opcionales
-en v0.10 pero requeridas para listing en verticales regulados (salud, legal).
+La suite invoca los **handlers reales de las herramientas** a través del adapter
+HTTP, así que ejercita el mismo codepath que un agente — no un conjunto paralelo
+de llamadas que pueda desviarse.
+
+Reporta dos niveles, por separado:
+
+- **(a) Binding** — `operaciones CORE requeridas: n/n` y `opcionales: m/k`. El
+  veredicto `HTTP-COMPATIBLE` significa exactamente eso: **las operaciones CORE
+  requeridas responden**. No significa conformance.
+- **(b) Certificación** — *no evaluada por esta suite*. Imprime en cada corrida
+  los requisitos CORE que necesitan verificación adicional o manual: rechazo de
+  transiciones inválidas, 3+ flujos de excepción, conformance de schema y agent
+  card. Ver la [matriz requisito → prueba](./public/spec/certification.md#requirement--verification-matrix).
 
 **Qué certifica esta suite y qué no:** verifica que tu superficie HTTP expone los
 endpoints del [HTTP profile](./spec/HTTP_PROFILE.md) y que responden con formas

@@ -4,7 +4,7 @@
 
 ## Cómo listar tu implementación
 
-1. Corre la suite de compatibilidad HTTP contra tu backend (ver [IMPLEMENTING.md paso 8](./IMPLEMENTING.md#paso-8--verificar-compatibilidad-http)). El resultado esperado es `HTTP-COMPATIBLE` — eso verifica el binding HTTP, no la conformance completa.
+1. Corre la suite de compatibilidad HTTP contra tu backend (ver [IMPLEMENTING.md paso 8](./IMPLEMENTING.md#paso-8--verificar-compatibilidad-http)). El resultado esperado es `HTTP-COMPATIBLE`, que significa exactamente una cosa: **binding — las operaciones CORE requeridas responden**. No es conformance: la suite imprime en cada corrida qué requisitos CORE *no* evalúa.
 2. Abre un PR que agregue tu fila a la tabla de abajo.
 3. Incluye en la descripción del PR el output completo de la suite y evidencia de los requisitos normativos (checklist de IMPLEMENTING.md paso 7).
 4. El equipo de Servicialo revisa contra la [matriz requisito → prueba](./public/spec/certification.md#requirement--verification-matrix), asigna nivel **CORE** o **FULL**, y mergea si el nivel es ≥ CORE.
@@ -27,9 +27,43 @@ To be listed as a Servicialo-compatible implementation, your platform MUST satis
 | # | Requirement | Spec reference | What it means |
 |:-:|-------------|:--------------:|---------------|
 | 1 | **Model services using the 8 dimensions** | §5 | Every service has: identity (what), provider (who delivers), client (who receives), schedule (when), location (where), lifecycle (cycle), evidence (proof), billing (settlement). Your data model must capture all 8. |
-| 2 | **Implement the 6 core lifecycle states** | §6 | `requested → scheduled → confirmed → in_progress → completed → documented`. The 3 financial states (`invoiced → collected → verified`) are OPTIONAL extensions — you may bundle them into the session lifecycle or manage them independently. Transitions within your implemented sequence are strictly ordered and each records `from`, `to`, `at`, `by`. Delivery, evidence, acceptance and settlement have no total order across them (§6.0). |
+| 2 | **Implement the 6 core lifecycle states** | §6 | `requested → scheduled → confirmed → in_progress → completed → documented`. The 3 close-out states (`invoiced → collected → verified` — the first two settlement, `verified` acceptance/verification) are OPTIONAL extensions — you may bundle them into the session lifecycle or manage them independently. Transitions within your implemented sequence are strictly ordered and each records `from`, `to`, `at`, `by`. Delivery, evidence, acceptance and settlement have no total order across them (§6.0). |
 | 3 | **Handle at least 3 exception flows** | §7 | Pick 3 of: cancellation, client no-show, provider no-show, rescheduling, quality dispute, partial delivery. The easiest starting set is cancellation + client no-show + rescheduling. |
-| 4 | **Expose at least one machine-to-machine binding** | §13 + [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) | Minimum 6 operations: `services.list`, `scheduling.check_availability`, `scheduling.book`, `scheduling.confirm`, `lifecycle.transition`, `delivery.checkin` — exposed through the HTTP binding, MCP, A2A, or an equivalent, declaring supported profiles and versions. A purely HTTP implementation is conformant without MCP. Connecting the reference MCP server to your API is the fastest path and the recommended agentic integration. |
+| 4 | **Expose at least one machine-to-machine binding** | §13 + [`spec/HTTP_PROFILE.md`](./spec/HTTP_PROFILE.md) | The 6 CORE operations listed below — exposed through the HTTP binding, MCP, A2A, or an equivalent, declaring supported profiles and versions. A purely HTTP implementation is conformant without MCP. Connecting the reference MCP server to your API is the fastest path and the recommended agentic integration. |
+
+**The 6 CORE operations.** The canonical, machine-readable list lives in
+[`protocol/manifest.yaml`](./protocol/manifest.yaml) under
+`conformance.core.required_operations`; this table restates it, and
+`scripts/verify-conformance-parity.mjs` fails CI if the two disagree. Each
+satisfies one clause of the CORE sentence in
+[`certification.md`](./public/spec/certification.md): *a consumer MUST be able to
+discover an offer, know its availability before committing it, create the
+commitment, manage that commitment's lifecycle, and record evidence of delivery.*
+
+<!-- conformance:required:start -->
+
+| Operation | Clause it satisfies |
+|---|---|
+| `registry.manifest` | the node declares itself (protocol version + endpoints) |
+| `services.list` | discover an offer |
+| `scheduling.check_availability` | know availability before committing it |
+| `scheduling.book` | create the commitment |
+| `lifecycle.transition` | manage the lifecycle |
+| `delivery.record_evidence` | record evidence of delivery |
+
+<!-- conformance:required:end -->
+
+Not required, and why:
+
+- **`registry.search`** belongs to the resolver, not to your node. You become
+  discoverable by registering, not by implementing search.
+- **`scheduling.confirm`, `delivery.checkin`, `delivery.checkout`** are
+  conveniences. Their effect is reachable through the required operations —
+  `confirmed`, `in_progress` and `delivered` are all valid `lifecycle.transition`
+  targets, and `gps`/`duration` are `delivery.record_evidence` types. Implement
+  them if they fit your product; they are not conformance conditions.
+- **`payments.create_sale`** is settlement — OPTIONAL / FULL. A free or
+  externally-billed service is conformant without it.
 
 **Optional** (enhances compliance, not required for listing):
 
@@ -54,7 +88,7 @@ This is calibrated for a team that already has a working service platform (appoi
 | **8 dimensions** | Low | Data model mapping. You likely already have most fields — the work is ensuring all 8 are present and named consistently. Validate against `schema/service.schema.json`. |
 | **6+3 lifecycle states** | Low–Medium | An ordered enum with transition rules. If you already have appointment statuses, it's a mapping exercise. The key constraint is strict ordering within your implemented sequence — no skipping from `requested` to `in_progress`. Financial states are optional. |
 | **3 exception flows** | Medium | State machine branching. Cancellation is straightforward (pre-delivery → cancelled with policy). No-show requires a detection trigger and penalty logic. Rescheduling requires finding a new compatible slot while preserving provider/resource. |
-| **Machine-to-machine binding** | Medium–High | 6 operations exposed via your REST surface (HTTP binding) or by connecting the reference MCP server to it. The protocol defines the contract; you implement the logic. The hardest part is `scheduling.check_availability` (multi-party intersection: provider × client × resource). |
+| **Machine-to-machine binding** | Medium–High | The 6 CORE operations exposed via your REST surface (HTTP binding) or by connecting the reference MCP server to it. The protocol defines the contract; you implement the logic. The hardest part is `scheduling.check_availability` (multi-party intersection: provider × client × resource). |
 | **Service Orders** | Medium | A parent object that groups services under scope + pricing + payment schedule, with a computed ledger. If you already have packages or plans, it's an evolution of that concept. |
 
 **Rough timeline**: A senior developer with an existing platform can reach minimum compliance (4 mandatory requirements) in 2–4 weeks. Service Orders add another 1–2 weeks. Full compliance with all optional features is a longer investment that depends on your existing architecture.
@@ -67,7 +101,7 @@ Checklist:
 - [ ] Create a service and advance it through the 6 core states (plus the financial states if you implement them) — each transition records `from`, `to`, `at`, `by`
 - [ ] Attempt an invalid transition (e.g. `requested → in_progress`) — it must fail
 - [ ] Trigger at least 3 exception flows and verify the state machine handles them
-- [ ] Execute a discovery query (`services.list` or `scheduling.check_availability`) through your machine-to-machine binding — e.g. your HTTP surface directly, or the reference MCP server connected to your API
+- [ ] Execute every CORE operation through your machine-to-machine binding — e.g. your HTTP surface directly, or the reference MCP server connected to your API
 - [ ] Evidence is recorded on service completion (`proof.evidence` array is populated)
 
 When you pass these, open a PR adding your platform to the table below.

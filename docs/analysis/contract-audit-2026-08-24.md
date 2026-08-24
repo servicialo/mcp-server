@@ -338,6 +338,28 @@ A v2 guardrail does not exist in `scripts/` yet
 
 ---
 
+## 6. Issues opened from this audit
+
+| # | Title | Covers |
+|---|---|---|
+| [#38](https://github.com/servicialo/mcp-server/issues/38) | Version drift in doc bodies, examples and telemetry default | §3 — the 17 drifts and the blind guardrail |
+| [#39](https://github.com/servicialo/mcp-server/issues/39) | HTTP contract: profile, suite and tools disagree | §2 — three contracts per operation, five CORE lists |
+| [#40](https://github.com/servicialo/mcp-server/issues/40) | Profile 2.0 — JSON:API envelope (historical reference) | §2.2 — the design removed from normative text |
+| [#41](https://github.com/servicialo/mcp-server/issues/41) | camelCase wire bodies, and Spanish in `payments.record_payment` | §1.2, §2.3 |
+| [#42](https://github.com/servicialo/mcp-server/issues/42) | Error envelope not exercised by the reference client | §1.2 error handling, §2.2 |
+| [#43](https://github.com/servicialo/mcp-server/issues/43) | Agent card required in CORE while the A2A binding is experimental | §4 |
+| [#44](https://github.com/servicialo/mcp-server/issues/44) | Node `/v1/manifest` shape — four exist, none declared | §2.5, §4.2 (P1) |
+| [#45](https://github.com/servicialo/mcp-server/issues/45) | Registration: CORE sentence and `check_availability` | §4 (P2) |
+
+Pre-existing and **not duplicated**: [#19](https://github.com/servicialo/mcp-server/issues/19)
+(telemetry default — its build-time-derived constant remains open, only the
+literal and the guardrail landed), [#34](https://github.com/servicialo/mcp-server/issues/34)
+(§10.5 version in a normative clause),
+[PR #23](https://github.com/servicialo/mcp-server/pull/23) (`delivered`/`charged`
+vocabulary migration).
+
+---
+
 ## 6. What this audit licenses
 
 - The contract table in §1 is the input for HTTP Profile **1.1.0** and the
@@ -347,3 +369,97 @@ A v2 guardrail does not exist in `scripts/` yet
   ("not exercised by the reference client").
 - §3 gives the v2 guardrail its 14 targets.
 - §4.2 lists what must **not** be guessed.
+
+---
+
+## 7. Post-change drift audit (§8)
+
+Re-run after the work landed, across every surface: manifest ↔ profile ↔
+openapi ↔ certification ↔ IMPLEMENTORS/IMPLEMENTING ↔ adapter/tools ↔ suite ↔
+quickstart ↔ site (`lib/manifest.ts`, `app/spec/**`, `public/spec/**`).
+
+Legend: **same** — agrees with what the tool sends (paths compared after
+`translatePath`, parameter names normalised); **DIFFERENT** — disagrees, with
+the offending value; **ABSENT** — the surface does not mention the operation;
+**n/a** — the surface is not expected to; **not covered** — the suite does not
+exercise it (OPTIONAL only).
+
+| Operation | Level | Profile | OpenAPI | Level parity | Suite | Guides | Quickstart | certification.md | Site |
+|---|---|---|---|---|---|---|---|---|---|
+| `resolve.lookup` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `resolve.search` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `trust.get_score` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `registry.search` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `registry.get_organization` | OPTIONAL | same | same | same | same | n/a | same | n/a | not mentioned |
+| `registry.manifest` | REQUIRED | same | same | same | same | same | same | same | present |
+| `registry.list_verticals` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `registry.list_regions` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `registry.list_event_types` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `services.list` | REQUIRED | same | same | same | same | same | same | same | present |
+| `scheduling.check_availability` | REQUIRED | same | same | same | same | same | same | same | present |
+| `a2a.get_agent_card` | OPTIONAL | ABSENT | same | n/a | not covered | n/a | same | n/a | present |
+| `docs.quickstart` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `market.list_segments` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `market.get_benchmark` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `service.get` | OPTIONAL | same | same | same | same | n/a | same | n/a | not mentioned |
+| `contract.get` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `clients.get_or_create` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `scheduling.book` | REQUIRED | same | same | same | same | same | same | same | present |
+| `scheduling.confirm` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `lifecycle.get_state` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `lifecycle.transition` | REQUIRED | same | same | same | same | same | same | same | present |
+| `scheduling.reschedule` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `scheduling.cancel` | OPTIONAL | same | same | same | same | n/a | same | n/a | not mentioned |
+| `delivery.checkin` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `delivery.checkout` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `delivery.record_evidence` | REQUIRED | same | same | same | same | same | same | same | present |
+| `documentation.create` | OPTIONAL | same | same | same | same | n/a | same | n/a | present |
+| `payments.create_sale` | OPTIONAL | same | same | same | same | n/a | same | n/a | not mentioned |
+| `payments.record_payment` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `payments.get_status` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.list` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.get` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.create` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.update` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.delete` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resource.get_availability` | OPTIONAL | same | same | same | not covered | n/a | same | n/a | not mentioned |
+| `resolve.register` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `resolve.update_endpoint` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+| `telemetry.heartbeat` | OPTIONAL | ABSENT | ABSENT | n/a | not covered | n/a | same | n/a | not mentioned |
+
+### Residual differences
+
+**`DIFFERENT`: none.** No surface contradicts another, and no documented path
+disagrees with what a tool sends.
+
+The remaining `ABSENT` cells are a **declared scope boundary, not drift**. The
+HTTP Profile covers the operations a *node* serves; thirteen tools are served by
+the global resolver or the network layer, which no node implements. That is now
+stated in HTTP Profile §1.1 with the full list, rather than left as an
+unexplained omission — §1 previously claimed the profile mapped "every MCP
+tool", which was false.
+
+| Group | Tools | Served at |
+|---|---|---|
+| Resolver | `resolve.lookup`, `resolve.search`, `resolve.register`, `resolve.update_endpoint`, `trust.get_score`, `telemetry.heartbeat` | `/v1/resolve/*` on the global resolver |
+| Network taxonomy | `registry.list_verticals`, `registry.list_regions`, `registry.list_event_types` | `/api/registry/*` |
+| Network intelligence | `market.list_segments`, `market.get_benchmark` | `/api/benchmarks*` |
+| Client-side only | `docs.quickstart` | no network call |
+
+`a2a.get_agent_card` is a node endpoint, present in `openapi.yaml` (annotated
+`x-mcp-tool` during this pass) but outside the HTTP conformance surface — the
+A2A binding is experimental.
+
+**Suite coverage of OPTIONAL operations.** The suite exercises all six REQUIRED
+operations and twelve OPTIONAL ones. It does not exercise
+`scheduling.reschedule`, `payments.record_payment`, `payments.get_status` or the
+six `resource.*` operations. All are OPTIONAL, so no conformance claim depends
+on them; recorded here so the gap is visible rather than implied.
+
+### Verification of this table
+
+`[ejecutado: node scripts/verify-conformance-parity.mjs → PASS, 57 documented
+paths match what the tools send]`. The table above was produced by a throwaway
+script over the same extractors (`scripts/lib/tool-wire.mjs`), then deleted; the
+standing check is the CI script.
+
