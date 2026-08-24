@@ -338,6 +338,28 @@ A v2 guardrail does not exist in `scripts/` yet
 
 ---
 
+## 6. Issues opened from this audit
+
+| # | Title | Covers |
+|---|---|---|
+| [#38](https://github.com/servicialo/mcp-server/issues/38) | Version drift in doc bodies, examples and telemetry default | §3 — the 17 drifts and the blind guardrail |
+| [#39](https://github.com/servicialo/mcp-server/issues/39) | HTTP contract: profile, suite and tools disagree | §2 — three contracts per operation, five CORE lists |
+| [#40](https://github.com/servicialo/mcp-server/issues/40) | Profile 2.0 — JSON:API envelope (historical reference) | §2.2 — the design removed from normative text |
+| [#41](https://github.com/servicialo/mcp-server/issues/41) | camelCase wire bodies, and Spanish in `payments.record_payment` | §1.2, §2.3 |
+| [#42](https://github.com/servicialo/mcp-server/issues/42) | Error envelope not exercised by the reference client | §1.2 error handling, §2.2 |
+| [#43](https://github.com/servicialo/mcp-server/issues/43) | Agent card required in CORE while the A2A binding is experimental | §4 |
+| [#44](https://github.com/servicialo/mcp-server/issues/44) | Node `/v1/manifest` shape — four exist, none declared | §2.5, §4.2 (P1) |
+| [#45](https://github.com/servicialo/mcp-server/issues/45) | Registration: CORE sentence and `check_availability` | §4 (P2) |
+
+Pre-existing and **not duplicated**: [#19](https://github.com/servicialo/mcp-server/issues/19)
+(telemetry default — its build-time-derived constant remains open, only the
+literal and the guardrail landed), [#34](https://github.com/servicialo/mcp-server/issues/34)
+(§10.5 version in a normative clause),
+[PR #23](https://github.com/servicialo/mcp-server/pull/23) (`delivered`/`charged`
+vocabulary migration).
+
+---
+
 ## 6. What this audit licenses
 
 - The contract table in §1 is the input for HTTP Profile **1.1.0** and the
