@@ -165,34 +165,32 @@ export function EstandarizaSection() {
         </blockquote>
 
         <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
-          El protocolo no define un score universal de reputación, y no es un
-          olvido: un score es una interpretación, y cada tercero interpreta
-          bajo su propia política. Quien financia y quien contrata pueden leer
-          el mismo historial y llegar a decisiones distintas sin que ninguno se
-          equivoque. Lo que el protocolo puede aportar es que los hechos sean
-          los mismos y viajen; la lectura queda de cada lado.
+          La reputación es contexto, no un score universal. Cada tercero
+          interpreta el historial verificable bajo su propia política.
         </p>
 
         <p className="max-w-[620px] text-[12px] text-text-muted leading-[1.7]">
-          Los cuatro tramos son definiciones, no capacidades disponibles. El
-          protocolo modela hoy los dos primeros, y parcialmente: la{" "}
+          Los cuatro tramos son definiciones, no capacidades disponibles.
+          Servicialo modela las primitivas necesarias para producir evidencia
+          de servicio verificable; el historial portable y la reputación siguen
+          siendo hipótesis por construir y validar entre nodos independientes.
+          La{" "}
           <a
             href="/extensions#proof-of-service"
             className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
           >
             Prueba de Servicio
           </a>{" "}
-          es una extensión en borrador y la especificación normativa de
-          portabilidad del historial está en desarrollo. Qué decisiones
-          habilitaría un historial portable se trata como consecuencia
-          condicional en{" "}
+          es una extensión en borrador y la portabilidad del historial no tiene
+          todavía especificación normativa. Qué decisiones habilitaría se trata
+          en{" "}
           <a
             href="/vision#red-de-confianza"
             className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
           >
             visión
           </a>
-          , no como capacidad de hoy.
+          .
         </p>
       </div>
 

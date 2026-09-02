@@ -179,8 +179,10 @@ export default function VisionPage() {
           El mismo historial verificable puede sostener decisiones distintas.
           Quien financia mira cumplimiento y disputas. Quien opera un servicio
           mira consistencia y experiencia. Un agente mira cuánta confianza
-          necesita para actuar sin revisión humana. Por eso el protocolo no
-          define un puntaje universal:{" "}
+          necesita para actuar sin revisión humana. Los tres pueden leer el
+          mismo historial y decidir distinto sin que ninguno se equivoque,
+          porque un score es una interpretación, no un hecho. Por eso el
+          protocolo no define un puntaje universal:{" "}
           <strong className="text-text">
             no posee la reputación, y sólo puede hacer portables y verificables
             los hechos que la sustentan.

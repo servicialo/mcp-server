@@ -64,7 +64,7 @@ const LAYERS = [
     layer: "Servicialo",
     who: "",
     what:
-      "Define qué significaba la obligación de servicio, qué estado alcanzó, qué evidencia la respalda y cómo ese historial sigue siendo portable.",
+      "Define qué significaba la obligación de servicio, qué estado alcanzó, qué evidencia la respalda y cómo ese historial puede seguir siendo portable.",
     self: true,
   },
 ];
