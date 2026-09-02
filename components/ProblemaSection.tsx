@@ -8,10 +8,14 @@ const COUNTERFACTUALS = [
     body: (
       <>
         Lo que prueba que una entrega ocurrió — la confirmación, la hora real,
-        la firma, el documento — queda dentro del software que corrió esa hora.
-        No hay una forma acordada de sacarlo, así que el registro del
-        profesional deja de ser suyo: es un subproducto del sistema que eligió
-        para agendar.
+        la firma, el documento — existe, pero vive dentro del software que
+        corrió esa hora. No hay una forma acordada de sacarlo, así que el
+        registro del profesional deja de ser suyo: es un subproducto del
+        sistema que eligió para agendar. Y no queda cautiva sólo la prueba de
+        esa entrega: queda cautivo el historial. Diez años de entregas
+        acreditadas no se acumulan en un registro que viaje con quien las
+        prestó — se acumulan fragmentados entre los sistemas que se fueron
+        usando, y cada cambio de plataforma empieza el conteo de nuevo.
       </>
     ),
   },
@@ -48,7 +52,7 @@ export function ProblemaSection() {
       <SectionTitle
         tag="01 — El problema"
         title="Qué pasa si esto no se define"
-        subtitle="No es un problema de agendas. Es que no existe una forma acordada de decir qué se prometió, qué se entregó y qué lo prueba — y la ausencia tiene tres consecuencias concretas."
+        subtitle="No es un problema de agendas. La evidencia de cumplimiento existe: lo que no existe es una forma acordada de decir qué se prometió, qué se entregó y qué lo prueba — y la ausencia tiene tres consecuencias concretas."
       />
 
       <ol className="list-none space-y-7 md:space-y-8 max-w-[640px]">
