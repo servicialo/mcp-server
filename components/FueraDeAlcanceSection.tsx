@@ -36,6 +36,39 @@ const NON_GOALS = [
   },
 ];
 
+// Reparto de capas. Servicialo no necesita poseer identidad, autorización ni
+// el sobre criptográfico con que viaja la evidencia; si emerge un estándar
+// común para cualquiera de esas capas, puede expresarse como un perfil de
+// servicios sobre él.
+//
+// TODO(autor): ningún perfil de ese tipo está escrito. La afirmación es sobre
+// la forma del protocolo — semántica separada del sobre que la transporta —,
+// no sobre un trabajo de interoperabilidad existente. La nota al pie lo dice.
+const LAYERS = [
+  {
+    layer: "Identidad",
+    who: "Otro estándar",
+    what: "puede establecer quién actuó.",
+  },
+  {
+    layer: "Autorización",
+    who: "Otro estándar",
+    what: "puede establecer qué le estaba permitido hacer.",
+  },
+  {
+    layer: "Transporte y sobre de evidencia",
+    who: "Otro estándar",
+    what: "puede transportar y firmar la evidencia.",
+  },
+  {
+    layer: "Servicialo",
+    who: "",
+    what:
+      "Define qué significaba la obligación de servicio, qué estado alcanzó, qué evidencia la respalda y cómo ese historial puede seguir siendo portable.",
+    self: true,
+  },
+];
+
 export function FueraDeAlcanceSection() {
   return (
     <section id="fuera-de-alcance" className="mb-16 md:mb-24 scroll-mt-16">
@@ -70,6 +103,68 @@ export function FueraDeAlcanceSection() {
           </em>
         </p>
       </blockquote>
+
+      {/* Composabilidad: qué capa ocupa Servicialo si otra especificación gana
+          las capas de abajo. No compite con ellas — se monta encima. */}
+      <div className="border-t border-border pt-8 md:pt-9 mb-8">
+        <h3 className="font-serif text-[22px] md:text-[26px] font-medium text-text leading-[1.2] mb-5">
+          Servicialo define semántica de servicio, no el stack de confianza
+          completo
+        </h3>
+
+        <p className="max-w-[640px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-7">
+          De la lista anterior se sigue algo que conviene decir directamente:
+          Servicialo no necesita controlar el transporte, la identidad, la
+          autorización ni el mecanismo criptográfico con que viaja la
+          evidencia. Si emerge un estándar común para cualquiera de esas capas,
+          Servicialo puede expresarse como un perfil de servicios sobre él —
+          sin cambiar lo que modela.
+        </p>
+
+        <dl className="border-t border-border max-w-[700px] mb-6">
+          {LAYERS.map((row) => (
+            <div
+              key={row.layer}
+              className={`border-b border-border py-4 md:py-5 md:flex md:gap-8 ${
+                row.self ? "border-l-2 border-l-text bg-surface-alt -mx-4 px-4" : ""
+              }`}
+            >
+              <dt
+                className={`md:w-[220px] md:shrink-0 font-mono text-[12px] uppercase tracking-[0.06em] mb-2 md:mb-0 ${
+                  row.self ? "font-semibold text-text" : "text-text-muted"
+                }`}
+              >
+                {row.layer}
+              </dt>
+              <dd
+                className={`font-serif text-[15px] md:text-[16px] leading-[1.7] ${
+                  row.self ? "text-text" : "text-text-body"
+                }`}
+              >
+                {row.who && (
+                  <>
+                    <span className="text-text-muted">{row.who}</span>{" "}
+                  </>
+                )}
+                {row.what}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <p className="max-w-[640px] font-serif text-[15px] md:text-[16px] text-text-body leading-[1.75] mb-5">
+          La autorización responde qué le estaba permitido hacer a alguien.
+          Servicialo responde qué ocurrió efectivamente. Son preguntas
+          distintas, y una capa adyacente que resuelva la primera no compite
+          con la segunda: la habilita.
+        </p>
+
+        <p className="max-w-[640px] text-[12px] text-text-muted leading-[1.7]">
+          Ningún perfil de ese tipo está escrito hoy. La afirmación es sobre la
+          forma del protocolo — la semántica está separada del sobre que la
+          transporta —, no sobre un trabajo de interoperabilidad existente.
+        </p>
+      </div>
 
       <p className="max-w-[640px] text-[13px] text-text-muted leading-[1.75]">
         La declaración de no-alcance normativa vive en{" "}

@@ -32,6 +32,32 @@ const STAGES = [
   },
 ];
 
+// La cadena que explica por qué la portabilidad importa más allá de una
+// transacción suelta. Definiciones canónicas — no describen capacidades
+// disponibles hoy (ver la nota al pie de la sección).
+const CHAIN = [
+  {
+    term: "Prueba",
+    wire: "Proof",
+    def: "Evidencia verificable de una obligación o gestión particular: qué se acordó, qué entrega ocurrió y qué la acredita bajo la política vigente entre las partes.",
+  },
+  {
+    term: "Historial verificable",
+    wire: "Verified history",
+    def: "La acumulación longitudinal de esas pruebas: qué ocurrió, cuántas veces, en qué contexto, con qué excepciones y con qué disputas.",
+  },
+  {
+    term: "Reputación",
+    wire: "Reputation",
+    def: "El contexto que ese historial aporta para una decisión concreta. No es un atributo del profesional ni un número que el protocolo emita: es una lectura del historial, hecha por quien decide y bajo su política.",
+  },
+  {
+    term: "Decisión",
+    wire: "Decision",
+    def: "La acción de un tercero que cambia porque confía en ese contexto. Ahí — y no antes — el historial portable tiene valor económico.",
+  },
+];
+
 export function EstandarizaSection() {
   return (
     <section id="que-estandariza" className="mb-16 md:mb-24 scroll-mt-16">
@@ -86,6 +112,83 @@ export function EstandarizaSection() {
             className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
           >
             extensión en borrador
+          </a>
+          .
+        </p>
+      </div>
+
+      {/* De la prueba a la reputación — por qué la portabilidad no termina en
+          probar una transacción. Los cuatro tramos son definiciones, no
+          capacidades: el protocolo modela hoy los dos primeros, y de forma
+          parcial. La nota de cierre lo dice explícitamente. */}
+      <div className="border-t border-border pt-8 md:pt-9 mb-7">
+        <h3 className="font-serif text-[22px] md:text-[26px] font-medium text-text leading-[1.2] mb-5">
+          De la prueba a la reputación
+        </h3>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-7">
+          El expediente de una entrega no es el final del recorrido. La razón
+          por la que la portabilidad importa no se agota en probar una
+          transacción: se agota recién cuando el historial que esa transacción
+          integra puede viajar con quien lo generó. Cuatro tramos, cada uno con
+          un significado distinto.
+        </p>
+
+        <dl className="border-t border-border max-w-[700px] mb-7">
+          {CHAIN.map((link) => (
+            <div
+              key={link.term}
+              className="border-b border-border py-4 md:py-5 md:flex md:gap-8"
+            >
+              <dt className="md:w-[220px] md:shrink-0 mb-2 md:mb-0">
+                <div className="font-mono text-[12px] font-semibold text-text uppercase tracking-[0.06em]">
+                  {link.term}
+                </div>
+                <div className="font-mono text-[10px] text-accent mt-0.5">
+                  {link.wire}
+                </div>
+              </dt>
+              <dd className="font-serif text-[15px] md:text-[16px] text-text-body leading-[1.7]">
+                {link.def}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <blockquote className="border-b border-border pb-6 md:pb-7 mb-6">
+          <p className="font-serif text-[20px] md:text-[24px] text-text leading-[1.45]">
+            Servicialo no posee la reputación.{" "}
+            <em className="text-accent">
+              Hace portables y verificables los hechos que la sustentan.
+            </em>
+          </p>
+        </blockquote>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          La reputación es contexto, no un score universal. Cada tercero
+          interpreta el historial verificable bajo su propia política.
+        </p>
+
+        <p className="max-w-[620px] text-[12px] text-text-muted leading-[1.7]">
+          Los cuatro tramos son definiciones, no capacidades disponibles.
+          Servicialo modela las primitivas necesarias para producir evidencia
+          de servicio verificable; el historial portable y la reputación siguen
+          siendo hipótesis por construir y validar entre nodos independientes.
+          La{" "}
+          <a
+            href="/extensions#proof-of-service"
+            className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+          >
+            Prueba de Servicio
+          </a>{" "}
+          es una extensión en borrador y la portabilidad del historial no tiene
+          todavía especificación normativa. Qué decisiones habilitaría se trata
+          en{" "}
+          <a
+            href="/vision#red-de-confianza"
+            className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+          >
+            visión
           </a>
           .
         </p>

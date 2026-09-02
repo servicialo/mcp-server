@@ -160,16 +160,57 @@ export default function VisionPage() {
         </div>
       </VisionSection>
 
-      {/* Red de confianza */}
-      <VisionSection id="red-de-confianza" badge="vision" tag="04 — Red de confianza" title="Reputación derivada de entregas verificadas">
+      {/* Red de confianza — la cadena prueba → historial → reputación → decisión
+          se define en la portada (§04). Acá sólo vive su consecuencia
+          condicional: qué decisiones podría sostener un historial portable.
+          Ninguna de esas decisiones se apoya hoy en el protocolo. */}
+      <VisionSection id="red-de-confianza" badge="vision" tag="04 — Red de confianza" title="La reputación es contexto, no un puntaje">
+        <p className="text-sm md:text-[15px] text-text-body leading-[1.8] mb-4">
+          Una prueba acredita una gestión. Muchas pruebas verificables forman
+          un historial. Ese historial aporta contexto para decidir qué esperar
+          ahora. Los tres son cosas distintas, y la cadena completa —{" "}
+          prueba, historial, reputación, decisión — está definida en{" "}
+          <a href="/#que-estandariza" className="text-accent hover:underline">
+            el modelo de la portada
+          </a>
+          . Lo que sigue es su consecuencia de largo plazo, no una capacidad.
+        </p>
+        <p className="text-sm md:text-[15px] text-text-body leading-[1.8] mb-4">
+          El mismo historial verificable puede sostener decisiones distintas.
+          Quien financia mira cumplimiento y disputas. Quien opera un servicio
+          mira consistencia y experiencia. Un agente mira cuánta confianza
+          necesita para actuar sin revisión humana. Los tres pueden leer el
+          mismo historial y decidir distinto sin que ninguno se equivoque,
+          porque un score es una interpretación, no un hecho. Por eso el
+          protocolo no define un puntaje universal:{" "}
+          <strong className="text-text">
+            no posee la reputación, y sólo puede hacer portables y verificables
+            los hechos que la sustentan.
+          </strong>{" "}
+          La interpretación queda en la política de cada tercero.
+        </p>
+        <div className="bg-surface rounded-none py-5 px-4 md:px-6 border border-border mb-4">
+          <div className="font-mono text-[10px] text-accent uppercase tracking-[0.08em] mb-2">
+            La hipótesis
+          </div>
+          <div className="text-[13px] text-text-body leading-[1.7]">
+            Si un historial verificable llegara a ser portable entre
+            implementaciones independientes, un tercero podría apoyarse en él
+            para contratar, financiar, asegurar, acreditar, delegar, cobrar o
+            resolver una disputa — sin integrarse una vez por cada sistema del
+            que provino la evidencia. Ninguna de esas decisiones se apoya hoy
+            en el protocolo.
+          </div>
+        </div>
         <p className="text-sm md:text-[15px] text-text-body leading-[1.8]">
-          En una red madura de implementaciones, la reputación de un proveedor
-          podría derivarse de entregas reales verificadas a través del
-          protocolo — no de governance tokens, votos delegados ni métricas de
-          participación. El resolver ya registra un puntaje de confianza básico
-          (actividad, verificación); la reputación portable entre plataformas
-          es visión: requiere múltiples implementaciones independientes y
-          mecanismos de atestación que hoy no existen.
+          Lo que existe hoy es mucho menos que eso: el resolver registra un
+          puntaje de confianza básico (actividad, verificación) que es una
+          señal operacional de la red, no reputación de servicio. La
+          reputación portable entre plataformas requiere múltiples
+          implementaciones independientes y mecanismos de atestación que
+          todavía no existen — y de derivarse, se derivaría de entregas reales
+          verificadas a través del protocolo, no de governance tokens, votos
+          delegados ni métricas de participación.
         </p>
       </VisionSection>
 
