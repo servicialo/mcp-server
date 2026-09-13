@@ -65,8 +65,9 @@ export default function WhitepaperPage() {
           Descargar el snapshot
         </h2>
         <p className="text-[13px] text-text-muted leading-[1.7] max-w-[600px] mb-5">
-          Los PDF se conservan tal como se publicaron en marzo de 2026 y no se
-          regeneran.
+          Los PDF conservan el contenido publicado en marzo de 2026 sin cambios.
+          El 13 de septiembre de 2026 se les agregó una primera página con una
+          nota de archivo fechada.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
