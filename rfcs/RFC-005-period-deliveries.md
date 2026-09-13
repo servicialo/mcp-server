@@ -5,12 +5,12 @@
 | RFC number | 005 |
 | Title | Period Deliveries (availability obligations satisfied over a window) |
 | Author(s) | Servicialo SpA — Franco Danioni ([@danioni](https://github.com/danioni)), acting maintainer |
-| Status | Draft — Open for Comment (window opened 2026-08-23) |
+| Status | Accepted (decision 2026-09-13) — see §12 |
 | Category | Minor (additive OPTIONAL field) — 2 wks comment + 1 wk FCP per [RFC-001](RFC-001-rfc-process-and-deprecation-policy.md) §3.2 |
 | Type | Protocol Semantics |
 | Discussion | [PR #21](https://github.com/servicialo/mcp-server/pull/21) |
 | Created | 2026-08-23 |
-| Last updated | 2026-08-23 |
+| Last updated | 2026-09-13 |
 | Target version | Servicialo Protocol v1.0 |
 | Motivating analysis | [`docs/servicialo-stress-test-casos.md`](../docs/servicialo-stress-test-casos.md) — Case 3 |
 | Related | [#6](https://github.com/servicialo/mcp-server/issues/6) (`cac_resolved`); [state-dimensions](../public/spec/extensions/state-dimensions.md); [proof-of-service](../public/spec/extensions/proof-of-service.md) |
@@ -660,8 +660,22 @@ has one of (mandate scope enforcement, §10.5 — specified, unenforced, uncheck
 
 ## 12. Decision
 
-*Populated by the maintainer at acceptance. Empty while the RFC is in Draft, Open
-for Comment, or Final Comment Period.*
+**Accepted — 2026-09-13.** Sole-maintainer decision under the pre-v1.0 rule of
+RFC-001 §3.4; RFC-001 itself is unratified
+([PR #13](https://github.com/servicialo/mcp-server/pull/13) open). Comment window
+2026-08-23 → 2026-09-06, Final Comment Period through 2026-09-13. No formal
+objections under RFC-001 §3.10. One editorial change after the comment period
+(272dab7, Annex A.4: verification stated as a commitment, not a fact). §11.1
+criteria 2 (running code behind the version gate) and 3 (period fixture in the
+conformance corpus) are not met at acceptance; they gate the `Implemented`
+transition and are tracked as follow-ups.
+
+The evidence floor in §4.5 — bilateral confirmation at window close, key
+`bilateral`, L2 on the Proof of Service 0.2.0 gradient — is produced today by no
+implementation, the reference implementation included: `protocol/manifest.yaml`
+records Proof of Service as having no wire object yet, so no delivery carries a
+certainty level, and the reference server exposes no recipient-side attestation
+tool. Acceptance names that gap; it does not close it.
 
 ---
 
