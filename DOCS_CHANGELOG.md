@@ -4,6 +4,17 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-09-13 — Whitepaper PDFs: dated archive notice stamped as first page
+
+The v0.9 whitepaper PDFs served from `/whitepaper` carried no in-file warning: once downloaded they circulated without the page's archive context, while stating in the present tense that every protocol feature described exists in production (and, in the Spanish edition, a strictly ordered 9-state lifecycle with auto-verification after a silence window). Neither describes the current protocol.
+
+- **`public/docs/servicialo-whitepaper.pdf` / `servicialo-whitepaper-en.pdf`** — a one-page archive notice (ES / EN) prepended as page 1, dated 2026-09-13: historical document, v0.9 cut (March 2026), not updated; claims about what exists in production describe the state declared at that date, not the current one; current state at servicialo.com/spec. Original pages copied unchanged (the stamping script verifies them page by page); document metadata preserved except `ModDate`.
+- **`docs/archive/servicialo-whitepaper-v0.9-{es,en}.original.pdf`** — the unstamped originals, kept verbatim (checksums in `docs/archive/README.md`).
+- **`scripts/stamp-whitepaper-archive-note.py`** — reproducible stamping (pypdf + reportlab). The generators `scripts/generate-whitepaper-es.py` / `generate-whitepaper.py` remain the source of the original content.
+- **`app/whitepaper/page.tsx`** — the download blurb said the PDFs "se conservan tal como se publicaron … y no se regeneran"; it now says the content is unchanged and that a dated archive notice page was added on 2026-09-13. Nothing else on the page changed.
+
+---
+
 ## 2026-08-01 — intents.md 1.2.0: payloads verified against the reference implementation
 
 `public/spec/intents.md` claimed shapes the reference implementation (Coordinalo) never produced. Every request/response in the doc is now verified against the live implementation:
