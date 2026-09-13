@@ -787,7 +787,13 @@ expressible in JSON Schema 2020-12** (the draft these schemas declare): there is
 no cross-property comparison, and no arithmetic over `date-time` values.
 
 They are therefore not schema constraints, and this RFC does not pretend they are.
-**Both are verified in the conformance suite**, with fixtures in both directions:
+**Both are to be verified in the conformance suite, with fixtures in both
+directions.** That suite is a commitment, not a current instrument:
+`certification.md` records that verification is manual today and that the
+automated certification suite is a roadmap item that does not exist yet. The only
+automated check the repository ships today, `npm run test:http-compat`, covers the
+HTTP binding surface and does not exercise these invariants. The fixtures the
+suite is to carry:
 
 | Fixture | Expected |
 |---|---|
