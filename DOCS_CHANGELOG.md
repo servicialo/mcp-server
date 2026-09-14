@@ -4,6 +4,17 @@ Changes to Servicialo documentation, messaging, and positioning.
 
 ---
 
+## 2026-09-14 — Two stray pre-v0.9 whitepaper PDFs moved into docs/archive/
+
+Two older whitepaper PDFs sat loose in the tree — one at the repository root, one in `docs/` — with no archive notice and no link from the site or from any document in the repo. Both are distinct documents, and distinct from the two v0.9 PDFs served out of `public/docs/`. Their content does not describe the current protocol. Verified unreferenced before moving: `public/` is the only served directory and neither file was in it, `next.config.mjs` rewrites/redirects do not reach them, and the only PDF links in the codebase (`app/whitepaper/page.tsx`) point at `public/docs/`. No markdown link to any PDF exists anywhere in the repo.
+
+- **`servicialo-whitepaper.pdf` (root) → `docs/archive/servicialo-whitepaper-v1.2-es.pdf`** — "El estándar abierto para servicios profesionales en la era de agentes de inteligencia artificial", 2026-03-04, 10 pp., anonymous document metadata. A non-technical overview; its `v1.2` is the document edition, not a protocol version. States in the present tense that "Servicialo ya está funcionando", and describes registry capabilities (real-time availability, multidimensional matching, market intelligence) that are not all implemented.
+- **`docs/whitepaper.pdf` → `docs/archive/servicialo-whitepaper-v0.6.0-es.pdf`** — "Servicialo: Protocolo Abierto para Servicios Profesionales", v0.6.0, 2026-03-06, 30 pp. Declares **MIT** (current license is Apache-2.0), a strictly ordered 9-universal-state lifecycle with an invariant sequence (retired: 6 core + 3 optional financial, no total order — `PROTOCOL.md` §6, §6.0), auto-verification after a silence window (specified but unimplemented — `lifecycle.transition` requires an explicit actor), and an automatically updated ledger (`service_orders.get_ledger` is in `specified_unimplemented_tools`).
+- **Binaries unchanged.** Pure `git mv`; no stamping, since neither PDF is served — the README carries the context instead. md5 before and after the move are identical, and the files keep no `.original` suffix because they are not the input to any served PDF.
+- **`docs/archive/README.md`** — split into the existing served-originals table (unchanged) and a new chronological table for these two, with provenance, document date, page count and md5, per-document notes on what each claims, and a section listing each divergence from the current protocol against its normative reference.
+
+---
+
 ## 2026-09-13 — Whitepaper PDFs: dated archive notice stamped as first page
 
 The v0.9 whitepaper PDFs served from `/whitepaper` carried no in-file warning: once downloaded they circulated without the page's archive context, while stating in the present tense that every protocol feature described exists in production (and, in the Spanish edition, a strictly ordered 9-state lifecycle with auto-verification after a silence window). Neither describes the current protocol.
