@@ -1,4 +1,5 @@
 import { SectionTitle } from "./SectionTitle";
+import { MaturityBadge } from "./MaturityBadge";
 
 // § 03 — Declaración de no-alcance. Cada línea dice qué NO es y con qué
 // compone en su lugar. Espeja PROTOCOL.md §1.2 (Scope and Non-Goals).
@@ -37,13 +38,25 @@ const NON_GOALS = [
 ];
 
 // Reparto de capas. Servicialo no necesita poseer identidad, autorización ni
-// el sobre criptográfico con que viaja la evidencia; si emerge un estándar
-// común para cualquiera de esas capas, puede expresarse como un perfil de
-// servicios sobre él.
+// transporte. Con la evidencia la postura es distinta: el protocolo exige
+// propiedades verificables — integridad, orden, no repudio de quien atesta e
+// inclusión comprobable en un registro — y no impone el mecanismo que las
+// provee; ese mecanismo puede venir de otro estándar. Si emerge un estándar
+// común para cualquiera de esas capas, Servicialo puede expresarse como un
+// perfil de servicios sobre él.
+//
+// Estado: las propiedades exigidas están formuladas como borrador de RFC
+// (RFC-007: Propiedades verificables de la evidencia, PR #55), todavía no como
+// texto normativo de PROTOCOL.md. La línea de estado bajo el párrafo lo dice.
+// TODO(autor): cuando RFC-007 se acepte e implemente, quitar la salvedad y
+// enlazar la sección normativa en lugar del PR.
 //
 // TODO(autor): ningún perfil de ese tipo está escrito. La afirmación es sobre
-// la forma del protocolo — semántica separada del sobre que la transporta —,
-// no sobre un trabajo de interoperabilidad existente. La nota al pie lo dice.
+// la forma del protocolo — semántica separada del mecanismo que la hace
+// verificable —, no sobre un trabajo de interoperabilidad existente. La nota
+// al pie lo dice.
+const RFC_007_URL = "https://github.com/servicialo/mcp-server/pull/55";
+
 const LAYERS = [
   {
     layer: "Identidad",
@@ -58,13 +71,13 @@ const LAYERS = [
   {
     layer: "Transporte y sobre de evidencia",
     who: "Otro estándar",
-    what: "puede transportar y firmar la evidencia.",
+    what: "puede transportar la evidencia y proveer el mecanismo que la hace verificable, si cumple las propiedades que el protocolo exige.",
   },
   {
     layer: "Servicialo",
     who: "",
     what:
-      "Define qué significaba la obligación de servicio, qué estado alcanzó, qué evidencia la respalda y cómo ese historial puede seguir siendo portable.",
+      "Define qué significaba la obligación de servicio, qué estado alcanzó, qué evidencia la respalda, qué propiedades debe cumplir esa evidencia para ser verificable y cómo ese historial puede seguir siendo portable.",
     self: true,
   },
 ];
@@ -112,14 +125,36 @@ export function FueraDeAlcanceSection() {
           completo
         </h3>
 
-        <p className="max-w-[640px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-7">
+        <p className="max-w-[640px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
           De la lista anterior se sigue algo que conviene decir directamente:
-          Servicialo no necesita controlar el transporte, la identidad, la
-          autorización ni el mecanismo criptográfico con que viaja la
-          evidencia. Si emerge un estándar común para cualquiera de esas capas,
-          Servicialo puede expresarse como un perfil de servicios sobre él —
-          sin cambiar lo que modela.
+          Servicialo no necesita controlar el transporte, la identidad ni la
+          autorización. Con la evidencia la postura es distinta. El protocolo
+          exige que sea verificable — integridad, orden, no repudio de quien
+          atesta e inclusión comprobable en un registro — y no impone el
+          mecanismo criptográfico que provee esas propiedades: cualquier
+          mecanismo que las cumpla es conforme, y puede venir de otro estándar.
+          Si emerge uno común para cualquiera de esas capas, Servicialo puede
+          expresarse como un perfil de servicios sobre él — sin cambiar lo que
+          modela.
         </p>
+
+        {/* Estado de esa exigencia, pegado al párrafo que la enuncia: es un
+            borrador de RFC, no texto normativo. */}
+        <div className="max-w-[640px] flex items-start gap-2.5 mb-7">
+          <MaturityBadge maturity="draft" />
+          <p className="text-[12px] text-text-muted leading-[1.6]">
+            Las propiedades exigidas están formuladas en el borrador{" "}
+            <a
+              href={RFC_007_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              RFC-007: Propiedades verificables de la evidencia
+            </a>
+            . Todavía no forman parte del texto normativo del protocolo.
+          </p>
+        </div>
 
         <dl className="border-t border-border max-w-[700px] mb-6">
           {LAYERS.map((row) => (
@@ -161,8 +196,9 @@ export function FueraDeAlcanceSection() {
 
         <p className="max-w-[640px] text-[12px] text-text-muted leading-[1.7]">
           Ningún perfil de ese tipo está escrito hoy. La afirmación es sobre la
-          forma del protocolo — la semántica está separada del sobre que la
-          transporta —, no sobre un trabajo de interoperabilidad existente.
+          forma del protocolo — la semántica está separada del mecanismo que la
+          hace verificable —, no sobre un trabajo de interoperabilidad
+          existente.
         </p>
       </div>
 
