@@ -1,5 +1,6 @@
 import { SectionTitle } from "./SectionTitle";
 import { MaturityBadge } from "./MaturityBadge";
+import { CERTAINTY_LEVELS } from "@/lib/data";
 
 // Los cinco elementos que el protocolo representa y conecta. Los objetos
 // canónicos, sus schemas y su estado viven en protocol/manifest.yaml y se
@@ -115,6 +116,110 @@ export function EstandarizaSection() {
           </a>
           .
         </p>
+      </div>
+
+      {/* Atestación con incentivos opuestos — qué hace confiable a una
+          atestación: no la firma, sino quién atesta y qué tiene en juego. El
+          principio se enuncia; lo que corre hoy se dice en la línea de estado
+          (la relación de interés del atestante no es dato todavía — issue #53).
+          El gradiente L1–L4 se renderiza desde protocol/manifest.yaml vía
+          lib/data.ts (CERTAINTY_LEVELS), con su estado real: borrador, dentro
+          de la extensión Proof of Service. No existe objeto wire. */}
+      <div className="border-t border-border pt-8 md:pt-9 mb-7">
+        <h3 className="font-serif text-[22px] md:text-[26px] font-medium text-text leading-[1.2] mb-5">
+          Atestación con incentivos opuestos
+        </h3>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          Una firma prueba quién declaró algo y que el registro no se alteró
+          después. No prueba que lo declarado sea verdad: dos partes con el
+          mismo interés pueden firmar juntas una falsedad perfectamente
+          verificable.
+        </p>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          Por eso la certeza de una evidencia depende de quién la atesta y de
+          qué tiene en juego. Vale más cuando la confirman partes con intereses
+          opuestos — el cliente confirma la entrega que el prestador quiere
+          cobrar — y cuando quien atesta responde por lo que firma.
+        </p>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          El protocolo no resuelve la colusión por sí solo. Lo que puede hacer
+          es dejarla visible: que cada atestación diga quién la hizo y qué
+          relación tenía con la obligación, para que cada consumidor de la
+          prueba aplique su propia política sobre cuánta corroboración exige y
+          de qué tipo.
+        </p>
+
+        {/* Qué corre hoy, pegado al principio que lo motiva. */}
+        <div className="max-w-[620px] flex items-start gap-2.5 mb-7">
+          <MaturityBadge maturity="design" />
+          <p className="text-[12px] text-text-muted leading-[1.6]">
+            Hoy cada atestación registra quién la hizo y en qué rol operativo
+            (prestador, cliente, sistema o agente). Su relación de interés con
+            la obligación todavía no se expresa como dato legible por quien
+            consume la prueba. La propuesta está planteada en el{" "}
+            <a
+              href="https://github.com/servicialo/mcp-server/issues/53"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              issue #53
+            </a>
+            .
+          </p>
+        </div>
+
+        <div className="border border-border border-l-2 border-l-text bg-surface-alt py-5 px-5 md:px-6">
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className="font-mono text-[10px] font-semibold text-text uppercase tracking-[0.1em]">
+              Gradiente de certeza
+            </div>
+            <MaturityBadge maturity="draft" />
+          </div>
+          <p className="font-serif text-[15px] md:text-[16px] text-text-body leading-[1.75] mb-4">
+            El gradiente de certeza es la forma en que el protocolo expresa
+            ese principio: ordena la evidencia disponible según cuántas fuentes
+            la corroboran y qué tan independientes son de quien afirma.
+          </p>
+          <ol className="list-none border-t border-border">
+            {CERTAINTY_LEVELS.map((l) => (
+              <li
+                key={l.level}
+                className="border-b border-border py-3 md:flex md:gap-6"
+              >
+                <div className="md:w-[220px] md:shrink-0 mb-1 md:mb-0">
+                  <span className="font-mono text-[12px] font-semibold text-accent tabular-nums">
+                    {l.level}
+                  </span>
+                  <span className="font-mono text-[12px] text-text ml-2.5">
+                    {l.name}
+                  </span>
+                </div>
+                <div className="text-[13px] text-text-muted leading-[1.6]">
+                  {l.desc}
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 text-[12px] text-text-muted leading-[1.7]">
+            Los niveles se acumulan en evidencia, no en verdad: L4 no
+            significa “más cierto”, significa que además existe conciliación
+            financiera. Una entrega gratuita puede alcanzar certeza suficiente
+            sin llegar a L4, y la acreditación es una dimensión aparte,
+            definida por política. El gradiente está en diseño dentro de la
+            extensión{" "}
+            <a
+              href="/extensions#proof-of-service"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              Proof of Service
+            </a>{" "}
+            (borrador); no existe objeto wire todavía.
+          </p>
+        </div>
       </div>
 
       {/* De la prueba a la reputación — por qué la portabilidad no termina en
