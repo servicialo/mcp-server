@@ -8,7 +8,7 @@
 | Status | Draft (borrador para comentarios; pasar a *Open for Comment* es acción del mantenedor, [RFC-001](RFC-001-rfc-process-and-deprecation-policy.md) §3.4 paso 5) |
 | Category | Por confirmar en la ventana. **Major** si las propiedades entran al Core como requisito de conformance; **Minor** si entran como requisito de la extensión Proof of Service. Ver §11, pregunta 1 |
 | Type | Protocol Semantics |
-| Discussion | Este PR (el enlace se completa al abrirlo) |
+| Discussion | [PR #55](https://github.com/servicialo/mcp-server/pull/55) |
 | Created | 2026-10-08 |
 | Last updated | 2026-10-08 |
 | Target version | Servicialo Protocol v1.0 |
