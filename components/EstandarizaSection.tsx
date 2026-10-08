@@ -220,6 +220,60 @@ export function EstandarizaSection() {
             (borrador); no existe objeto wire todavía.
           </p>
         </div>
+
+        {/* Quién atesta: la persona o su agente. Cierra el bloque de
+            atestación con la dimensión que Delegated Agency (experimental)
+            todavía no lleva a la atestación misma. Lo que corre hoy se dice en
+            la línea de estado; la propuesta está en el issue #54. */}
+        <h4 className="font-serif text-[18px] md:text-[20px] font-medium text-text leading-[1.25] mt-8 mb-4">
+          Quién atesta: la persona o su agente
+        </h4>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          Una atestación puede hacerla la persona directamente o un agente que
+          actúa con mandato. Para la responsabilidad, la diferencia importa:
+          toda atestación debe poder indicar cuál de las dos fue y, si fue un
+          agente, bajo qué mandato identificable y revocable actuó. Y cada
+          política puede exigir atestación humana para ciertos hechos — una
+          recepción con consecuencias legales, por ejemplo.
+        </p>
+
+        <p className="max-w-[620px] font-serif text-[16px] md:text-[17px] text-text-body leading-[1.75] mb-5">
+          Cuando se conectan tanto las organizaciones como sus clientes
+          finales, puede haber agentes en los dos lados de la misma obligación:
+          el de quien presta y el de quien recibe. Una confirmación bilateral
+          entre dos agentes sigue siendo bilateral; que baste o no depende de
+          la política de quien consume la prueba, y para aplicarla necesita
+          saberlo.
+        </p>
+
+        {/* Qué corre hoy, pegado al principio que lo motiva. */}
+        <div className="max-w-[620px] flex items-start gap-2.5">
+          <MaturityBadge maturity="experimental" />
+          <p className="text-[12px] text-text-muted leading-[1.6]">
+            Hoy la extensión{" "}
+            <a
+              href="/extensions#delegated-agency"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              Delegated Agency
+            </a>{" "}
+            (experimental) define el mandato y exige registrarlo en las
+            transiciones hechas por agentes. El sobre de evidencia distingue el
+            método de captura, pero no vincula una atestación de agente con su
+            mandato ni con la parte a la que representa. La propuesta está
+            planteada en el{" "}
+            <a
+              href="https://github.com/servicialo/mcp-server/issues/54"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline decoration-border hover:decoration-accent underline-offset-4 transition-colors"
+            >
+              issue #54
+            </a>
+            .
+          </p>
+        </div>
       </div>
 
       {/* De la prueba a la reputación — por qué la portabilidad no termina en
